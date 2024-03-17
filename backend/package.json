@@ -1,0 +1,48 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/app.ts",
+    "dev": "concurrently \"npx tsc -w\"  \"nodemon dist/app.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^20.11.28",
+    "@types/validator": "^13.11.9",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-session": "^1.18.0",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.2.2",
+    "mongoose-findorcreate": "^4.0.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth": "^2.0.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^8.0.0",
+    "ts-node": "^10.9.2",
+    "validator": "^13.11.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.2",
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express-session": "^1.18.0",
+    "@types/passport": "^1.0.16",
+    "@types/passport-google-oauth20": "^2.0.14",
+    "@types/passport-local": "^1.0.38",
+    "nodemon": "^3.1.0"
+  }
+}
