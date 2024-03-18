@@ -1,6 +1,16 @@
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginSchema } from "../lib/schemas";
 import { DarkLink } from "./DarkLink";
 import { DarkButton } from "./DarkButton";
 import { BASE_URL } from "../lib/urls";
+
+type LoginInputs = {
+    email: string;
+    password: string;
+};
 
 const SocialLoginButton = () => {
     return (
@@ -43,31 +53,73 @@ const SocialLoginButton = () => {
 };
 
 export const LoginForm = () => {
+    const {
+        register,
+        handleSubmit,
+        setError,
+        formState: { errors },
+    } = useForm<LoginInputs>({
+        resolver: zodResolver(LoginSchema),
+    });
+
+    const navigate = useNavigate();
+
     return (
         <div className="flex justify-center items-center">
-            <form className="flex flex-col justify-start w-[26rem] bg-amber-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5 ">
+            <form
+                className="flex flex-col justify-start w-[26rem] bg-amber-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5"
+                onSubmit={handleSubmit(async (data) => {
+                    axios({
+                        method: "post",
+                        url: BASE_URL + "auth/login",
+                        withCredentials: true,
+                        data,
+                    })
+                        .then(() => {
+                            navigate("/");
+                        })
+                        .catch((error) => {
+                            if (error.response.status === 500) {
+                                setError("email", {
+                                    type: "custom",
+                                    message: "Incorrect username or password",
+                                });
+                                setError("password", {
+                                    type: "custom",
+                                    message: "Incorrect username or password",
+                                });
+                            } else {
+                                console.log(error);
+                            }
+                        });
+                })}
+            >
                 <p className="text-2xl font-bold text-center">
                     Login to your account
                 </p>
                 <div className="flex flex-col gap-2">
                     <label htmlFor="email">Email:</label>
                     <input
+                        {...register("email")}
                         className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
                         type="email"
                         id="email"
                         name="email"
                         placeholder="your@email.com"
                     />
+                    <p>{errors.email?.message}</p>
                 </div>
                 <div className="flex flex-col gap-2">
                     <label htmlFor="password">Password:</label>
                     <input
+                        {...register("password")}
                         className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
                         type="password"
                         id="password"
                         name="password"
                         placeholder="password"
                     />
+                    <p>{errors.password?.message}</p>
                 </div>
                 <div className="flex justify-center">
                     <DarkButton type="submit" text="LOGIN" />

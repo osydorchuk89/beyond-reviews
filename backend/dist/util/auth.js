@@ -35,26 +35,20 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
     })
         .catch((error) => cb(error));
 }));
-passport_1.default.use(new passport_local_1.Strategy({ usernameField: "email", passwordField: "password" }, (email, password, done) => {
+passport_1.default.use(new passport_local_1.Strategy({ usernameField: "email", passwordField: "password" }, (email, password, cb) => {
     user_1.User.findOne({ email: email })
         .then(async (user) => {
         if (!user) {
-            return done(null, false, {
-                message: "Incorrect username or password.",
-            });
+            return cb(new Error());
         }
-        else {
-            const userPassword = user.password;
-            const passwordCorrect = await bcrypt_1.default.compare(password, userPassword);
-            if (!passwordCorrect) {
-                done(null, false, {
-                    message: "Incorrect username or password.",
-                });
-                return done(null, user);
-            }
+        const userPassword = user.password;
+        const passwordCorrect = await bcrypt_1.default.compare(password, userPassword);
+        if (!passwordCorrect) {
+            return cb(new Error());
         }
+        return cb(null, user);
     })
-        .catch((error) => done(error));
+        .catch((error) => cb(error));
 }));
 passport_1.default.serializeUser(function (user, cb) {
     cb(null, user);

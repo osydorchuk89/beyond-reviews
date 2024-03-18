@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/app.ts",
-    "dev": "concurrently \"npx tsc -w\"  \"nodemon dist/app.js\""
+    "dev": "nodemon src/app.ts",
+    "start": "concurrently \"npx tsc -w\"  \"nodemon dist/app.js\""
   },
   "keywords": [],
   "author": "",

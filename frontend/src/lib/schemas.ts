@@ -1,5 +1,5 @@
 import { z } from "zod";
-// import { isMobilePhone } from "validator";
+
 export const UserSchema = z.object({
     firstName: z
         .string()
@@ -11,6 +11,19 @@ export const UserSchema = z.object({
         .trim()
         .min(1, { message: "This field is required" })
         .min(2, { message: "Last name should have at least two characters" }),
+    email: z
+        .string()
+        .trim()
+        .min(1, { message: "This field is required" })
+        .email({ message: "Please enter a valid email" }),
+    password: z
+        .string()
+        .trim()
+        .min(1, { message: "This field is required" })
+        .min(8, { message: "Password should have at least eight characters" }),
+});
+
+export const LoginSchema = z.object({
     email: z
         .string()
         .trim()

@@ -39,9 +39,7 @@ export const RegistrationForm = () => {
                         navigate("/");
                     })
                     .catch((error) => {
-                        const errorMessage: String =
-                            error.response.data.message;
-                        if (errorMessage.startsWith("E11000")) {
+                        if (error.response.status === 409) {
                             setError("email", {
                                 type: "custom",
                                 message: "User with this email already exists",
@@ -50,6 +48,18 @@ export const RegistrationForm = () => {
                             console.log(error);
                         }
                     });
+                // .catch((error) => {
+                //     const errorMessage: String =
+                //         error.response.data.message;
+                //     if (errorMessage.startsWith("E11000")) {
+                //         setError("email", {
+                //             type: "custom",
+                //             message: "User with this email already exists",
+                //         });
+                //     } else {
+                //         console.log(error);
+                //     }
+                // });
             })}
         >
             <div className="flex flex-col gap-2">
