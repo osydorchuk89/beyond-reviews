@@ -53,16 +53,16 @@ app.use("/api/users", userRouter);
 app.use("/api/hello", helloRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
-    res.send("success");
+    res.send(req.user);
 });
 
 app.get("/auth/google", passport.authenticate("google"));
 
 app.get(
     "/auth/google/callback",
-    passport.authenticate("google"),
+    passport.authenticate("google", { successRedirect: BASE_CLIENT_URL }),
     (req, res) => {
-        res.redirect(BASE_CLIENT_URL);
+        res.send(req.user);
     }
 );
 

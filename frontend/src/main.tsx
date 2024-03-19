@@ -1,5 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import { store } from "./store/index.ts";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { Root } from "./routes/Root.tsx";
 import { Home } from "./routes/Home.tsx";
 import { Registration } from "./routes/Registration.tsx";
@@ -28,8 +31,14 @@ const router = createBrowserRouter([
     },
 ]);
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <Provider store={store}>
+            <QueryClientProvider client={queryClient}>
+                <RouterProvider router={router} />
+            </QueryClientProvider>
+        </Provider>
     </React.StrictMode>
 );

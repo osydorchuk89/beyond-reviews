@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useAppDispatch } from "../store/hooks";
+import { authActions } from "../store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "../lib/schemas";
 import { DarkLink } from "./DarkLink";
@@ -62,6 +64,8 @@ export const LoginForm = () => {
         resolver: zodResolver(LoginSchema),
     });
 
+    const dispatch = useAppDispatch();
+
     const navigate = useNavigate();
 
     return (
@@ -75,7 +79,8 @@ export const LoginForm = () => {
                         withCredentials: true,
                         data,
                     })
-                        .then(() => {
+                        .then((response) => {
+                            dispatch(authActions.login(response.data));
                             navigate("/");
                         })
                         .catch((error) => {

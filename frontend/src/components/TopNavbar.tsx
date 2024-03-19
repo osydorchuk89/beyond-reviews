@@ -1,5 +1,9 @@
-import { Link } from "react-router-dom";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { authActions } from "../store";
 import { DarkButton } from "./DarkButton";
+import { BASE_URL } from "../lib/urls";
 
 const topLinks = [
     { id: 1, text: "Books", link: "#" },
@@ -8,6 +12,11 @@ const topLinks = [
 ];
 
 export const TopNavBar = () => {
+    const authData = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    console.log(authData);
+
     return (
         <nav className="sticky top-0 z-10 bg-amber-50 w-full flex items-center justify-between p-5">
             <a href="/">
@@ -25,9 +34,25 @@ export const TopNavBar = () => {
                     </li>
                 ))}
             </ul>
-            <Link to="/login">
-                <DarkButton text="LOGIN" />
-            </Link>
+            {authData.isAuthenticated ? (
+                <DarkButton
+                    text="LOGOUT"
+                    handleClick={() => {
+                        axios({
+                            method: "get",
+                            url: BASE_URL + "logout",
+                            withCredentials: true,
+                        })
+                            .then(() => dispatch(authActions.logout()))
+                            .catch((error) => console.log(error));
+                    }}
+                />
+            ) : (
+                <DarkButton
+                    text="LOGIN"
+                    handleClick={() => navigate("/login")}
+                />
+            )}
         </nav>
     );
 };
