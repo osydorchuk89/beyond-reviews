@@ -1,10 +1,10 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
-const initialState = { isAuthenticated: false, userData: null };
+const initialAuthState = { isAuthenticated: false, userData: null };
 
 const authSlice = createSlice({
     name: "auth",
-    initialState,
+    initialState: initialAuthState,
     reducers: {
         login(state, action) {
             state.isAuthenticated = true;
@@ -17,11 +17,10 @@ const authSlice = createSlice({
     },
 });
 
-export const authActions = authSlice.actions;
-
 export const store = configureStore({
     reducer: { auth: authSlice.reducer },
 });
+export const authActions = authSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -60,7 +60,9 @@ app.get("/auth/google", passport.authenticate("google"));
 
 app.get(
     "/auth/google/callback",
-    passport.authenticate("google", { successRedirect: BASE_CLIENT_URL }),
+    passport.authenticate("google", {
+        successRedirect: BASE_CLIENT_URL + "/login/success",
+    }),
     (req, res) => {
         res.send(req.user);
     }

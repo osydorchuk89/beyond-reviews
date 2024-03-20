@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { authActions } from "../store";
@@ -19,9 +20,9 @@ export const TopNavBar = () => {
 
     return (
         <nav className="sticky top-0 z-10 bg-amber-50 w-full flex items-center justify-between p-5">
-            <a href="/">
+            <Link to="/">
                 <span className="text-2xl font-bold">Beyond Reviews</span>
-            </a>
+            </Link>
             <ul className="flex gap-10">
                 {topLinks.map((item) => (
                     <li key={item.id}>

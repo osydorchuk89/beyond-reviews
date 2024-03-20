@@ -1,7 +1,7 @@
 import { useLayoutEffect, ReactNode } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { checkUser } from "../lib/checkUser";
+// import { useQuery } from "@tanstack/react-query";
+// import { checkUser } from "../lib/checkUser";
 import { TopNavBar } from "../components/TopNavbar";
 import { BottomNavBar } from "../components/BottomNavBar";
 
@@ -18,12 +18,10 @@ export const Root = () => {
         return children;
     };
 
-    const { data, isPending, isError, error } = useQuery({
-        queryKey: ["checkUser"],
-        queryFn: checkUser,
-    });
-
-    console.log(data);
+    // const { data, isLoading, isError, error } = useQuery({
+    //     queryKey: ["checkUser"],
+    //     queryFn: checkUser,
+    // });
 
     return (
         <ScrollToTopWrapper>

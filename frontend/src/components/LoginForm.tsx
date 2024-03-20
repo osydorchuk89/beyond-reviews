@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useAppDispatch } from "../store/hooks";
@@ -16,9 +17,17 @@ type LoginInputs = {
 
 const SocialLoginButton = () => {
     return (
-        <a
+        <button
             className="flex justify-center items-center relative py-2 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-200"
-            href={`${BASE_URL}auth/google`}
+            type="button"
+            onClick={() => {
+                location.href = BASE_URL + "auth/google";
+                axios({
+                    method: "get",
+                    url: BASE_URL + "auth/google/callback",
+                }).then((res) => console.log(res));
+            }}
+            // href={`${BASE_URL}auth/google`}
         >
             <div className="absolute left-3">
                 <svg
@@ -50,11 +59,12 @@ const SocialLoginButton = () => {
             <div>
                 <p className="text-xl">Login with Google </p>
             </div>
-        </a>
+        </button>
     );
 };
 
 export const LoginForm = () => {
+    const [invalidCredentials, setInvalidCredentials] = useState(false);
     const {
         register,
         handleSubmit,
@@ -71,6 +81,7 @@ export const LoginForm = () => {
     return (
         <div className="flex justify-center items-center">
             <form
+                noValidate
                 className="flex flex-col justify-start w-[26rem] bg-amber-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5"
                 onSubmit={handleSubmit(async (data) => {
                     axios({
@@ -80,19 +91,21 @@ export const LoginForm = () => {
                         data,
                     })
                         .then((response) => {
+                            setInvalidCredentials(false);
                             dispatch(authActions.login(response.data));
                             navigate("/");
                         })
                         .catch((error) => {
                             if (error.response.status === 500) {
-                                setError("email", {
-                                    type: "custom",
-                                    message: "Incorrect username or password",
-                                });
-                                setError("password", {
-                                    type: "custom",
-                                    message: "Incorrect username or password",
-                                });
+                                setInvalidCredentials(true);
+                                // setError("email", {
+                                //     type: "custom",
+                                //     message: "Incorrect username or password",
+                                // });
+                                // setError("password", {
+                                //     type: "custom",
+                                //     message: "Incorrect username or password",
+                                // });
                             } else {
                                 console.log(error);
                             }
@@ -125,13 +138,18 @@ export const LoginForm = () => {
                         placeholder="password"
                     />
                     <p>{errors.password?.message}</p>
+                    {invalidCredentials && (
+                        <p className="self-center w-fit bg-red-800 text-red-50 my-2 py-2 px-5 rounded-md">
+                            Incorrect username or password
+                        </p>
+                    )}
                 </div>
                 <div className="flex justify-center">
                     <DarkButton type="submit" text="LOGIN" />
                 </div>
                 <p className="text-center">
                     Don't have an account?{" "}
-                    <DarkLink text="Register here" link="/registration" />
+                    <DarkLink text="Register here" to="/registration" />
                 </p>
                 <p className="w-full text-center border-b-2 border-amber-950 leading-[0.1rem] my-5">
                     <span className="bg-amber-100 px-2">or</span>

@@ -9,13 +9,13 @@ export const Home = () => {
                 website.
             </p>
             <p className="text-xl">
-                <DarkLink text="Login to your account" link="/login" />
+                <DarkLink text="Login to your account" to="/login" />
             </p>
             <p className="text-xl">Or</p>
             <p className="text-xl">
-                Browse <DarkLink text="books" link="#" />,{" "}
-                <DarkLink text="movies" link="#" />, or{" "}
-                <DarkLink text="music" link="#" />
+                Browse <DarkLink text="books" to="#" />,{" "}
+                <DarkLink text="movies" to="#" />, or{" "}
+                <DarkLink text="music" to="#" />
             </p>
         </div>
     );

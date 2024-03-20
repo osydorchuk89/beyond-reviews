@@ -7,6 +7,7 @@ import { Root } from "./routes/Root.tsx";
 import { Home } from "./routes/Home.tsx";
 import { Registration } from "./routes/Registration.tsx";
 import { Login } from "./routes/Login.tsx";
+import { LoginSuccess } from "./routes/LoginSuccess.tsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
@@ -20,12 +21,21 @@ const router = createBrowserRouter([
                 element: <Home />,
             },
             {
-                path: "/registration",
+                path: "registration",
                 element: <Registration />,
             },
             {
-                path: "/login",
-                element: <Login />,
+                path: "login",
+                children: [
+                    {
+                        index: true,
+                        element: <Login />,
+                    },
+                    {
+                        path: "success",
+                        element: <LoginSuccess />,
+                    },
+                ],
             },
         ],
     },
