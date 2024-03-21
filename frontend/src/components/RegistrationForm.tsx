@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema } from "../lib/schemas";
 import { DarkButton } from "./DarkButton";
@@ -23,43 +24,38 @@ export const RegistrationForm = () => {
         resolver: zodResolver(UserSchema),
     });
 
+    const sendRegistrationFormData = async (data: RegistrationInputs) => {
+        try {
+            await axios({
+                method: "post",
+                url: BASE_API_URL + "users/",
+                data,
+            });
+            navigate("/");
+        } catch (error: any) {
+            if (error.response.status === 409) {
+                setError("email", {
+                    type: "custom",
+                    message: "User with this email already exists",
+                });
+            } else {
+                console.log(error);
+            }
+        }
+    };
+
+    const { mutate } = useMutation({
+        mutationFn: sendRegistrationFormData,
+    });
+
     const navigate = useNavigate();
 
     return (
         <form
             noValidate
             className="flex flex-col justify-start w-[36rem] px-5 pt-5 pb-10 gap-5"
-            onSubmit={handleSubmit(async (data) => {
-                axios({
-                    method: "post",
-                    url: BASE_API_URL + "users/",
-                    data,
-                })
-                    .then(() => {
-                        navigate("/");
-                    })
-                    .catch((error) => {
-                        if (error.response.status === 409) {
-                            setError("email", {
-                                type: "custom",
-                                message: "User with this email already exists",
-                            });
-                        } else {
-                            console.log(error);
-                        }
-                    });
-                // .catch((error) => {
-                //     const errorMessage: String =
-                //         error.response.data.message;
-                //     if (errorMessage.startsWith("E11000")) {
-                //         setError("email", {
-                //             type: "custom",
-                //             message: "User with this email already exists",
-                //         });
-                //     } else {
-                //         console.log(error);
-                //     }
-                // });
+            onSubmit={handleSubmit((data) => {
+                mutate(data);
             })}
         >
             <div className="flex flex-col gap-2">

@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import { useAppDispatch } from "../store/hooks";
 import { authActions } from "../store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,10 +23,10 @@ const SocialLoginButton = () => {
             type="button"
             onClick={() => {
                 location.href = BASE_URL + "auth/google";
-                axios({
-                    method: "get",
-                    url: BASE_URL + "auth/google/callback",
-                }).then((res) => console.log(res));
+                // axios({
+                //     method: "get",
+                //     url: BASE_URL + "auth/google/callback",
+                // }).then((res) => console.log(res));
             }}
             // href={`${BASE_URL}auth/google`}
         >
@@ -68,10 +69,33 @@ export const LoginForm = () => {
     const {
         register,
         handleSubmit,
-        setError,
         formState: { errors },
     } = useForm<LoginInputs>({
         resolver: zodResolver(LoginSchema),
+    });
+
+    const sendLoginFormData = async (data: LoginInputs) => {
+        try {
+            const response = await axios({
+                method: "post",
+                url: BASE_URL + "auth/login",
+                withCredentials: true,
+                data,
+            });
+            setInvalidCredentials(false);
+            dispatch(authActions.login(response.data));
+            return navigate("/");
+        } catch (error: any) {
+            if (error.response.status === 500) {
+                setInvalidCredentials(true);
+            } else {
+                console.log(error);
+            }
+        }
+    };
+
+    const { mutate } = useMutation({
+        mutationFn: sendLoginFormData,
     });
 
     const dispatch = useAppDispatch();
@@ -79,37 +103,34 @@ export const LoginForm = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="flex justify-center items-center">
+        <div className="flex flex-col justify-center items-center">
+            {invalidCredentials && (
+                <div
+                    className="flex justify-between bg-red-100 border border-red-400 text-red-700 px-4 py-2 mb-5 rounded"
+                    role="alert"
+                >
+                    <span className="block sm:inline">Invalid credentials</span>
+                    <button
+                        className="ml-3"
+                        onClick={() => setInvalidCredentials(false)}
+                    >
+                        <svg
+                            className="fill-current h-6 w-6 text-red-500"
+                            role="button"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                        >
+                            <title>Close</title>
+                            <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                        </svg>
+                    </button>
+                </div>
+            )}
             <form
                 noValidate
                 className="flex flex-col justify-start w-[26rem] bg-amber-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5"
-                onSubmit={handleSubmit(async (data) => {
-                    axios({
-                        method: "post",
-                        url: BASE_URL + "auth/login",
-                        withCredentials: true,
-                        data,
-                    })
-                        .then((response) => {
-                            setInvalidCredentials(false);
-                            dispatch(authActions.login(response.data));
-                            navigate("/");
-                        })
-                        .catch((error) => {
-                            if (error.response.status === 500) {
-                                setInvalidCredentials(true);
-                                // setError("email", {
-                                //     type: "custom",
-                                //     message: "Incorrect username or password",
-                                // });
-                                // setError("password", {
-                                //     type: "custom",
-                                //     message: "Incorrect username or password",
-                                // });
-                            } else {
-                                console.log(error);
-                            }
-                        });
+                onSubmit={handleSubmit((data) => {
+                    mutate(data);
                 })}
             >
                 <p className="text-2xl font-bold text-center">
@@ -138,11 +159,11 @@ export const LoginForm = () => {
                         placeholder="password"
                     />
                     <p>{errors.password?.message}</p>
-                    {invalidCredentials && (
+                    {/* {invalidCredentials && (
                         <p className="self-center w-fit bg-red-800 text-red-50 my-2 py-2 px-5 rounded-md">
                             Incorrect username or password
                         </p>
-                    )}
+                    )} */}
                 </div>
                 <div className="flex justify-center">
                     <DarkButton type="submit" text="LOGIN" />
