@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,7 +31,7 @@ export const RegistrationForm = () => {
                 url: BASE_API_URL + "users/",
                 data,
             });
-            navigate("/");
+            navigate({ to: "/" });
         } catch (error: any) {
             if (error.response.status === 409) {
                 setError("email", {

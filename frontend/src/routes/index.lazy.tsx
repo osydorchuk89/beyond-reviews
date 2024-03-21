@@ -1,6 +1,7 @@
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { DarkLink } from "../components/DarkLink";
 
-export const Home = () => {
+const Home = () => {
     return (
         <div className="flex flex-col justify-center items-center py-20 px-10 gap-20">
             <p className="text-5xl font-bold">Welcome to Beyond Reviews!</p>
@@ -20,3 +21,7 @@ export const Home = () => {
         </div>
     );
 };
+
+export const Route = createLazyFileRoute("/")({
+    component: Home,
+});

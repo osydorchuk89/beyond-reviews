@@ -1,6 +1,6 @@
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { authActions } from "../store";
 import { DarkButton } from "./DarkButton";
@@ -51,7 +51,7 @@ export const TopNavBar = () => {
             ) : (
                 <DarkButton
                     text="LOGIN"
-                    handleClick={() => navigate("/login")}
+                    handleClick={() => navigate({ to: "/login" })}
                 />
             )}
         </nav>

@@ -1,3 +1,4 @@
+import { createLazyFileRoute } from "@tanstack/react-router";
 import axios from "axios";
 import { useAppDispatch } from "../store/hooks";
 import { authActions } from "../store";
@@ -5,7 +6,7 @@ import { useEffect } from "react";
 import { DarkLink } from "../components/DarkLink";
 import { BASE_URL } from "../lib/urls";
 
-export const LoginSuccess = () => {
+const LoginSuccess = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -23,3 +24,7 @@ export const LoginSuccess = () => {
         </div>
     );
 };
+
+export const Route = createLazyFileRoute("/login/success")({
+    component: LoginSuccess,
+});

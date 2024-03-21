@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useAppDispatch } from "../store/hooks";
@@ -84,7 +84,7 @@ export const LoginForm = () => {
             });
             setInvalidCredentials(false);
             dispatch(authActions.login(response.data));
-            return navigate("/");
+            navigate({ to: "/" });
         } catch (error: any) {
             if (error.response.status === 500) {
                 setInvalidCredentials(true);
