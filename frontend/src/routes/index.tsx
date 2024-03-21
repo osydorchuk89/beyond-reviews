@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { DarkLink } from "../components/DarkLink";
 
 const Home = () => {
@@ -22,6 +22,6 @@ const Home = () => {
     );
 };
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createFileRoute("/")({
     component: Home,
 });

@@ -6,8 +6,10 @@ import bodyParser from "body-parser";
 import session from "express-session";
 import "dotenv/config";
 import { userRouter } from "./routes/users";
+import { movieRouter } from "./routes/movies";
 import { helloRouter } from "./routes/hello";
 import { BASE_CLIENT_URL } from "./util/urls";
+import { Movie } from "./models/movie";
 require("./util/auth");
 
 const isLoggedIn: RequestHandler = (req, res, next) => {
@@ -49,6 +51,8 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/users", userRouter);
+
+app.use("/api/movies", movieRouter);
 
 app.use("/api/hello", helloRouter);
 

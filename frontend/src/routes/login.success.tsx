@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import axios from "axios";
 import { useAppDispatch } from "../store/hooks";
 import { authActions } from "../store";
@@ -25,6 +25,6 @@ const LoginSuccess = () => {
     );
 };
 
-export const Route = createLazyFileRoute("/login/success")({
+export const Route = createFileRoute("/login/success")({
     component: LoginSuccess,
 });
