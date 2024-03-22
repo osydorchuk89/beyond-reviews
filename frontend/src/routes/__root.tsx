@@ -1,25 +1,13 @@
 import { createRootRoute } from "@tanstack/react-router";
-// import { useLayoutEffect, ReactNode } from "react";
-// import { Outlet, useLocation } from "react-router-dom";
+import { ScrollRestoration } from "@tanstack/react-router";
 import { Outlet } from "@tanstack/react-router";
 import { TopNavBar } from "../components/TopNavbar";
 import { BottomNavBar } from "../components/BottomNavBar";
 
-// interface Props {
-//     children?: ReactNode;
-// }
-
 const Root = () => {
-    // const ScrollToTopWrapper = ({ children }: Props) => {
-    //     const location = useLocation();
-    //     useLayoutEffect(() => {
-    //         document.documentElement.scrollTo(0, 0);
-    //     }, [location.pathname]);
-    //     return children;
-    // };
-
     return (
         <>
+            <ScrollRestoration />
             <TopNavBar />
             <Outlet></Outlet>
             <BottomNavBar />

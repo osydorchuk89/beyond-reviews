@@ -1,28 +1,50 @@
+import { Link } from "@tanstack/react-router";
+import { StarIcon } from "./StarIcon";
+
 interface MovieCardProps {
+    _id: string;
     title: string;
     releaseYear: number;
-    overview: string;
-    language: string;
+    genres: string[];
     avgVote: number;
     numVotes: number;
     poster: string;
 }
 
-export const MovieCard = ({ ...props }: MovieCardProps) => {
+export const MovieCard = ({
+    _id,
+    title,
+    releaseYear,
+    genres,
+    avgVote,
+    numVotes,
+    poster,
+}: MovieCardProps) => {
+    const mainGenres =
+        genres.length > 1 ? `${genres[0]} | ${genres[1]}` : genres[0];
+
     return (
-        <div className="flex flex-col w-72 justify-start items-center border border-amber-950 rounded-lg p-5">
-            <p className="text-center text-lg font-bold h-14 mb-2">
-                {props.title} ({props.releaseYear})
+        <div className="flex flex-col w-80 justify-start items-center bg-amber-100 rounded-lg shadow-lg p-5">
+            <p className="text-center text-lg font-bold h-14">
+                <Link
+                    className="hover:underline"
+                    to="/movies/$movieId"
+                    params={{
+                        movieId: _id,
+                    }}
+                >
+                    {title} ({releaseYear})
+                </Link>
             </p>
-            <img
-                src={`https://image.tmdb.org/t/p/w600_and_h900_bestv2/${props.poster}`}
-                className="rounded-lg"
-            />
-            <p className="text-sm my-5 line-clamp-5 min-h-24">
-                {props.overview}
-            </p>
-            <p>Average Vote: {props.avgVote}</p>
-            <p>Number of Votes: {props.numVotes}</p>
+            <p className="mb-2">{mainGenres}</p>
+            <img src={poster} className="rounded-lg" />
+            <div className="flex mt-4">
+                <span>
+                    <StarIcon className="w-6 h-6 fill-yellow-500 border-none" />
+                </span>
+                <span>{avgVote.toPrecision(2)}</span>
+                <span className="text-gray-600 ml-5">{numVotes} votes</span>
+            </div>
         </div>
     );
 };

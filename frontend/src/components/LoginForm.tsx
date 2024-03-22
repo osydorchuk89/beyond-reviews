@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useAppDispatch } from "../store/hooks";
@@ -73,6 +73,7 @@ export const LoginForm = () => {
     } = useForm<LoginInputs>({
         resolver: zodResolver(LoginSchema),
     });
+    const { history } = useRouter();
 
     const sendLoginFormData = async (data: LoginInputs) => {
         try {
@@ -84,7 +85,8 @@ export const LoginForm = () => {
             });
             setInvalidCredentials(false);
             dispatch(authActions.login(response.data));
-            navigate({ to: "/" });
+            history.back();
+            // navigate({ to: "/" });
         } catch (error: any) {
             if (error.response.status === 500) {
                 setInvalidCredentials(true);
@@ -159,11 +161,6 @@ export const LoginForm = () => {
                         placeholder="password"
                     />
                     <p>{errors.password?.message}</p>
-                    {/* {invalidCredentials && (
-                        <p className="self-center w-fit bg-red-800 text-red-50 my-2 py-2 px-5 rounded-md">
-                            Incorrect username or password
-                        </p>
-                    )} */}
                 </div>
                 <div className="flex justify-center">
                     <DarkButton type="submit" text="LOGIN" />
