@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-const { Schema } = mongoose;
+import { Schema, model, Types } from "mongoose";
 
 export interface IMovie {
     title: string;
@@ -11,6 +10,7 @@ export interface IMovie {
     runtime: number;
     avgVote: number;
     numVotes: number;
+    ratings: Types.ObjectId[];
     poster: string;
 }
 
@@ -24,7 +24,8 @@ const movieSchema = new Schema<IMovie>({
     runtime: Number,
     avgVote: Number,
     numVotes: Number,
+    ratings: [{ type: Schema.Types.ObjectId, ref: "UserRating" }],
     poster: String,
 });
 
-export const Movie = mongoose.model<IMovie>("Movie", movieSchema);
+export const Movie = model<IMovie>("Movie", movieSchema);

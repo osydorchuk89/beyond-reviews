@@ -22,3 +22,13 @@ export const UserSchema = z.object({
         .min(1, { message: "This field is required" })
         .min(8, { message: "Password should have at least eight characters" }),
 });
+
+export const UserRatingSchema = z.object({
+    movieRating: z.coerce
+        .number({
+            invalid_type_error: "Please select rating",
+        })
+        .min(1)
+        .max(10),
+    movieReview: z.string().optional(),
+});

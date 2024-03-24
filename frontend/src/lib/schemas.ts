@@ -29,9 +29,15 @@ export const LoginSchema = z.object({
         .trim()
         .min(1, { message: "This field is required" })
         .email({ message: "Please enter a valid email" }),
-    password: z
-        .string()
-        .trim()
-        .min(1, { message: "This field is required" })
-        .min(8, { message: "Password should have at least eight characters" }),
+    password: z.string().trim().min(1, { message: "This field is required" }),
+});
+
+export const UserRatingSchema = z.object({
+    movieRating: z.coerce
+        .number({
+            invalid_type_error: "Please select rating",
+        })
+        .min(1)
+        .max(10),
+    movieReview: z.string().optional(),
 });

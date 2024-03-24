@@ -1,6 +1,18 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
-const initialAuthState = { isAuthenticated: false, userData: null };
+interface AuthState {
+    isAuthenticated: boolean;
+    userData: {
+        _id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        password?: string;
+        googleId?: string;
+    } | null;
+}
+
+const initialAuthState: AuthState = { isAuthenticated: false, userData: null };
 
 const authSlice = createSlice({
     name: "auth",

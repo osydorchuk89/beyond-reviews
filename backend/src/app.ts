@@ -9,10 +9,9 @@ import { userRouter } from "./routes/users";
 import { movieRouter } from "./routes/movies";
 import { helloRouter } from "./routes/hello";
 import { BASE_CLIENT_URL } from "./util/urls";
-import { Movie } from "./models/movie";
 require("./util/auth");
 
-const isLoggedIn: RequestHandler = (req, res, next) => {
+export const isLoggedIn: RequestHandler = (req, res, next) => {
     if (req.isAuthenticated()) {
         next();
     } else {

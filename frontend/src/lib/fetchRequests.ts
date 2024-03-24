@@ -1,28 +1,6 @@
 import axios from "axios";
 import { BASE_API_URL } from "./urls";
 
-// const genres = {
-//     12: "Adventure",
-//     14: "Fantasy",
-//     16: "Animation",
-//     18: "Drama",
-//     27: "Horror",
-//     28: "Action",
-//     35: "Comedy",
-//     36: "History",
-//     37: "Western",
-//     53: "Thriller",
-//     80: "Crime",
-//     99: "Documentary",
-//     878: "Science Fiction",
-//     9648: "Mystery",
-//     10402: "Music",
-//     10749: "Romance",
-//     10751: "Family",
-//     10752: "War",
-//     10770: "TV Movie",
-// };
-
 const BASE_URL = "https://api.themoviedb.org/3/movie/";
 
 export const fetchMovies = async (page: Number) => {
@@ -67,7 +45,8 @@ export const fetchMovies = async (page: Number) => {
                 runtime: movieData.runtime,
                 avgVote: movieData.vote_average,
                 numVotes: movieData.vote_count,
-                poster: `https://image.tmdb.org/t/p/w600_and_h900_bestv2/${movieData.poster_path}`,
+                ratings: [],
+                poster: `https://image.tmdb.org/t/p/w600_and_h900_bestv2${movieData.poster_path}`,
             });
             console.log("done");
         }
