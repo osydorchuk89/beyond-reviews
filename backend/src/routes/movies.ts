@@ -17,7 +17,9 @@ movieRouter.get("/", async (req, res) => {
 
 movieRouter.get("/:movieId", async (req, res) => {
     try {
-        const movie = await Movie.findById(req.params.movieId);
+        const movie = await Movie.findById(req.params.movieId).populate(
+            "ratings"
+        );
         res.send(movie);
     } catch (error) {
         res.send(error);
@@ -64,6 +66,7 @@ movieRouter.post("/:movieId/ratings", async (req, res) => {
                 }
                 movie.ratings.push(userRating._id);
                 await Movie.findByIdAndUpdate(req.params.movieId, movie);
+                res.status(200).send();
             } else {
                 res.status(500).send({
                     message: "Could not update movie ratings",

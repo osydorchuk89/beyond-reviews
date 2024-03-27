@@ -1,4 +1,5 @@
 import axios from "axios";
+import { store } from "../store";
 import { createFileRoute } from "@tanstack/react-router";
 import { BASE_API_URL } from "../lib/urls";
 import { MovieMainInfo, MovieAddInfo } from "../components/MovieInfo";
@@ -17,11 +18,14 @@ const MovieDetails = () => {
 };
 
 const fetchMovie = async (movieId: string) => {
+    const userId = store.getState().auth.userData?._id;
     try {
         const response = await axios({
             method: "get",
             url: `${BASE_API_URL}movies/${movieId}`,
         });
+        if (userId) {
+        }
         return response.data;
     } catch (error) {
         console.log(error);
@@ -30,7 +34,7 @@ const fetchMovie = async (movieId: string) => {
 
 export const Route = createFileRoute("/movies/$movieId")({
     component: MovieDetails,
-    loader: async ({ params }) => {
+    loader: ({ params }) => {
         return fetchMovie(params.movieId);
     },
 });

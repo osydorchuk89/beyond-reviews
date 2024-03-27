@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useAppSelector } from "../store/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useLoaderData } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import { Movie, MovieRating } from "../lib/types";
 import { UserRatingSchema } from "../lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DarkButton } from "./DarkButton";
@@ -18,32 +19,61 @@ interface RatingInputs {
 
 export const MovieRatingForm = () => {
     const authData = useAppSelector((state) => state.auth);
-    const { movieId } = useParams({ strict: false });
+    const userId = authData.userData?._id;
+    const movie: Movie = useLoaderData({ from: "/movies/$movieId" });
+    const { movieId } = useParams({ strict: false }) as { movieId: string };
 
-    const getUserRating = async () => {
-        if (authData.userData) {
-            try {
-                const response = await axios({
-                    method: "get",
-                    url: BASE_API_URL + "movies/" + movieId + "/ratings",
-                    withCredentials: true,
-                    params: {
-                        userId: authData.userData._id,
-                    },
-                });
-                return response.data;
-            } catch (error) {
-                console.log(error);
-            }
-        } else {
-            return null;
+    const [rating, setRating] = useState(0);
+    const [hover, setHover] = useState(0);
+    const [review, setReview] = useState("no review");
+    const [hasRated, setHasRated] = useState(false);
+
+    // const getUserRating = async () => {
+    //     if (authData.userData) {
+    //         try {
+    //             const response = await axios({
+    //                 method: "get",
+    //                 url: BASE_API_URL + "movies/" + movieId + "/ratings",
+    //                 withCredentials: true,
+    //                 params: {
+    //                     userId: authData.userData._id,
+    //                 },
+    //             });
+    //             if (response.data) {
+    //                 setRating(response.data.movieRating);
+    //                 setHover(response.data.movieRating);
+    //                 response.data.movieReview &&
+    //                     setReview(response.data.movieReview);
+    //                 setHasRated(true);
+    //                 return response.data;
+    //             } else {
+    //                 return null;
+    //             }
+    //         } catch (error) {
+    //             console.log(error);
+    //         }
+    //     } else {
+    //         return null;
+    //     }
+    // };
+
+    // const { data } = useQuery({
+    //     queryKey: ["user-rating"],
+    //     queryFn: getUserRating,
+    // });
+
+    useEffect(() => {
+        const movieRatings = movie.ratings as MovieRating[];
+        const currentUserRating = movieRatings.find(
+            (item) => item.userId === userId
+        );
+        if (currentUserRating) {
+            setRating(currentUserRating.movieRating);
+            setHover(currentUserRating.movieRating);
+            setReview(currentUserRating.movieReview);
+            setHasRated(true);
         }
-    };
-
-    const query = useQuery({
-        queryKey: ["user-rating"],
-        queryFn: getUserRating,
-    });
+    }, [movieId]);
 
     const {
         register,
@@ -56,7 +86,6 @@ export const MovieRatingForm = () => {
     });
 
     const sendUserRatingData = async (data: RatingInputs) => {
-        console.log(movieId);
         try {
             await axios({
                 method: "post",
@@ -64,7 +93,8 @@ export const MovieRatingForm = () => {
                 withCredentials: true,
                 data: { ...data, userId: authData.userData!._id },
             });
-            console.log("succesfully posted rating");
+            setHasRated(true);
+            setReview(data.movieReview || "no review");
         } catch (error: any) {
             console.log(error);
         }
@@ -74,16 +104,11 @@ export const MovieRatingForm = () => {
         mutationFn: sendUserRatingData,
     });
 
-    const initialRating = query.data?.movieRating || 0;
-
-    const [rating, setRating] = useState(initialRating);
-    const [hover, setHover] = useState(initialRating);
-
     let starClassName = "w-8 h-8 border-none hover:cursor-pointer";
 
     return (
         <div>
-            {authData.isAuthenticated ? (
+            {authData.isAuthenticated && !hasRated && (
                 <form
                     noValidate
                     onSubmit={handleSubmit((data) => {
@@ -139,7 +164,24 @@ export const MovieRatingForm = () => {
                     </div>
                     <DarkButton type="submit" text="RATE" />
                 </form>
-            ) : (
+            )}
+            {authData.isAuthenticated && hasRated && (
+                <div className="flex flex-col gap-5">
+                    <p>
+                        <span className="font-bold">Your rating: </span>
+                        {rating}/10
+                    </p>
+                    <p>
+                        {" "}
+                        <span className="font-bold">Your review: </span>
+                        {review}
+                    </p>
+                    <div className="flex justify-start">
+                        <DarkButton text="EDIT YOUR RATING" />
+                    </div>
+                </div>
+            )}
+            {!authData.isAuthenticated && (
                 <p className="px-4 py-2 bg-amber-100 rounded-md">
                     To rate the movie or post a review, please{" "}
                     <DarkLink
