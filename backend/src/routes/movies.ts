@@ -54,10 +54,11 @@ movieRouter.post("/:movieId/ratings", async (req, res) => {
                     userId: req.body.userId,
                     movieId: req.params.movieId,
                 },
-                { upsert: true, new: true, setDefaultsOnInsert: true }
+                { upsert: true, new: true }
             );
             const movie = await Movie.findById(req.params.movieId);
             if (movie) {
+                //adding rating to ratings array
                 if (movie.ratings.includes(userRating._id)) {
                     const userRatingIndex = movie.ratings.indexOf(
                         userRating._id
@@ -65,6 +66,20 @@ movieRouter.post("/:movieId/ratings", async (req, res) => {
                     movie.ratings.splice(userRatingIndex, 1);
                 }
                 movie.ratings.push(userRating._id);
+                //adding rating to ratings array
+                //updating average rating and number of ratings
+                const movieRatings = await UserRating.find({
+                    _id: {
+                        $in: movie.ratings,
+                    },
+                });
+                movie.avgRating =
+                    movieRatings.reduce(
+                        (acc, item) => acc + item.movieRating,
+                        0
+                    ) / movieRatings.length;
+                movie.numRatings = movieRatings.length;
+                //updating average rating and number of ratings
                 await Movie.findByIdAndUpdate(req.params.movieId, movie);
                 res.status(200).send();
             } else {

@@ -1,6 +1,8 @@
-import { useLoaderData } from "@tanstack/react-router";
+import { useLoaderData, useParams } from "@tanstack/react-router";
 import { Movie } from "../lib/types";
 import { StarIcon } from "./StarIcon";
+import { useQuery } from "@tanstack/react-query";
+import { getMovie } from "../lib/requests";
 
 export const MovieMainInfo = () => {
     const movie: Movie = useLoaderData({ from: "/movies/$movieId" });
@@ -17,6 +19,14 @@ export const MovieMainInfo = () => {
 
 export const MovieAddInfo = () => {
     const movie: Movie = useLoaderData({ from: "/movies/$movieId" });
+
+    const { movieId } = useParams({ strict: false }) as { movieId: string };
+
+    const { data } = useQuery({
+        queryKey: ["movie", "info"],
+        queryFn: () => getMovie(movieId),
+    });
+
     return (
         <div className="flex flex-col gap-5 text-lg mb-5">
             <p>
@@ -28,9 +38,11 @@ export const MovieAddInfo = () => {
                 <span>{movie.runtime} min</span>
                 <span className="flex">
                     <StarIcon className="w-6 h-6 fill-yellow-500 border-none" />{" "}
-                    {movie.avgVote.toPrecision(2)}
+                    {data?.avgRating.toPrecision(2) ||
+                        movie.avgRating.toPrecision(2) ||
+                        "N/A"}
                 </span>
-                <span>{movie.numVotes} votes</span>
+                <span>{data?.numRatings || movie.numRatings || 0} votes</span>
             </div>
             <p>{movie.overview}</p>
         </div>

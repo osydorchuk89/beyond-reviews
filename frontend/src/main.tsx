@@ -4,7 +4,8 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { Provider } from "react-redux";
 import { store } from "./store/index.ts";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/requests.ts";
 import "./index.css";
 
 const router = createRouter({ routeTree });
@@ -14,8 +15,6 @@ declare module "@tanstack/react-router" {
         router: typeof router;
     }
 }
-
-const queryClient = new QueryClient();
 
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {

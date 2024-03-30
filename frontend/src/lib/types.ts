@@ -14,6 +14,8 @@ export interface Movie {
     director: string;
     overview: string;
     ratings: string[] | MovieRating[];
+    avgRating: number;
+    numRatings: number;
     genres: string[];
     runtime: number;
     language: string;

@@ -1,6 +1,6 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
-interface AuthState {
+export interface AuthState {
     isAuthenticated: boolean;
     userData: {
         _id: string;

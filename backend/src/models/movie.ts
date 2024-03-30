@@ -11,6 +11,8 @@ export interface IMovie {
     avgVote: number;
     numVotes: number;
     ratings: Types.ObjectId[];
+    avgRating: number;
+    numRatings: number;
     poster: string;
 }
 
@@ -25,6 +27,8 @@ const movieSchema = new Schema<IMovie>({
     avgVote: Number,
     numVotes: Number,
     ratings: [{ type: Schema.Types.ObjectId, ref: "UserRating" }],
+    avgRating: Number,
+    numRatings: Number,
     poster: String,
 });
 

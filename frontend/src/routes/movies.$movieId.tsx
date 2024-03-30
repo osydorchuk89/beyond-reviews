@@ -4,6 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { BASE_API_URL } from "../lib/urls";
 import { MovieMainInfo, MovieAddInfo } from "../components/MovieInfo";
 import { MovieRatingForm } from "../components/MovieRatingForm";
+import { getMovie } from "../lib/requests";
 
 const MovieDetails = () => {
     return (
@@ -17,24 +18,24 @@ const MovieDetails = () => {
     );
 };
 
-const fetchMovie = async (movieId: string) => {
-    const userId = store.getState().auth.userData?._id;
-    try {
-        const response = await axios({
-            method: "get",
-            url: `${BASE_API_URL}movies/${movieId}`,
-        });
-        if (userId) {
-        }
-        return response.data;
-    } catch (error) {
-        console.log(error);
-    }
-};
+// const fetchMovie = async (movieId: string) => {
+//     const userId = store.getState().auth.userData?._id;
+//     try {
+//         const response = await axios({
+//             method: "get",
+//             url: `${BASE_API_URL}movies/${movieId}`,
+//         });
+//         if (userId) {
+//         }
+//         return response.data;
+//     } catch (error) {
+//         console.log(error);
+//     }
+// };
 
 export const Route = createFileRoute("/movies/$movieId")({
     component: MovieDetails,
     loader: ({ params }) => {
-        return fetchMovie(params.movieId);
+        return getMovie(params.movieId);
     },
 });
