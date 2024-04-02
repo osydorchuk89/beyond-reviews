@@ -3,6 +3,7 @@ import { Movie } from "../lib/types";
 import { StarIcon } from "./StarIcon";
 import { useQuery } from "@tanstack/react-query";
 import { getMovie } from "../lib/requests";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export const MovieMainInfo = () => {
     const movie: Movie = useLoaderData({ from: "/movies/$movieId" });
@@ -19,13 +20,18 @@ export const MovieMainInfo = () => {
 
 export const MovieAddInfo = () => {
     const movie: Movie = useLoaderData({ from: "/movies/$movieId" });
-
     const { movieId } = useParams({ strict: false }) as { movieId: string };
 
-    const { data } = useQuery({
+    const { data, isFetching } = useQuery({
         queryKey: ["movie", "info"],
         queryFn: () => getMovie(movieId),
     });
+
+    const avgRating =
+        data?.avgRating?.toPrecision(2) ||
+        movie.avgRating?.toPrecision(2) ||
+        "N/A";
+    const numRatings = data?.numRatings || movie.numRatings || 0;
 
     return (
         <div className="flex flex-col gap-5 text-lg mb-5">
@@ -36,13 +42,16 @@ export const MovieAddInfo = () => {
             <p className="font-bold">Directed by: {movie.director}</p>
             <div className="flex gap-5 text-gray-600 ">
                 <span>{movie.runtime} min</span>
-                <span className="flex">
-                    <StarIcon className="w-6 h-6 fill-yellow-500 border-none" />{" "}
-                    {data?.avgRating.toPrecision(2) ||
-                        movie.avgRating.toPrecision(2) ||
-                        "N/A"}
-                </span>
-                <span>{data?.numRatings || movie.numRatings || 0} votes</span>
+                {isFetching ? (
+                    <LoadingSpinner />
+                ) : (
+                    <span className="flex">
+                        <StarIcon className="w-6 h-6 fill-yellow-500 border-none" />{" "}
+                        {avgRating}
+                    </span>
+                )}
+
+                <span>{numRatings} votes</span>
             </div>
             <p>{movie.overview}</p>
         </div>

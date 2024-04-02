@@ -1,7 +1,4 @@
-import axios from "axios";
-import { store } from "../store";
 import { createFileRoute } from "@tanstack/react-router";
-import { BASE_API_URL } from "../lib/urls";
 import { MovieMainInfo, MovieAddInfo } from "../components/MovieInfo";
 import { MovieRatingForm } from "../components/MovieRatingForm";
 import { getMovie } from "../lib/requests";

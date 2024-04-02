@@ -3,7 +3,7 @@ import { useAppSelector } from "../store/hooks";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../lib/requests";
-import { useParams } from "@tanstack/react-router";
+import { useLoaderData, useParams } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { UserRatingSchema } from "../lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,9 @@ import { DarkButton } from "./DarkButton";
 import { DarkLink } from "./DarkLink";
 import { StarIcon } from "./StarIcon";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { SuccessAlert } from "./SuccesAlert";
 import { BASE_API_URL } from "../lib/urls";
+import { Movie, MovieRating } from "../lib/types";
 
 interface RatingInputs {
     movieRating: number;
@@ -20,20 +22,25 @@ interface RatingInputs {
 }
 
 export const MovieRatingForm = () => {
-    const authData = useAppSelector((state) => state.auth);
     const { movieId } = useParams({ strict: false }) as { movieId: string };
+    const authData = useAppSelector((state) => state.auth);
+    const userId = authData.userData?._id;
+    const movie: Movie = useLoaderData({ from: "/movies/$movieId" });
+    const ratings = movie.ratings as MovieRating[];
+    const userRating =
+        ratings.filter((item) => item.userId === userId)[0]?.movieRating || 0;
 
     const [isEditing, setIsEditing] = useState(false);
+    const [successAlert, setSuccessAlert] = useState(false);
+    const [rating, setRating] = useState(userRating);
+    const [hover, setHover] = useState(userRating);
+    const [hasRated, setHasRated] = useState(userRating > 0 ? true : false);
 
     const { data, isFetching } = useQuery({
-        queryKey: ["movie", "userRating", { authData }],
+        queryKey: ["movie", "userRating", authData, movieId],
         queryFn: () => getUserRating(authData, movieId),
         staleTime: 60000,
     });
-
-    const [rating, setRating] = useState(data?.movieRating || 0);
-    const [hover, setHover] = useState(data?.movieRating || 0);
-    const [hasRated, setHasRated] = useState(data ? true : false);
 
     const {
         register,
@@ -55,6 +62,7 @@ export const MovieRatingForm = () => {
             });
             setHasRated(true);
             setIsEditing(false);
+            setSuccessAlert(true);
         } catch (error: any) {
             console.log(error);
         }
@@ -76,8 +84,6 @@ export const MovieRatingForm = () => {
     });
 
     let starClassName = "w-8 h-8 border-none hover:cursor-pointer";
-
-    console.log(hasRated);
 
     return (
         <div>
@@ -186,6 +192,7 @@ export const MovieRatingForm = () => {
                     )}
                 </div>
             )}
+            {successAlert && <SuccessAlert />}
         </div>
     );
 };

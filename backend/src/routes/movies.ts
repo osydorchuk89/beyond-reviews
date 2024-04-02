@@ -16,10 +16,9 @@ movieRouter.get("/", async (req, res) => {
 });
 
 movieRouter.get("/:movieId", async (req, res) => {
+    const movieId = req.params.movieId;
     try {
-        const movie = await Movie.findById(req.params.movieId).populate(
-            "ratings"
-        );
+        const movie = await Movie.findById(movieId).populate("ratings");
         res.send(movie);
     } catch (error) {
         res.send(error);
@@ -30,8 +29,13 @@ movieRouter.get("/:movieId/ratings", async (req, res) => {
     const { userId } = req.query;
     const { movieId } = req.params;
     try {
-        const userRating = await UserRating.findOne({ userId, movieId });
-        res.send(userRating);
+        if (userId) {
+            const userRating = await UserRating.findOne({ userId, movieId });
+            res.send(userRating);
+        } else {
+            const userRating = await UserRating.find({ movieId });
+            res.send(userRating);
+        }
     } catch (error) {
         res.send(error);
     }

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AuthState, store } from "../store";
+import { AuthState } from "../store";
 import { BASE_API_URL } from "./urls";
 import { QueryClient } from "@tanstack/react-query";
 
@@ -30,14 +30,11 @@ export const getUserRating = async (authData: AuthState, movieId: string) => {
 };
 
 export const getMovie = async (movieId: string) => {
-    const userId = store.getState().auth.userData?._id;
     try {
         const response = await axios({
             method: "get",
             url: `${BASE_API_URL}movies/${movieId}`,
         });
-        if (userId) {
-        }
         return response.data;
     } catch (error) {
         console.log(error);
