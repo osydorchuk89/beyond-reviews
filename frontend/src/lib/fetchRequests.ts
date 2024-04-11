@@ -43,8 +43,8 @@ export const fetchMovies = async (page: Number) => {
                 language: movieData.original_language,
                 genres: movieGenres,
                 runtime: movieData.runtime,
-                avgVote: movieData.vote_average,
-                numVotes: movieData.vote_count,
+                avgRating: 0,
+                numRatings: 0,
                 ratings: [],
                 poster: `https://image.tmdb.org/t/p/w600_and_h900_bestv2${movieData.poster_path}`,
             });

@@ -12,7 +12,12 @@ export interface AuthState {
     } | null;
 }
 
+interface DialogState {
+    isOpen: boolean;
+}
+
 const initialAuthState: AuthState = { isAuthenticated: false, userData: null };
+const initialDialogState: DialogState = { isOpen: false };
 
 const authSlice = createSlice({
     name: "auth",
@@ -29,10 +34,24 @@ const authSlice = createSlice({
     },
 });
 
+const dialogSlice = createSlice({
+    name: "dialog",
+    initialState: initialDialogState,
+    reducers: {
+        open(state) {
+            state.isOpen = true;
+        },
+        close(state) {
+            state.isOpen = false;
+        },
+    },
+});
+
 export const store = configureStore({
-    reducer: { auth: authSlice.reducer },
+    reducer: { auth: authSlice.reducer, dialog: dialogSlice.reducer },
 });
 export const authActions = authSlice.actions;
+export const dialogActions = dialogSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

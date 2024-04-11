@@ -6,8 +6,8 @@ interface MovieCardProps {
     title: string;
     releaseYear: number;
     genres: string[];
-    avgVote: number;
-    numVotes: number;
+    avgRating: number;
+    numRatings: number;
     poster: string;
 }
 
@@ -16,8 +16,8 @@ export const MovieCard = ({
     title,
     releaseYear,
     genres,
-    avgVote,
-    numVotes,
+    avgRating,
+    numRatings,
     poster,
 }: MovieCardProps) => {
     const mainGenres =
@@ -42,8 +42,8 @@ export const MovieCard = ({
                 <span>
                     <StarIcon className="w-6 h-6 fill-yellow-500 border-none" />
                 </span>
-                <span>{avgVote.toPrecision(2)}</span>
-                <span className="text-gray-600 ml-5">{numVotes} votes</span>
+                <span>{avgRating.toPrecision(2)}</span>
+                <span className="text-gray-600 ml-5">{numRatings} votes</span>
             </div>
         </div>
     );

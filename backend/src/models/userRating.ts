@@ -5,6 +5,7 @@ export interface IUserRating {
     movieId: Types.ObjectId;
     movieRating: number;
     movieReview?: string;
+    date: Date;
 }
 
 const userRatingSchema = new Schema<IUserRating>({
@@ -12,6 +13,7 @@ const userRatingSchema = new Schema<IUserRating>({
     movieId: { type: Schema.Types.ObjectId, ref: "Movie" },
     movieRating: Number,
     movieReview: String,
+    date: Date,
 });
 
 export const UserRating = model<IUserRating>("UserRating", userRatingSchema);

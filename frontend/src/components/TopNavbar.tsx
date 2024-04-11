@@ -23,7 +23,7 @@ export const TopNavBar = () => {
     const activeLinkClassName = linkClassName + " bg-amber-300";
 
     return (
-        <nav className="sticky top-0 z-10 bg-amber-50 w-full flex items-center justify-between p-5">
+        <nav className="sticky top-0 bg-amber-50 w-full flex items-center justify-between p-5">
             <Link to="/">
                 <span className="text-2xl font-bold">Beyond Reviews</span>
             </Link>

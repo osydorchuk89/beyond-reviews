@@ -2,7 +2,7 @@ import { Router } from "express";
 import { Movie } from "../models/movie";
 import { UserRating } from "../models/userRating";
 import { UserRatingSchema } from "../util/schemas";
-import { isLoggedIn } from "../app";
+// import { isLoggedIn } from "../app";
 
 export const movieRouter = Router();
 
@@ -18,7 +18,10 @@ movieRouter.get("/", async (req, res) => {
 movieRouter.get("/:movieId", async (req, res) => {
     const movieId = req.params.movieId;
     try {
-        const movie = await Movie.findById(movieId).populate("ratings");
+        const movie = await Movie.findById(movieId).populate({
+            path: "ratings",
+            populate: "userId",
+        });
         res.send(movie);
     } catch (error) {
         res.send(error);
@@ -57,6 +60,7 @@ movieRouter.post("/:movieId/ratings", async (req, res) => {
                     ...validationResult.data,
                     userId: req.body.userId,
                     movieId: req.params.movieId,
+                    date: req.body.date,
                 },
                 { upsert: true, new: true }
             );

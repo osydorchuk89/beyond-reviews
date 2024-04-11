@@ -1,8 +1,18 @@
+export interface User {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    __v: number;
+}
+
 export interface MovieRating {
     movieId: string;
     movieRating: number;
     movieReview: string;
-    userId: string;
+    userId: string | User;
+    date: Date;
     __v: number;
     _id: string;
 }

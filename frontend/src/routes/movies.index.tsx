@@ -23,8 +23,8 @@ const Movies = () => {
                         title={movie.title}
                         releaseYear={movie.releaseYear}
                         genres={movie.genres}
-                        avgVote={movie.avgRating || 0}
-                        numVotes={movie.numRatings || 0}
+                        avgRating={movie.avgRating}
+                        numRatings={movie.numRatings}
                         poster={movie.poster}
                     />
                 ))}

@@ -1,20 +1,19 @@
 import axios from "axios";
-import { useAppSelector } from "../store/hooks";
 import { useState } from "react";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
+import { dialogActions } from "../store";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { queryClient } from "../lib/requests";
-import { useLoaderData, useParams } from "@tanstack/react-router";
+import { getMovie } from "../lib/requests";
+import { useParams } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { UserRatingSchema } from "../lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getUserRating } from "../lib/requests";
 import { DarkButton } from "./DarkButton";
 import { DarkLink } from "./DarkLink";
 import { StarIcon } from "./StarIcon";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { SuccessAlert } from "./SuccesAlert";
 import { BASE_API_URL } from "../lib/urls";
-import { Movie, MovieRating } from "../lib/types";
+import { MovieRating } from "../lib/types";
 
 interface RatingInputs {
     movieRating: number;
@@ -22,25 +21,31 @@ interface RatingInputs {
 }
 
 export const MovieRatingForm = () => {
-    const { movieId } = useParams({ strict: false }) as { movieId: string };
     const authData = useAppSelector((state) => state.auth);
     const userId = authData.userData?._id;
-    const movie: Movie = useLoaderData({ from: "/movies/$movieId" });
-    const ratings = movie.ratings as MovieRating[];
+    const { movieId } = useParams({ strict: false }) as { movieId: string };
+    const { data, isFetching, refetch } = useQuery({
+        queryKey: ["movie", { movieId: movieId }],
+        queryFn: () => getMovie(movieId),
+        enabled: false,
+    });
+
+    console.log(data);
+
+    const dispatch = useAppDispatch();
+
+    const movieRatings = data.ratings as MovieRating[];
     const userRating =
-        ratings.filter((item) => item.userId === userId)[0]?.movieRating || 0;
+        movieRatings.filter((item) => item.userId === userId)[0]?.movieRating ||
+        0;
+    const userReview =
+        movieRatings.filter((item) => item.userId === userId)[0]?.movieReview ||
+        "";
 
     const [isEditing, setIsEditing] = useState(false);
-    const [successAlert, setSuccessAlert] = useState(false);
     const [rating, setRating] = useState(userRating);
     const [hover, setHover] = useState(userRating);
     const [hasRated, setHasRated] = useState(userRating > 0 ? true : false);
-
-    const { data, isFetching } = useQuery({
-        queryKey: ["movie", "userRating", authData, movieId],
-        queryFn: () => getUserRating(authData, movieId),
-        staleTime: 60000,
-    });
 
     const {
         register,
@@ -54,25 +59,27 @@ export const MovieRatingForm = () => {
 
     const sendUserRatingData = async (data: RatingInputs) => {
         try {
+            const date = new Date();
             await axios({
                 method: "post",
                 url: BASE_API_URL + "movies/" + movieId + "/ratings",
                 withCredentials: true,
-                data: { ...data, userId: authData.userData!._id },
+                data: { ...data, userId: authData.userData!._id, date },
             });
             setHasRated(true);
             setIsEditing(false);
-            setSuccessAlert(true);
+            dispatch(dialogActions.open());
+            refetch();
         } catch (error: any) {
             console.log(error);
         }
     };
 
     const editUserRating = async () => {
-        setValue("movieRating", data.movieRating, {
+        setValue("movieRating", userRating, {
             shouldValidate: true,
         });
-        setValue("movieReview", data.movieReview, {
+        setValue("movieReview", userReview, {
             shouldValidate: true,
         });
         setIsEditing(true);
@@ -80,7 +87,6 @@ export const MovieRatingForm = () => {
 
     const { mutate } = useMutation({
         mutationFn: sendUserRatingData,
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["movie"] }),
     });
 
     let starClassName = "w-8 h-8 border-none hover:cursor-pointer";
@@ -165,12 +171,12 @@ export const MovieRatingForm = () => {
                         <div className="flex flex-col gap-5">
                             <p>
                                 <span className="font-bold">Your rating: </span>
-                                {data.movieRating}/10
+                                {userRating}/10
                             </p>
                             <p>
                                 {" "}
                                 <span className="font-bold">Your review: </span>
-                                {data.movieReview}
+                                {userReview}
                             </p>
                             <div className="flex justify-start">
                                 <DarkButton
@@ -187,12 +193,10 @@ export const MovieRatingForm = () => {
                                 to="/login"
                                 text="login to your account"
                             ></DarkLink>
-                            .
                         </p>
                     )}
                 </div>
             )}
-            {successAlert && <SuccessAlert />}
         </div>
     );
 };

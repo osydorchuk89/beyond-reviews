@@ -3,6 +3,7 @@ import { ScrollRestoration } from "@tanstack/react-router";
 import { Outlet } from "@tanstack/react-router";
 import { TopNavBar } from "../components/TopNavbar";
 import { BottomNavBar } from "../components/BottomNavBar";
+import { SuccessDialog } from "../components/SuccessDialog";
 
 const Root = () => {
     return (
@@ -11,6 +12,7 @@ const Root = () => {
             <TopNavBar />
             <Outlet></Outlet>
             <BottomNavBar />
+            <SuccessDialog />
         </>
     );
 };

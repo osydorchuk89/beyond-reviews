@@ -7,7 +7,6 @@ import session from "express-session";
 import "dotenv/config";
 import { userRouter } from "./routes/users";
 import { movieRouter } from "./routes/movies";
-import { helloRouter } from "./routes/hello";
 import { BASE_CLIENT_URL } from "./util/urls";
 require("./util/auth");
 
@@ -52,8 +51,6 @@ app.get("/", (_, res) => {
 app.use("/api/users", userRouter);
 
 app.use("/api/movies", movieRouter);
-
-app.use("/api/hello", helloRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
     res.send(req.user);
