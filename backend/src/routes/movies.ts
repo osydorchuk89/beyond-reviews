@@ -2,6 +2,7 @@ import { Router } from "express";
 import { Movie } from "../models/movie";
 import { UserRating } from "../models/userRating";
 import { UserRatingSchema } from "../util/schemas";
+import { ObjectId } from "mongodb";
 // import { isLoggedIn } from "../app";
 
 export const movieRouter = Router();
@@ -16,7 +17,7 @@ movieRouter.get("/", async (req, res) => {
 });
 
 movieRouter.get("/:movieId", async (req, res) => {
-    const movieId = req.params.movieId;
+    const { movieId } = req.params;
     try {
         const movie = await Movie.findById(movieId).populate({
             path: "ratings",
@@ -29,16 +30,12 @@ movieRouter.get("/:movieId", async (req, res) => {
 });
 
 movieRouter.get("/:movieId/ratings", async (req, res) => {
-    const { userId } = req.query;
     const { movieId } = req.params;
     try {
-        if (userId) {
-            const userRating = await UserRating.findOne({ userId, movieId });
-            res.send(userRating);
-        } else {
-            const userRating = await UserRating.find({ movieId });
-            res.send(userRating);
-        }
+        const movieRatings = await UserRating.find({ movieId })
+            .populate("likedBy")
+            .populate("userId");
+        res.send(movieRatings);
     } catch (error) {
         res.send(error);
     }
@@ -98,6 +95,31 @@ movieRouter.post("/:movieId/ratings", async (req, res) => {
         } catch (error) {
             res.send(error);
         }
+    }
+});
+
+movieRouter.put("/:movieId/ratings/:ratingId", async (req, res) => {
+    const ratingId = req.params.ratingId;
+    const { like, userId } = req.body;
+    try {
+        const rating = await UserRating.findById(ratingId);
+        if (rating) {
+            if (like) {
+                rating.likedBy.push(userId);
+            } else {
+                rating.likedBy = rating.likedBy.filter(
+                    (item) => item.toString() !== userId
+                );
+            }
+            await rating.save();
+            res.status(200).send();
+        } else {
+            res.status(500).send({
+                message: "Could not find rating",
+            });
+        }
+    } catch (error) {
+        res.send(error);
     }
 });
 

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { dialogActions } from "../store";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getMovie } from "../lib/requests";
+import { getMovie, queryClient } from "../lib/requests";
 import { useParams } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { UserRatingSchema } from "../lib/schemas";
@@ -13,7 +13,7 @@ import { DarkLink } from "./DarkLink";
 import { StarIcon } from "./StarIcon";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { BASE_API_URL } from "../lib/urls";
-import { MovieRating } from "../lib/types";
+import { MovieRating, User } from "../lib/types";
 
 interface RatingInputs {
     movieRating: number;
@@ -30,17 +30,19 @@ export const MovieRatingForm = () => {
         enabled: false,
     });
 
-    console.log(data);
-
     const dispatch = useAppDispatch();
 
     const movieRatings = data.ratings as MovieRating[];
     const userRating =
-        movieRatings.filter((item) => item.userId === userId)[0]?.movieRating ||
-        0;
+        movieRatings.filter((item) => {
+            const userItem = item.userId as User;
+            return userItem._id === userId;
+        })[0]?.movieRating || 0;
     const userReview =
-        movieRatings.filter((item) => item.userId === userId)[0]?.movieReview ||
-        "";
+        movieRatings.filter((item) => {
+            const userItem = item.userId as User;
+            return userItem._id === userId;
+        })[0]?.movieReview || "";
 
     const [isEditing, setIsEditing] = useState(false);
     const [rating, setRating] = useState(userRating);
@@ -70,6 +72,9 @@ export const MovieRatingForm = () => {
             setIsEditing(false);
             dispatch(dialogActions.open());
             refetch();
+            queryClient.invalidateQueries({
+                queryKey: ["movie", "ratings", { movieId: movieId }],
+            });
         } catch (error: any) {
             console.log(error);
         }
@@ -99,7 +104,7 @@ export const MovieRatingForm = () => {
                 </div>
             )}
             {!isFetching && (
-                <div>
+                <div className="bg-amber-100 rounded-lg shadow-lg p-5">
                     {authData.isAuthenticated && (!hasRated || isEditing) && (
                         <form
                             noValidate
@@ -164,7 +169,17 @@ export const MovieRatingForm = () => {
                                     cols={70}
                                 />
                             </div>
-                            <DarkButton type="submit" text="RATE" />
+                            {isEditing ? (
+                                <div className="flex gap-10">
+                                    <DarkButton type="submit" text="EDIT" />
+                                    <DarkButton
+                                        text="CANCEL"
+                                        handleClick={() => setIsEditing(false)}
+                                    />
+                                </div>
+                            ) : (
+                                <DarkButton type="submit" text="RATE" />
+                            )}
                         </form>
                     )}
                     {authData.isAuthenticated && hasRated && !isEditing && (
@@ -176,7 +191,7 @@ export const MovieRatingForm = () => {
                             <p>
                                 {" "}
                                 <span className="font-bold">Your review: </span>
-                                {userReview}
+                                {userReview || "N/A"}
                             </p>
                             <div className="flex justify-start">
                                 <DarkButton

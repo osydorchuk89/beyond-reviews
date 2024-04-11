@@ -47,7 +47,9 @@ export const MovieAddInfo = () => {
                     <StarIcon className="w-6 h-6 fill-yellow-500 border-none" />{" "}
                     {avgRating}
                 </span>
-                <span>{numRatings} votes</span>
+                <span>
+                    {numRatings} {numRatings === 1 ? "vote" : "votes"}
+                </span>
             </div>
             <p>{data.overview}</p>
         </div>

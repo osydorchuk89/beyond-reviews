@@ -40,3 +40,15 @@ export const getMovie = async (movieId: string) => {
         console.log(error);
     }
 };
+
+export const getMovieRatings = async (movieId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: `${BASE_API_URL}movies/${movieId}/ratings`,
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
