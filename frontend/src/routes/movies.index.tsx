@@ -1,10 +1,9 @@
-import axios from "axios";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Movie } from "../lib/types";
-import { BASE_API_URL } from "../lib/urls";
 import { MovieCard } from "../components/MovieCard";
-import { DarkButton } from "../components/DarkButton";
+import { Button } from "../components/Button";
+import { getMovies } from "../lib/requests";
 
 const Movies = () => {
     const moviesData = Route.useLoaderData();
@@ -31,8 +30,9 @@ const Movies = () => {
             </div>
             {numberMovies < moviesData.length && (
                 <div className="flex justify-center mb-10">
-                    <DarkButton
+                    <Button
                         text="LOAD MORE"
+                        style="dark"
                         handleClick={() =>
                             setNumberMovies((prevState) => prevState + 20)
                         }
@@ -43,19 +43,7 @@ const Movies = () => {
     );
 };
 
-const fetchMovies = async () => {
-    try {
-        const response = await axios({
-            method: "get",
-            url: BASE_API_URL + "movies",
-        });
-        return response.data;
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 export const Route = createFileRoute("/movies/")({
     component: Movies,
-    loader: fetchMovies,
+    loader: getMovies,
 });

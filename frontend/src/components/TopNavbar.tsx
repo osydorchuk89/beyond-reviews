@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { authActions } from "../store";
-import { DarkButton } from "./DarkButton";
+import { Button } from "./Button";
 import { BASE_URL } from "../lib/urls";
 
 const topLinks = [
@@ -44,7 +44,8 @@ export const TopNavBar = () => {
                 ))}
             </ul>
             {authData.isAuthenticated ? (
-                <DarkButton
+                <Button
+                    style="dark"
                     text="LOGOUT"
                     handleClick={() => {
                         axios({
@@ -57,8 +58,9 @@ export const TopNavBar = () => {
                     }}
                 />
             ) : (
-                <DarkButton
+                <Button
                     text="LOGIN"
+                    style="dark"
                     handleClick={() => navigate({ to: "/login" })}
                 />
             )}

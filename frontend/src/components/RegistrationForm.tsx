@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema } from "../lib/schemas";
-import { DarkButton } from "./DarkButton";
+import { Button } from "./Button";
 import { BASE_API_URL } from "../lib/urls";
 
 type RegistrationInputs = {
@@ -103,7 +103,7 @@ export const RegistrationForm = () => {
                 <p>{errors.password?.message}</p>
             </div>
             <div className="flex justify-center">
-                <DarkButton type="submit" text="REGISTER" />
+                <Button type="submit" style="dark" text="REGISTER" />
             </div>
         </form>
     );

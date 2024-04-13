@@ -8,7 +8,7 @@ import { useAppDispatch } from "../store/hooks";
 import { authActions } from "../store";
 import { LoginSchema } from "../lib/schemas";
 import { DarkLink } from "./DarkLink";
-import { DarkButton } from "./DarkButton";
+import { Button } from "./Button";
 import { SocialLoginButton } from "./SocialLoginButton";
 import { BASE_URL } from "../lib/urls";
 
@@ -113,7 +113,7 @@ export const LoginForm = () => {
                     <p>{errors.password?.message}</p>
                 </div>
                 <div className="flex justify-center">
-                    <DarkButton type="submit" text="LOGIN" />
+                    <Button type="submit" style="dark" text="LOGIN" />
                 </div>
                 <p className="text-center">
                     Don't have an account?{" "}

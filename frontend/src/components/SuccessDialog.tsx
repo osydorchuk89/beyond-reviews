@@ -1,7 +1,7 @@
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { dialogActions } from "../store";
 import { Dialog } from "@headlessui/react";
-import { DarkButton } from "./DarkButton";
+import { Button } from "./Button";
 
 interface CloseIconProps {
     handleClick: () => void;
@@ -47,8 +47,9 @@ export const SuccessDialog = () => {
                     </Dialog.Title>
                     <Dialog.Description className="flex flex-col justify-start items-center py-8 text-lg gap-12">
                         <p>You succesfully added/edited your rating!</p>
-                        <DarkButton
+                        <Button
                             text="Sounds good!"
+                            style="dark"
                             handleClick={() => dispatch(dialogActions.close())}
                         />
                     </Dialog.Description>

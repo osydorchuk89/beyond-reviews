@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { dialogActions } from "../store";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -8,7 +8,7 @@ import { useParams } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { UserRatingSchema } from "../lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DarkButton } from "./DarkButton";
+import { Button } from "./Button";
 import { DarkLink } from "./DarkLink";
 import { StarIcon } from "./StarIcon";
 import { LoadingSpinner } from "./LoadingSpinner";
@@ -19,6 +19,33 @@ interface RatingInputs {
     movieRating: number;
     movieReview?: string;
 }
+
+const useTruncatedElement = ({
+    ref,
+}: {
+    ref: React.RefObject<HTMLSpanElement>;
+}) => {
+    const [isTruncated, setIsTruncated] = useState(false);
+    const [isShowingMore, setIsShowingMore] = useState(false);
+
+    useLayoutEffect(() => {
+        const { offsetHeight, scrollHeight } = ref.current || {};
+
+        if (offsetHeight && scrollHeight && offsetHeight < scrollHeight) {
+            setIsTruncated(true);
+        } else {
+            setIsTruncated(false);
+        }
+    }, [ref]);
+
+    const toggleIsShowingMore = () => setIsShowingMore((prev) => !prev);
+
+    return {
+        isTruncated,
+        isShowingMore,
+        toggleIsShowingMore,
+    };
+};
 
 export const MovieRatingForm = () => {
     const authData = useAppSelector((state) => state.auth);
@@ -96,6 +123,12 @@ export const MovieRatingForm = () => {
 
     let starClassName = "w-8 h-8 border-none hover:cursor-pointer";
 
+    const ref = useRef(null);
+    const { isTruncated, isShowingMore, toggleIsShowingMore } =
+        useTruncatedElement({
+            ref,
+        });
+
     return (
         <div>
             {isFetching && (
@@ -171,14 +204,23 @@ export const MovieRatingForm = () => {
                             </div>
                             {isEditing ? (
                                 <div className="flex gap-10">
-                                    <DarkButton type="submit" text="EDIT" />
-                                    <DarkButton
+                                    <Button
+                                        style="dark"
+                                        type="submit"
+                                        text="EDIT"
+                                    />
+                                    <Button
+                                        style="dark"
                                         text="CANCEL"
                                         handleClick={() => setIsEditing(false)}
                                     />
                                 </div>
                             ) : (
-                                <DarkButton type="submit" text="RATE" />
+                                <Button
+                                    style="dark"
+                                    type="submit"
+                                    text="RATE"
+                                />
                             )}
                         </form>
                     )}
@@ -191,11 +233,32 @@ export const MovieRatingForm = () => {
                             <p>
                                 {" "}
                                 <span className="font-bold">Your review: </span>
-                                {userReview || "N/A"}
+                                <span
+                                    ref={ref}
+                                    className={
+                                        !isShowingMore ? "line-clamp-5" : ""
+                                    }
+                                >
+                                    {userReview || "N/A"}
+                                </span>
+                                {isTruncated && (
+                                    <div>
+                                        <Button
+                                            style="light"
+                                            text={
+                                                isShowingMore
+                                                    ? "Show less"
+                                                    : "Show more"
+                                            }
+                                            handleClick={toggleIsShowingMore}
+                                        />
+                                    </div>
+                                )}
                             </p>
                             <div className="flex justify-start">
-                                <DarkButton
+                                <Button
                                     text="EDIT YOUR RATING"
+                                    style="dark"
                                     handleClick={editUserRating}
                                 />
                             </div>

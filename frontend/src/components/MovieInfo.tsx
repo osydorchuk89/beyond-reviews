@@ -11,7 +11,7 @@ export const MovieMainInfo = () => {
         enabled: false,
     });
     return (
-        <div className="flex flex-col flex-wrap justify-between items-center w-1/3">
+        <div className="flex flex-col flex-wrap justify-start items-center gap-10 w-1/3">
             <p className="text-4xl text-center mb-5">
                 {data.title} ({data.releaseYear})
             </p>

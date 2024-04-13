@@ -29,6 +29,18 @@ export const getUserRating = async (authData: AuthState, movieId: string) => {
     }
 };
 
+export const getMovies = async () => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_API_URL + "movies",
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export const getMovie = async (movieId: string) => {
     try {
         const response = await axios({
