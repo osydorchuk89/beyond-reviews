@@ -14,5 +14,5 @@ export default {
             sans: ["Roboto", "sans-serif"],
         },
     },
-    plugins: [],
+    plugins: [require("@headlessui/tailwindcss")({ prefix: "ui" })],
 };

@@ -2,30 +2,7 @@ import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { dialogActions } from "../store";
 import { Dialog } from "@headlessui/react";
 import { Button } from "./Button";
-
-interface CloseIconProps {
-    handleClick: () => void;
-}
-
-const CloseIcon = ({ handleClick }: CloseIconProps) => {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6 cursor-pointer absolute right-5"
-            onClick={handleClick}
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18 18 6M6 6l12 12"
-            />
-        </svg>
-    );
-};
+import { CloseIcon } from "./CloseIcon";
 
 export const SuccessDialog = () => {
     const dialogData = useAppSelector((state) => state.dialog);
@@ -43,6 +20,7 @@ export const SuccessDialog = () => {
                         <span className="text-xl font-bold">Success</span>
                         <CloseIcon
                             handleClick={() => dispatch(dialogActions.close())}
+                            className="w-6 h-6 cursor-pointer absolute right-5"
                         />
                     </Dialog.Title>
                     <Dialog.Description className="flex flex-col justify-start items-center py-8 text-lg gap-12">

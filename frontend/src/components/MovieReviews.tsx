@@ -16,9 +16,6 @@ export const MovieReviews = () => {
     });
 
     const movieRatings = data as MovieRating[];
-    const sortedMovieRatings = movieRatings.sort(
-        (a, b) => b.likedBy.length - a.likedBy.length
-    );
 
     return (
         <div>
@@ -26,19 +23,23 @@ export const MovieReviews = () => {
             <p className="text-center text-xl font-bold">User Reviews</p>
             <div className="flex flex-col my-5 gap-5">
                 {isFetched &&
-                    sortedMovieRatings.length > 0 &&
-                    sortedMovieRatings.map((rating) => (
-                        <ReviewCard
-                            key={rating._id}
-                            reviewId={rating._id}
-                            user={rating.userId as User}
-                            rating={rating.movieRating}
-                            review={rating.movieReview}
-                            date={rating.date}
-                            likes={rating.likedBy.length}
-                            isOwnReview={(rating.userId as User)._id === userId}
-                        />
-                    ))}
+                    movieRatings.length > 0 &&
+                    movieRatings
+                        .sort((a, b) => b.likedBy.length - a.likedBy.length)
+                        .map((rating) => (
+                            <ReviewCard
+                                key={rating._id}
+                                reviewId={rating._id}
+                                user={rating.userId as User}
+                                rating={rating.movieRating}
+                                review={rating.movieReview}
+                                date={rating.date}
+                                likes={rating.likedBy.length}
+                                isOwnReview={
+                                    (rating.userId as User)._id === userId
+                                }
+                            />
+                        ))}
                 {isFetched && movieRatings.length === 0 && (
                     <div className="flex justify-center italic">
                         No movie ratings yet

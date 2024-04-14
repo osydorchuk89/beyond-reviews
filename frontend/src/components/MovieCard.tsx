@@ -25,7 +25,7 @@ export const MovieCard = ({
 
     return (
         <div className="flex flex-col w-80 justify-start items-center bg-amber-100 rounded-lg shadow-lg p-5">
-            <p className="text-center text-lg font-bold h-14">
+            <p className="text-center text-lg font-bold h-14 mb-2">
                 <Link
                     className="hover:underline"
                     to="/movies/$movieId"

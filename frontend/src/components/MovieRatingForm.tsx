@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { dialogActions } from "../store";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "./Button";
 import { DarkLink } from "./DarkLink";
 import { StarIcon } from "./StarIcon";
+import { useTruncatedElement } from "../hooks/useTuncatedElement";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { BASE_API_URL } from "../lib/urls";
 import { MovieRating, User } from "../lib/types";
@@ -20,36 +21,9 @@ interface RatingInputs {
     movieReview?: string;
 }
 
-const useTruncatedElement = ({
-    ref,
-}: {
-    ref: React.RefObject<HTMLSpanElement>;
-}) => {
-    const [isTruncated, setIsTruncated] = useState(false);
-    const [isShowingMore, setIsShowingMore] = useState(false);
-
-    useLayoutEffect(() => {
-        const { offsetHeight, scrollHeight } = ref.current || {};
-
-        if (offsetHeight && scrollHeight && offsetHeight < scrollHeight) {
-            setIsTruncated(true);
-        } else {
-            setIsTruncated(false);
-        }
-    }, [ref]);
-
-    const toggleIsShowingMore = () => setIsShowingMore((prev) => !prev);
-
-    return {
-        isTruncated,
-        isShowingMore,
-        toggleIsShowingMore,
-    };
-};
-
 export const MovieRatingForm = () => {
-    const authData = useAppSelector((state) => state.auth);
-    const userId = authData.userData?._id;
+    const { isAuthenticated, userData } = useAppSelector((state) => state.auth);
+    const userId = userData?._id;
     const { movieId } = useParams({ strict: false }) as { movieId: string };
     const { data, isFetching, refetch } = useQuery({
         queryKey: ["movie", { movieId: movieId }],
@@ -93,7 +67,7 @@ export const MovieRatingForm = () => {
                 method: "post",
                 url: BASE_API_URL + "movies/" + movieId + "/ratings",
                 withCredentials: true,
-                data: { ...data, userId: authData.userData!._id, date },
+                data: { ...data, userId: userData!._id, date },
             });
             setHasRated(true);
             setIsEditing(false);
@@ -138,7 +112,7 @@ export const MovieRatingForm = () => {
             )}
             {!isFetching && (
                 <div className="bg-amber-100 rounded-lg shadow-lg p-5">
-                    {authData.isAuthenticated && (!hasRated || isEditing) && (
+                    {isAuthenticated && (!hasRated || isEditing) && (
                         <form
                             noValidate
                             onSubmit={handleSubmit((data) => {
@@ -224,27 +198,31 @@ export const MovieRatingForm = () => {
                             )}
                         </form>
                     )}
-                    {authData.isAuthenticated && hasRated && !isEditing && (
+                    {isAuthenticated && hasRated && !isEditing && (
                         <div className="flex flex-col gap-5">
-                            <p>
-                                <span className="font-bold">Your rating: </span>
-                                {userRating}/10
-                            </p>
-                            <p>
+                            <div>
+                                <span className="font-bold">
+                                    Your rating:{" "}
+                                    <span className="font-normal">
+                                        {userRating}/10
+                                    </span>
+                                </span>
+                            </div>
+                            <div>
                                 {" "}
-                                <span className="font-bold">Your review: </span>
-                                <span
+                                <p className="font-bold">Your review: </p>
+                                <p
                                     ref={ref}
                                     className={
                                         !isShowingMore ? "line-clamp-5" : ""
                                     }
                                 >
                                     {userReview || "N/A"}
-                                </span>
+                                </p>
                                 {isTruncated && (
                                     <div>
                                         <Button
-                                            style="light"
+                                            style="mt-1 text-green-700 hover:text-green-950 text-base font-medium uppercase"
                                             text={
                                                 isShowingMore
                                                     ? "Show less"
@@ -254,7 +232,7 @@ export const MovieRatingForm = () => {
                                         />
                                     </div>
                                 )}
-                            </p>
+                            </div>
                             <div className="flex justify-start">
                                 <Button
                                     text="EDIT YOUR RATING"
@@ -264,7 +242,7 @@ export const MovieRatingForm = () => {
                             </div>
                         </div>
                     )}
-                    {!authData.isAuthenticated && (
+                    {!isAuthenticated && (
                         <p className="px-4 py-2 bg-amber-100 rounded-md">
                             To rate the movie or post a review, please{" "}
                             <DarkLink
