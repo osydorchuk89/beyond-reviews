@@ -30,38 +30,36 @@ export const SearchBar = () => {
     };
 
     return (
-        <div className="flex flex-col justify-between bg-amber-100 rounded-md m-5 overflow-hidden">
+        <div className="flex flex-col justify-between bg-amber-100 rounded-md overflow-hidden">
             <p className="text-center text-xl font-bold bg-amber-700 text-amber-50 py-2">
                 Search
             </p>
             <form
                 noValidate
                 onSubmit={handleSubmit(onSubmit)}
-                className="flex justify-center items-center gap-10 py-5"
+                className="flex flex-col justify-center gap-3 py-3 px-5"
             >
-                <div className="flex flex-col">
-                    <input
-                        {...register("title", {
-                            required: true,
-                        })}
-                        className="w-[440px] border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
-                        placeholder="enter movie title"
-                        type="text"
-                    />
+                <input
+                    {...register("title", {
+                        required: true,
+                    })}
+                    className="w-full border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
+                    placeholder="enter movie title"
+                    type="text"
+                />
+                <div className="flex justify-start gap-2 w-full">
+                    <Button style="dark" text="Search" type="submit" />
+                    {searchTerm && (
+                        <div className="flex items-center gap-2 bg-amber-300 rounded-md text-amber-950 font-bold p-2 overflow-hidden">
+                            <span className="truncate">{searchTerm}</span>
+                            <CloseIcon
+                                className="w-5 h-5 cursor-pointer flex-none"
+                                handleClick={handleCloseSearchTag}
+                            />
+                        </div>
+                    )}
                 </div>
-                <Button style="dark" text="Search" type="submit" />
             </form>
-            {searchTerm && (
-                <div className="flex justify-center pb-5">
-                    <div className="flex items-center gap-2 bg-amber-300 rounded-md text-amber-950 font-bold p-2">
-                        {searchTerm}
-                        <CloseIcon
-                            className="w-5 h-5 cursor-pointer"
-                            handleClick={handleCloseSearchTag}
-                        />
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

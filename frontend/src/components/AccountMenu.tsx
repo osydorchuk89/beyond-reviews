@@ -17,7 +17,7 @@ export const AccountMenu = ({ text }: AccountMenuProps) => {
     return (
         <Menu
             as="div"
-            className="flex flex-col items-center w-44 absolute right-40"
+            className="flex flex-col items-center w-44 absolute right-44"
         >
             <Menu.Button className="w-12 h-12 rounded-full overflow-hidden bg-amber-300 mb-4">
                 {text}

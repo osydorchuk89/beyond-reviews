@@ -1,4 +1,5 @@
 import express, { RequestHandler } from "express";
+import { Server } from "socket.io";
 import mongoose from "mongoose";
 import passport from "passport";
 import cors from "cors";
@@ -84,6 +85,10 @@ app.get("/protected", isLoggedIn, (req, res) => {
 mongoose
     .connect(process.env.DATABASE_URL!)
     .then((_) => {
-        app.listen(3000);
+        const server = app.listen(3000);
+        const io = new Server(server);
+        io.on("connection", (socket) => {
+            console.log("a user connected");
+        });
     })
     .catch((error) => console.log(error));

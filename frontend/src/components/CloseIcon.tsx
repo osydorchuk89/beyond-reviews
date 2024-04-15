@@ -1,5 +1,5 @@
 interface CloseIconProps {
-    handleClick: () => void;
+    handleClick?: () => void;
     className: string;
 }
 

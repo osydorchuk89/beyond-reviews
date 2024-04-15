@@ -6,7 +6,8 @@ import { UserSchema } from "../util/schemas";
 export const userRouter = Router();
 
 userRouter.get("/", (req, res) => {
-    res.send(req.user);
+    const users = User.find();
+    res.send(users);
 });
 
 userRouter.post("/", async (req, res) => {
@@ -27,9 +28,6 @@ userRouter.post("/", async (req, res) => {
             );
             validatedData.password = hashedPassword;
             const user = new User(validatedData);
-            // user.save()
-            //     .then(() => res.status(200).send())
-            //     .catch((error) => res.status(500).send({ message: error.message }));
             try {
                 await user.save();
                 res.status(200).send();

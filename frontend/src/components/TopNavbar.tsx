@@ -6,6 +6,7 @@ import { authActions } from "../store";
 import { Button } from "./Button";
 import { AccountMenu } from "./AccountMenu";
 import { BASE_URL } from "../lib/urls";
+import { MessageBox } from "./MessageBox";
 
 const topLinks = [
     { id: 1, text: "Books", link: "#" },
@@ -53,6 +54,7 @@ export const TopNavBar = () => {
             {isAuthenticated ? (
                 <div className="flex">
                     <AccountMenu text={userNameAbbreviation as string} />
+                    <MessageBox />
                     <Button
                         style="dark"
                         text="LOGOUT"

@@ -64,3 +64,15 @@ export const getMovieRatings = async (movieId: string) => {
         console.log(error);
     }
 };
+
+export const getUsers = async () => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_API_URL + "users",
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
