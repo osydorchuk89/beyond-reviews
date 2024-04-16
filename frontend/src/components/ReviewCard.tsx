@@ -31,8 +31,8 @@ export const ReviewCard = ({
     isOwnReview,
 }: ReviewCardProps) => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };
-    const authData = useAppSelector((state) => state.auth);
-    const userId = authData.userData?._id;
+    const { isAuthenticated, userData } = useAppSelector((state) => state.auth);
+    const userId = userData?._id;
     const { data, refetch } = useQuery({
         queryKey: ["movie", "ratings", { movieId: movieId }],
         queryFn: () => getMovieRatings(movieId),
@@ -122,7 +122,7 @@ export const ReviewCard = ({
             <p className="text-gray-500 text-sm mt-5 mb-1">
                 {likes} {likes === 1 ? "like" : "likes"}
             </p>
-            {authData.isAuthenticated && !isOwnReview && (
+            {isAuthenticated && !isOwnReview && (
                 <LikeIcon
                     className={
                         iconFilled

@@ -8,8 +8,8 @@ import { useAppSelector } from "../store/hooks";
 
 export const MovieReviews = () => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };
-    const authData = useAppSelector((state) => state.auth);
-    const userId = authData.userData?._id;
+    const { userData } = useAppSelector((state) => state.auth);
+    const userId = userData?._id;
     const { data, isFetched } = useQuery({
         queryKey: ["movie", "ratings", { movieId: movieId }],
         queryFn: () => getMovieRatings(movieId),

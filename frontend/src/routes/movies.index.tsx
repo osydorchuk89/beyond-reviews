@@ -90,11 +90,11 @@ const Movies = () => {
 
     return (
         <div className="flex flex-col w-full">
-            <p className="text-4xl text-center font-bold my-10">
+            <p className="text-4xl text-center font-bold py-5 mb-5 border-b border-b-amber-700">
                 Popular Movies
             </p>
             <div className="flex">
-                <div className="flex flex-col w-1/4 ml-5 gap-2 ">
+                <div className="flex flex-col w-1/4 ml-5 gap-2 mb-5">
                     <SearchBar />
                     <SortFilterBar itemsList={sortList} title="Sort by:" />
                     <SortFilterBar itemsList={filterList} title="Filter:" />
@@ -120,7 +120,7 @@ const Movies = () => {
                                         ))}
                                 </div>
                             ) : (
-                                <div className="flex justify-center items-center h-[50vh]">
+                                <div className="flex justify-center items-start mt-20 h-[50vh]">
                                     <p className="text-2xl">No movies found</p>
                                 </div>
                             )}
@@ -131,7 +131,7 @@ const Movies = () => {
                                         style="dark"
                                         handleClick={() =>
                                             setNumberMovies(
-                                                (prevState) => prevState + 20
+                                                (prevState) => prevState + 15
                                             )
                                         }
                                     />

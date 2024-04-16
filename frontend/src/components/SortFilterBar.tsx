@@ -32,7 +32,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
     };
 
     return (
-        <div className="flex flex-col rounded-md bg-amber-100 overflow-hidden">
+        <div className="flex flex-col rounded-md shadow-md bg-amber-100 overflow-hidden">
             <p className="bg-amber-700 text-amber-50 text-center text-xl font-bold py-2">
                 {title}
             </p>

@@ -30,7 +30,7 @@ export const SearchBar = () => {
     };
 
     return (
-        <div className="flex flex-col justify-between bg-amber-100 rounded-md overflow-hidden">
+        <div className="flex flex-col justify-between bg-amber-100 rounded-md shadow-md overflow-hidden">
             <p className="text-center text-xl font-bold bg-amber-700 text-amber-50 py-2">
                 Search
             </p>
