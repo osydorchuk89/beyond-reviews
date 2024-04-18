@@ -2,8 +2,6 @@ import { Router } from "express";
 import { Movie } from "../models/movie";
 import { UserRating } from "../models/userRating";
 import { UserRatingSchema } from "../util/schemas";
-// import { ObjectId } from "mongodb";
-// import { isLoggedIn } from "../app";
 
 export const movieRouter = Router();
 

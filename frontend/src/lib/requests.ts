@@ -76,3 +76,19 @@ export const getUsers = async () => {
         console.log(error);
     }
 };
+
+export const getMessages = async (senderId: string, recipientId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_API_URL + "messages",
+            params: {
+                sender: senderId,
+                recipient: recipientId,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};

@@ -8,7 +8,10 @@ import session from "express-session";
 import "dotenv/config";
 import { userRouter } from "./routes/users";
 import { movieRouter } from "./routes/movies";
+import { messageRouter } from "./routes/messages";
 import { BASE_CLIENT_URL } from "./util/urls";
+import { createServer } from "http";
+import { socket } from "./socket";
 require("./util/auth");
 
 export const isLoggedIn: RequestHandler = (req, res, next) => {
@@ -41,7 +44,6 @@ app.use(
         // cookie: { secure: true },
     })
 );
-// app.use(passport.authenticate("session"));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -50,8 +52,8 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/users", userRouter);
-
 app.use("/api/movies", movieRouter);
+app.use("/api/messages", messageRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
     res.send(req.user);
@@ -85,10 +87,12 @@ app.get("/protected", isLoggedIn, (req, res) => {
 mongoose
     .connect(process.env.DATABASE_URL!)
     .then((_) => {
-        const server = app.listen(3000);
-        const io = new Server(server);
+        const httpServer = createServer(app);
+        const io = socket.init(httpServer);
         io.on("connection", (socket) => {
-            console.log("a user connected");
+            console.log(socket.id);
+            // socket.on("join-room", (data) => socket.join(data));
         });
+        httpServer.listen(3000);
     })
     .catch((error) => console.log(error));

@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "./Button";
 import { CloseIcon } from "./CloseIcon";
 
-interface SearchInputs {
+interface SearchInput {
     title: string;
 }
 
@@ -12,9 +12,9 @@ export const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const navigate = useNavigate();
 
-    const { register, handleSubmit, reset } = useForm<SearchInputs>();
+    const { register, handleSubmit, reset } = useForm<SearchInput>();
 
-    const onSubmit: SubmitHandler<SearchInputs> = (data) => {
+    const onSubmit: SubmitHandler<SearchInput> = (data) => {
         navigate({
             search: (prevState) => ({ ...prevState, search: data.title }),
         });

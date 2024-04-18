@@ -14,7 +14,7 @@ import { StarIcon } from "./StarIcon";
 import { useTruncatedElement } from "../hooks/useTuncatedElement";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { BASE_API_URL } from "../lib/urls";
-import { MovieRating, User } from "../lib/types";
+import { Movie, MovieRating, User } from "../lib/types";
 
 interface RatingInputs {
     movieRating: number;
@@ -25,7 +25,11 @@ export const MovieRatingForm = () => {
     const { isAuthenticated, userData } = useAppSelector((state) => state.auth);
     const userId = userData?._id;
     const { movieId } = useParams({ strict: false }) as { movieId: string };
-    const { data, isFetching, refetch } = useQuery({
+    const {
+        data: movieData,
+        isFetching,
+        refetch,
+    } = useQuery<Movie>({
         queryKey: ["movie", { movieId: movieId }],
         queryFn: () => getMovie(movieId),
         enabled: false,
@@ -33,7 +37,7 @@ export const MovieRatingForm = () => {
 
     const dispatch = useAppDispatch();
 
-    const movieRatings = data.ratings as MovieRating[];
+    const movieRatings = movieData?.ratings as MovieRating[];
     const userRating =
         movieRatings.filter((item) => {
             const userItem = item.userId as User;

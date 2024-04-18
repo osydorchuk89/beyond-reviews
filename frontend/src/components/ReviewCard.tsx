@@ -33,15 +33,13 @@ export const ReviewCard = ({
     const { movieId } = useParams({ strict: false }) as { movieId: string };
     const { isAuthenticated, userData } = useAppSelector((state) => state.auth);
     const userId = userData?._id;
-    const { data, refetch } = useQuery({
+    const { data: movieRatings, refetch } = useQuery<MovieRating[]>({
         queryKey: ["movie", "ratings", { movieId: movieId }],
         queryFn: () => getMovieRatings(movieId),
         enabled: false,
     });
 
-    const reviewData = (data as MovieRating[]).find(
-        (item) => item._id === reviewId
-    );
+    const reviewData = movieRatings!.find((item) => item._id === reviewId);
 
     const hasUserLikedReview = (reviewData!.userId as User)._id === userId;
 

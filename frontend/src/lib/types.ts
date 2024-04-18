@@ -7,6 +7,14 @@ export interface User {
     __v: number;
 }
 
+export interface Message {
+    _id: string;
+    sender: User;
+    recipient: User;
+    text: string;
+    date: Date;
+}
+
 export interface MovieRating {
     movieId: string;
     movieRating: number;

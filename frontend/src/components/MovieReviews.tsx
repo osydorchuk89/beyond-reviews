@@ -10,12 +10,17 @@ export const MovieReviews = () => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };
     const { userData } = useAppSelector((state) => state.auth);
     const userId = userData?._id;
-    const { data, isFetched } = useQuery({
+    const { data: movieRatings, isFetched } = useQuery({
         queryKey: ["movie", "ratings", { movieId: movieId }],
-        queryFn: () => getMovieRatings(movieId),
+        queryFn: async () => {
+            const movieRatingsData: MovieRating[] =
+                await getMovieRatings(movieId);
+            const movieRatings = movieRatingsData.sort(
+                (a, b) => b.likedBy.length - a.likedBy.length
+            );
+            return movieRatings;
+        },
     });
-
-    const movieRatings = data as MovieRating[];
 
     return (
         <div>
@@ -23,24 +28,20 @@ export const MovieReviews = () => {
             <p className="text-center text-xl font-bold">User Reviews</p>
             <div className="flex flex-col my-5 gap-5">
                 {isFetched &&
-                    movieRatings.length > 0 &&
-                    movieRatings
-                        .sort((a, b) => b.likedBy.length - a.likedBy.length)
-                        .map((rating) => (
-                            <ReviewCard
-                                key={rating._id}
-                                reviewId={rating._id}
-                                user={rating.userId as User}
-                                rating={rating.movieRating}
-                                review={rating.movieReview}
-                                date={rating.date}
-                                likes={rating.likedBy.length}
-                                isOwnReview={
-                                    (rating.userId as User)._id === userId
-                                }
-                            />
-                        ))}
-                {isFetched && movieRatings.length === 0 && (
+                    movieRatings!.length > 0 &&
+                    movieRatings!.map((rating) => (
+                        <ReviewCard
+                            key={rating._id}
+                            reviewId={rating._id}
+                            user={rating.userId as User}
+                            rating={rating.movieRating}
+                            review={rating.movieReview}
+                            date={rating.date}
+                            likes={rating.likedBy.length}
+                            isOwnReview={(rating.userId as User)._id === userId}
+                        />
+                    ))}
+                {isFetched && movieRatings!.length === 0 && (
                     <div className="flex justify-center italic">
                         No movie ratings yet
                     </div>

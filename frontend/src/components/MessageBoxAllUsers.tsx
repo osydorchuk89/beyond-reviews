@@ -7,26 +7,28 @@ import { User } from "../lib/types";
 import { MessageBoxContext } from "./MessageBox";
 
 export const MessageBoxAllUsers = () => {
-    const { selectSingleUser } = useContext(MessageBoxContext);
+    const { selectSingleUser, selectUserName } = useContext(MessageBoxContext);
     const { userData } = useAppSelector((state) => state.auth);
     const userId = userData!._id;
-    const { data } = useQuery({
+    const { data: users } = useQuery<User[]>({
         queryKey: ["users"],
         queryFn: getUsers,
     });
 
-    const users = data as User[];
-
     return (
         <div>
-            {data &&
+            {users &&
                 users
                     .filter((user) => user._id !== userId)
                     .map((user) => (
                         <div
                             key={user._id}
                             className="flex flex-col"
-                            onClick={() => selectSingleUser(user._id)}
+                            onClick={() => {
+                                const userName = `${user.firstName} ${user.lastName}`;
+                                selectSingleUser(user._id);
+                                selectUserName(userName);
+                            }}
                         >
                             <div className="flex justify-start items-center gap-2 w-full hover:bg-amber-200 cursor-pointer px-2 py-5">
                                 <UserIcon />
