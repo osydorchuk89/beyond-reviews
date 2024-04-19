@@ -2,6 +2,7 @@ import { Router } from "express";
 import { Message } from "../models/message";
 import { User } from "../models/user";
 import { socket } from "../socket";
+import { concatStrings } from "../util/utils";
 
 export const messageRouter = Router();
 
@@ -47,8 +48,10 @@ messageRouter.post("/", async (req, res) => {
             date,
         });
         await message.save();
+        const senderId = sender!._id.toString();
         const recipientId = recipient!._id.toString();
-        socket.getIO().emit("new-message");
+        const roomId = concatStrings([senderId, recipientId]);
+        socket.getIO().to(roomId).emit("new-message");
         res.status(200).send();
     } catch (error: any) {
         res.status(500).send({ message: error.message });

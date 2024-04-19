@@ -7,7 +7,7 @@ import { User } from "../lib/types";
 import { MessageBoxContext } from "./MessageBox";
 
 export const MessageBoxAllUsers = () => {
-    const { selectSingleUser, selectUserName } = useContext(MessageBoxContext);
+    const { selectSingleUser } = useContext(MessageBoxContext);
     const { userData } = useAppSelector((state) => state.auth);
     const userId = userData!._id;
     const { data: users } = useQuery<User[]>({
@@ -26,8 +26,7 @@ export const MessageBoxAllUsers = () => {
                             className="flex flex-col"
                             onClick={() => {
                                 const userName = `${user.firstName} ${user.lastName}`;
-                                selectSingleUser(user._id);
-                                selectUserName(userName);
+                                selectSingleUser(user._id, userName);
                             }}
                         >
                             <div className="flex justify-start items-center gap-2 w-full hover:bg-amber-200 cursor-pointer px-2 py-5">

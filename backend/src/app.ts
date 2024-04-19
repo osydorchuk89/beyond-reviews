@@ -90,8 +90,8 @@ mongoose
         const httpServer = createServer(app);
         const io = socket.init(httpServer);
         io.on("connection", (socket) => {
-            console.log(socket.id);
-            // socket.on("join-room", (data) => socket.join(data));
+            // console.log(socket.id);
+            socket.on("join-room", (room) => socket.join(room));
         });
         httpServer.listen(3000);
     })

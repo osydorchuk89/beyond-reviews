@@ -4,24 +4,28 @@ import { io } from "socket.io-client";
 import { MessageBoxContext } from "./MessageBox";
 import { useQuery } from "@tanstack/react-query";
 import { getMessages, queryClient } from "../lib/requests";
-import { User } from "../lib/types";
 import { Button } from "./Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { BASE_API_URL, BASE_URL } from "../lib/urls";
 import { useAppSelector } from "../store/hooks";
 import { Message } from "../lib/types";
+import { concatStrings } from "../lib/utils";
 
 interface MessageInput {
     message: string;
 }
+
 export const MessageBoxSingleUser = () => {
     const messagesRef = useRef<HTMLDivElement>(null);
     const { userData } = useAppSelector((state) => state.auth);
     const userId = userData!._id;
+    const { user: otherUser, selectAllUsers } = useContext(MessageBoxContext);
 
     useEffect(() => {
-        messagesRef.current?.scrollIntoView({ behavior: "smooth" });
+        // messagesRef.current?.scrollIntoView({ behavior: "smooth" });
         const socket = io(BASE_URL);
+        const roomId = concatStrings([userId, otherUser.id]);
+        socket.emit("join-room", roomId);
         socket.on("new-message", () => {
             queryClient.invalidateQueries({
                 queryKey: ["messages"],
@@ -29,17 +33,12 @@ export const MessageBoxSingleUser = () => {
         });
     }, []);
 
-    const {
-        user: otherUserId,
-        userName: otherUSerName,
-        selectAllUsers,
-    } = useContext(MessageBoxContext);
     const { data: messages } = useQuery({
         queryKey: ["messages"],
         queryFn: async () => {
             const messagesData: Message[] = await getMessages(
                 userId,
-                otherUserId
+                otherUser.id
             );
             const messages = messagesData.map((message) => {
                 const messageDate = new Date(message.date);
@@ -68,7 +67,7 @@ export const MessageBoxSingleUser = () => {
                 },
                 data: {
                     sender: userId,
-                    recipient: otherUserId,
+                    recipient: otherUser.id,
                     message: data.message,
                     date,
                 },
@@ -85,13 +84,13 @@ export const MessageBoxSingleUser = () => {
 
     return (
         <div className="flex flex-col h-full justify-between items-center p-3">
-            <p className="text-xl font-semibold">{otherUSerName}</p>
+            <p className="text-xl font-semibold">{otherUser.name}</p>
             <div
                 className="h-[26rem] w-full flex flex-col justify-start gap-3 p-5 overflow-y-auto"
                 ref={messagesRef}
             >
                 {messages &&
-                    messages.map((message) => (
+                    messages!.map((message) => (
                         <div
                             className={
                                 message.sender._id === userId
