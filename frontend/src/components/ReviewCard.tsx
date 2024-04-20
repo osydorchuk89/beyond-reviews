@@ -1,9 +1,8 @@
 import axios from "axios";
 import { useParams } from "@tanstack/react-router";
-import { MovieRating, User } from "../lib/types";
-import { useAppSelector } from "../store/hooks";
+import { AuthStatus, MovieRating, User } from "../lib/types";
 import { useQuery } from "@tanstack/react-query";
-import { getMovieRatings } from "../lib/requests";
+import { getAuthStatus, getMovieRatings } from "../lib/requests";
 import { useRef, useState } from "react";
 import { BASE_API_URL } from "../lib/urls";
 import { StarIcon } from "./StarIcon";
@@ -31,16 +30,22 @@ export const ReviewCard = ({
     isOwnReview,
 }: ReviewCardProps) => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };
-    const { isAuthenticated, userData } = useAppSelector((state) => state.auth);
-    const userId = userData?._id;
     const { data: movieRatings, refetch } = useQuery<MovieRating[]>({
         queryKey: ["movie", "ratings", { movieId: movieId }],
         queryFn: () => getMovieRatings(movieId),
         enabled: false,
     });
 
-    const reviewData = movieRatings!.find((item) => item._id === reviewId);
+    const { data: authStatus } = useQuery<AuthStatus>({
+        queryKey: ["authState"],
+        queryFn: getAuthStatus,
+        enabled: false,
+    });
 
+    const isAuthenticated = authStatus!.isAuthenticated;
+    const userId = authStatus!.userData?._id;
+
+    const reviewData = movieRatings!.find((item) => item._id === reviewId);
     const hasUserLikedReview = (reviewData!.userId as User)._id === userId;
 
     const [iconFilled, setIconFilled] = useState(hasUserLikedReview);

@@ -1,12 +1,12 @@
 import axios from "axios";
-import { Link } from "@tanstack/react-router";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { authActions } from "../store";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate, useRouterState, Link } from "@tanstack/react-router";
 import { Button } from "./Button";
 import { AccountMenu } from "./AccountMenu";
 import { BASE_URL } from "../lib/urls";
 import { MessageBox } from "./MessageBox";
+import { getAuthStatus, queryClient } from "../lib/requests";
+import { AuthStatus } from "../lib/types";
 
 const topLinks = [
     { id: 1, text: "Books", link: "#" },
@@ -15,8 +15,29 @@ const topLinks = [
 ];
 
 export const TopNavBar = () => {
-    const { isAuthenticated, userData } = useAppSelector((state) => state.auth);
-    const dispatch = useAppDispatch();
+    const logout = async () => {
+        try {
+            await axios({
+                method: "get",
+                url: BASE_URL + "logout",
+                withCredentials: true,
+            });
+            await queryClient.invalidateQueries({
+                queryKey: ["authState"],
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const { data: authStatus } = useQuery<AuthStatus>({
+        queryKey: ["authState"],
+        queryFn: getAuthStatus,
+        staleTime: 1000 * 60,
+    });
+
+    const isAuthenticated = authStatus!.isAuthenticated;
+
     const navigate = useNavigate();
     const router = useRouterState();
     const currentPath = router.location.pathname;
@@ -25,7 +46,7 @@ export const TopNavBar = () => {
     const activeLinkClassName = linkClassName + " bg-amber-300";
 
     const userNameAbbreviation =
-        `${userData?.firstName.charAt(0)}${userData?.lastName.charAt(0)}` ||
+        `${authStatus?.userData?.firstName.charAt(0)}${authStatus?.userData?.lastName.charAt(0)}` ||
         null;
 
     return (
@@ -55,19 +76,7 @@ export const TopNavBar = () => {
                 <div className="flex">
                     <AccountMenu text={userNameAbbreviation as string} />
                     <MessageBox />
-                    <Button
-                        style="dark"
-                        text="LOGOUT"
-                        handleClick={() => {
-                            axios({
-                                method: "get",
-                                url: BASE_URL + "logout",
-                                withCredentials: true,
-                            })
-                                .then(() => dispatch(authActions.logout()))
-                                .catch((error) => console.log(error));
-                        }}
-                    />
+                    <Button style="dark" text="LOGOUT" handleClick={logout} />
                 </div>
             ) : (
                 <Button

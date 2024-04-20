@@ -1,7 +1,8 @@
 import axios from "axios";
 import { AuthState } from "../store";
-import { BASE_API_URL } from "./urls";
+import { BASE_API_URL, BASE_URL } from "./urls";
 import { QueryClient } from "@tanstack/react-query";
+import { Message } from "./types";
 
 export const queryClient = new QueryClient();
 
@@ -86,6 +87,29 @@ export const getMessages = async (senderId: string, recipientId: string) => {
                 sender: senderId,
                 recipient: recipientId,
             },
+        });
+        const messages: Message[] = response.data;
+        const parsedMessages = messages.map((message) => {
+            const messageDate = new Date(message.date);
+            const parsedDate = messageDate.toLocaleString("default", {
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+            return { ...message, date: parsedDate };
+        });
+        return parsedMessages;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const getAuthStatus = async () => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_URL + "auth",
+            withCredentials: true,
         });
         return response.data;
     } catch (error) {

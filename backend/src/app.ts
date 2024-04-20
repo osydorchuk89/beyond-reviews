@@ -1,5 +1,4 @@
-import express, { RequestHandler } from "express";
-import { Server } from "socket.io";
+import express from "express";
 import mongoose from "mongoose";
 import passport from "passport";
 import cors from "cors";
@@ -9,18 +8,11 @@ import "dotenv/config";
 import { userRouter } from "./routes/users";
 import { movieRouter } from "./routes/movies";
 import { messageRouter } from "./routes/messages";
+import { authRouter } from "./routes/auth";
 import { BASE_CLIENT_URL } from "./util/urls";
 import { createServer } from "http";
 import { socket } from "./socket";
 require("./util/auth");
-
-export const isLoggedIn: RequestHandler = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        res.send("Unathorized");
-    }
-};
 
 const app = express();
 
@@ -54,6 +46,7 @@ app.get("/", (_, res) => {
 app.use("/api/users", userRouter);
 app.use("/api/movies", movieRouter);
 app.use("/api/messages", messageRouter);
+app.use("/auth", authRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
     res.send(req.user);
@@ -80,17 +73,12 @@ app.get("/logout", (req, res, next) => {
     res.send("Logged out");
 });
 
-app.get("/protected", isLoggedIn, (req, res) => {
-    res.send(req.user);
-});
-
 mongoose
     .connect(process.env.DATABASE_URL!)
     .then((_) => {
         const httpServer = createServer(app);
         const io = socket.init(httpServer);
         io.on("connection", (socket) => {
-            // console.log(socket.id);
             socket.on("join-room", (room) => socket.join(room));
         });
         httpServer.listen(3000);

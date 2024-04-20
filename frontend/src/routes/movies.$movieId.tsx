@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { MovieMainInfo, MovieAddInfo } from "../components/MovieInfo";
 import { MovieRatingForm } from "../components/MovieRatingForm";
 import { MovieReviews } from "../components/MovieReviews";
-import { getMovie, queryClient } from "../lib/requests";
+import { getMovie, getMovieRatings, queryClient } from "../lib/requests";
 
 const MovieDetails = () => {
     return (
@@ -21,9 +21,14 @@ const MovieDetails = () => {
 
 export const Route = createFileRoute("/movies/$movieId")({
     component: MovieDetails,
-    loader: ({ params }) =>
-        queryClient.ensureQueryData({
+    loader: async ({ params }) => {
+        queryClient.prefetchQuery({
+            queryKey: ["movie", "ratings", { movieId: params.movieId }],
+            queryFn: () => getMovieRatings(params.movieId),
+        });
+        await queryClient.prefetchQuery({
             queryKey: ["movie", { movieId: params.movieId }],
             queryFn: () => getMovie(params.movieId),
-        }),
+        });
+    },
 });

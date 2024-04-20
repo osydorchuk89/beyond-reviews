@@ -33,7 +33,10 @@ movieRouter.get("/:movieId/ratings", async (req, res) => {
         const movieRatings = await UserRating.find({ movieId })
             .populate("likedBy")
             .populate("userId");
-        res.send(movieRatings);
+        const sortedMovieRatings = movieRatings.sort(
+            (a, b) => b.likedBy.length - a.likedBy.length
+        );
+        res.send(sortedMovieRatings);
     } catch (error) {
         res.send(error);
     }

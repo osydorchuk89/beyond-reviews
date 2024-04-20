@@ -42,3 +42,8 @@ export interface Movie {
     numVotes: number;
     poster: string;
 }
+
+export interface AuthStatus {
+    isAuthenticated: boolean;
+    userData: User | null;
+}

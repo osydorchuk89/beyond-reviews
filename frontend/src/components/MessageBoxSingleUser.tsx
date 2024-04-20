@@ -1,15 +1,14 @@
 import axios from "axios";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { MessageBoxContext } from "./MessageBox";
 import { useQuery } from "@tanstack/react-query";
-import { getMessages, queryClient } from "../lib/requests";
+import { getAuthStatus, getMessages, queryClient } from "../lib/requests";
 import { Button } from "./Button";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { BASE_API_URL, BASE_URL } from "../lib/urls";
-import { useAppSelector } from "../store/hooks";
-import { Message } from "../lib/types";
 import { concatStrings } from "../lib/utils";
+import { AuthStatus } from "../lib/types";
 
 interface MessageInput {
     message: string;
@@ -17,12 +16,26 @@ interface MessageInput {
 
 export const MessageBoxSingleUser = () => {
     const messagesRef = useRef<HTMLDivElement>(null);
-    const { userData } = useAppSelector((state) => state.auth);
-    const userId = userData!._id;
+    useLayoutEffect(() => {
+        if (messagesRef && messagesRef.current) {
+            const element = messagesRef.current;
+            element.scroll({
+                top: element.scrollHeight,
+                left: 0,
+            });
+        }
+    });
+
     const { user: otherUser, selectAllUsers } = useContext(MessageBoxContext);
 
+    const { data: authStatus } = useQuery<AuthStatus>({
+        queryKey: ["authState"],
+        queryFn: getAuthStatus,
+        enabled: false,
+    });
+    const userId = authStatus!.userData!._id;
+
     useEffect(() => {
-        // messagesRef.current?.scrollIntoView({ behavior: "smooth" });
         const socket = io(BASE_URL);
         const roomId = concatStrings([userId, otherUser.id]);
         socket.emit("join-room", roomId);
@@ -34,24 +47,8 @@ export const MessageBoxSingleUser = () => {
     }, []);
 
     const { data: messages } = useQuery({
-        queryKey: ["messages"],
-        queryFn: async () => {
-            const messagesData: Message[] = await getMessages(
-                userId,
-                otherUser.id
-            );
-            const messages = messagesData.map((message) => {
-                const messageDate = new Date(message.date);
-                const parsedDate = messageDate.toLocaleString("default", {
-                    hour12: false,
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
-                return { ...message, date: parsedDate };
-            });
-
-            return messages;
-        },
+        queryKey: ["messages", { otherUser: otherUser.id }],
+        queryFn: () => getMessages(userId, otherUser.id),
     });
 
     const { register, handleSubmit, reset } = useForm<MessageInput>();

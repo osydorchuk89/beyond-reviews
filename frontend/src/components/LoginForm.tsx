@@ -4,13 +4,12 @@ import { useRouter } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAppDispatch } from "../store/hooks";
-import { authActions } from "../store";
 import { LoginSchema } from "../lib/schemas";
 import { DarkLink } from "./DarkLink";
 import { Button } from "./Button";
 import { SocialLoginButton } from "./SocialLoginButton";
 import { BASE_URL } from "../lib/urls";
+import { queryClient } from "../lib/requests";
 
 interface LoginInputs {
     email: string;
@@ -30,14 +29,16 @@ export const LoginForm = () => {
 
     const sendLoginFormData = async (data: LoginInputs) => {
         try {
-            const response = await axios({
+            await axios({
                 method: "post",
                 url: BASE_URL + "auth/login",
                 withCredentials: true,
                 data,
             });
             setInvalidCredentials(false);
-            dispatch(authActions.login(response.data));
+            await queryClient.invalidateQueries({
+                queryKey: ["authState"],
+            });
             history.back();
         } catch (error: any) {
             if (error.response.status === 500) {
@@ -51,8 +52,6 @@ export const LoginForm = () => {
     const { mutate } = useMutation({
         mutationFn: sendLoginFormData,
     });
-
-    const dispatch = useAppDispatch();
 
     return (
         <div className="flex flex-col justify-center items-center">
@@ -95,7 +94,6 @@ export const LoginForm = () => {
                         className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
                         type="email"
                         id="email"
-                        // name="email"
                         placeholder="your@email.com"
                     />
                     <p>{errors.email?.message}</p>
@@ -107,7 +105,6 @@ export const LoginForm = () => {
                         className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
                         type="password"
                         id="password"
-                        // name="password"
                         placeholder="password"
                     />
                     <p>{errors.password?.message}</p>
