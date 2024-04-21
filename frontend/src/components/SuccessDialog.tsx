@@ -2,7 +2,7 @@ import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { dialogActions } from "../store";
 import { Dialog } from "@headlessui/react";
 import { Button } from "./Button";
-import { CloseIcon } from "./CloseIcon";
+import { CloseIcon } from "./icons/CloseIcon";
 
 export const SuccessDialog = () => {
     const dialogData = useAppSelector((state) => state.dialog);
@@ -13,8 +13,11 @@ export const SuccessDialog = () => {
             open={dialogData.isOpen}
             onClose={() => dispatch(dialogActions.close())}
         >
-            <div className="fixed inset-0 bg-black/75" aria-hidden="true" />
-            <div className="fixed inset-0 flex w-screen items-center justify-center">
+            <div
+                className="fixed inset-0 bg-black/75 z-20"
+                aria-hidden="true"
+            />
+            <div className="fixed inset-0 flex w-screen items-center justify-center z-30">
                 <Dialog.Panel className="rounded-xl bg-white w-[480px] shadow-md">
                     <Dialog.Title className="flex rounded-xl rounded-b-none bg-amber-500 py-5 relative justify-center shadow-md">
                         <span className="text-xl font-bold">Success</span>

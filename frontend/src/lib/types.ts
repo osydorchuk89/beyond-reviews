@@ -21,7 +21,7 @@ export interface MovieRating {
     movieReview: string;
     userId: string | User;
     date: Date;
-    likedBy: User[];
+    likedBy: string[] | User[];
     __v: number;
     _id: string;
 }
@@ -41,6 +41,7 @@ export interface Movie {
     avgVote: number;
     numVotes: number;
     poster: string;
+    likedBy: string[] | User[];
 }
 
 export interface AuthStatus {

@@ -7,8 +7,9 @@ import { SortFilterBar } from "../components/SortFilterBar";
 import { MovieCard } from "../components/MovieCard";
 import { Button } from "../components/Button";
 import { LoadingSpinner } from "../components/LoadingSpinner";
-import { getMovies } from "../lib/requests";
+import { getMovies, queryClient } from "../lib/requests";
 import { filterList, sortList } from "../lib/data";
+import { useQuery } from "@tanstack/react-query";
 
 const movieSearchSchema = z.object({
     search: z.string().optional().catch(""),
@@ -16,7 +17,7 @@ const movieSearchSchema = z.object({
     sort: z.string().optional().catch(""),
 });
 
-const loadingComponent = () => {
+const LoadingComponent = () => {
     return (
         <div className="w-full h-full flex justify-center items-center">
             <LoadingSpinner />
@@ -31,28 +32,35 @@ const Movies = () => {
         navigate({ search: {} });
     }, []);
 
-    const moviesData: Movie[] = Route.useLoaderData();
+    const { data: movies } = useQuery<Movie[]>({
+        queryKey: ["movies"],
+        queryFn: getMovies,
+    });
+
+    // const movies: Movie[] = Route.useLoaderData();
     const [numberMovies, setNumberMovies] = useState(15);
     const { search, filter, sort } = Route.useSearch();
 
-    let sortedMovies = moviesData;
+    let sortedMovies = movies as Movie[];
 
     switch (sort) {
         case "oldest":
-            sortedMovies = moviesData.sort(
+            sortedMovies = sortedMovies.sort(
                 (a, b) => a.releaseYear - b.releaseYear
             );
             break;
         case "newest":
-            sortedMovies = moviesData.sort(
+            sortedMovies = sortedMovies.sort(
                 (a, b) => b.releaseYear - a.releaseYear
             );
             break;
         case "highestRating":
-            sortedMovies = moviesData.sort((a, b) => b.avgRating - a.avgRating);
+            sortedMovies = sortedMovies.sort(
+                (a, b) => b.avgRating - a.avgRating
+            );
             break;
         case "mostVotes":
-            sortedMovies = moviesData.sort(
+            sortedMovies = sortedMovies.sort(
                 (a, b) => b.numRatings - a.numRatings
             );
             break;
@@ -60,22 +68,22 @@ const Movies = () => {
 
     switch (filter) {
         case "year2023":
-            sortedMovies = moviesData.filter(
+            sortedMovies = sortedMovies.filter(
                 (item) => item.releaseYear === 2023
             );
             break;
         case "year2024":
-            sortedMovies = moviesData.filter(
+            sortedMovies = sortedMovies.filter(
                 (item) => item.releaseYear === 2024
             );
             break;
         case "genreAction":
-            sortedMovies = moviesData.filter((item) =>
+            sortedMovies = sortedMovies.filter((item) =>
                 item.genres.includes("Action")
             );
             break;
         case "genreDrama":
-            sortedMovies = moviesData.filter((item) =>
+            sortedMovies = sortedMovies.filter((item) =>
                 item.genres.includes("Drama")
             );
             break;
@@ -147,7 +155,11 @@ const Movies = () => {
 
 export const Route = createFileRoute("/movies/")({
     component: Movies,
-    loader: getMovies,
-    pendingComponent: loadingComponent,
+    loader: async () =>
+        await queryClient.ensureQueryData({
+            queryKey: ["movies"],
+            queryFn: getMovies,
+        }),
+    pendingComponent: LoadingComponent,
     validateSearch: movieSearchSchema,
 });

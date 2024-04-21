@@ -6,7 +6,7 @@ import {
     getUsers,
     queryClient,
 } from "../lib/requests";
-import { UserIcon } from "./UserIcon";
+import { UserIcon } from "./icons/UserIcon";
 import { AuthStatus, User } from "../lib/types";
 import { MessageBoxContext } from "./MessageBox";
 

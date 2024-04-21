@@ -1,6 +1,6 @@
 import { useState, createContext } from "react";
 import { Popover } from "@headlessui/react";
-import { MessageIcon } from "./MessageIcon";
+import { MessageIcon } from "./icons/MessageIcon";
 import { CloseIconAlt } from "./CloseIconAlt";
 import { MessageBoxAllUsers } from "./MessageBoxAllUsers";
 import { MessageBoxSingleUser } from "./MessageBoxSingleUser";

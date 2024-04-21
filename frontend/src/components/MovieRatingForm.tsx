@@ -8,7 +8,7 @@ import { UserRatingSchema } from "../lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "./Button";
 import { DarkLink } from "./DarkLink";
-import { StarIcon } from "./StarIcon";
+import { StarIcon } from "./icons/StarIcon";
 import { useTruncatedElement } from "../hooks/useTuncatedElement";
 import { BASE_API_URL } from "../lib/urls";
 import { Movie, MovieRating, User } from "../lib/types";

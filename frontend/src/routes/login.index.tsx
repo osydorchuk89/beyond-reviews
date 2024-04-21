@@ -1,5 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LoginForm } from "../components/LoginForm";
+import { z } from "zod";
+
+const redirectSchema = z.object({
+    redirect: z.string().optional().catch(""),
+});
 
 const Login = () => {
     return (
@@ -11,4 +16,5 @@ const Login = () => {
 
 export const Route = createFileRoute("/login/")({
     component: Login,
+    validateSearch: redirectSchema,
 });

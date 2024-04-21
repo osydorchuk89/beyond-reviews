@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as RegistrationImport } from './routes/registration'
 import { Route as GetmoviesImport } from './routes/getmovies'
 import { Route as IndexImport } from './routes/index'
+import { Route as UserIndexImport } from './routes/user.index'
 import { Route as MoviesIndexImport } from './routes/movies.index'
 import { Route as LoginIndexImport } from './routes/login.index'
+import { Route as UserReviewsImport } from './routes/user.reviews'
 import { Route as MoviesMovieIdImport } from './routes/movies.$movieId'
 import { Route as LoginSuccessImport } from './routes/login.success'
 
@@ -36,6 +38,11 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const UserIndexRoute = UserIndexImport.update({
+  path: '/user/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const MoviesIndexRoute = MoviesIndexImport.update({
   path: '/movies/',
   getParentRoute: () => rootRoute,
@@ -43,6 +50,11 @@ const MoviesIndexRoute = MoviesIndexImport.update({
 
 const LoginIndexRoute = LoginIndexImport.update({
   path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UserReviewsRoute = UserReviewsImport.update({
+  path: '/user/reviews',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -80,12 +92,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoviesMovieIdImport
       parentRoute: typeof rootRoute
     }
+    '/user/reviews': {
+      preLoaderRoute: typeof UserReviewsImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       preLoaderRoute: typeof LoginIndexImport
       parentRoute: typeof rootRoute
     }
     '/movies/': {
       preLoaderRoute: typeof MoviesIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/user/': {
+      preLoaderRoute: typeof UserIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -99,8 +119,10 @@ export const routeTree = rootRoute.addChildren([
   RegistrationRoute,
   LoginSuccessRoute,
   MoviesMovieIdRoute,
+  UserReviewsRoute,
   LoginIndexRoute,
   MoviesIndexRoute,
+  UserIndexRoute,
 ])
 
 /* prettier-ignore-end */

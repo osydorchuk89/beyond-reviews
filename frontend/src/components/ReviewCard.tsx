@@ -2,11 +2,11 @@ import axios from "axios";
 import { useParams } from "@tanstack/react-router";
 import { AuthStatus, MovieRating, User } from "../lib/types";
 import { useQuery } from "@tanstack/react-query";
-import { getAuthStatus, getMovieRatings } from "../lib/requests";
+import { getAuthStatus, getMovieRatings, queryClient } from "../lib/requests";
 import { useRef, useState } from "react";
 import { BASE_API_URL } from "../lib/urls";
-import { StarIcon } from "./StarIcon";
-import { LikeIcon } from "./LikeIcon";
+import { StarIcon } from "./icons/StarIcon";
+import { LikeIcon } from "./icons/LikeIcon";
 import { useTruncatedElement } from "../hooks/useTuncatedElement";
 import { Button } from "./Button";
 
@@ -30,10 +30,10 @@ export const ReviewCard = ({
     isOwnReview,
 }: ReviewCardProps) => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };
-    const { data: movieRatings, refetch } = useQuery<MovieRating[]>({
+    const { data: movieRatings } = useQuery<MovieRating[]>({
         queryKey: ["movie", "ratings", { movieId: movieId }],
         queryFn: () => getMovieRatings(movieId),
-        enabled: false,
+        // enabled: false,
     });
 
     const { data: authStatus } = useQuery<AuthStatus>({
@@ -46,7 +46,9 @@ export const ReviewCard = ({
     const userId = authStatus!.userData?._id;
 
     const reviewData = movieRatings!.find((item) => item._id === reviewId);
-    const hasUserLikedReview = (reviewData!.userId as User)._id === userId;
+    const hasUserLikedReview = (reviewData!.likedBy as string[]).includes(
+        userId as string
+    );
 
     const [iconFilled, setIconFilled] = useState(hasUserLikedReview);
     const [hasLiked, setHasLiked] = useState(hasUserLikedReview);
@@ -68,7 +70,9 @@ export const ReviewCard = ({
                 data: { like: hasLiked ? false : true, userId },
             });
             setHasLiked((prevState) => !prevState);
-            refetch();
+            queryClient.invalidateQueries({
+                queryKey: ["movie", "ratings", { movieId: movieId }],
+            });
         } catch (error: any) {
             console.log(error);
         }

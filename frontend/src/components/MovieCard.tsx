@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { StarIcon } from "./StarIcon";
+import { StarIcon } from "./icons/StarIcon";
 
 interface MovieCardProps {
     _id: string;

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { useRouter } from "@tanstack/react-router";
+import { useRouter, getRouteApi } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +8,7 @@ import { LoginSchema } from "../lib/schemas";
 import { DarkLink } from "./DarkLink";
 import { Button } from "./Button";
 import { SocialLoginButton } from "./SocialLoginButton";
-import { BASE_URL } from "../lib/urls";
+import { BASE_CLIENT_URL, BASE_URL } from "../lib/urls";
 import { queryClient } from "../lib/requests";
 
 interface LoginInputs {
@@ -16,7 +16,11 @@ interface LoginInputs {
     password: string;
 }
 
+const routeApi = getRouteApi("/login/");
+
 export const LoginForm = () => {
+    const { redirect } = routeApi.useSearch();
+
     const [invalidCredentials, setInvalidCredentials] = useState(false);
     const {
         register,
@@ -39,7 +43,11 @@ export const LoginForm = () => {
             await queryClient.invalidateQueries({
                 queryKey: ["authState"],
             });
-            history.back();
+            if (redirect) {
+                history.push(redirect.replace(BASE_CLIENT_URL, ""));
+            } else {
+                history.back();
+            }
         } catch (error: any) {
             if (error.response.status === 500) {
                 setInvalidCredentials(true);

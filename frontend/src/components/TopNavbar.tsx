@@ -15,6 +15,8 @@ const topLinks = [
 ];
 
 export const TopNavBar = () => {
+    const navigate = useNavigate();
+
     const logout = async () => {
         try {
             await axios({
@@ -25,6 +27,7 @@ export const TopNavBar = () => {
             await queryClient.invalidateQueries({
                 queryKey: ["authState"],
             });
+            navigate({ to: "/" });
         } catch (error) {
             console.log(error);
         }
@@ -38,7 +41,6 @@ export const TopNavBar = () => {
 
     const isAuthenticated = authStatus!.isAuthenticated;
 
-    const navigate = useNavigate();
     const router = useRouterState();
     const currentPath = router.location.pathname;
 
@@ -50,7 +52,7 @@ export const TopNavBar = () => {
         null;
 
     return (
-        <nav className="sticky top-0 bg-amber-50 w-full flex items-center justify-between p-5">
+        <nav className="sticky top-0 bg-amber-50 w-full flex items-center justify-between p-5 z-10">
             <Link to="/">
                 <span className="text-2xl text-amber-950 font-bold">
                     Beyond Reviews
