@@ -14,6 +14,8 @@ interface MessageInput {
     message: string;
 }
 
+const socket = io(BASE_URL);
+
 export const MessageBoxSingleUser = () => {
     const messagesRef = useRef<HTMLDivElement>(null);
     useLayoutEffect(() => {
@@ -35,16 +37,15 @@ export const MessageBoxSingleUser = () => {
     });
     const userId = authStatus!.userData!._id;
 
-    useEffect(() => {
-        const socket = io(BASE_URL);
-        const roomId = concatStrings([userId, otherUser.id]);
-        socket.emit("join-room", roomId);
-        socket.on("new-message", () => {
-            queryClient.invalidateQueries({
-                queryKey: ["messages"],
-            });
-        });
-    }, []);
+    // useEffect(() => {
+    //     const roomId = concatStrings([userId, otherUser.id]);
+    //     socket.emit("join-room", roomId);
+    //     socket.on("new-message", ({ data, from }) => {
+    //         queryClient.invalidateQueries({
+    //             queryKey: ["messages"],
+    //         });
+    //     });
+    // }, [socket]);
 
     const { data: messages } = useQuery({
         queryKey: ["messages", { otherUser: otherUser.id }],
@@ -70,6 +71,7 @@ export const MessageBoxSingleUser = () => {
                 },
             });
             reset();
+            // socket.emit("message-sent", { data, to: otherUser.id });
         } catch (error) {
             console.log(error);
         }

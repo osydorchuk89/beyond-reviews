@@ -51,7 +51,11 @@ messageRouter.post("/", async (req, res) => {
         const senderId = sender!._id.toString();
         const recipientId = recipient!._id.toString();
         const roomId = concatStrings([senderId, recipientId]);
-        socket.getIO().to(roomId).emit("new-message");
+        const io = socket.getIO();
+        // io.on("message-sent", ({ data, to }) => {
+        //     io.to(to).emit("new-message", { data, from: senderId });
+        // });
+        io.to(recipientId).to(senderId).emit("new-message", { from: senderId });
         res.status(200).send();
     } catch (error: any) {
         res.status(500).send({ message: error.message });
