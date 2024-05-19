@@ -5,6 +5,8 @@ export interface IMessage {
     recipient: Types.ObjectId;
     text: string;
     date: Date;
+    seen: boolean;
+    read: boolean;
 }
 
 const messageSchema = new Schema<IMessage>({
@@ -12,6 +14,8 @@ const messageSchema = new Schema<IMessage>({
     recipient: { type: Schema.Types.ObjectId, ref: "User" },
     text: String,
     date: Date,
+    seen: Boolean,
+    read: Boolean,
 });
 
 export const Message = model<IMessage>("Message", messageSchema);

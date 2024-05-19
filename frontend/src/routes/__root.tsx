@@ -11,7 +11,7 @@ const Root = () => {
         <>
             <ScrollRestoration />
             <TopNavBar />
-            <Outlet></Outlet>
+            <Outlet />
             <BottomNavBar />
             <SuccessDialog />
         </>

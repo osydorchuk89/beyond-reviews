@@ -14,10 +14,16 @@ export interface AuthState {
 
 interface DialogState {
     isOpen: boolean;
+    allUsers: boolean | null;
+    otherUser: { id: string; name: string } | null;
 }
 
 const initialAuthState: AuthState = { isAuthenticated: false, userData: null };
-const initialDialogState: DialogState = { isOpen: false };
+const initialDialogState: DialogState = {
+    isOpen: false,
+    allUsers: true,
+    otherUser: null,
+};
 
 const authSlice = createSlice({
     name: "auth",
@@ -40,9 +46,19 @@ const dialogSlice = createSlice({
     reducers: {
         open(state) {
             state.isOpen = true;
+            state.allUsers = true;
         },
         close(state) {
             state.isOpen = false;
+            state.allUsers = null;
+        },
+        selectSingleUser(state, action) {
+            state.allUsers = false;
+            state.otherUser = action.payload;
+        },
+        selectAllUSers(state) {
+            state.allUsers = true;
+            state.otherUser = null;
         },
     },
 });

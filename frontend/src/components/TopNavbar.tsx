@@ -5,7 +5,7 @@ import { Button } from "./Button";
 import { AccountMenu } from "./AccountMenu";
 import { BASE_URL } from "../lib/urls";
 import { MessageBox } from "./MessageBox";
-import { getAuthStatus, queryClient } from "../lib/requests";
+import { getAuthStatus, getUsers, queryClient } from "../lib/requests";
 import { AuthStatus } from "../lib/types";
 
 const topLinks = [
@@ -38,6 +38,8 @@ export const TopNavBar = () => {
         queryFn: getAuthStatus,
         staleTime: 1000 * 60,
     });
+
+    useQuery({ queryKey: ["users"], queryFn: getUsers });
 
     const isAuthenticated = authStatus!.isAuthenticated;
 

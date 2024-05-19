@@ -2,7 +2,7 @@ import axios from "axios";
 import { AuthState } from "../store";
 import { BASE_API_URL, BASE_URL } from "./urls";
 import { QueryClient } from "@tanstack/react-query";
-import { Message } from "./types";
+import { Message, UsersMessages } from "./types";
 
 export const queryClient = new QueryClient();
 
@@ -89,7 +89,7 @@ export const getMessages = async (senderId: string, recipientId: string) => {
             },
         });
         const messages: Message[] = response.data;
-        const parsedMessages = messages.map((message) => {
+        const parsedMessages: Message[] = messages.map((message) => {
             const messageDate = new Date(message.date);
             const parsedDate = messageDate.toLocaleString("default", {
                 hour12: false,
@@ -98,7 +98,34 @@ export const getMessages = async (senderId: string, recipientId: string) => {
             });
             return { ...message, date: parsedDate };
         });
-        return parsedMessages;
+        const usersMessages: UsersMessages = {
+            sender: senderId,
+            recipient: recipientId,
+            messages: parsedMessages,
+        };
+        return usersMessages;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const getAllMessages = async (
+    users: { senderId: string; recipientId: string }[]
+) => {
+    const allMessages = [];
+    for (const { senderId, recipientId } of users) {
+        const messages = await getMessages(senderId, recipientId);
+        allMessages.push(messages);
+    }
+    return allMessages;
+};
+
+export const markMessageRead = async (messageId: string) => {
+    try {
+        await axios({
+            method: "put",
+            url: BASE_API_URL + "messages/" + messageId,
+        });
     } catch (error) {
         console.log(error);
     }

@@ -2,7 +2,6 @@ import { Router } from "express";
 import { Message } from "../models/message";
 import { User } from "../models/user";
 import { socket } from "../socket";
-import { concatStrings } from "../util/utils";
 
 export const messageRouter = Router();
 
@@ -36,28 +35,64 @@ messageRouter.get("/", async (req, res) => {
 
 messageRouter.post("/", async (req, res) => {
     const messageText = req.body.message;
+    const date = req.body.date.toString();
     const sender = await User.findById(req.body.sender);
     const recipient = await User.findById(req.body.recipient);
-    const date = req.body.date.toString();
 
     try {
         const message = new Message({
-            sender,
-            recipient,
+            sender: sender!._id,
+            recipient: recipient!._id,
             text: messageText,
             date,
+            read: false,
         });
         await message.save();
         const senderId = sender!._id.toString();
         const recipientId = recipient!._id.toString();
-        const roomId = concatStrings([senderId, recipientId]);
         const io = socket.getIO();
         // io.on("message-sent", ({ data, to }) => {
         //     io.to(to).emit("new-message", { data, from: senderId });
         // });
-        io.to(recipientId).to(senderId).emit("new-message", { from: senderId });
+        io.to(recipientId)
+            .to(senderId)
+            .emit("new-message", { data: message, from: senderId });
         res.status(200).send();
     } catch (error: any) {
         res.status(500).send({ message: error.message });
     }
 });
+
+messageRouter.put("/:messageId", async (req, res) => {
+    try {
+        const { messageId } = req.params;
+        await Message.findByIdAndUpdate(messageId, { read: true });
+        res.status(200).send();
+    } catch (error: any) {
+        res.status(500).send({ message: error.message });
+    }
+});
+
+// messageRouter.put("/:messageId", async (req, res) => {
+//     try {
+//         const { messageId } = req.params;
+//         const message = await Message.findById(messageId);
+//         if (message) {
+//             if (!message.seen) {
+//                 message.seen = true;
+//                 await message.save();
+//                 res.status(200).send();
+//             } else {
+//                 message.read = true;
+//                 await message.save();
+//                 res.status(200).send();
+//             }
+//         } else {
+//             res.status(500).send({
+//                 message: "Could not find message",
+//             });
+//         }
+//     } catch (error: any) {
+//         res.status(500).send({ message: error.message });
+//     }
+// });

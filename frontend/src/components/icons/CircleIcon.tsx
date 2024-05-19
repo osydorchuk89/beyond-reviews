@@ -2,10 +2,10 @@ export const CircleIcon = ({ className }: { className: string }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            fill="#f59e0b"
+            fill="#b45309"
             viewBox="0 0 24 24"
             strokeWidth="1"
-            stroke="#f59e0b"
+            stroke="#b45309"
             className={className}
         >
             <path

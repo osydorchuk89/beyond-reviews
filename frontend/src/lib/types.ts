@@ -12,7 +12,15 @@ export interface Message {
     sender: User;
     recipient: User;
     text: string;
-    date: Date;
+    date: Date | string;
+    seen: boolean;
+    read: boolean;
+}
+
+export interface UsersMessages {
+    sender: User | string;
+    recipient: User | string;
+    messages: Message[];
 }
 
 export interface MovieRating {

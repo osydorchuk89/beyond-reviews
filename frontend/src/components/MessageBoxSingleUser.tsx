@@ -1,23 +1,27 @@
 import axios from "axios";
-import { useContext, useEffect, useLayoutEffect, useRef } from "react";
-import { io } from "socket.io-client";
-import { MessageBoxContext } from "./MessageBox";
-import { useQuery } from "@tanstack/react-query";
-import { getAuthStatus, getMessages, queryClient } from "../lib/requests";
+import { useLayoutEffect, useRef } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+    getAuthStatus,
+    getMessages,
+    markMessageRead,
+    queryClient,
+} from "../lib/requests";
 import { Button } from "./Button";
+import { MessageItem } from "./MessageItem";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { BASE_API_URL, BASE_URL } from "../lib/urls";
-import { concatStrings } from "../lib/utils";
-import { AuthStatus } from "../lib/types";
+import { BASE_API_URL } from "../lib/urls";
+import { AuthStatus, Message } from "../lib/types";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { dialogActions } from "../store";
 
 interface MessageInput {
     message: string;
 }
 
-const socket = io(BASE_URL);
-
 export const MessageBoxSingleUser = () => {
     const messagesRef = useRef<HTMLDivElement>(null);
+
     useLayoutEffect(() => {
         if (messagesRef && messagesRef.current) {
             const element = messagesRef.current;
@@ -28,7 +32,10 @@ export const MessageBoxSingleUser = () => {
         }
     });
 
-    const { user: otherUser, selectAllUsers } = useContext(MessageBoxContext);
+    const { name: otherUserName, id: otherUserId } = useAppSelector(
+        (state) => state.dialog.otherUser!
+    );
+    const dispatch = useAppDispatch();
 
     const { data: authStatus } = useQuery<AuthStatus>({
         queryKey: ["authState"],
@@ -37,20 +44,31 @@ export const MessageBoxSingleUser = () => {
     });
     const userId = authStatus!.userData!._id;
 
-    // useEffect(() => {
-    //     const roomId = concatStrings([userId, otherUser.id]);
-    //     socket.emit("join-room", roomId);
-    //     socket.on("new-message", ({ data, from }) => {
-    //         queryClient.invalidateQueries({
-    //             queryKey: ["messages"],
-    //         });
-    //     });
-    // }, [socket]);
-
-    const { data: messages } = useQuery({
-        queryKey: ["messages", { otherUser: otherUser.id }],
-        queryFn: () => getMessages(userId, otherUser.id),
+    const { data: usersMessages } = useQuery({
+        queryKey: ["messages", { user: userId, otherUser: otherUserId }],
+        queryFn: () => getMessages(userId, otherUserId),
     });
+
+    const { mutate: markMessageAsRead } = useMutation({
+        mutationFn: async (messageId: string) =>
+            await markMessageRead(messageId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [
+                    "messages",
+                    // { user: userId, otherUser: otherUserId },
+                ],
+            });
+        },
+    });
+
+    const markMessagesAsRead = (messages: Message[]) => {
+        messages.forEach((msg) => {
+            if (!msg.read && msg.sender._id !== userId) {
+                markMessageAsRead(msg._id);
+            }
+        });
+    };
 
     const { register, handleSubmit, reset } = useForm<MessageInput>();
 
@@ -65,52 +83,30 @@ export const MessageBoxSingleUser = () => {
                 },
                 data: {
                     sender: userId,
-                    recipient: otherUser.id,
+                    recipient: otherUserId,
                     message: data.message,
                     date,
                 },
             });
             reset();
-            // socket.emit("message-sent", { data, to: otherUser.id });
         } catch (error) {
             console.log(error);
         }
     };
 
-    const messageStyle =
-        "flex gap-2 justify-between px-4 py-1 rounded-lg relative";
-    const timeStampStyle = "absolute right-1 bottom-1 text-[10px]";
-
     return (
-        <div className="flex flex-col h-full justify-between items-center p-3">
-            <p className="text-xl font-semibold">{otherUser.name}</p>
+        <div
+            className="flex flex-col h-full justify-between items-center p-3"
+            onClick={() => markMessagesAsRead(usersMessages!.messages)}
+        >
+            <p className="text-xl font-semibold">{otherUserName}</p>
             <div
                 className="h-[26rem] w-full flex flex-col justify-start gap-3 p-5 overflow-y-auto"
                 ref={messagesRef}
             >
-                {messages &&
-                    messages!.map((message) => (
-                        <div
-                            className={
-                                message.sender._id === userId
-                                    ? messageStyle + " bg-amber-200  self-end"
-                                    : messageStyle +
-                                      " bg-amber-700 text-amber-50 self-start"
-                            }
-                            key={message._id}
-                        >
-                            <span className="mr-10">{message.text}</span>
-                            <span
-                                className={
-                                    message.sender._id === userId
-                                        ? timeStampStyle + " text-gray-700"
-                                        : timeStampStyle + " text-gray-50"
-                                }
-                            >
-                                {message.date}
-                            </span>
-                        </div>
-                    ))}
+                {usersMessages!.messages.map((message) => (
+                    <MessageItem message={message} key={message._id} />
+                ))}
             </div>
             <div className="w-full flex flex-col gap-5">
                 <form
@@ -134,7 +130,9 @@ export const MessageBoxSingleUser = () => {
                 </form>
                 <p
                     className="text-center hover:underline cursor-pointer"
-                    onClick={selectAllUsers}
+                    onClick={() => {
+                        dispatch(dialogActions.selectAllUSers());
+                    }}
                 >
                     Back to all messages
                 </p>

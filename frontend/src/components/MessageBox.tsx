@@ -1,103 +1,92 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect } from "react";
 import { Popover } from "@headlessui/react";
 import { MessageIcon } from "./icons/MessageIcon";
-import { CloseIconAlt } from "./icons/CloseIconAlt";
 import { CircleIcon } from "./icons/CircleIcon";
 import { MessageBoxAllUsers } from "./MessageBoxAllUsers";
 import { MessageBoxSingleUser } from "./MessageBoxSingleUser";
-import { BackIcon } from "./BackIcon";
+import { MessageBoxTopPanel } from "./MessageBoxTopPanel";
 import { BASE_URL } from "../lib/urls";
 import { io } from "socket.io-client";
 import { useQuery } from "@tanstack/react-query";
-import { AuthStatus } from "../lib/types";
-import { getAuthStatus, queryClient } from "../lib/requests";
-
-interface MessageBoxContextProps {
-    user: { id: string; name: string };
-    selectAllUsers: () => void;
-    selectSingleUser: (userId: string, userName: string) => void;
-}
+import { AuthStatus, User } from "../lib/types";
+import {
+    getAllMessages,
+    getAuthStatus,
+    getUsers,
+    queryClient,
+} from "../lib/requests";
+import { useAppSelector } from "../store/hooks";
 
 const socket = io(BASE_URL);
 
-export const MessageBoxContext = createContext({} as MessageBoxContextProps);
-
 export const MessageBox = () => {
-    const [user, setUsers] = useState({ id: "", name: "" });
-    const [newMessage, setNewMessage] = useState<boolean>(false);
+    const { allUsers } = useAppSelector((state) => state.dialog);
 
     const { data: authStatus } = useQuery<AuthStatus>({
         queryKey: ["authState"],
         queryFn: getAuthStatus,
         enabled: false,
     });
+
+    const { data: users } = useQuery<User[]>({
+        queryKey: ["users"],
+        queryFn: getUsers,
+    });
+
     const userId = authStatus!.userData!._id;
 
+    const { data: allMessages } = useQuery({
+        queryKey: ["messages"],
+        queryFn: () => {
+            const userPairs = users!.map((user) => ({
+                senderId: user._id,
+                recipientId: userId,
+            }));
+            return getAllMessages(userPairs!);
+        },
+    });
+
+    const hasUnreadMessages = allMessages?.find((usersMessages) =>
+        usersMessages!.messages.find((message) => !message.read)
+    );
+
     useEffect(() => {
-        // const roomId = concatStrings([userId, otherUser.id]);
-        // socket.emit("join-room", roomId);
         socket.emit("join-room", userId);
-        socket.on("new-message", ({ from }) => {
-            queryClient.invalidateQueries({
-                queryKey: ["messages"],
-            });
+        socket.on("new-message", ({ data, from }) => {
             if (from !== userId) {
-                setNewMessage(true);
+                queryClient.invalidateQueries({
+                    queryKey: ["messages", { user: userId, otherUser: from }],
+                });
+            } else {
+                queryClient.invalidateQueries({
+                    queryKey: [
+                        "messages",
+                        { user: userId, otherUser: data.recipient },
+                    ],
+                });
             }
         });
     }, [socket]);
 
-    const messageBoxContextValue = {
-        user,
-        selectAllUsers: () => setUsers({ id: "", name: "" }),
-        selectSingleUser: (userId: string, userName: string) =>
-            setUsers({ id: userId, name: userName }),
-    };
-
     return (
-        <MessageBoxContext.Provider value={messageBoxContextValue}>
-            <Popover>
-                <Popover.Button
-                    className="absolute top-7 right-[182px] cursor-pointer"
-                    onClick={() => {
-                        setUsers({ id: "", name: "" });
-                        if (newMessage) {
-                            setNewMessage(false);
-                        }
-                    }}
-                >
+        <Popover>
+            <>
+                <Popover.Button className="absolute top-7 right-[182px] cursor-pointer">
                     <MessageIcon />
                     <CircleIcon
-                        className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${newMessage ? "" : "hidden"}`}
+                        className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${hasUnreadMessages ? "" : "hidden"}`}
                     />
                 </Popover.Button>
                 <Popover.Panel className="flex flex-col absolute top-[90px] right-0 z-10 w-96 h-[87vh] bg-amber-50 rounded-md rounded-r-none shadow-md">
-                    <div className="flex justify-between py-3 px-3">
-                        {user.id === "" ? (
-                            <button className="invisible" />
-                        ) : (
-                            <button>
-                                <BackIcon
-                                    className="w-8 h-8"
-                                    handleClick={() =>
-                                        setUsers({ id: "", name: "" })
-                                    }
-                                />
-                            </button>
-                        )}
-
-                        <Popover.Button>
-                            <CloseIconAlt className="w-8 h-8" />
-                        </Popover.Button>
-                    </div>
+                    <MessageBoxTopPanel />
                     <hr className="h-px bg-amber-400 border-0" />
-                    {user.id === "" ? (
+                    {allUsers ? (
                         <MessageBoxAllUsers />
                     ) : (
                         <MessageBoxSingleUser />
                     )}
                 </Popover.Panel>
-            </Popover>
-        </MessageBoxContext.Provider>
+            </>
+        </Popover>
     );
 };

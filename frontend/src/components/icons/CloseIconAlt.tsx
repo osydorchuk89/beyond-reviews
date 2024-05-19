@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-export const CloseIconAlt = ({ className }: { className: string }) => {
+interface CloseIconAltProps {
+    className: string;
+    handleClick?: React.MouseEventHandler<SVGSVGElement>;
+}
+
+export const CloseIconAlt = ({ className, handleClick }: CloseIconAltProps) => {
     const [mouseOver, setMouseOver] = useState(false);
 
     return (
@@ -13,6 +18,7 @@ export const CloseIconAlt = ({ className }: { className: string }) => {
             className={className}
             onMouseEnter={() => setMouseOver(true)}
             onMouseLeave={() => setMouseOver(false)}
+            onClick={handleClick}
         >
             <path
                 strokeLinecap="round"
