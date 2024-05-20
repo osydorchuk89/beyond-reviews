@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { BASE_API_URL } from "../lib/urls";
-import { queryClient } from "../lib/requests";
+// import { queryClient } from "../lib/requests";
 
 // interface UseReadMessageProps {
 //     messageId: string;
