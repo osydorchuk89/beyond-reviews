@@ -8,7 +8,7 @@ import {
     queryClient,
 } from "../lib/requests";
 import { Button } from "./Button";
-import { MessageItem } from "./MessageItem";
+import { MessageBoxItem } from "./MessageBoxItem";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { BASE_API_URL } from "../lib/urls";
 import { AuthStatus, Message } from "../lib/types";
@@ -105,7 +105,7 @@ export const MessageBoxSingleUser = () => {
                 ref={messagesRef}
             >
                 {usersMessages!.messages.map((message) => (
-                    <MessageItem message={message} key={message._id} />
+                    <MessageBoxItem message={message} key={message._id} />
                 ))}
             </div>
             <div className="w-full flex flex-col gap-5">

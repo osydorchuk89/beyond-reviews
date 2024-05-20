@@ -6,7 +6,7 @@ interface MessageProps {
     message: Message;
 }
 
-export const MessageItem = ({ message }: MessageProps) => {
+export const MessageBoxItem = ({ message }: MessageProps) => {
     const { data: authStatus } = useQuery<AuthStatus>({
         queryKey: ["authState"],
         queryFn: getAuthStatus,
@@ -27,7 +27,7 @@ export const MessageItem = ({ message }: MessageProps) => {
                       : messageStyle + " bg-slate-200 self-start font-bold"
             }
         >
-            <span className="mr-10">{message.text}</span>
+            <span className="mr-16">{message.text}</span>
             <span className="absolute right-1 bottom-1 text-[10px]">
                 {message.date as string}
             </span>

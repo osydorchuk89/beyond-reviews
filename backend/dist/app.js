@@ -11,12 +11,13 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const express_session_1 = __importDefault(require("express-session"));
 require("dotenv/config");
 const users_1 = require("./routes/users");
-const hello_1 = require("./routes/hello");
+const movies_1 = require("./routes/movies");
+const messages_1 = require("./routes/messages");
+const auth_1 = require("./routes/auth");
 const urls_1 = require("./util/urls");
+const http_1 = require("http");
+const socket_1 = require("./socket");
 require("./util/auth");
-const isLoggedIn = (req, res, next) => {
-    req.isAuthenticated() ? next() : res.send("Unathorized");
-};
 const app = (0, express_1.default)();
 const corsOptions = {
     origin: "http://localhost:5173",
@@ -34,26 +35,21 @@ app.use((0, express_session_1.default)({
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-app.use(passport_1.default.authenticate("session"));
 app.get("/", (_, res) => {
     res.send("Hello World!");
 });
 app.use("/api/users", users_1.userRouter);
-app.use("/api/hello", hello_1.helloRouter);
-app.post("/auth/login", passport_1.default.authenticate("local", {
-    // successRedirect: BASE_CLIENT_URL,
-    failureRedirect: urls_1.BASE_CLIENT_URL + "/login",
-}), (req, res) => {
-    console.log(req.user);
+app.use("/api/movies", movies_1.movieRouter);
+app.use("/api/messages", messages_1.messageRouter);
+app.use("/auth", auth_1.authRouter);
+app.post("/auth/login", passport_1.default.authenticate("local"), (req, res) => {
     res.send(req.user);
 });
 app.get("/auth/google", passport_1.default.authenticate("google"));
 app.get("/auth/google/callback", passport_1.default.authenticate("google", {
-    // successRedirect: BASE_CLIENT_URL,
-    failureRedirect: urls_1.BASE_CLIENT_URL + "/login",
+    successRedirect: urls_1.BASE_CLIENT_URL + "/login/success",
 }), (req, res) => {
-    res.redirect(urls_1.BASE_CLIENT_URL);
-    // res.send(req.user);
+    res.send(req.user);
 });
 app.get("/logout", (req, res, next) => {
     req.logout((err) => {
@@ -66,6 +62,11 @@ app.get("/logout", (req, res, next) => {
 mongoose_1.default
     .connect(process.env.DATABASE_URL)
     .then((_) => {
-    app.listen(3000);
+    const httpServer = (0, http_1.createServer)(app);
+    const io = socket_1.socket.init(httpServer);
+    io.on("connection", (socket) => {
+        socket.on("join-room", (room) => socket.join(room));
+    });
+    httpServer.listen(3000);
 })
     .catch((error) => console.log(error));

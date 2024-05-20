@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserSchema = void 0;
+exports.UserRatingSchema = exports.UserSchema = void 0;
 const zod_1 = require("zod");
 exports.UserSchema = zod_1.z.object({
     firstName: zod_1.z
@@ -23,4 +23,13 @@ exports.UserSchema = zod_1.z.object({
         .trim()
         .min(1, { message: "This field is required" })
         .min(8, { message: "Password should have at least eight characters" }),
+});
+exports.UserRatingSchema = zod_1.z.object({
+    movieRating: zod_1.z.coerce
+        .number({
+        invalid_type_error: "Please select rating",
+    })
+        .min(1)
+        .max(10),
+    movieReview: zod_1.z.string().optional(),
 });

@@ -28,6 +28,7 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
                 .save()
                 .then(() => cb(null, newUser))
                 .catch((error) => console.log(error));
+            return cb(null, newUser);
         }
         else {
             return cb(null, user);
@@ -50,9 +51,9 @@ passport_1.default.use(new passport_local_1.Strategy({ usernameField: "email", p
     })
         .catch((error) => cb(error));
 }));
-passport_1.default.serializeUser(function (user, cb) {
+passport_1.default.serializeUser((user, cb) => {
     cb(null, user);
 });
-passport_1.default.deserializeUser(function (user, cb) {
+passport_1.default.deserializeUser((user, cb) => {
     cb(null, user);
 });

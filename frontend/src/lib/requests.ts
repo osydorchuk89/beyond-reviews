@@ -92,6 +92,8 @@ export const getMessages = async (senderId: string, recipientId: string) => {
         const parsedMessages: Message[] = messages.map((message) => {
             const messageDate = new Date(message.date);
             const parsedDate = messageDate.toLocaleString("default", {
+                month: "short",
+                day: "numeric",
                 hour12: false,
                 hour: "2-digit",
                 minute: "2-digit",

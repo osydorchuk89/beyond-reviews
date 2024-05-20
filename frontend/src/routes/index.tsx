@@ -15,7 +15,7 @@ const Home = () => {
             <p className="text-xl">Or</p>
             <p className="text-xl">
                 Browse <DarkLink text="books" to="#" />,{" "}
-                <DarkLink text="movies" to="#" />, or{" "}
+                <DarkLink text="movies" to="/movies" />, or{" "}
                 <DarkLink text="music" to="#" />
             </p>
         </div>
