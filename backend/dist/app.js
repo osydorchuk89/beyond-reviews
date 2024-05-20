@@ -14,7 +14,6 @@ const users_1 = require("./routes/users");
 const movies_1 = require("./routes/movies");
 const messages_1 = require("./routes/messages");
 const auth_1 = require("./routes/auth");
-const urls_1 = require("./util/urls");
 const http_1 = require("http");
 const socket_1 = require("./socket");
 require("./util/auth");
@@ -45,12 +44,16 @@ app.use("/auth", auth_1.authRouter);
 app.post("/auth/login", passport_1.default.authenticate("local"), (req, res) => {
     res.send(req.user);
 });
-app.get("/auth/google", passport_1.default.authenticate("google"));
-app.get("/auth/google/callback", passport_1.default.authenticate("google", {
-    successRedirect: urls_1.BASE_CLIENT_URL + "/login/success",
-}), (req, res) => {
-    res.send(req.user);
-});
+// app.get("/auth/google", passport.authenticate("google"));
+// app.get(
+//     "/auth/google/callback",
+//     passport.authenticate("google", {
+//         successRedirect: BASE_CLIENT_URL + "/login/success",
+//     }),
+//     (req, res) => {
+//         res.send(req.user);
+//     }
+// );
 app.get("/logout", (req, res, next) => {
     req.logout((err) => {
         if (err) {
