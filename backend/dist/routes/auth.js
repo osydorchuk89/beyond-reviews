@@ -5,6 +5,7 @@ const express_1 = require("express");
 exports.authRouter = (0, express_1.Router)();
 exports.authRouter.get("/", (req, res) => {
     const isAuthenticated = req.isAuthenticated();
+    console.log(req.session);
     let authStatus;
     if (isAuthenticated) {
         authStatus = {
