@@ -42,6 +42,7 @@ export const TopNavBar = () => {
     useQuery({ queryKey: ["users"], queryFn: getUsers });
 
     const isAuthenticated = authStatus!.isAuthenticated;
+    console.log(authStatus);
 
     const router = useRouterState();
     const currentPath = router.location.pathname;
