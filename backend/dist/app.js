@@ -33,7 +33,9 @@ app.use((0, express_session_1.default)({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    // cookie: { secure: true },
+    cookie: {
+        secure: process.env.NODE_ENV === "production" ? true : false,
+    },
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());

@@ -36,7 +36,9 @@ app.use(
         secret: process.env.EXPRESS_SESSION_SECRET!,
         resave: false,
         saveUninitialized: true,
-        // cookie: { secure: true },
+        cookie: {
+            secure: process.env.NODE_ENV === "production" ? true : false,
+        },
     })
 );
 app.use(passport.initialize());
