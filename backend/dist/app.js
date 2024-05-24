@@ -19,10 +19,7 @@ const socket_1 = require("./socket");
 require("./util/auth");
 const app = (0, express_1.default)();
 const corsOptions = {
-    origin: [
-        "http://localhost:5173",
-        "https://beyond-reviews-smoc.onrender.com/",
-    ],
+    origin: "https://beyond-reviews-smoc.onrender.com/",
     credentials: true,
     optionSuccessStatus: 200,
 };
