@@ -56,6 +56,7 @@ app.use("/api/messages", messageRouter);
 app.use("/auth", authRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
+    console.log(req.user);
     res.send(req.user);
 });
 
