@@ -64,6 +64,7 @@ app.use("/auth", authRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
     req.session.user = req.user;
+    req.session.save();
     res.send(req.user);
 });
 

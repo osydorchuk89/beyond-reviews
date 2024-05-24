@@ -50,6 +50,7 @@ app.use("/api/messages", messages_1.messageRouter);
 app.use("/auth", auth_1.authRouter);
 app.post("/auth/login", passport_1.default.authenticate("local"), (req, res) => {
     req.session.user = req.user;
+    req.session.save();
     res.send(req.user);
 });
 // app.get("/auth/google", passport.authenticate("google"));
