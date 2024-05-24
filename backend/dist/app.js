@@ -34,9 +34,12 @@ app.use((0, express_session_1.default)({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    // cookie: {
-    //     secure: process.env.NODE_ENV === "production" ? true : false,
-    // },
+    cookie: {
+        secure: process.env.NODE_ENV === "production" ? true : false,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        httpOnly: true,
+        maxAge: 1000 * 60,
+    },
     store: connect_mongo_1.default.create({ mongoUrl: process.env.DATABASE_URL }),
 }));
 app.use(passport_1.default.initialize());
@@ -49,8 +52,6 @@ app.use("/api/movies", movies_1.movieRouter);
 app.use("/api/messages", messages_1.messageRouter);
 app.use("/auth", auth_1.authRouter);
 app.post("/auth/login", passport_1.default.authenticate("local"), (req, res) => {
-    req.session.user = req.user;
-    req.session.save();
     res.send(req.user);
 });
 // app.get("/auth/google", passport.authenticate("google"));

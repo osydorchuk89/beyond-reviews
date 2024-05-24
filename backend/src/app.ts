@@ -44,9 +44,12 @@ app.use(
         secret: process.env.EXPRESS_SESSION_SECRET!,
         resave: false,
         saveUninitialized: false,
-        // cookie: {
-        //     secure: process.env.NODE_ENV === "production" ? true : false,
-        // },
+        cookie: {
+            secure: process.env.NODE_ENV === "production" ? true : false,
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            httpOnly: true,
+            maxAge: 1000 * 60,
+        },
         store: MongoStore.create({ mongoUrl: process.env.DATABASE_URL! }),
     })
 );
@@ -63,8 +66,6 @@ app.use("/api/messages", messageRouter);
 app.use("/auth", authRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
-    req.session.user = req.user;
-    req.session.save();
     res.send(req.user);
 });
 
