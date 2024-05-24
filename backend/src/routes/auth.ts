@@ -7,7 +7,7 @@ authRouter.get("/", (req, res) => {
     let authStatus;
     console.log(req.session);
 
-    if (req.session.passport && req.session.passport.user) {
+    if (req.session.passport?.user) {
         authStatus = {
             isAuthenticated: true,
             userData: req.user,

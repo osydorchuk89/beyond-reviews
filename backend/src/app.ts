@@ -61,10 +61,14 @@ app.use("/api/movies", movieRouter);
 app.use("/api/messages", messageRouter);
 app.use("/auth", authRouter);
 
-app.post("/auth/login", passport.authenticate("local"), (req, res) => {
-    req.session.save();
-    res.send(req.user);
-});
+app.post(
+    "/auth/login",
+    passport.authenticate("local", { keepSessionInfo: true }),
+    (req, res) => {
+        req.session.save();
+        res.send(req.user);
+    }
+);
 
 // app.get("/auth/google", passport.authenticate("google"));
 
@@ -79,7 +83,7 @@ app.post("/auth/login", passport.authenticate("local"), (req, res) => {
 // );
 
 app.get("/logout", (req, res, next) => {
-    req.logout((err) => {
+    req.logout({ keepSessionInfo: true }, (err) => {
         if (err) {
             return next(err);
         }
