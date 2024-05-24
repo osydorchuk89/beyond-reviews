@@ -8,8 +8,7 @@ export const fetchMovies = async (page: Number) => {
         method: "get",
         headers: {
             accept: "application/json",
-            Authorization:
-                "Bearer " + import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN,
+            Authorization: "Bearer " + process.env.VITE_TMDB_READ_ACCESS_TOKEN,
         },
     };
     try {
@@ -70,8 +69,7 @@ export const fetchMovieGenres = async () => {
         url: "https://api.themoviedb.org/3/genre/movie/list",
         headers: {
             accept: "application/json",
-            Authorization:
-                "Bearer " + import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN,
+            Authorization: "Bearer " + process.env.VITE_TMDB_READ_ACCESS_TOKEN,
         },
     };
     try {
