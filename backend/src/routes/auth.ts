@@ -3,12 +3,10 @@ import { Router } from "express";
 export const authRouter = Router();
 
 authRouter.get("/", (req, res) => {
-    const isAuthenticated = req.isAuthenticated();
-    console.log(isAuthenticated);
-
+    // const isAuthenticated = req.isAuthenticated();
     let authStatus;
 
-    if (isAuthenticated) {
+    if (req.user) {
         authStatus = {
             isAuthenticated: true,
             userData: req.user,

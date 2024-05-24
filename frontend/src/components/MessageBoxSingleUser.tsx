@@ -52,8 +52,10 @@ export const MessageBoxSingleUser = () => {
     });
 
     usersMessages!.messages.map((msg, index, arr) => {
-        if (index > 0) {
-            const currentMessageDate = (msg.date as string).split(",")[0];
+        const currentMessageDate = (msg.date as string).split(",")[0];
+        if (index === 0) {
+            msg.dateSeparator = currentMessageDate;
+        } else {
             const previousMessageDate = (arr[index - 1].date as string).split(
                 ","
             )[0];

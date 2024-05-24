@@ -4,10 +4,9 @@ exports.authRouter = void 0;
 const express_1 = require("express");
 exports.authRouter = (0, express_1.Router)();
 exports.authRouter.get("/", (req, res) => {
-    const isAuthenticated = req.isAuthenticated();
-    console.log(isAuthenticated);
+    // const isAuthenticated = req.isAuthenticated();
     let authStatus;
-    if (isAuthenticated) {
+    if (req.user) {
         authStatus = {
             isAuthenticated: true,
             userData: req.user,
