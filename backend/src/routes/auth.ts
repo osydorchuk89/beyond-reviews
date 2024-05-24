@@ -5,6 +5,7 @@ export const authRouter = Router();
 authRouter.get("/", (req, res) => {
     // const isAuthenticated = req.isAuthenticated();
     let authStatus;
+    console.log(req.user);
 
     if (req.user) {
         authStatus = {
