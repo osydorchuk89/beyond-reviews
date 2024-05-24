@@ -13,7 +13,14 @@ import { authRouter } from "./routes/auth";
 import { BASE_CLIENT_URL } from "./util/urls";
 import { createServer } from "http";
 import { socket } from "./socket";
+import { IUser } from "./models/user";
 require("./util/auth");
+
+declare module "express-session" {
+    export interface SessionData {
+        user: Express.User;
+    }
+}
 
 const app = express();
 
@@ -36,7 +43,7 @@ app.use(
     session({
         secret: process.env.EXPRESS_SESSION_SECRET!,
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         // cookie: {
         //     secure: process.env.NODE_ENV === "production" ? true : false,
         // },
@@ -56,6 +63,7 @@ app.use("/api/messages", messageRouter);
 app.use("/auth", authRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
+    req.session.user = req.user;
     res.send(req.user);
 });
 
@@ -76,6 +84,7 @@ app.get("/logout", (req, res, next) => {
         if (err) {
             return next(err);
         }
+        delete req.session.user;
     });
     res.send("Logged out");
 });

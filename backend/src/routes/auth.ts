@@ -3,11 +3,11 @@ import { Router } from "express";
 export const authRouter = Router();
 
 authRouter.get("/", (req, res) => {
-    const isAuthenticated = req.isAuthenticated();
+    // const isAuthenticated = req.isAuthenticated();
 
     let authStatus;
 
-    if (isAuthenticated) {
+    if (req.session.user) {
         authStatus = {
             isAuthenticated: true,
             userData: req.user,

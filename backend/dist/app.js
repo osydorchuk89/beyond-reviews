@@ -33,7 +33,7 @@ app.use(body_parser_1.default.json());
 app.use((0, express_session_1.default)({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     // cookie: {
     //     secure: process.env.NODE_ENV === "production" ? true : false,
     // },
@@ -49,6 +49,7 @@ app.use("/api/movies", movies_1.movieRouter);
 app.use("/api/messages", messages_1.messageRouter);
 app.use("/auth", auth_1.authRouter);
 app.post("/auth/login", passport_1.default.authenticate("local"), (req, res) => {
+    req.session.user = req.user;
     res.send(req.user);
 });
 // app.get("/auth/google", passport.authenticate("google"));
@@ -66,6 +67,7 @@ app.get("/logout", (req, res, next) => {
         if (err) {
             return next(err);
         }
+        delete req.session.user;
     });
     res.send("Logged out");
 });
