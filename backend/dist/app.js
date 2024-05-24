@@ -49,7 +49,7 @@ app.use("/api/movies", movies_1.movieRouter);
 app.use("/api/messages", messages_1.messageRouter);
 app.use("/auth", auth_1.authRouter);
 app.post("/auth/login", passport_1.default.authenticate("local"), (req, res) => {
-    console.log(req.user);
+    req.session.save();
     res.send(req.user);
 });
 // app.get("/auth/google", passport.authenticate("google"));

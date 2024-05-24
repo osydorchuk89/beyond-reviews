@@ -15,6 +15,12 @@ import { createServer } from "http";
 import { socket } from "./socket";
 require("./util/auth");
 
+declare module "express-session" {
+    export interface SessionData {
+        passport: { user: any };
+    }
+}
+
 const app = express();
 
 const corsOptions = {
@@ -56,7 +62,7 @@ app.use("/api/messages", messageRouter);
 app.use("/auth", authRouter);
 
 app.post("/auth/login", passport.authenticate("local"), (req, res) => {
-    console.log(req.user);
+    req.session.save();
     res.send(req.user);
 });
 
