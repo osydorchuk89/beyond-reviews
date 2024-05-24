@@ -140,6 +140,7 @@ export const getAuthStatus = async () => {
             url: BASE_URL + "auth",
             withCredentials: true,
         });
+        console.log(BASE_URL);
         return response.data;
     } catch (error) {
         console.log(error);
