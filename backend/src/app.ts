@@ -16,12 +16,6 @@ import { socket } from "./socket";
 import { IUser } from "./models/user";
 require("./util/auth");
 
-declare module "express-session" {
-    export interface SessionData {
-        user: Express.User;
-    }
-}
-
 const app = express();
 
 const corsOptions = {
@@ -39,6 +33,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
+app.set("trust proxy", 1);
+
 app.use(
     session({
         secret: process.env.EXPRESS_SESSION_SECRET!,
@@ -49,7 +45,7 @@ app.use(
             secure: process.env.NODE_ENV === "production" ? true : false,
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             httpOnly: true,
-            maxAge: 1000 * 60,
+            maxAge: 1000 * 60 * 24,
         },
         store: MongoStore.create({ mongoUrl: process.env.DATABASE_URL! }),
     })
@@ -87,7 +83,6 @@ app.get("/logout", (req, res, next) => {
         if (err) {
             return next(err);
         }
-        delete req.session.user;
     });
     res.send("Logged out");
 });
