@@ -63,7 +63,8 @@ export const MessageBoxAllUsers = () => {
                             messages!.recipient === userId
                     );
                     const hasUnreadMessages = userMessages?.messages?.find(
-                        (message) => !message.read
+                        (message) =>
+                            message.sender._id !== userId && !message.read
                     );
                     return (
                         <div

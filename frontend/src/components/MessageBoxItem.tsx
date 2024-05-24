@@ -18,19 +18,26 @@ export const MessageBoxItem = ({ message }: MessageProps) => {
         "flex gap-2 justify-between px-4 py-1 rounded-lg relative";
 
     return (
-        <div
-            className={
-                message.sender._id === userId
-                    ? messageStyle + " bg-amber-200 self-end"
-                    : message.read
-                      ? messageStyle + " bg-slate-200 self-start"
-                      : messageStyle + " bg-slate-200 self-start font-bold"
-            }
-        >
-            <span className="mr-16">{message.text}</span>
-            <span className="absolute right-1 bottom-1 text-[10px]">
-                {message.date as string}
-            </span>
-        </div>
+        <>
+            {message.dateSeparator && (
+                <p className="text-center font-semibold">
+                    {message.dateSeparator}
+                </p>
+            )}
+            <div
+                className={
+                    message.sender._id === userId
+                        ? messageStyle + " bg-amber-200 self-end"
+                        : message.read
+                          ? messageStyle + " bg-slate-200 self-start"
+                          : messageStyle + " bg-slate-200 self-start font-bold"
+                }
+            >
+                <span className="mr-6">{message.text}</span>
+                <span className="absolute right-1 bottom-1 text-[10px]">
+                    {(message.date as string).split(",")[1]}
+                </span>
+            </div>
+        </>
     );
 };

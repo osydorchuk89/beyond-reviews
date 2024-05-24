@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
     getAuthStatus,
@@ -21,9 +21,11 @@ interface MessageInput {
 
 export const MessageBoxSingleUser = () => {
     const messagesRef = useRef<HTMLDivElement>(null);
+    const [numberMessages, setNumberMessages] = useState(20);
+    const [hasScrolled, setHasScrolled] = useState(false);
 
     useLayoutEffect(() => {
-        if (messagesRef && messagesRef.current) {
+        if (messagesRef && messagesRef.current && !hasScrolled) {
             const element = messagesRef.current;
             element.scroll({
                 top: element.scrollHeight,
@@ -47,6 +49,19 @@ export const MessageBoxSingleUser = () => {
     const { data: usersMessages } = useQuery({
         queryKey: ["messages", { user: userId, otherUser: otherUserId }],
         queryFn: () => getMessages(userId, otherUserId),
+    });
+
+    usersMessages!.messages.map((msg, index, arr) => {
+        if (index > 0) {
+            const currentMessageDate = (msg.date as string).split(",")[0];
+            const previousMessageDate = (arr[index - 1].date as string).split(
+                ","
+            )[0];
+            if (currentMessageDate !== previousMessageDate) {
+                msg.dateSeparator = currentMessageDate;
+            }
+        }
+        return msg;
     });
 
     const { mutate: markMessageAsRead } = useMutation({
@@ -94,6 +109,26 @@ export const MessageBoxSingleUser = () => {
         }
     };
 
+    const onScroll = () => {
+        if (messagesRef.current) {
+            const element = messagesRef.current;
+            const elementHeight = element.scrollHeight;
+            if (
+                element.scrollTop === 0 &&
+                usersMessages!.messages.length > numberMessages
+            ) {
+                setTimeout(() => {
+                    element.scroll({
+                        top: element.scrollHeight - elementHeight,
+                        left: 0,
+                    });
+                }, 1);
+                setNumberMessages((prevState) => prevState + 20);
+                setHasScrolled(true);
+            }
+        }
+    };
+
     return (
         <div
             className="flex flex-col h-full justify-between items-center p-3"
@@ -103,10 +138,13 @@ export const MessageBoxSingleUser = () => {
             <div
                 className="h-[26rem] w-full flex flex-col justify-start gap-3 p-5 overflow-y-auto"
                 ref={messagesRef}
+                onScroll={onScroll}
             >
-                {usersMessages!.messages.map((message) => (
-                    <MessageBoxItem message={message} key={message._id} />
-                ))}
+                {usersMessages!.messages
+                    .slice(-numberMessages)
+                    .map((message) => (
+                        <MessageBoxItem message={message} key={message._id} />
+                    ))}
             </div>
             <div className="w-full flex flex-col gap-5">
                 <form

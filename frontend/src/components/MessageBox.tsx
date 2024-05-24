@@ -47,7 +47,9 @@ export const MessageBox = () => {
     });
 
     const hasUnreadMessages = allMessages?.find((usersMessages) =>
-        usersMessages!.messages.find((message) => !message.read)
+        usersMessages!.messages.find(
+            (message) => message.sender._id !== userId && !message.read
+        )
     );
 
     useEffect(() => {

@@ -15,6 +15,7 @@ export interface Message {
     date: Date | string;
     seen: boolean;
     read: boolean;
+    dateSeparator?: string;
 }
 
 export interface UsersMessages {
