@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
-import session from "express-session";
+import session from "cookie-session";
 import "dotenv/config";
 import { userRouter } from "./routes/users";
 import { movieRouter } from "./routes/movies";
@@ -34,11 +34,12 @@ app.use(bodyParser.json());
 app.use(
     session({
         secret: process.env.EXPRESS_SESSION_SECRET!,
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-            secure: process.env.NODE_ENV === "production" ? true : false,
-        },
+        // resave: false,
+        // saveUninitialized: true,
+        // cookie: {
+        //     secure: process.env.NODE_ENV === "production" ? true : false,
+        // },
+        secure: process.env.NODE_ENV === "production" ? true : false,
     })
 );
 app.use(passport.initialize());
