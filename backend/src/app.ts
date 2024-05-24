@@ -15,12 +15,6 @@ import { createServer } from "http";
 import { socket } from "./socket";
 require("./util/auth");
 
-declare module "express-session" {
-    export interface SessionData {
-        passport: { user: any };
-    }
-}
-
 const app = express();
 
 const corsOptions = {
@@ -42,12 +36,9 @@ app.use(
     session({
         secret: process.env.EXPRESS_SESSION_SECRET!,
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true,
         // cookie: {
         //     secure: process.env.NODE_ENV === "production" ? true : false,
-        // },
-        // cookie: {
-        //     secure: false,
         // },
         store: MongoStore.create({ mongoUrl: process.env.DATABASE_URL! }),
     })

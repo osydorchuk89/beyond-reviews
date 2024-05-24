@@ -33,12 +33,9 @@ app.use(body_parser_1.default.json());
 app.use((0, express_session_1.default)({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     // cookie: {
     //     secure: process.env.NODE_ENV === "production" ? true : false,
-    // },
-    // cookie: {
-    //     secure: false,
     // },
     store: connect_mongo_1.default.create({ mongoUrl: process.env.DATABASE_URL }),
 }));
