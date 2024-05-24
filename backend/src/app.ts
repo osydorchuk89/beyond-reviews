@@ -84,6 +84,6 @@ mongoose
         io.on("connection", (socket) => {
             socket.on("join-room", (room) => socket.join(room));
         });
-        httpServer.listen(3000);
+        httpServer.listen(process.env.PORT || 3000);
     })
     .catch((error) => console.log(error));
