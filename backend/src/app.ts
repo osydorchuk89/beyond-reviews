@@ -4,6 +4,7 @@ import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
 import session from "express-session";
+import MongoStore from "connect-mongo";
 import "dotenv/config";
 import { userRouter } from "./routes/users";
 import { movieRouter } from "./routes/movies";
@@ -39,6 +40,7 @@ app.use(
         cookie: {
             secure: process.env.NODE_ENV === "production" ? true : false,
         },
+        store: MongoStore.create({ mongoUrl: process.env.DATABASE_URL! }),
     })
 );
 app.use(passport.initialize());

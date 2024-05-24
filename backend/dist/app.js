@@ -9,6 +9,7 @@ const passport_1 = __importDefault(require("passport"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_session_1 = __importDefault(require("express-session"));
+const connect_mongo_1 = __importDefault(require("connect-mongo"));
 require("dotenv/config");
 const users_1 = require("./routes/users");
 const movies_1 = require("./routes/movies");
@@ -36,6 +37,7 @@ app.use((0, express_session_1.default)({
     cookie: {
         secure: process.env.NODE_ENV === "production" ? true : false,
     },
+    store: connect_mongo_1.default.create({ mongoUrl: process.env.DATABASE_URL }),
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
