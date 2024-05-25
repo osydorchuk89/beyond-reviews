@@ -51,7 +51,7 @@ export const MessageBoxSingleUser = () => {
         queryFn: () => getMessages(userId, otherUserId),
     });
 
-    usersMessages!.messages.map((msg, index, arr) => {
+    usersMessages?.messages.map((msg, index, arr) => {
         const currentMessageDate = (msg.date as string).split(",")[0];
         if (index === 0) {
             msg.dateSeparator = currentMessageDate;
@@ -117,7 +117,8 @@ export const MessageBoxSingleUser = () => {
             const elementHeight = element.scrollHeight;
             if (
                 element.scrollTop === 0 &&
-                usersMessages!.messages.length > numberMessages
+                usersMessages &&
+                usersMessages.messages.length > numberMessages
             ) {
                 setTimeout(() => {
                     element.scroll({
