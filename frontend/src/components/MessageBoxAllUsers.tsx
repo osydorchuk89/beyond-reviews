@@ -44,7 +44,7 @@ export const MessageBoxAllUsers = () => {
             queryFn: () => getMessages(userId, otherUserId),
             // Prefetch only fires when data is older than the staleTime,
             // so in a case like this you definitely want to set one
-            // staleTime: 60000,
+            staleTime: 1000,
         });
     };
 
