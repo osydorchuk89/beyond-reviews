@@ -39,7 +39,7 @@ export const MessageBoxAllUsers = () => {
     });
 
     const prefetchMessages = (otherUserId: string) => {
-        queryClient.ensureQueryData({
+        queryClient.prefetchQuery({
             queryKey: ["messages", { user: userId, otherUser: otherUserId }],
             queryFn: () => getMessages(userId, otherUserId),
             // Prefetch only fires when data is older than the staleTime,
@@ -71,6 +71,9 @@ export const MessageBoxAllUsers = () => {
                             key={user._id}
                             className="flex flex-col"
                             onMouseEnter={() => {
+                                prefetchMessages(user._id);
+                            }}
+                            onFocus={() => {
                                 prefetchMessages(user._id);
                             }}
                             onClick={() => {
