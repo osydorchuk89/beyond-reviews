@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DarkLink } from "../components/DarkLink";
+import { useQuery } from "@tanstack/react-query";
+import { AuthStatus } from "../lib/types";
+import { getAuthStatus } from "../lib/requests";
 
 const Home = () => {
+    const { data: authStatus } = useQuery<AuthStatus>({
+        queryKey: ["authState"],
+        queryFn: getAuthStatus,
+        staleTime: 1000 * 60,
+    });
+
+    const isAuthenticated = authStatus!.isAuthenticated;
+
     return (
         <div className="flex flex-col justify-center items-center py-20 px-10 gap-20">
             <p className="text-5xl font-bold">Welcome to Beyond Reviews!</p>
@@ -10,7 +21,14 @@ const Home = () => {
                 website.
             </p>
             <p className="text-xl">
-                <DarkLink text="Login to your account" to="/login" />
+                <DarkLink
+                    text={
+                        isAuthenticated
+                            ? "Go to your profile"
+                            : "Login to your account"
+                    }
+                    to={isAuthenticated ? "/#" : "/login"}
+                />
             </p>
             <p className="text-xl">Or</p>
             <p className="text-xl">

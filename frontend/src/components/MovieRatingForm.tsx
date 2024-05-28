@@ -13,7 +13,7 @@ import { useTruncatedElement } from "../hooks/useTuncatedElement";
 import { BASE_API_URL } from "../lib/urls";
 import { Movie, MovieRating, User } from "../lib/types";
 import { useAppDispatch } from "../store/hooks";
-import { dialogActions } from "../store";
+import { popUpActions } from "../store";
 
 interface RatingInputs {
     movieRating: number;
@@ -81,7 +81,7 @@ export const MovieRatingForm = () => {
             });
             setHasRated(true);
             setIsEditing(false);
-            dispatch(dialogActions.open());
+            dispatch(popUpActions.open());
             queryClient.invalidateQueries({
                 queryKey: ["movie"],
             });

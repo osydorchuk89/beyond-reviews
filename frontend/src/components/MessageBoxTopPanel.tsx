@@ -2,10 +2,10 @@ import { BackIcon } from "./BackIcon";
 import { Popover } from "@headlessui/react";
 import { CloseIconAlt } from "./icons/CloseIconAlt";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { dialogActions } from "../store";
+import { messageBoxActions } from "../store";
 
 export const MessageBoxTopPanel = () => {
-    const { allUsers } = useAppSelector((state) => state.dialog);
+    const { allUsers } = useAppSelector((state) => state.messageBox);
     const dispatch = useAppDispatch();
 
     return (
@@ -17,7 +17,7 @@ export const MessageBoxTopPanel = () => {
                     <BackIcon
                         className="w-8 h-8"
                         handleClick={() => {
-                            dispatch(dialogActions.selectAllUSers());
+                            dispatch(messageBoxActions.selectAllUSers());
                         }}
                     />
                 </button>

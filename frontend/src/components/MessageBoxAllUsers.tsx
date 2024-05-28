@@ -9,7 +9,7 @@ import {
 import { UserIcon } from "./icons/UserIcon";
 import { AuthStatus, User } from "../lib/types";
 import { useAppDispatch } from "../store/hooks";
-import { dialogActions } from "../store/index";
+import { messageBoxActions } from "../store/index";
 
 export const MessageBoxAllUsers = () => {
     const dispatch = useAppDispatch();
@@ -79,7 +79,7 @@ export const MessageBoxAllUsers = () => {
                             onClick={() => {
                                 const userName = `${user.firstName} ${user.lastName}`;
                                 dispatch(
-                                    dialogActions.selectSingleUser({
+                                    messageBoxActions.selectSingleUser({
                                         id: user._id,
                                         name: userName,
                                     })

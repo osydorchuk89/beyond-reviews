@@ -1,48 +1,27 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
-export interface AuthState {
-    isAuthenticated: boolean;
-    userData: {
-        _id: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        password?: string;
-        googleId?: string;
-    } | null;
-}
-
-interface DialogState {
+interface MessageBoxState {
     isOpen: boolean;
     allUsers: boolean | null;
     otherUser: { id: string; name: string } | null;
 }
 
-const initialAuthState: AuthState = { isAuthenticated: false, userData: null };
-const initialDialogState: DialogState = {
+interface PopUpState {
+    isOpen: boolean;
+}
+
+const initialMessageBoxState: MessageBoxState = {
     isOpen: false,
     allUsers: true,
     otherUser: null,
 };
+const initialPopUpState: PopUpState = {
+    isOpen: false,
+};
 
-const authSlice = createSlice({
-    name: "auth",
-    initialState: initialAuthState,
-    reducers: {
-        login(state, action) {
-            state.isAuthenticated = true;
-            state.userData = action.payload;
-        },
-        logout(state) {
-            state.isAuthenticated = false;
-            state.userData = null;
-        },
-    },
-});
-
-const dialogSlice = createSlice({
-    name: "dialog",
-    initialState: initialDialogState,
+const messageBoxSlice = createSlice({
+    name: "messageBox",
+    initialState: initialMessageBoxState,
     reducers: {
         open(state) {
             state.isOpen = true;
@@ -63,11 +42,24 @@ const dialogSlice = createSlice({
     },
 });
 
-export const store = configureStore({
-    reducer: { auth: authSlice.reducer, dialog: dialogSlice.reducer },
+const popUpSlice = createSlice({
+    name: "popUp",
+    initialState: initialPopUpState,
+    reducers: {
+        open(state) {
+            state.isOpen = true;
+        },
+        close(state) {
+            state.isOpen = false;
+        },
+    },
 });
-export const authActions = authSlice.actions;
-export const dialogActions = dialogSlice.actions;
+
+export const store = configureStore({
+    reducer: { messageBox: messageBoxSlice.reducer, popUp: popUpSlice.reducer },
+});
+export const messageBoxActions = messageBoxSlice.actions;
+export const popUpActions = popUpSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

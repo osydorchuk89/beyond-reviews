@@ -19,7 +19,6 @@ import { Route as MoviesIndexImport } from './routes/movies.index'
 import { Route as LoginIndexImport } from './routes/login.index'
 import { Route as UserReviewsImport } from './routes/user.reviews'
 import { Route as MoviesMovieIdImport } from './routes/movies.$movieId'
-import { Route as LoginSuccessImport } from './routes/login.success'
 
 // Create/Update Routes
 
@@ -63,11 +62,6 @@ const MoviesMovieIdRoute = MoviesMovieIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const LoginSuccessRoute = LoginSuccessImport.update({
-  path: '/login/success',
-  getParentRoute: () => rootRoute,
-} as any)
-
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -82,10 +76,6 @@ declare module '@tanstack/react-router' {
     }
     '/registration': {
       preLoaderRoute: typeof RegistrationImport
-      parentRoute: typeof rootRoute
-    }
-    '/login/success': {
-      preLoaderRoute: typeof LoginSuccessImport
       parentRoute: typeof rootRoute
     }
     '/movies/$movieId': {
@@ -117,7 +107,6 @@ export const routeTree = rootRoute.addChildren([
   IndexRoute,
   GetmoviesRoute,
   RegistrationRoute,
-  LoginSuccessRoute,
   MoviesMovieIdRoute,
   UserReviewsRoute,
   LoginIndexRoute,

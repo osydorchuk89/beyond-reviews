@@ -20,7 +20,7 @@ import { useAppSelector } from "../store/hooks";
 const socket = io(BASE_URL);
 
 export const MessageBox = () => {
-    const { allUsers } = useAppSelector((state) => state.dialog);
+    const { allUsers } = useAppSelector((state) => state.messageBox);
 
     const { data: authStatus } = useQuery<AuthStatus>({
         queryKey: ["authState"],
@@ -70,25 +70,21 @@ export const MessageBox = () => {
         });
     }, [socket]);
 
+    console.log(allUsers);
+
     return (
         <Popover>
-            <>
-                <Popover.Button className="absolute top-7 right-[182px] cursor-pointer">
-                    <MessageIcon />
-                    <CircleIcon
-                        className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${hasUnreadMessages ? "" : "hidden"}`}
-                    />
-                </Popover.Button>
-                <Popover.Panel className="flex flex-col absolute top-[90px] right-0 z-10 w-96 h-[87vh] bg-amber-50 rounded-md rounded-r-none shadow-md">
-                    <MessageBoxTopPanel />
-                    <hr className="h-px bg-amber-400 border-0" />
-                    {allUsers ? (
-                        <MessageBoxAllUsers />
-                    ) : (
-                        <MessageBoxSingleUser />
-                    )}
-                </Popover.Panel>
-            </>
+            <Popover.Button className="absolute top-7 right-[182px] cursor-pointer">
+                <MessageIcon />
+                <CircleIcon
+                    className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${hasUnreadMessages ? "" : "hidden"}`}
+                />
+            </Popover.Button>
+            <Popover.Panel className="flex flex-col absolute top-[90px] right-0 z-10 w-96 h-[87vh] bg-amber-50 rounded-md rounded-r-none shadow-md">
+                <MessageBoxTopPanel />
+                <hr className="h-px bg-amber-400 border-0" />
+                {allUsers ? <MessageBoxAllUsers /> : <MessageBoxSingleUser />}
+            </Popover.Panel>
         </Popover>
     );
 };

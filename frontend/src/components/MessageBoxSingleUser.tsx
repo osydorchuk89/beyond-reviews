@@ -13,7 +13,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { BASE_API_URL } from "../lib/urls";
 import { AuthStatus, Message } from "../lib/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { dialogActions } from "../store";
+import { messageBoxActions } from "../store";
 
 interface MessageInput {
     message: string;
@@ -35,7 +35,7 @@ export const MessageBoxSingleUser = () => {
     });
 
     const { name: otherUserName, id: otherUserId } = useAppSelector(
-        (state) => state.dialog.otherUser!
+        (state) => state.messageBox.otherUser!
     );
     const dispatch = useAppDispatch();
 
@@ -171,7 +171,7 @@ export const MessageBoxSingleUser = () => {
                 <p
                     className="text-center hover:underline cursor-pointer"
                     onClick={() => {
-                        dispatch(dialogActions.selectAllUSers());
+                        dispatch(messageBoxActions.selectAllUSers());
                     }}
                 >
                     Back to all messages

@@ -12,7 +12,6 @@ interface ArgsType {
 
 export const root = {
     sendMessage: async (parent: any, args: ArgsType) => {
-        console.log("efjbvjkfbvjfk");
         const messageText = args.messageData.message;
         const sender = User.findById(args.messageData.sender);
         const recipient = User.findById(args.messageData.recipient);
