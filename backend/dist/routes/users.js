@@ -8,12 +8,23 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const express_1 = require("express");
 const user_1 = require("../models/user");
 const schemas_1 = require("../util/schemas");
+const upload_1 = require("../upload");
 exports.userRouter = (0, express_1.Router)();
+exports.userRouter.get("/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await user_1.User.findById(userId);
+        res.send(user);
+    }
+    catch (error) {
+        res.send(error);
+    }
+});
 exports.userRouter.get("/", async (req, res) => {
     const users = await user_1.User.find();
     res.send(users);
 });
-exports.userRouter.post("/", async (req, res) => {
+exports.userRouter.post("/", upload_1.fileUpload.single("photo"), async (req, res) => {
     const validationResult = schemas_1.UserSchema.safeParse(req.body);
     if (!validationResult.success) {
         res.status(500).send({ message: "Validation failed" });

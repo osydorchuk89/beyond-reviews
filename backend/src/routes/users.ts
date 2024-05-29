@@ -2,15 +2,26 @@ import bcrypt from "bcrypt";
 import { Router } from "express";
 import { User } from "../models/user";
 import { UserSchema } from "../util/schemas";
+import { fileUpload } from "../upload";
 
 export const userRouter = Router();
+
+userRouter.get("/:userId", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await User.findById(userId);
+        res.send(user);
+    } catch (error) {
+        res.send(error);
+    }
+});
 
 userRouter.get("/", async (req, res) => {
     const users = await User.find();
     res.send(users);
 });
 
-userRouter.post("/", async (req, res) => {
+userRouter.post("/", fileUpload.single("photo"), async (req, res) => {
     const validationResult = UserSchema.safeParse(req.body);
     if (!validationResult.success) {
         res.status(500).send({ message: "Validation failed" });

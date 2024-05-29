@@ -20,8 +20,8 @@ const Root = () => {
 
 export const Route = createRootRoute({
     component: Root,
-    loader: async () =>
-        await queryClient.ensureQueryData({
+    loader: () =>
+        queryClient.ensureQueryData({
             queryKey: ["authState"],
             queryFn: getAuthStatus,
         }),

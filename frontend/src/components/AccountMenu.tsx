@@ -1,19 +1,30 @@
 import { Menu, Transition } from "@headlessui/react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { AuthStatus } from "../lib/types";
+import { getAuthStatus } from "../lib/requests";
 
 interface AccountMenuProps {
     text: string;
 }
 
 const menuList = [
-    { href: "#", text: "My Profile" },
-    { href: "#", text: "My Friends" },
+    { href: "/users/$userId/profile", text: "Profile" },
+    { href: "#", text: "Friends" },
     { href: "/movies", text: "Favorite Movies" },
-    { href: "#", text: "My Reviews" },
+    { href: "/users/$userId/reviews", text: "Reviews" },
     { href: "#", text: "Settings" },
 ];
 
 export const AccountMenu = ({ text }: AccountMenuProps) => {
+    const { data: authStatus } = useQuery<AuthStatus>({
+        queryKey: ["authState"],
+        queryFn: getAuthStatus,
+        staleTime: 1000 * 60,
+    });
+
+    const userId = authStatus!.userData!._id;
+
     return (
         <Menu
             as="div"
@@ -38,6 +49,7 @@ export const AccountMenu = ({ text }: AccountMenuProps) => {
                             key={item.text}
                             to={item.href}
                             className="p-4 ui-active:bg-amber-900 ui-active:text-amber-50 ui-not-active:bg-amber-300 ui-not-active:text-amber-950"
+                            params={{ userId }}
                         >
                             {item.text}
                         </Menu.Item>

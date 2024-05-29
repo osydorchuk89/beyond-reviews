@@ -1,20 +1,20 @@
 import axios from "axios";
-import { AuthState } from "../store";
 import { BASE_API_URL, BASE_URL } from "./urls";
 import { QueryClient } from "@tanstack/react-query";
-import { Message, UsersMessages } from "./types";
+import { AuthStatus, Message, UsersMessages } from "./types";
 
 export const queryClient = new QueryClient();
 
-export const getUserRating = async (authData: AuthState, movieId: string) => {
-    if (authData.userData) {
+export const getUserRating = async (movieId: string) => {
+    const authStatus = queryClient.getQueryData<AuthStatus>(["authState"]);
+    if (authStatus!.userData) {
         try {
             const response = await axios({
                 method: "get",
                 url: BASE_API_URL + "movies/" + movieId + "/ratings",
                 withCredentials: true,
                 params: {
-                    userId: authData.userData._id,
+                    userId: authStatus!.userData._id,
                 },
             });
             if (response.data) {
@@ -59,6 +59,18 @@ export const getMovieRatings = async (movieId: string) => {
         const response = await axios({
             method: "get",
             url: `${BASE_API_URL}movies/${movieId}/ratings`,
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const getUser = async (userId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_API_URL + "users/" + userId,
         });
         return response.data;
     } catch (error) {

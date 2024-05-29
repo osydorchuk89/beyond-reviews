@@ -4,6 +4,7 @@ export interface IUser {
     firstName: string;
     lastName: string;
     email: string;
+    photo: string;
     password?: string;
     googleId?: string;
     ratings?: Types.ObjectId[];
@@ -14,6 +15,7 @@ const userSchema = new Schema<IUser>({
     firstName: String,
     lastName: String,
     email: { type: String, required: true, unique: true },
+    photo: String,
     password: String,
     googleId: String,
     ratings: [{ type: Schema.Types.ObjectId, ref: "UserRating" }],

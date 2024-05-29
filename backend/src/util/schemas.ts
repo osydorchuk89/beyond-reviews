@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+const MAX_FILE_SIZE = 4500000;
+const ACCEPTED_IMAGE_TYPES = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+];
+
 export const UserSchema = z.object({
     firstName: z
         .string()
@@ -21,6 +29,16 @@ export const UserSchema = z.object({
         .trim()
         .min(1, { message: "This field is required" })
         .min(8, { message: "Password should have at least eight characters" }),
+    // photo: z
+    //     .any()
+    //     .refine(
+    //         (file) => file?.size <= MAX_FILE_SIZE,
+    //         "Photo size should not exceed 5MB"
+    //     )
+    //     .refine(
+    //         (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+    //         "Please upload your photo"
+    //     ),
 });
 
 export const UserRatingSchema = z.object({

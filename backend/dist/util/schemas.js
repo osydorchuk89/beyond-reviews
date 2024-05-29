@@ -2,6 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRatingSchema = exports.UserSchema = void 0;
 const zod_1 = require("zod");
+const MAX_FILE_SIZE = 4500000;
+const ACCEPTED_IMAGE_TYPES = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+];
 exports.UserSchema = zod_1.z.object({
     firstName: zod_1.z
         .string()
@@ -23,6 +30,16 @@ exports.UserSchema = zod_1.z.object({
         .trim()
         .min(1, { message: "This field is required" })
         .min(8, { message: "Password should have at least eight characters" }),
+    // photo: z
+    //     .any()
+    //     .refine(
+    //         (file) => file?.size <= MAX_FILE_SIZE,
+    //         "Photo size should not exceed 5MB"
+    //     )
+    //     .refine(
+    //         (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+    //         "Please upload your photo"
+    //     ),
 });
 exports.UserRatingSchema = zod_1.z.object({
     movieRating: zod_1.z.coerce

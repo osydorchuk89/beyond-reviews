@@ -19,6 +19,8 @@ import { Route as MoviesIndexImport } from './routes/movies.index'
 import { Route as LoginIndexImport } from './routes/login.index'
 import { Route as UserReviewsImport } from './routes/user.reviews'
 import { Route as MoviesMovieIdImport } from './routes/movies.$movieId'
+import { Route as UsersUserIdReviewsImport } from './routes/users_.$userId.reviews'
+import { Route as UsersUserIdProfileImport } from './routes/users_.$userId.profile'
 
 // Create/Update Routes
 
@@ -62,6 +64,16 @@ const MoviesMovieIdRoute = MoviesMovieIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const UsersUserIdReviewsRoute = UsersUserIdReviewsImport.update({
+  path: '/users/$userId/reviews',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UsersUserIdProfileRoute = UsersUserIdProfileImport.update({
+  path: '/users/$userId/profile',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -98,6 +110,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserIndexImport
       parentRoute: typeof rootRoute
     }
+    '/users/$userId/profile': {
+      preLoaderRoute: typeof UsersUserIdProfileImport
+      parentRoute: typeof rootRoute
+    }
+    '/users/$userId/reviews': {
+      preLoaderRoute: typeof UsersUserIdReviewsImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -112,6 +132,8 @@ export const routeTree = rootRoute.addChildren([
   LoginIndexRoute,
   MoviesIndexRoute,
   UserIndexRoute,
+  UsersUserIdProfileRoute,
+  UsersUserIdReviewsRoute,
 ])
 
 /* prettier-ignore-end */

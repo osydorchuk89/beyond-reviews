@@ -6,6 +6,7 @@ const userSchema = new mongoose_1.Schema({
     firstName: String,
     lastName: String,
     email: { type: String, required: true, unique: true },
+    photo: String,
     password: String,
     googleId: String,
     ratings: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "UserRating" }],

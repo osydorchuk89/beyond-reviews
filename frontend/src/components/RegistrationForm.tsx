@@ -12,6 +12,7 @@ type RegistrationInputs = {
     lastName: string;
     email: string;
     password: string;
+    photo: File[];
 };
 
 export const RegistrationForm = () => {
@@ -25,11 +26,20 @@ export const RegistrationForm = () => {
     });
 
     const sendRegistrationFormData = async (data: RegistrationInputs) => {
+        const newData = new FormData();
+        newData.append("firstName", data.firstName);
+        newData.append("lastName", data.lastName);
+        newData.append("email", data.email);
+        newData.append("password", data.password);
+        newData.append("photo", data.photo[0]);
         try {
             await axios({
                 method: "post",
                 url: BASE_API_URL + "users/",
-                data,
+                headers: {
+                    "Content-Type": "multi-part/formdata",
+                },
+                data: newData,
             });
             navigate({ to: "/" });
         } catch (error: any) {
@@ -91,7 +101,7 @@ export const RegistrationForm = () => {
                 />
                 <p>{errors.email?.message}</p>
             </div>
-            <div className="flex flex-col gap-2 mb-5">
+            <div className="flex flex-col gap-2">
                 <label htmlFor="password">Password:</label>
                 <input
                     {...register("password")}
@@ -101,6 +111,16 @@ export const RegistrationForm = () => {
                     placeholder="password"
                 />
                 <p>{errors.password?.message}</p>
+            </div>
+            <div className="flex flex-col gap-2 mb-5">
+                <label htmlFor="photo">Photo:</label>
+                <input
+                    {...register("photo")}
+                    className=""
+                    type="file"
+                    id="photo"
+                />
+                <p>{errors.photo?.message}</p>
             </div>
             <div className="flex justify-center">
                 <Button type="submit" style="dark" text="REGISTER" />

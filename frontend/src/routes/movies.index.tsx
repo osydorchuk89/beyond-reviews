@@ -155,8 +155,8 @@ const Movies = () => {
 
 export const Route = createFileRoute("/movies/")({
     component: Movies,
-    loader: async () =>
-        await queryClient.ensureQueryData({
+    loader: () =>
+        queryClient.ensureQueryData({
             queryKey: ["movies"],
             queryFn: getMovies,
         }),

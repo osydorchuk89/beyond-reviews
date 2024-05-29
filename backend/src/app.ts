@@ -10,10 +10,8 @@ import { userRouter } from "./routes/users";
 import { movieRouter } from "./routes/movies";
 import { messageRouter } from "./routes/messages";
 import { authRouter } from "./routes/auth";
-import { BASE_CLIENT_URL } from "./util/urls";
 import { createServer } from "http";
 import { socket } from "./socket";
-import { IUser } from "./models/user";
 require("./util/auth");
 
 const app = express();
