@@ -29,17 +29,23 @@ export const UserSchema = z.object({
         .trim()
         .min(1, { message: "This field is required" })
         .min(8, { message: "Password should have at least eight characters" }),
-    photo: z
-        .any()
-        .refine((files: File[]) => files.length > 0, "Please upload your photo")
-        .refine(
-            (files: File[]) => files[0]?.size <= MAX_FILE_SIZE,
-            "Photo size should not exceed 5MB"
-        )
-        .refine(
-            (files: File[]) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
-            "Only jpg, jpeg, png, or webp formats are accepted"
-        ),
+    photo: z.any().superRefine((files, ctx) => {
+        if (files.length > 0 && files[0]?.size > MAX_FILE_SIZE) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Photo size should not exceed 5MB",
+            });
+        }
+        if (
+            files.length > 0 &&
+            !ACCEPTED_IMAGE_TYPES.includes(files[0]?.type)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Only jpg, jpeg, png, or webp formats are accepted",
+            });
+        }
+    }),
 });
 
 export const LoginSchema = z.object({

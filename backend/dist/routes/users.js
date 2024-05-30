@@ -25,13 +25,24 @@ exports.userRouter.get("/", async (req, res) => {
     res.send(users);
 });
 exports.userRouter.post("/", upload_1.fileUpload.single("photo"), async (req, res) => {
-    const validationResult = schemas_1.UserSchema.safeParse(req.body);
+    const userData = req.body;
+    if (req.file) {
+        const userPhotoFile = req.file;
+        userData.photo = userPhotoFile.location;
+    }
+    else {
+        userData.photo =
+            "https://beyond-reviews-os.s3.eu-central-1.amazonaws.com/user-icon.png";
+    }
+    const validationResult = schemas_1.UserSchema.safeParse(userData);
     if (!validationResult.success) {
         res.status(500).send({ message: "Validation failed" });
     }
     else {
         const validatedData = validationResult.data;
-        const userExists = await user_1.User.findOne({ email: validatedData.email });
+        const userExists = await user_1.User.findOne({
+            email: validatedData.email,
+        });
         if (userExists) {
             res.status(409).send({
                 message: "User with this email already exists",

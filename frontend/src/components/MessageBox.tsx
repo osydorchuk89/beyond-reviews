@@ -15,12 +15,14 @@ import {
     getUsers,
     queryClient,
 } from "../lib/requests";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { messageBoxActions } from "../store";
 
 const socket = io(BASE_URL);
 
 export const MessageBox = () => {
     const { allUsers } = useAppSelector((state) => state.messageBox);
+    const dispatch = useAppDispatch();
 
     const { data: authStatus } = useQuery<AuthStatus>({
         queryKey: ["authState"],
@@ -70,21 +72,34 @@ export const MessageBox = () => {
         });
     }, [socket]);
 
-    console.log(allUsers);
-
     return (
         <Popover>
-            <Popover.Button className="absolute top-7 right-[182px] cursor-pointer">
-                <MessageIcon />
-                <CircleIcon
-                    className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${hasUnreadMessages ? "" : "hidden"}`}
-                />
-            </Popover.Button>
-            <Popover.Panel className="flex flex-col absolute top-[90px] right-0 z-10 w-96 h-[87vh] bg-amber-50 rounded-md rounded-r-none shadow-md">
-                <MessageBoxTopPanel />
-                <hr className="h-px bg-amber-400 border-0" />
-                {allUsers ? <MessageBoxAllUsers /> : <MessageBoxSingleUser />}
-            </Popover.Panel>
+            {({ open }) => (
+                <>
+                    <Popover.Button
+                        className="absolute top-7 right-[182px] cursor-pointer"
+                        onClick={() => {
+                            open
+                                ? dispatch(messageBoxActions.close())
+                                : dispatch(messageBoxActions.open());
+                        }}
+                    >
+                        <MessageIcon />
+                        <CircleIcon
+                            className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${hasUnreadMessages ? "" : "hidden"}`}
+                        />
+                    </Popover.Button>
+                    <Popover.Panel className="flex flex-col absolute top-[90px] right-0 z-10 w-96 h-[87vh] bg-amber-50 rounded-md rounded-r-none shadow-md">
+                        <MessageBoxTopPanel />
+                        <hr className="h-px bg-amber-400 border-0" />
+                        {allUsers ? (
+                            <MessageBoxAllUsers />
+                        ) : (
+                            <MessageBoxSingleUser />
+                        )}
+                    </Popover.Panel>
+                </>
+            )}
         </Popover>
     );
 };

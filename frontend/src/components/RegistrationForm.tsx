@@ -69,7 +69,9 @@ export const RegistrationForm = () => {
             })}
         >
             <div className="flex flex-col gap-2">
-                <label htmlFor="firstName">First Name:</label>
+                <label htmlFor="firstName" className="font-semibold">
+                    First Name:
+                </label>
                 <input
                     {...register("firstName")}
                     className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
@@ -77,10 +79,14 @@ export const RegistrationForm = () => {
                     id="firstName"
                     placeholder="Jane"
                 />
-                <p>{errors.firstName?.message}</p>
+                <p className="text-red-700 font-medium">
+                    {errors.firstName?.message}
+                </p>
             </div>
             <div className="flex flex-col gap-2">
-                <label htmlFor="lastName">Last Name:</label>
+                <label htmlFor="lastName" className="font-semibold">
+                    Last Name:
+                </label>
                 <input
                     {...register("lastName")}
                     className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
@@ -88,10 +94,14 @@ export const RegistrationForm = () => {
                     id="lastName"
                     placeholder="Doe"
                 />
-                <p>{errors.lastName?.message}</p>
+                <p className="text-red-700 font-medium">
+                    {errors.lastName?.message}
+                </p>
             </div>
             <div className="flex flex-col gap-2">
-                <label htmlFor="email">Email:</label>
+                <label htmlFor="email" className="font-semibold">
+                    Email:
+                </label>
                 <input
                     {...register("email")}
                     className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
@@ -99,10 +109,14 @@ export const RegistrationForm = () => {
                     id="email"
                     placeholder="jane.doe@email.com"
                 />
-                <p>{errors.email?.message}</p>
+                <p className="text-red-700 font-medium">
+                    {errors.email?.message}
+                </p>
             </div>
             <div className="flex flex-col gap-2">
-                <label htmlFor="password">Password:</label>
+                <label htmlFor="password" className="font-semibold">
+                    Password:
+                </label>
                 <input
                     {...register("password")}
                     className="border border-gray-700 rounded-md px-3 py-2 focus:border-amber-900"
@@ -110,17 +124,23 @@ export const RegistrationForm = () => {
                     id="password"
                     placeholder="password"
                 />
-                <p>{errors.password?.message}</p>
+                <p className="text-red-700 font-medium">
+                    {errors.password?.message}
+                </p>
             </div>
             <div className="flex flex-col gap-2 mb-5">
-                <label htmlFor="photo">Photo:</label>
+                <label htmlFor="photo" className="font-semibold">
+                    Photo (optional):
+                </label>
                 <input
                     {...register("photo")}
-                    className=""
+                    className="w-min file:border-none file:px-4 file:py-2 file:rounded-md file:text-amber-950 file:bg-amber-200 file:active:bg-amber-400 file:hover:cursor-pointer"
                     type="file"
                     id="photo"
                 />
-                <p>{errors.photo?.message}</p>
+                <p className="text-red-700 font-medium">
+                    {errors.photo?.message}
+                </p>
             </div>
             <div className="flex justify-center">
                 <Button type="submit" style="dark" text="REGISTER" />
