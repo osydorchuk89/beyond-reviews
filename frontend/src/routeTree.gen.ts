@@ -17,8 +17,8 @@ import { Route as IndexImport } from './routes/index'
 import { Route as MoviesIndexImport } from './routes/movies.index'
 import { Route as LoginIndexImport } from './routes/login.index'
 import { Route as MoviesMovieIdImport } from './routes/movies.$movieId'
-import { Route as UsersUserIdReviewsImport } from './routes/users_.$userId.reviews'
 import { Route as UsersUserIdProfileImport } from './routes/users_.$userId.profile'
+import { Route as UsersUserIdActivityImport } from './routes/users_.$userId.activity'
 
 // Create/Update Routes
 
@@ -52,13 +52,13 @@ const MoviesMovieIdRoute = MoviesMovieIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const UsersUserIdReviewsRoute = UsersUserIdReviewsImport.update({
-  path: '/users/$userId/reviews',
+const UsersUserIdProfileRoute = UsersUserIdProfileImport.update({
+  path: '/users/$userId/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
-const UsersUserIdProfileRoute = UsersUserIdProfileImport.update({
-  path: '/users/$userId/profile',
+const UsersUserIdActivityRoute = UsersUserIdActivityImport.update({
+  path: '/users/$userId/activity',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -90,12 +90,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MoviesIndexImport
       parentRoute: typeof rootRoute
     }
-    '/users/$userId/profile': {
-      preLoaderRoute: typeof UsersUserIdProfileImport
+    '/users/$userId/activity': {
+      preLoaderRoute: typeof UsersUserIdActivityImport
       parentRoute: typeof rootRoute
     }
-    '/users/$userId/reviews': {
-      preLoaderRoute: typeof UsersUserIdReviewsImport
+    '/users/$userId/profile': {
+      preLoaderRoute: typeof UsersUserIdProfileImport
       parentRoute: typeof rootRoute
     }
   }
@@ -110,8 +110,8 @@ export const routeTree = rootRoute.addChildren([
   MoviesMovieIdRoute,
   LoginIndexRoute,
   MoviesIndexRoute,
+  UsersUserIdActivityRoute,
   UsersUserIdProfileRoute,
-  UsersUserIdReviewsRoute,
 ])
 
 /* prettier-ignore-end */

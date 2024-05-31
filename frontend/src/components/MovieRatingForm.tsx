@@ -234,10 +234,7 @@ export const MovieRatingForm = () => {
                 {!authStatus!.isAuthenticated && (
                     <p className="px-4 py-2 bg-amber-100 rounded-md">
                         To rate the movie or post a review, please{" "}
-                        <DarkLink
-                            to="/login"
-                            text="login to your account"
-                        ></DarkLink>
+                        <DarkLink to="/login" text="login to your account" />
                     </p>
                 )}
             </div>

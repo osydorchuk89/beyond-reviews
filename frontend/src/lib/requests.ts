@@ -78,6 +78,18 @@ export const getUser = async (userId: string) => {
     }
 };
 
+export const getUserRatings = async (userId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_API_URL + "users/" + userId + "/ratings/",
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export const getUsers = async () => {
     try {
         const response = await axios({

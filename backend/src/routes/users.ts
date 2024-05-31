@@ -3,22 +3,40 @@ import { Router } from "express";
 import { User } from "../models/user";
 import { UserSchema } from "../util/schemas";
 import { fileUpload } from "../upload";
+import { UserRating } from "../models/userRating";
 
 export const userRouter = Router();
+
+userRouter.get("/", async (req, res) => {
+    const users = await User.find();
+    res.send(users);
+});
 
 userRouter.get("/:userId", async (req, res) => {
     const { userId } = req.params;
     try {
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).populate("likes", [
+            "title",
+            "releaseYear",
+            "poster",
+        ]);
         res.send(user);
     } catch (error) {
         res.send(error);
     }
 });
 
-userRouter.get("/", async (req, res) => {
-    const users = await User.find();
-    res.send(users);
+userRouter.get("/:userId/ratings", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const userRatings = await UserRating.find({ userId }).populate(
+            "movieId",
+            ["title", "releaseYear", "poster"]
+        );
+        res.send(userRatings);
+    } catch (error) {
+        res.send(error);
+    }
 });
 
 userRouter.post("/", fileUpload.single("photo"), async (req, res) => {

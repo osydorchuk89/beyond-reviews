@@ -9,20 +9,35 @@ const express_1 = require("express");
 const user_1 = require("../models/user");
 const schemas_1 = require("../util/schemas");
 const upload_1 = require("../upload");
+const userRating_1 = require("../models/userRating");
 exports.userRouter = (0, express_1.Router)();
+exports.userRouter.get("/", async (req, res) => {
+    const users = await user_1.User.find();
+    res.send(users);
+});
 exports.userRouter.get("/:userId", async (req, res) => {
     const { userId } = req.params;
     try {
-        const user = await user_1.User.findById(userId);
+        const user = await user_1.User.findById(userId).populate("likes", [
+            "title",
+            "releaseYear",
+            "poster",
+        ]);
         res.send(user);
     }
     catch (error) {
         res.send(error);
     }
 });
-exports.userRouter.get("/", async (req, res) => {
-    const users = await user_1.User.find();
-    res.send(users);
+exports.userRouter.get("/:userId/ratings", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const userRatings = await userRating_1.UserRating.find({ userId }).populate("movieId", ["title", "releaseYear", "poster"]);
+        res.send(userRatings);
+    }
+    catch (error) {
+        res.send(error);
+    }
 });
 exports.userRouter.post("/", upload_1.fileUpload.single("photo"), async (req, res) => {
     const userData = req.body;

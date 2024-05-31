@@ -8,6 +8,13 @@ export interface User {
     __v: number;
 }
 
+export interface MovieShort {
+    _id: string;
+    title: string;
+    poster: string;
+    releaseYear: number;
+}
+
 export interface Message {
     _id: string;
     sender: User;
@@ -26,7 +33,7 @@ export interface UsersMessages {
 }
 
 export interface MovieRating {
-    movieId: string;
+    movieId: string | MovieShort;
     movieRating: number;
     movieReview: string;
     userId: string | User;
