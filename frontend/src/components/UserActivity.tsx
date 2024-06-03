@@ -22,7 +22,7 @@ export const UserActivity = () => {
     const userName = `${userData!.firstName} ${userData!.lastName}`;
 
     return (
-        <div className="flex flex-col my-20 mx-60  gap-10">
+        <div className="flex flex-col my-20 mx-60 gap-10">
             {userRatings!.map((rating) => {
                 const movie = rating.movieId as MovieShort;
                 const ratingDate = new Date(rating.date);

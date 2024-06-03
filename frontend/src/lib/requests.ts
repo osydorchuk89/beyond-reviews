@@ -30,11 +30,12 @@ export const getUserRating = async (movieId: string) => {
     }
 };
 
-export const getMovies = async () => {
+export const getMovies = async (movieIds: string[]) => {
     try {
         const response = await axios({
             method: "get",
             url: BASE_API_URL + "movies",
+            params: { movieIds },
         });
         return response.data;
     } catch (error) {

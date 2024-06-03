@@ -10,6 +10,12 @@ interface PopUpState {
     isOpen: boolean;
 }
 
+interface InfoBarState {
+    justRegistered: boolean;
+    justLoggedIn: boolean;
+    justLoggedOut: boolean;
+}
+
 const initialMessageBoxState: MessageBoxState = {
     isOpen: false,
     allUsers: true,
@@ -17,6 +23,11 @@ const initialMessageBoxState: MessageBoxState = {
 };
 const initialPopUpState: PopUpState = {
     isOpen: false,
+};
+const initialInfoBarState: InfoBarState = {
+    justRegistered: false,
+    justLoggedIn: false,
+    justLoggedOut: false,
 };
 
 const messageBoxSlice = createSlice({
@@ -55,11 +66,41 @@ const popUpSlice = createSlice({
     },
 });
 
+const infoBarSlice = createSlice({
+    name: "infoBar",
+    initialState: initialInfoBarState,
+    reducers: {
+        showRegisteredBar(state) {
+            state.justRegistered = true;
+        },
+        hideRegisteredBar(state) {
+            state.justRegistered = true;
+        },
+        showLoggedInBar(state) {
+            state.justLoggedIn = true;
+        },
+        hideLoggedInBar(state) {
+            state.justLoggedIn = false;
+        },
+        showLoggedOutBar(state) {
+            state.justLoggedOut = true;
+        },
+        hideLoggedOutBar(state) {
+            state.justLoggedOut = false;
+        },
+    },
+});
+
 export const store = configureStore({
-    reducer: { messageBox: messageBoxSlice.reducer, popUp: popUpSlice.reducer },
+    reducer: {
+        messageBox: messageBoxSlice.reducer,
+        popUp: popUpSlice.reducer,
+        infoBar: infoBarSlice.reducer,
+    },
 });
 export const messageBoxActions = messageBoxSlice.actions;
 export const popUpActions = popUpSlice.actions;
+export const infoBarActions = infoBarSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

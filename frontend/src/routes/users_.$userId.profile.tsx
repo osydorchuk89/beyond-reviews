@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getUser, queryClient } from "../lib/requests";
 import { UserProfile } from "../components/UserProfile";
-import { isAuthenticated } from "../lib/auth";
+import { redirectIfNotAuthenticated } from "../lib/auth";
 
 export const Route = createFileRoute("/users/$userId/profile")({
     component: UserProfile,
@@ -10,5 +10,5 @@ export const Route = createFileRoute("/users/$userId/profile")({
             queryKey: ["users", { userId: params.userId }],
             queryFn: () => getUser(params.userId),
         }),
-    beforeLoad: isAuthenticated,
+    beforeLoad: redirectIfNotAuthenticated,
 });

@@ -12,7 +12,7 @@ const menuList = [
     { href: "/users/$userId/profile", text: "Profile" },
     { href: "/users/$userId/activity", text: "Activity" },
     { href: "#", text: "Friends" },
-    { href: "/movies", text: "Favorite Movies" },
+    { href: "/users/$userId/fav-movies", text: "Favorite Movies" },
     { href: "#", text: "Settings" },
 ];
 

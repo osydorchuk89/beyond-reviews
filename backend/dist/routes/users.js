@@ -18,11 +18,12 @@ exports.userRouter.get("/", async (req, res) => {
 exports.userRouter.get("/:userId", async (req, res) => {
     const { userId } = req.params;
     try {
-        const user = await user_1.User.findById(userId).populate("likes", [
-            "title",
-            "releaseYear",
-            "poster",
-        ]);
+        const user = await user_1.User.findById(userId);
+        // .populate("likes", [
+        //     "title",
+        //     "releaseYear",
+        //     "poster",
+        // ]);
         res.send(user);
     }
     catch (error) {

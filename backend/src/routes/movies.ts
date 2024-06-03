@@ -7,8 +7,15 @@ import { User } from "../models/user";
 export const movieRouter = Router();
 
 movieRouter.get("/", async (req, res) => {
+    let movieParams;
+    if (req.query.movieIds) {
+        const { movieIds } = req.query;
+        movieParams = { _id: { $in: movieIds } };
+    } else {
+        movieParams = {};
+    }
     try {
-        const movies = await Movie.find({});
+        const movies = await Movie.find(movieParams);
         res.send(movies);
     } catch (error) {
         res.send(error);

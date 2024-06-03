@@ -8,8 +8,16 @@ const schemas_1 = require("../util/schemas");
 const user_1 = require("../models/user");
 exports.movieRouter = (0, express_1.Router)();
 exports.movieRouter.get("/", async (req, res) => {
+    let movieParams;
+    if (req.query.movieIds) {
+        const { movieIds } = req.query;
+        movieParams = { _id: { $in: movieIds } };
+    }
+    else {
+        movieParams = {};
+    }
     try {
-        const movies = await movie_1.Movie.find({});
+        const movies = await movie_1.Movie.find(movieParams);
         res.send(movies);
     }
     catch (error) {

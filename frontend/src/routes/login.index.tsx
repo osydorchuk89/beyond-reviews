@@ -6,15 +6,7 @@ const redirectSchema = z.object({
     redirect: z.string().optional().catch(""),
 });
 
-const Login = () => {
-    return (
-        <div className="flex flex-col justify-center items-center py-10">
-            <LoginForm />
-        </div>
-    );
-};
-
 export const Route = createFileRoute("/login/")({
-    component: Login,
+    component: LoginForm,
     validateSearch: redirectSchema,
 });
