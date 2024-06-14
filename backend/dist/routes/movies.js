@@ -8,16 +8,8 @@ const schemas_1 = require("../util/schemas");
 const user_1 = require("../models/user");
 exports.movieRouter = (0, express_1.Router)();
 exports.movieRouter.get("/", async (req, res) => {
-    let movieParams;
-    if (req.query.movieIds) {
-        const { movieIds } = req.query;
-        movieParams = { _id: { $in: movieIds } };
-    }
-    else {
-        movieParams = {};
-    }
     try {
-        const movies = await movie_1.Movie.find(movieParams);
+        const movies = await movie_1.Movie.find({});
         res.send(movies);
     }
     catch (error) {
@@ -27,10 +19,7 @@ exports.movieRouter.get("/", async (req, res) => {
 exports.movieRouter.get("/:movieId", async (req, res) => {
     const { movieId } = req.params;
     try {
-        const movie = await movie_1.Movie.findById(movieId).populate({
-            path: "ratings",
-            populate: "userId",
-        });
+        const movie = await movie_1.Movie.findById(movieId).populate("ratings");
         res.send(movie);
     }
     catch (error) {
@@ -39,18 +28,18 @@ exports.movieRouter.get("/:movieId", async (req, res) => {
 });
 exports.movieRouter.put("/:movieId", async (req, res) => {
     const { movieId } = req.params;
-    const { like, userId } = req.body;
+    const { saved, userId } = req.body;
     try {
         const movie = await movie_1.Movie.findById(movieId);
         const user = await user_1.User.findById(userId);
         if (movie && user) {
-            if (like) {
-                movie.likedBy?.push(userId);
-                user.likes?.push(movie._id);
+            if (saved) {
+                movie.onWatchList?.push(userId);
+                user.watchList?.push(movie._id);
             }
             else {
-                movie.likedBy = movie.likedBy.filter((item) => item.toString() !== userId);
-                user.likes = user.likes.filter((item) => item.toString() !== movie._id.toString());
+                movie.onWatchList = movie.onWatchList.filter((item) => item.toString() !== userId);
+                user.watchList = user.watchList.filter((item) => item.toString() !== movie._id.toString());
             }
             await movie.save();
             await user.save();
@@ -69,9 +58,7 @@ exports.movieRouter.put("/:movieId", async (req, res) => {
 exports.movieRouter.get("/:movieId/ratings", async (req, res) => {
     const { movieId } = req.params;
     try {
-        const movieRatings = await userRating_1.UserRating.find({ movieId })
-            // .populate("likedBy")
-            .populate("userId", ["firstName", "lastName"]);
+        const movieRatings = await userRating_1.UserRating.find({ movieId }).populate("userId", ["firstName", "lastName"]);
         const sortedMovieRatings = movieRatings.sort((a, b) => b.likedBy.length - a.likedBy.length);
         res.send(sortedMovieRatings);
     }

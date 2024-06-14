@@ -19,7 +19,7 @@ export const Movies = () => {
 
     const { data: movies } = useQuery<Movie[]>({
         queryKey: ["movies"],
-        queryFn: () => getMovies([]),
+        queryFn: () => getMovies(),
     });
 
     // const movies: Movie[] = Route.useLoaderData();

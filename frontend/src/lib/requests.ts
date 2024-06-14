@@ -30,12 +30,11 @@ export const getUserRating = async (movieId: string) => {
     }
 };
 
-export const getMovies = async (movieIds: string[]) => {
+export const getMovies = async () => {
     try {
         const response = await axios({
             method: "get",
             url: BASE_API_URL + "movies",
-            params: { movieIds },
         });
         return response.data;
     } catch (error) {
@@ -84,6 +83,18 @@ export const getUserRatings = async (userId: string) => {
         const response = await axios({
             method: "get",
             url: BASE_API_URL + "users/" + userId + "/ratings/",
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const getUserSavedMovies = async (userId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_API_URL + "users/" + userId + "/watchList/",
         });
         return response.data;
     } catch (error) {

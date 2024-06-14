@@ -13,6 +13,15 @@ export default {
         fontFamily: {
             sans: ["Roboto", "sans-serif"],
         },
+        animation: {
+            fade: "fadeIn .5s ease-in-out",
+        },
+        keyframes: {
+            fadeIn: {
+                from: { opacity: 0 },
+                to: { opacity: 1 },
+            },
+        },
     },
     plugins: [require("@headlessui/tailwindcss")({ prefix: "ui" })],
 };

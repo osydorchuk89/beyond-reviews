@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema } from "../lib/schemas";
 import { Button } from "./Button";
 import { BASE_API_URL } from "../lib/urls";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { infoBarActions } from "../store";
 
 type RegistrationInputs = {
     firstName: string;
@@ -25,6 +27,11 @@ export const RegistrationForm = () => {
         resolver: zodResolver(UserSchema),
     });
 
+    const { justLoggedIn, justLoggedOut } = useAppSelector(
+        (state) => state.infoBar
+    );
+    const dispatch = useAppDispatch();
+
     const sendRegistrationFormData = async (data: RegistrationInputs) => {
         const newData = new FormData();
         newData.append("firstName", data.firstName);
@@ -42,6 +49,9 @@ export const RegistrationForm = () => {
                 data: newData,
             });
             navigate({ to: "/" });
+            justLoggedIn && dispatch(infoBarActions.hideLoggedInBar());
+            justLoggedOut && dispatch(infoBarActions.hideLoggedOutBar());
+            dispatch(infoBarActions.showRegisteredBar());
         } catch (error: any) {
             if (error.response.status === 409) {
                 setError("email", {

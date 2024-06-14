@@ -9,13 +9,17 @@ import { InfoBar } from "../components/InfoBar";
 import { useAppSelector } from "../store/hooks";
 
 const Root = () => {
-    const { justLoggedIn } = useAppSelector((state) => state.infoBar);
+    const { justLoggedIn, justLoggedOut, justRegistered } = useAppSelector(
+        (state) => state.infoBar
+    );
 
     return (
         <>
             <ScrollRestoration />
             <TopNavBar />
-            {justLoggedIn && <InfoBar />}
+            {justLoggedIn && <InfoBar action="justLoggedIn" />}
+            {justLoggedOut && <InfoBar action="justLoggedOut" />}
+            {justRegistered && <InfoBar action="justRegistered" />}
             <Outlet />
             <BottomNavBar />
             <SuccessDialog />

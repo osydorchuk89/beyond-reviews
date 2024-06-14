@@ -43,16 +43,16 @@ export const MovieRatingForm = () => {
 
     const dispatch = useAppDispatch();
 
-    const movieRatings = movieData?.ratings as MovieRating[];
+    const movieRatings = movieData!.ratings as MovieRating[];
     const userRating =
         movieRatings.filter((item) => {
-            const userItem = item.userId as User;
-            return userItem._id === userId;
+            const userItem = item.userId as string;
+            return userItem === userId;
         })[0]?.movieRating || 0;
     const userReview =
         movieRatings.filter((item) => {
-            const userItem = item.userId as User;
-            return userItem._id === userId;
+            const userItem = item.userId as string;
+            return userItem === userId;
         })[0]?.movieReview || "";
 
     const [isEditing, setIsEditing] = useState(false);

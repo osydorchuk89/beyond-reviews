@@ -17,8 +17,8 @@ import { Route as IndexImport } from './routes/index'
 import { Route as MoviesIndexImport } from './routes/movies.index'
 import { Route as LoginIndexImport } from './routes/login.index'
 import { Route as MoviesMovieIdImport } from './routes/movies.$movieId'
+import { Route as UsersUserIdSavedMoviesImport } from './routes/users_.$userId.saved-movies'
 import { Route as UsersUserIdProfileImport } from './routes/users_.$userId.profile'
-import { Route as UsersUserIdFavMoviesImport } from './routes/users_.$userId.fav-movies'
 import { Route as UsersUserIdActivityImport } from './routes/users_.$userId.activity'
 
 // Create/Update Routes
@@ -53,13 +53,13 @@ const MoviesMovieIdRoute = MoviesMovieIdImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const UsersUserIdProfileRoute = UsersUserIdProfileImport.update({
-  path: '/users/$userId/profile',
+const UsersUserIdSavedMoviesRoute = UsersUserIdSavedMoviesImport.update({
+  path: '/users/$userId/saved-movies',
   getParentRoute: () => rootRoute,
 } as any)
 
-const UsersUserIdFavMoviesRoute = UsersUserIdFavMoviesImport.update({
-  path: '/users/$userId/fav-movies',
+const UsersUserIdProfileRoute = UsersUserIdProfileImport.update({
+  path: '/users/$userId/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -100,12 +100,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersUserIdActivityImport
       parentRoute: typeof rootRoute
     }
-    '/users/$userId/fav-movies': {
-      preLoaderRoute: typeof UsersUserIdFavMoviesImport
-      parentRoute: typeof rootRoute
-    }
     '/users/$userId/profile': {
       preLoaderRoute: typeof UsersUserIdProfileImport
+      parentRoute: typeof rootRoute
+    }
+    '/users/$userId/saved-movies': {
+      preLoaderRoute: typeof UsersUserIdSavedMoviesImport
       parentRoute: typeof rootRoute
     }
   }
@@ -121,8 +121,8 @@ export const routeTree = rootRoute.addChildren([
   LoginIndexRoute,
   MoviesIndexRoute,
   UsersUserIdActivityRoute,
-  UsersUserIdFavMoviesRoute,
   UsersUserIdProfileRoute,
+  UsersUserIdSavedMoviesRoute,
 ])
 
 /* prettier-ignore-end */

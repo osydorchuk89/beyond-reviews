@@ -7,6 +7,8 @@ import { BASE_URL } from "../lib/urls";
 import { MessageBox } from "./MessageBox";
 import { getAuthStatus, getUsers, queryClient } from "../lib/requests";
 import { AuthStatus } from "../lib/types";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { infoBarActions } from "../store";
 
 const topLinks = [
     { id: 1, text: "Books", link: "#" },
@@ -16,6 +18,10 @@ const topLinks = [
 
 export const TopNavBar = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { justLoggedIn, justRegistered } = useAppSelector(
+        (state) => state.infoBar
+    );
 
     const logout = async () => {
         try {
@@ -28,6 +34,9 @@ export const TopNavBar = () => {
                 queryKey: ["authState"],
             });
             navigate({ to: "/" });
+            justLoggedIn && dispatch(infoBarActions.hideLoggedInBar());
+            justRegistered && dispatch(infoBarActions.hideRegisteredBar());
+            dispatch(infoBarActions.showLoggedOutBar());
         } catch (error) {
             console.log(error);
         }

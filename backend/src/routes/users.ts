@@ -4,6 +4,7 @@ import { User } from "../models/user";
 import { UserSchema } from "../util/schemas";
 import { fileUpload } from "../upload";
 import { UserRating } from "../models/userRating";
+import { Movie } from "../models/movie";
 
 export const userRouter = Router();
 
@@ -35,6 +36,25 @@ userRouter.get("/:userId/ratings", async (req, res) => {
             ["title", "releaseYear", "poster"]
         );
         res.send(userRatings);
+    } catch (error) {
+        res.send(error);
+    }
+});
+
+userRouter.get("/:userId/watchList", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await User.findById(userId);
+        if (user) {
+            const movieIds = user.watchList;
+            const movieParams = { _id: { $in: movieIds } };
+            const savedMovies = await Movie.find(movieParams);
+            res.send(savedMovies);
+        } else {
+            res.status(500).send({
+                message: "Could not find user",
+            });
+        }
     } catch (error) {
         res.send(error);
     }

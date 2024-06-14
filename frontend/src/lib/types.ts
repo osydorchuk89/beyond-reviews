@@ -5,7 +5,7 @@ export interface User {
     email: string;
     password: string;
     photo: string;
-    likes: string[];
+    watchList: string[];
     ratings: string[];
     __v: number;
 }
@@ -60,7 +60,7 @@ export interface Movie {
     avgVote: number;
     numVotes: number;
     poster: string;
-    likedBy: string[] | User[];
+    onWatchList: string[] | User[];
 }
 
 export interface AuthStatus {

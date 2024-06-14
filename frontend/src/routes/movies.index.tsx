@@ -15,7 +15,7 @@ export const Route = createFileRoute("/movies/")({
     loader: () =>
         queryClient.ensureQueryData({
             queryKey: ["movies"],
-            queryFn: () => getMovies([]),
+            queryFn: () => getMovies(),
         }),
     pendingComponent: LoadingComponent,
     validateSearch: movieSearchSchema,

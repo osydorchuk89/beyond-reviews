@@ -10,7 +10,7 @@ import { Button } from "./Button";
 import { SocialLoginButton } from "./SocialLoginButton";
 import { BASE_CLIENT_URL, BASE_URL } from "../lib/urls";
 import { queryClient } from "../lib/requests";
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { infoBarActions } from "../store";
 
 interface LoginInputs {
@@ -34,6 +34,9 @@ export const LoginForm = () => {
     const { history } = useRouter();
 
     const dispatch = useAppDispatch();
+    const { justLoggedOut, justRegistered } = useAppSelector(
+        (state) => state.infoBar
+    );
 
     const sendLoginFormData = async (data: LoginInputs) => {
         try {
@@ -58,6 +61,8 @@ export const LoginForm = () => {
                 } else {
                     history.back();
                 }
+                justLoggedOut && dispatch(infoBarActions.hideLoggedOutBar());
+                justRegistered && dispatch(infoBarActions.hideRegisteredBar());
                 dispatch(infoBarActions.showLoggedInBar());
             }
         } catch (error: any) {

@@ -14,10 +14,12 @@ export const UserActivity = () => {
 
     const { data: userRatings } = useQuery<MovieRating[]>({
         queryKey: ["ratings", { userId }],
-        queryFn: () => getUserRatings(userId),
+        queryFn: async () => {
+            const originalUserRatings = await getUserRatings(userId);
+            const reversedUserRatings = originalUserRatings.reverse();
+            return reversedUserRatings;
+        },
     });
-
-    console.log(userRatings);
 
     const userName = `${userData!.firstName} ${userData!.lastName}`;
 
@@ -54,10 +56,12 @@ export const UserActivity = () => {
                                 <span className="italic">{parsedDate}</span>
                             </p>
                         </div>
-                        {rating.movieReview && (
+                        {rating.movieReview ? (
                             <p className="mt-2">
                                 <strong>Review</strong>: {rating.movieReview}
                             </p>
+                        ) : (
+                            <p className="italic mt-2">No review</p>
                         )}
                     </div>
                 );

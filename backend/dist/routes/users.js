@@ -10,6 +10,7 @@ const user_1 = require("../models/user");
 const schemas_1 = require("../util/schemas");
 const upload_1 = require("../upload");
 const userRating_1 = require("../models/userRating");
+const movie_1 = require("../models/movie");
 exports.userRouter = (0, express_1.Router)();
 exports.userRouter.get("/", async (req, res) => {
     const users = await user_1.User.find();
@@ -35,6 +36,26 @@ exports.userRouter.get("/:userId/ratings", async (req, res) => {
     try {
         const userRatings = await userRating_1.UserRating.find({ userId }).populate("movieId", ["title", "releaseYear", "poster"]);
         res.send(userRatings);
+    }
+    catch (error) {
+        res.send(error);
+    }
+});
+exports.userRouter.get("/:userId/watchList", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await user_1.User.findById(userId);
+        if (user) {
+            const movieIds = user.watchList;
+            const movieParams = { _id: { $in: movieIds } };
+            const savedMovies = await movie_1.Movie.find(movieParams);
+            res.send(savedMovies);
+        }
+        else {
+            res.status(500).send({
+                message: "Could not find user",
+            });
+        }
     }
     catch (error) {
         res.send(error);
