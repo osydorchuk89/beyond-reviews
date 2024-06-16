@@ -7,6 +7,7 @@ exports.userRouter = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const express_1 = require("express");
 const user_1 = require("../models/user");
+const activity_1 = require("../models/activity");
 const schemas_1 = require("../util/schemas");
 const upload_1 = require("../upload");
 const userRating_1 = require("../models/userRating");
@@ -50,6 +51,41 @@ exports.userRouter.get("/:userId/watchList", async (req, res) => {
             const movieParams = { _id: { $in: movieIds } };
             const savedMovies = await movie_1.Movie.find(movieParams);
             res.send(savedMovies);
+        }
+        else {
+            res.status(500).send({
+                message: "Could not find user",
+            });
+        }
+    }
+    catch (error) {
+        res.send(error);
+    }
+});
+exports.userRouter.get("/:userId/activity", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await user_1.User.findById(userId);
+        if (user) {
+            const activities = await activity_1.Activity.find({ userId })
+                .populate("movieId", ["title", "releaseYear", "poster"])
+                .populate("userId", ["firstName", "lastName"])
+                .populate("otherUserId", ["firstName", "lastName"])
+                .populate({
+                path: "ratingId",
+                populate: {
+                    path: "userId",
+                    select: "firstName lastName",
+                },
+            })
+                .populate({
+                path: "ratingId",
+                populate: {
+                    path: "movieId",
+                    select: "_id title releaseYear",
+                },
+            });
+            res.send(activities);
         }
         else {
             res.status(500).send({

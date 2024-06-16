@@ -10,12 +10,12 @@ export interface User {
     __v: number;
 }
 
-export interface MovieShort {
-    _id: string;
-    title: string;
-    poster: string;
-    releaseYear: number;
-}
+// export interface MovieShort {
+//     _id: string;
+//     title: string;
+//     poster: string;
+//     releaseYear: number;
+// }
 
 export interface Message {
     _id: string;
@@ -35,12 +35,25 @@ export interface UsersMessages {
 }
 
 export interface MovieRating {
-    movieId: string | MovieShort;
+    movieId: string | Movie;
     movieRating: number;
     movieReview: string;
     userId: string | User;
     date: Date;
     likedBy: string[] | User[];
+    __v: number;
+    _id: string;
+}
+
+export interface Activity {
+    userId: User;
+    movieId: Movie;
+    ratingId: MovieRating;
+    otherUserId: User;
+    action: string;
+    rating: string;
+    review: string;
+    date: Date;
     __v: number;
     _id: string;
 }

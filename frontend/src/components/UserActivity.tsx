@@ -1,41 +1,57 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { MovieRating, MovieShort, User } from "../lib/types";
-import { getUser, getUserRatings } from "../lib/requests";
+import { Activity, AuthStatus, Movie, User } from "../lib/types";
+import { getAuthStatus, getUserActivity } from "../lib/requests";
 import { DarkLink } from "./DarkLink";
+import { useRef } from "react";
+import { useTruncatedElement } from "../hooks/useTuncatedElement";
+import { Button } from "./Button";
 
 export const UserActivity = () => {
     const { userId } = useParams({ strict: false }) as { userId: string };
 
-    const { data: userData } = useQuery<User>({
-        queryKey: ["users", { userId }],
-        queryFn: () => getUser(userId),
+    const { data: authStatus } = useQuery<AuthStatus>({
+        queryKey: ["authState"],
+        queryFn: getAuthStatus,
     });
 
-    const { data: userRatings } = useQuery<MovieRating[]>({
-        queryKey: ["ratings", { userId }],
-        queryFn: async () => {
-            const originalUserRatings = await getUserRatings(userId);
-            const reversedUserRatings = originalUserRatings.reverse();
-            return reversedUserRatings;
-        },
+    const { data: activityData } = useQuery<Activity[]>({
+        queryKey: ["activity", { userId }],
+        queryFn: () => getUserActivity(userId),
     });
+
+    const { userData } = authStatus!;
 
     const userName = `${userData!.firstName} ${userData!.lastName}`;
 
+    const ref = useRef(null);
+    const { isTruncated, isShowingMore, toggleIsShowingMore } =
+        useTruncatedElement({
+            ref,
+        });
+
+    const reversedActivityData = [...activityData!].reverse();
+
     return (
         <div className="flex flex-col my-20 mx-60 gap-10">
-            {userRatings!.map((rating) => {
-                const movie = rating.movieId as MovieShort;
-                const ratingDate = new Date(rating.date);
-                const parsedDate = ratingDate.toLocaleString("default", {
+            {reversedActivityData!.map((activity) => {
+                let ratingUserName;
+                let ratingUserId;
+                if (activity.ratingId) {
+                    const ratingUser = activity.ratingId.userId as User;
+                    ratingUserName = `${ratingUser.firstName} ${ratingUser.lastName}`;
+                    ratingUserId = ratingUser._id;
+                }
+                const activityDate = new Date(activity.date);
+                const parsedDate = activityDate.toLocaleString("default", {
                     day: "2-digit",
                     month: "long",
                     year: "numeric",
                 });
+
                 return (
                     <div
-                        key={rating._id}
+                        key={activity._id}
                         className="p-5 rounded-lg shadow-lg bg-amber-100"
                     >
                         <div className="flex justify-between">
@@ -44,24 +60,112 @@ export const UserActivity = () => {
                                     src={userData!.photo}
                                     className="object-cover object-top w-8 h-8 rounded-full self-center mr-2"
                                 />
-                                <span className="font-bold">
-                                    {userName} rated {rating.movieRating}/10{" "}
-                                    <DarkLink
-                                        text={`${movie.title} (${movie.releaseYear})`}
-                                        to={`/movies/${movie._id}`}
-                                    />
-                                </span>
+                                {activity.movieId &&
+                                    activity.action === "rated" && (
+                                        <span className="font-bold">
+                                            {userName} rated {activity.rating}
+                                            /10{" "}
+                                            <DarkLink
+                                                text={`${activity.movieId.title} (${activity.movieId.releaseYear})`}
+                                                to={`/movies/${activity.movieId._id}`}
+                                            />
+                                        </span>
+                                    )}
+                                {activity.movieId &&
+                                    activity.action !== "rated" && (
+                                        <span className="font-bold">
+                                            {userName}{" "}
+                                            {activity.action === "saved"
+                                                ? "added"
+                                                : "removed"}{" "}
+                                            <DarkLink
+                                                text={`${activity.movieId.title} (${activity.movieId.releaseYear})`}
+                                                to={`/movies/${activity.movieId._id}`}
+                                            />{" "}
+                                            {activity.action === "saved"
+                                                ? "to"
+                                                : "from"}{" "}
+                                            watch list
+                                        </span>
+                                    )}
+                                {activity.ratingId && (
+                                    <span className="font-bold">
+                                        {userName}{" "}
+                                        {activity.action === "liked"
+                                            ? "liked"
+                                            : "unliked"}{" "}
+                                        a rating by{" "}
+                                        <DarkLink
+                                            text={ratingUserName!}
+                                            to={`/users/${ratingUserId}/activity`}
+                                        />{" "}
+                                    </span>
+                                )}
                             </p>
                             <p>
                                 <span className="italic">{parsedDate}</span>
                             </p>
                         </div>
-                        {rating.movieReview ? (
+                        {activity.movieId && activity.review && (
                             <p className="mt-2">
-                                <strong>Review</strong>: {rating.movieReview}
+                                <strong>Review</strong>: {activity.review}
                             </p>
-                        ) : (
-                            <p className="italic mt-2">No review</p>
+                        )}
+                        {activity.movieId &&
+                            activity.action === "rated" &&
+                            !activity.review && (
+                                <p className="italic mt-2">No review</p>
+                            )}
+                        {activity.ratingId && (
+                            <div className="mt-2">
+                                <p>
+                                    <strong>Movie</strong>:{" "}
+                                    <DarkLink
+                                        text={`${(activity.ratingId.movieId as Movie).title} (${(activity.ratingId.movieId as Movie).releaseYear})`}
+                                        to={`/movies/${(activity.ratingId.movieId as Movie)._id}`}
+                                    />
+                                </p>
+                                <p>
+                                    <strong>Rating</strong>:{" "}
+                                    {`${activity.ratingId.movieRating}/10`}
+                                </p>
+                                <p>
+                                    <strong>Review</strong>:{" "}
+                                    {activity.ratingId.movieReview ? (
+                                        <div>
+                                            <span
+                                                ref={ref}
+                                                className={
+                                                    !isShowingMore
+                                                        ? "line-clamp-5 w-full"
+                                                        : "w-full"
+                                                }
+                                            >
+                                                {activity.ratingId.movieReview}
+                                            </span>
+                                            {isTruncated && (
+                                                <div>
+                                                    <Button
+                                                        style="text-green-700 hover:text-green-950 text-sm font-medium uppercase"
+                                                        text={
+                                                            isShowingMore
+                                                                ? "Show less"
+                                                                : "Show more"
+                                                        }
+                                                        handleClick={
+                                                            toggleIsShowingMore
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <span className="italic">
+                                            no review
+                                        </span>
+                                    )}
+                                </p>
+                            </div>
                         )}
                     </div>
                 );

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { Movie } from "../models/movie";
 import { UserRating } from "../models/userRating";
+import { Activity } from "../models/activity";
 import { UserRatingSchema } from "../util/schemas";
 import { User } from "../models/user";
 
@@ -43,8 +44,16 @@ movieRouter.put("/:movieId", async (req, res) => {
                     (item) => item.toString() !== movie._id.toString()
                 );
             }
+            const userActivityParams = {
+                userId,
+                movieId,
+                action: saved ? "saved" : "unsaved",
+                date: new Date(),
+            };
+            const userActivity = new Activity(userActivityParams);
             await movie.save();
             await user.save();
+            await userActivity.save();
         } else {
             res.status(500).send({
                 message: "Could not find movie and/or user",
@@ -140,6 +149,19 @@ movieRouter.post("/:movieId/ratings", async (req, res) => {
                     message: "Could not find user",
                 });
             }
+            // adding user action to the respective collection
+            if (user && movie) {
+                const userActivityParams = {
+                    userId: user._id,
+                    movieId: movie._id,
+                    action: "rated",
+                    rating: movieRating,
+                    review: movieReview,
+                    date: new Date(),
+                };
+                const userActivity = new Activity(userActivityParams);
+                await userActivity.save();
+            }
             res.status(200).send();
         } catch (error) {
             res.send(error);
@@ -161,6 +183,14 @@ movieRouter.put("/:movieId/ratings/:ratingId", async (req, res) => {
                 );
             }
             await rating.save();
+            const userActivityParams = {
+                userId,
+                ratingId: rating._id,
+                action: like ? "liked" : "unliked",
+                date: new Date(),
+            };
+            const userActivity = new Activity(userActivityParams);
+            await userActivity.save();
             res.status(200).send();
         } else {
             res.status(500).send({

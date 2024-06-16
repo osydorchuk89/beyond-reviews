@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { Router } from "express";
 import { User } from "../models/user";
+import { Activity } from "../models/activity";
 import { UserSchema } from "../util/schemas";
 import { fileUpload } from "../upload";
 import { UserRating } from "../models/userRating";
@@ -50,6 +51,40 @@ userRouter.get("/:userId/watchList", async (req, res) => {
             const movieParams = { _id: { $in: movieIds } };
             const savedMovies = await Movie.find(movieParams);
             res.send(savedMovies);
+        } else {
+            res.status(500).send({
+                message: "Could not find user",
+            });
+        }
+    } catch (error) {
+        res.send(error);
+    }
+});
+
+userRouter.get("/:userId/activity", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await User.findById(userId);
+        if (user) {
+            const activities = await Activity.find({ userId })
+                .populate("movieId", ["title", "releaseYear", "poster"])
+                .populate("userId", ["firstName", "lastName"])
+                .populate("otherUserId", ["firstName", "lastName"])
+                .populate({
+                    path: "ratingId",
+                    populate: {
+                        path: "userId",
+                        select: "firstName lastName",
+                    },
+                })
+                .populate({
+                    path: "ratingId",
+                    populate: {
+                        path: "movieId",
+                        select: "_id title releaseYear",
+                    },
+                });
+            res.send(activities);
         } else {
             res.status(500).send({
                 message: "Could not find user",

@@ -35,7 +35,7 @@ export const InfoBar = ({ action }: { action: string }) => {
     const infoBarFunction = values[action as keyof ValuesType].closeFunction;
 
     useEffect(() => {
-        setTimeout(infoBarFunction, 3000);
+        setTimeout(infoBarFunction, 2000);
     }, []);
 
     return (

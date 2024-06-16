@@ -108,7 +108,7 @@ export const ReviewCard = ({
                     <p
                         ref={ref}
                         className={
-                            !isShowingMore ? "line-clamp-3 w-full" : "w-full"
+                            !isShowingMore ? "line-clamp-5 w-full" : "w-full"
                         }
                     >
                         {review}

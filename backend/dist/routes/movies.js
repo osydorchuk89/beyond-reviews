@@ -4,6 +4,7 @@ exports.movieRouter = void 0;
 const express_1 = require("express");
 const movie_1 = require("../models/movie");
 const userRating_1 = require("../models/userRating");
+const activity_1 = require("../models/activity");
 const schemas_1 = require("../util/schemas");
 const user_1 = require("../models/user");
 exports.movieRouter = (0, express_1.Router)();
@@ -41,8 +42,16 @@ exports.movieRouter.put("/:movieId", async (req, res) => {
                 movie.onWatchList = movie.onWatchList.filter((item) => item.toString() !== userId);
                 user.watchList = user.watchList.filter((item) => item.toString() !== movie._id.toString());
             }
+            const userActivityParams = {
+                userId,
+                movieId,
+                action: saved ? "saved" : "unsaved",
+                date: new Date(),
+            };
+            const userActivity = new activity_1.Activity(userActivityParams);
             await movie.save();
             await user.save();
+            await userActivity.save();
         }
         else {
             res.status(500).send({
@@ -126,6 +135,19 @@ exports.movieRouter.post("/:movieId/ratings", async (req, res) => {
                     message: "Could not find user",
                 });
             }
+            // adding user action to the respective collection
+            if (user && movie) {
+                const userActivityParams = {
+                    userId: user._id,
+                    movieId: movie._id,
+                    action: "rated",
+                    rating: movieRating,
+                    review: movieReview,
+                    date: new Date(),
+                };
+                const userActivity = new activity_1.Activity(userActivityParams);
+                await userActivity.save();
+            }
             res.status(200).send();
         }
         catch (error) {
@@ -146,6 +168,14 @@ exports.movieRouter.put("/:movieId/ratings/:ratingId", async (req, res) => {
                 rating.likedBy = rating.likedBy.filter((item) => item.toString() !== userId);
             }
             await rating.save();
+            const userActivityParams = {
+                userId,
+                ratingId: rating._id,
+                action: like ? "liked" : "unliked",
+                date: new Date(),
+            };
+            const userActivity = new activity_1.Activity(userActivityParams);
+            await userActivity.save();
             res.status(200).send();
         }
         else {
