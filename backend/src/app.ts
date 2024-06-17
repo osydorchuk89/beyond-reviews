@@ -40,8 +40,7 @@ app.use(
         saveUninitialized: true,
         cookie: {
             secure: process.env.NODE_ENV === "production" ? true : false,
-            // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            sameSite: "lax",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             httpOnly: true,
             maxAge: 1000 * 60 * 24,
         },
