@@ -22,7 +22,6 @@ export const Movies = () => {
         queryFn: () => getMovies(),
     });
 
-    // const movies: Movie[] = Route.useLoaderData();
     const [numberMovies, setNumberMovies] = useState(15);
     const { search, filter, sort } = Route.useSearch();
 
@@ -83,7 +82,7 @@ export const Movies = () => {
 
     return (
         <div className="flex flex-col w-full">
-            <p className="text-4xl text-center font-bold py-5 mb-5 border-b border-b-amber-700">
+            <p className="text-4xl text-center font-bold py-10 mb-5 border-b border-b-amber-700">
                 Popular Movies
             </p>
             <div className="flex">

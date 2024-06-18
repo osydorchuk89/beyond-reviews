@@ -65,7 +65,7 @@ export const TopNavBar = () => {
     return (
         <nav className="sticky top-0 bg-amber-50 w-full flex items-center justify-between p-5 z-10">
             <Link to="/">
-                <span className="text-2xl text-amber-950 font-bold">
+                <span className="text-2xl text-amber-950 font-bold hover:text-amber-700">
                     Beyond Reviews
                 </span>
             </Link>

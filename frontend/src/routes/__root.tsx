@@ -7,6 +7,7 @@ import { SuccessDialog } from "../components/SuccessDialog";
 import { getAuthStatus, queryClient } from "../lib/requests";
 import { InfoBar } from "../components/InfoBar";
 import { useAppSelector } from "../store/hooks";
+import { AnimatePresence } from "framer-motion";
 
 const Root = () => {
     const { justLoggedIn, justLoggedOut, justRegistered } = useAppSelector(
@@ -17,9 +18,11 @@ const Root = () => {
         <>
             <ScrollRestoration />
             <TopNavBar />
-            {justLoggedIn && <InfoBar action="justLoggedIn" />}
-            {justLoggedOut && <InfoBar action="justLoggedOut" />}
-            {justRegistered && <InfoBar action="justRegistered" />}
+            <AnimatePresence>
+                {justLoggedIn && <InfoBar action="justLoggedIn" />}
+                {justLoggedOut && <InfoBar action="justLoggedOut" />}
+                {justRegistered && <InfoBar action="justRegistered" />}
+            </AnimatePresence>
             <Outlet />
             <BottomNavBar />
             <SuccessDialog />

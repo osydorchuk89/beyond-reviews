@@ -2,6 +2,7 @@ import { CloseIcon } from "./icons/CloseIcon";
 import { useAppDispatch } from "../store/hooks";
 import { infoBarActions } from "../store";
 import { useEffect } from "react";
+import { motion } from "framer-motion";
 
 interface ValuesElementsType {
     text: string;
@@ -39,12 +40,18 @@ export const InfoBar = ({ action }: { action: string }) => {
     }, []);
 
     return (
-        <div className="flex justify-center items-center w-full py-1 font-medium bg-green-400 animate-fade absolute">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex justify-center items-center w-full py-1 font-medium bg-green-400 absolute"
+        >
             <p>{infoBarText}</p>
             <CloseIcon
                 handleClick={infoBarFunction}
                 className="w-5 h-5 cursor-pointer absolute right-5"
             />
-        </div>
+        </motion.div>
     );
 };
