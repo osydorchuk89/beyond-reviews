@@ -9,6 +9,7 @@ import { StarIcon } from "./icons/StarIcon";
 import { LikeIcon } from "./icons/LikeIcon";
 import { useTruncatedElement } from "../hooks/useTuncatedElement";
 import { Button } from "./Button";
+import { DarkLink } from "./DarkLink";
 
 interface ReviewCardProps {
     reviewId: string;
@@ -90,9 +91,10 @@ export const ReviewCard = ({
         <div className="flex flex-col items-start bg-amber-100 rounded-lg shadow-lg p-5">
             <div className="flex flex-col w-full mb-5">
                 <div className="flex justify-between">
-                    <p className="font-bold">
-                        {user.firstName} {user.lastName}
-                    </p>
+                    <DarkLink
+                        text={`${user.firstName} ${user.lastName}`}
+                        to={`/users/${user._id}/profile`}
+                    />
                     <div className="flex">
                         <span>
                             <StarIcon className="w-6 h-6 fill-yellow-500 border-none" />

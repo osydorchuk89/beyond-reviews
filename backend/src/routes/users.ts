@@ -68,7 +68,7 @@ userRouter.get("/:userId/activity", async (req, res) => {
         if (user) {
             const activities = await Activity.find({ userId })
                 .populate("movieId", ["title", "releaseYear", "poster"])
-                .populate("userId", ["firstName", "lastName"])
+                .populate("userId", ["firstName", "lastName", "photo"])
                 .populate("otherUserId", ["firstName", "lastName"])
                 .populate({
                     path: "ratingId",
@@ -84,7 +84,7 @@ userRouter.get("/:userId/activity", async (req, res) => {
                         select: "_id title releaseYear",
                     },
                 });
-            res.send(activities);
+            res.send({ activities, user });
         } else {
             res.status(500).send({
                 message: "Could not find user",
@@ -92,6 +92,31 @@ userRouter.get("/:userId/activity", async (req, res) => {
         }
     } catch (error) {
         res.send(error);
+    }
+});
+
+userRouter.post("/:userId/friends", async (req, res) => {
+    const { userId } = req.params;
+    const { otherUserId } = req.body;
+    try {
+        const user = await User.findById(userId);
+        const otherUser = await User.findById(otherUserId);
+        if (user && otherUser) {
+            if (!user.friends.includes(otherUser._id)) {
+                user.friends.push(otherUser._id);
+                otherUser.friends.push(user._id);
+                await user.save();
+                await otherUser.save();
+                res.status(200).send();
+            } else
+                res.status(409).send({
+                    message: "The user is already on the friend list",
+                });
+        } else {
+            res.status(500).send({ message: "Cannot find user" });
+        }
+    } catch (error: any) {
+        res.status(500).send({ message: error.message });
     }
 });
 

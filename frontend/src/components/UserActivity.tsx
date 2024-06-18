@@ -15,14 +15,17 @@ export const UserActivity = () => {
         queryFn: getAuthStatus,
     });
 
-    const { data: activityData } = useQuery<Activity[]>({
+    const { data: activityData } = useQuery({
         queryKey: ["activity", { userId }],
         queryFn: () => getUserActivity(userId),
     });
 
-    const { userData } = authStatus!;
+    const { activities, user } = activityData;
 
-    const userName = `${userData!.firstName} ${userData!.lastName}`;
+    const userName = `${user.firstName} ${user.lastName}`;
+    const userPhotoSrc = user.photo;
+
+    const isSameUser = userId === authStatus!.userData?._id;
 
     const ref = useRef(null);
     const { isTruncated, isShowingMore, toggleIsShowingMore } =
@@ -30,13 +33,15 @@ export const UserActivity = () => {
             ref,
         });
 
-    const reversedActivityData = [...activityData!].reverse();
+    const reversedActivityData: Activity[] = [...activities!].reverse();
 
     const navigate = useNavigate();
 
     return (
-        <div className="flex flex-col items-center justify-center my-20 mx-60 gap-10">
-            <p className="text-center text-2xl font-bold">Activity</p>
+        <div className="flex flex-col my-20 mx-60 gap-10">
+            <p className="text-center text-2xl font-bold">
+                {isSameUser ? "Your" : `${userName}'s `}Activity
+            </p>
             {reversedActivityData.length > 0 &&
                 reversedActivityData!.map((activity) => {
                     let ratingUserName;
@@ -61,14 +66,14 @@ export const UserActivity = () => {
                             <div className="flex justify-between">
                                 <p className="flex items-center">
                                     <img
-                                        src={userData!.photo}
+                                        src={userPhotoSrc}
                                         className="object-cover object-top w-8 h-8 rounded-full self-center mr-2"
                                     />
                                     {activity.movieId &&
                                         activity.action === "rated" && (
                                             <span className="font-bold">
-                                                {userName} rated{" "}
-                                                {activity.rating}
+                                                {isSameUser ? "You" : userName}{" "}
+                                                rated {activity.rating}
                                                 /10{" "}
                                                 <DarkLink
                                                     text={`${activity.movieId.title} (${activity.movieId.releaseYear})`}
@@ -79,7 +84,7 @@ export const UserActivity = () => {
                                     {activity.movieId &&
                                         activity.action !== "rated" && (
                                             <span className="font-bold">
-                                                {userName}{" "}
+                                                {isSameUser ? "You" : userName}{" "}
                                                 {activity.action === "saved"
                                                     ? "added"
                                                     : "removed"}{" "}
@@ -95,14 +100,14 @@ export const UserActivity = () => {
                                         )}
                                     {activity.ratingId && (
                                         <span className="font-bold">
-                                            {userName}{" "}
+                                            {isSameUser ? "You" : userName}{" "}
                                             {activity.action === "liked"
                                                 ? "liked"
                                                 : "unliked"}{" "}
                                             a rating by{" "}
                                             <DarkLink
                                                 text={ratingUserName!}
-                                                to={`/users/${ratingUserId}/activity`}
+                                                to={`/users/${ratingUserId}/profile`}
                                             />{" "}
                                         </span>
                                     )}
@@ -179,8 +184,11 @@ export const UserActivity = () => {
                     );
                 })}
             {reversedActivityData.length === 0 && (
-                <div className="flex flex-col gap-10">
-                    <p className="text-center text-lg">You have no activity</p>
+                <div className="flex flex-col items-center justify-center gap-10">
+                    <p className="text-center text-lg">
+                        {isSameUser ? "You have" : `${userName} has`} no
+                        activity
+                    </p>
                     <Button
                         text="Explore movies"
                         style="dark"

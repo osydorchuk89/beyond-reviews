@@ -7,15 +7,9 @@ export interface User {
     photo: string;
     watchList: string[];
     ratings: string[];
+    friends: User[] | string[];
     __v: number;
 }
-
-// export interface MovieShort {
-//     _id: string;
-//     title: string;
-//     poster: string;
-//     releaseYear: number;
-// }
 
 export interface Message {
     _id: string;
