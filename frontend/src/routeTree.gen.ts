@@ -19,6 +19,7 @@ import { Route as LoginIndexImport } from './routes/login.index'
 import { Route as MoviesMovieIdImport } from './routes/movies.$movieId'
 import { Route as UsersUserIdSavedMoviesImport } from './routes/users_.$userId.saved-movies'
 import { Route as UsersUserIdProfileImport } from './routes/users_.$userId.profile'
+import { Route as UsersUserIdFriendsImport } from './routes/users_.$userId.friends'
 import { Route as UsersUserIdActivityImport } from './routes/users_.$userId.activity'
 
 // Create/Update Routes
@@ -63,6 +64,11 @@ const UsersUserIdProfileRoute = UsersUserIdProfileImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const UsersUserIdFriendsRoute = UsersUserIdFriendsImport.update({
+  path: '/users/$userId/friends',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const UsersUserIdActivityRoute = UsersUserIdActivityImport.update({
   path: '/users/$userId/activity',
   getParentRoute: () => rootRoute,
@@ -100,6 +106,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersUserIdActivityImport
       parentRoute: typeof rootRoute
     }
+    '/users/$userId/friends': {
+      preLoaderRoute: typeof UsersUserIdFriendsImport
+      parentRoute: typeof rootRoute
+    }
     '/users/$userId/profile': {
       preLoaderRoute: typeof UsersUserIdProfileImport
       parentRoute: typeof rootRoute
@@ -121,6 +131,7 @@ export const routeTree = rootRoute.addChildren([
   LoginIndexRoute,
   MoviesIndexRoute,
   UsersUserIdActivityRoute,
+  UsersUserIdFriendsRoute,
   UsersUserIdProfileRoute,
   UsersUserIdSavedMoviesRoute,
 ])

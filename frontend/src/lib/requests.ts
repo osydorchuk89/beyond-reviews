@@ -126,7 +126,25 @@ export const getUsers = async () => {
     }
 };
 
-export const addFriend = async (userId: string, otherUserId: string) => {
+export const sendFriendRequest = async (
+    userId: string,
+    otherUserId: string
+) => {
+    try {
+        await axios({
+            method: "post",
+            url: BASE_API_URL + "users/" + userId + "/friend-requests/",
+            data: { otherUserId },
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const acceptFriendRequest = async (
+    userId: string,
+    otherUserId: string
+) => {
     try {
         await axios({
             method: "post",
@@ -137,7 +155,6 @@ export const addFriend = async (userId: string, otherUserId: string) => {
         console.log(error);
     }
 };
-
 export const getMessages = async (senderId: string, recipientId: string) => {
     try {
         const response = await axios({

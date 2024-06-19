@@ -5,7 +5,12 @@ import { Button } from "./Button";
 import { CloseIcon } from "./icons/CloseIcon";
 
 export const SuccessDialog = () => {
-    const { isOpen } = useAppSelector((state) => state.popUp);
+    const {
+        isOpen,
+        submittedRating,
+        sentFriendRequest,
+        acceptedFriendRequest,
+    } = useAppSelector((state) => state.popUp);
     const dispatch = useAppDispatch();
 
     return (
@@ -24,9 +29,17 @@ export const SuccessDialog = () => {
                         />
                     </Dialog.Title>
                     <Dialog.Description className="flex flex-col justify-start items-center py-8 text-lg gap-12">
-                        <p>You succesfully added/edited your rating!</p>
+                        {submittedRating && (
+                            <p>You succesfully added/edited your rating!</p>
+                        )}
+                        {sentFriendRequest && (
+                            <p>You succesfully sent a friend request!</p>
+                        )}
+                        {acceptedFriendRequest && (
+                            <p>You succesfully accepted a friend request!</p>
+                        )}
                         <Button
-                            text="Sounds good!"
+                            text="Sounds good"
                             style="dark"
                             handleClick={() => dispatch(popUpActions.close())}
                         />

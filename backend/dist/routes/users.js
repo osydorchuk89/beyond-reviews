@@ -20,12 +20,14 @@ exports.userRouter.get("/", async (req, res) => {
 exports.userRouter.get("/:userId", async (req, res) => {
     const { userId } = req.params;
     try {
-        const user = await user_1.User.findById(userId);
-        // .populate("likes", [
-        //     "title",
-        //     "releaseYear",
-        //     "poster",
-        // ]);
+        const user = await user_1.User.findById(userId)
+            .populate("friends", ["_id", "firstName", "lastName", "photo"])
+            .populate("friendRequests", [
+            "_id",
+            "firstName",
+            "lastName",
+            "photo",
+        ]);
         res.send(user);
     }
     catch (error) {
@@ -97,6 +99,31 @@ exports.userRouter.get("/:userId/activity", async (req, res) => {
         res.send(error);
     }
 });
+exports.userRouter.post("/:userId/friend-requests", async (req, res) => {
+    const { userId } = req.params;
+    const { otherUserId } = req.body;
+    try {
+        const user = await user_1.User.findById(userId);
+        const otherUser = await user_1.User.findById(otherUserId);
+        if (user && otherUser) {
+            if (!user.friendRequests.includes(otherUser._id)) {
+                user.friendRequests.push(otherUser._id);
+                await user.save();
+                res.status(200).send();
+            }
+            else
+                res.status(409).send({
+                    message: "User has already received a friend rreuest",
+                });
+        }
+        else {
+            res.status(500).send({ message: "Cannot find user" });
+        }
+    }
+    catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+});
 exports.userRouter.post("/:userId/friends", async (req, res) => {
     const { userId } = req.params;
     const { otherUserId } = req.body;
@@ -105,6 +132,8 @@ exports.userRouter.post("/:userId/friends", async (req, res) => {
         const otherUser = await user_1.User.findById(otherUserId);
         if (user && otherUser) {
             if (!user.friends.includes(otherUser._id)) {
+                const updatedUserFriendRequests = user.friendRequests.filter((requestUser) => requestUser.toString() !== otherUser._id.toString());
+                user.friendRequests = updatedUserFriendRequests;
                 user.friends.push(otherUser._id);
                 otherUser.friends.push(user._id);
                 await user.save();

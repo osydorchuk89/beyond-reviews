@@ -1,19 +1,35 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { addFriend, getAuthStatus, getUser } from "../lib/requests";
+import {
+    sendFriendRequest,
+    getAuthStatus,
+    getUser,
+    queryClient,
+    acceptFriendRequest,
+} from "../lib/requests";
 import { AuthStatus, User } from "../lib/types";
 import { DarkLink } from "./DarkLink";
 import { Button } from "./Button";
+import { useAppDispatch } from "../store/hooks";
+import { popUpActions } from "../store";
 
 export const UserProfile = () => {
     const { userId } = useParams({ strict: false }) as {
         userId: string;
     };
 
+    let visitingUser: User | undefined;
+    // let visitingUserId = "";
+
     const { data: authStatus } = useQuery<AuthStatus>({
         queryKey: ["authState"],
         queryFn: getAuthStatus,
     });
+
+    if (authStatus!.isAuthenticated) {
+        visitingUser = authStatus!.userData!;
+        // visitingUserId = authStatus!.userData!._id;
+    }
 
     const { isAuthenticated, userData } = authStatus!;
     const isSameUser = userId === userData?._id;
@@ -24,6 +40,21 @@ export const UserProfile = () => {
     });
 
     const userName = `${pageUserData!.firstName} ${pageUserData!.lastName}`;
+
+    const { mutate: sendFriendRequestFn } = useMutation({
+        mutationFn: () => sendFriendRequest(userId, authStatus!.userData!._id),
+        onSuccess: () =>
+            queryClient.invalidateQueries({ queryKey: ["users", { userId }] }),
+    });
+
+    const { mutate: acceptFriendRequestFn } = useMutation({
+        mutationFn: () =>
+            acceptFriendRequest(userId, authStatus!.userData!._id),
+        onSuccess: () =>
+            queryClient.invalidateQueries({ queryKey: ["users", { userId }] }),
+    });
+
+    const dispatch = useAppDispatch();
 
     return (
         <div className="flex flex-col my-20 mx-60 p-5 rounded-lg shadow-lg bg-amber-100 gap-10">
@@ -52,19 +83,39 @@ export const UserProfile = () => {
                         </li>
                         <li>User ratings</li>
                         {isAuthenticated &&
-                            !(userData!.friends as string[]).includes(
+                            !(
+                                pageUserData!.friendRequests as string[]
+                            ).includes(visitingUser!._id) &&
+                            !(
+                                visitingUser!.friendRequests as string[]
+                            ).includes(userId) && (
+                                <li>
+                                    <Button
+                                        text="Send a friend request"
+                                        style="dark"
+                                        handleClick={() => {
+                                            sendFriendRequestFn();
+                                            dispatch(
+                                                popUpActions.openSentFriendRequestPopUp()
+                                            );
+                                        }}
+                                    />
+                                </li>
+                            )}
+                        {isAuthenticated &&
+                            (visitingUser!.friendRequests as string[]).includes(
                                 userId
                             ) && (
                                 <li>
                                     <Button
-                                        text="Add as a friend"
+                                        text="Accept friend request"
                                         style="dark"
-                                        handleClick={() =>
-                                            addFriend(
-                                                userId,
-                                                authStatus!.userData!._id
-                                            )
-                                        }
+                                        handleClick={() => {
+                                            acceptFriendRequestFn();
+                                            dispatch(
+                                                popUpActions.openAcceptedFriendRequestPopUp()
+                                            );
+                                        }}
                                     />
                                 </li>
                             )}

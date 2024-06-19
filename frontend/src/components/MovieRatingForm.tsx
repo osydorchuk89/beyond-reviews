@@ -81,7 +81,7 @@ export const MovieRatingForm = () => {
             });
             setHasRated(true);
             setIsEditing(false);
-            dispatch(popUpActions.open());
+            dispatch(popUpActions.openSubmittedRatingPopUp());
             queryClient.invalidateQueries({
                 queryKey: ["movie"],
             });

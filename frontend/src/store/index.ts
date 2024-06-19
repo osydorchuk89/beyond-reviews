@@ -8,6 +8,9 @@ interface MessageBoxState {
 
 interface PopUpState {
     isOpen: boolean;
+    submittedRating: boolean;
+    sentFriendRequest: boolean;
+    acceptedFriendRequest: boolean;
 }
 
 interface InfoBarState {
@@ -23,6 +26,9 @@ const initialMessageBoxState: MessageBoxState = {
 };
 const initialPopUpState: PopUpState = {
     isOpen: false,
+    submittedRating: false,
+    sentFriendRequest: false,
+    acceptedFriendRequest: false,
 };
 const initialInfoBarState: InfoBarState = {
     justRegistered: false,
@@ -57,11 +63,22 @@ const popUpSlice = createSlice({
     name: "popUp",
     initialState: initialPopUpState,
     reducers: {
-        open(state) {
+        openSubmittedRatingPopUp(state) {
             state.isOpen = true;
+            state.submittedRating = true;
+        },
+        openSentFriendRequestPopUp(state) {
+            state.isOpen = true;
+            state.sentFriendRequest = true;
+        },
+        openAcceptedFriendRequestPopUp(state) {
+            state.isOpen = true;
+            state.acceptedFriendRequest = true;
         },
         close(state) {
             state.isOpen = false;
+            state.submittedRating = false;
+            state.sentFriendRequest = false;
         },
     },
 });

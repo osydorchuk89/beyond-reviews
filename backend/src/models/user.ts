@@ -9,6 +9,7 @@ export interface IUser {
     googleId?: string;
     ratings?: Types.ObjectId[];
     watchList: Types.ObjectId[];
+    friendRequests: Types.ObjectId[];
     friends: Types.ObjectId[];
 }
 
@@ -21,6 +22,7 @@ const userSchema = new Schema<IUser>({
     googleId: String,
     ratings: [{ type: Schema.Types.ObjectId, ref: "UserRating" }],
     watchList: [{ type: Schema.Types.ObjectId, ref: "Movie" }],
+    friendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 

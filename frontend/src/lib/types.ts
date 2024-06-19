@@ -8,6 +8,7 @@ export interface User {
     watchList: string[];
     ratings: string[];
     friends: User[] | string[];
+    friendRequests: User[] | string[];
     __v: number;
 }
 

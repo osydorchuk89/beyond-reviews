@@ -11,7 +11,7 @@ interface AccountMenuProps {
 const menuList = [
     { href: "/users/$userId/profile", text: "Profile" },
     { href: "/users/$userId/activity", text: "Activity" },
-    { href: "#", text: "Friends" },
+    { href: "/users/$userId/friends", text: "Friends" },
     { href: "/users/$userId/saved-movies", text: "Watch List" },
     { href: "#", text: "Settings" },
 ];
