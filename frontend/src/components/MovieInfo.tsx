@@ -7,6 +7,7 @@ import { BookMarkIcon } from "./icons/BookMarkIcon";
 import { useState } from "react";
 import axios from "axios";
 import { BASE_API_URL } from "../lib/urls";
+import { DarkLink } from "./DarkLink";
 
 export const MovieMainInfo = () => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };
@@ -115,11 +116,43 @@ export const MovieAddInfo = () => {
                 </div>
             )}
             <p>
-                {genres.slice(0, -1).map((item) => item + " | ")}
-                {genres.at(-1)}
+                {genres.slice(0, -1).map((item) => (
+                    <span>
+                        <DarkLink
+                            search={(prevState) => ({
+                                ...prevState,
+                                filter: `genre-${item}`,
+                            })}
+                            resetScroll={false}
+                            to="/movies"
+                            text={item}
+                        />{" "}
+                        |{" "}
+                    </span>
+                ))}
+                <DarkLink
+                    search={(prevState) => ({
+                        ...prevState,
+                        filter: `genre-${genres.at(-1)}`,
+                    })}
+                    resetScroll={false}
+                    to="/movies"
+                    text={genres.at(-1)!}
+                />
             </p>
             <p className="font-bold">
-                Directed by: {movieData && movieData.director}
+                Directed by:{" "}
+                {movieData && (
+                    <DarkLink
+                        search={(prevState) => ({
+                            ...prevState,
+                            filter: `director-${movieData.director}`,
+                        })}
+                        resetScroll={false}
+                        to="/movies"
+                        text={movieData.director}
+                    />
+                )}
             </p>
             <div className="flex gap-5 text-gray-600 ">
                 <span>{movieData && movieData.runtime} min</span>

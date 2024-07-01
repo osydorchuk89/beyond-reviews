@@ -5,17 +5,13 @@ import { Movie } from "../lib/types";
 import { getMovies } from "../lib/requests";
 import { SearchBar } from "./SearchBar";
 import { SortFilterBar } from "./SortFilterBar";
-import { filterList, sortList } from "../lib/data";
+import { sideBarFilterList, sideBarSortList } from "../lib/data";
 import { MovieCard } from "./MovieCard";
 import { Button } from "./Button";
 import { Route } from "../routes/movies.index";
 
 export const Movies = () => {
     const navigate = useNavigate();
-
-    useEffect(() => {
-        navigate({ search: {} });
-    }, []);
 
     const { data: movies } = useQuery<Movie[]>({
         queryKey: ["movies"],
@@ -24,6 +20,12 @@ export const Movies = () => {
 
     const [numberMovies, setNumberMovies] = useState(15);
     const { search, filter, sort } = Route.useSearch();
+
+    useEffect(() => {
+        if (!search && !filter && !sort) {
+            navigate({ search: {} });
+        }
+    }, []);
 
     let sortedMovies = movies as Movie[];
 
@@ -48,30 +50,60 @@ export const Movies = () => {
                 (a, b) => b.numRatings - a.numRatings
             );
             break;
+        case "":
+            sortedMovies = sortedMovies.sort(
+                (a, b) => b.releaseYear - a.releaseYear
+            );
+            break;
+        default:
+            sortedMovies = sortedMovies.sort(
+                (a, b) => b.releaseYear - a.releaseYear
+            );
     }
 
-    switch (filter) {
-        case "year2023":
-            sortedMovies = sortedMovies.filter(
-                (item) => item.releaseYear === 2023
-            );
-            break;
-        case "year2024":
-            sortedMovies = sortedMovies.filter(
-                (item) => item.releaseYear === 2024
-            );
-            break;
-        case "genreAction":
-            sortedMovies = sortedMovies.filter((item) =>
-                item.genres.includes("Action")
-            );
-            break;
-        case "genreDrama":
-            sortedMovies = sortedMovies.filter((item) =>
-                item.genres.includes("Drama")
-            );
-            break;
+    if (filter?.startsWith("year")) {
+        const year = +filter.split("-")[1];
+        sortedMovies = sortedMovies.filter((item) => item.releaseYear === year);
+    } else if (filter?.startsWith("genre")) {
+        const genre = filter.split("-")[1];
+        sortedMovies = sortedMovies.filter((item) =>
+            item.genres.includes(genre)
+        );
+    } else if (filter?.startsWith("director")) {
+        const director = filter.split("-")[1];
+        console.log(director);
+        sortedMovies = sortedMovies.filter(
+            (item) => item.director === director
+        );
     }
+
+    // switch (filter) {
+    //     case "year2023":
+    //         sortedMovies = sortedMovies.filter(
+    //             (item) => item.releaseYear === 2023
+    //         );
+    //         break;
+    //     case "year2024":
+    //         sortedMovies = sortedMovies.filter(
+    //             (item) => item.releaseYear === 2024
+    //         );
+    //         break;
+    //     case "genreAction":
+    //         sortedMovies = sortedMovies.filter((item) =>
+    //             item.genres.includes("Action")
+    //         );
+    //         break;
+    //     case "genreDrama":
+    //         sortedMovies = sortedMovies.filter((item) =>
+    //             item.genres.includes("Drama")
+    //         );
+    //         break;
+    //     case "director-denis-villeneuve":
+    //         sortedMovies = sortedMovies.filter(
+    //             (item) => item.director === "Denis Villeneuve"
+    //         );
+    //         break;
+    // }
 
     if (search) {
         const searchTerm = search.toLowerCase();
@@ -88,8 +120,14 @@ export const Movies = () => {
             <div className="flex">
                 <div className="flex flex-col w-1/4 ml-5 gap-2 mb-5">
                     <SearchBar />
-                    <SortFilterBar itemsList={sortList} title="Sort by:" />
-                    <SortFilterBar itemsList={filterList} title="Filter:" />
+                    <SortFilterBar
+                        itemsList={sideBarSortList}
+                        title="Sort by:"
+                    />
+                    <SortFilterBar
+                        itemsList={sideBarFilterList}
+                        title="Filter:"
+                    />
                 </div>
                 <div className="flex flex-col w-3/4">
                     <div className="flex-col">
