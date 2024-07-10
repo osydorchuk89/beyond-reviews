@@ -150,6 +150,28 @@ userRouter.post("/:userId/friends", async (req, res) => {
     }
 });
 
+userRouter.get("/:userId/friends", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await User.findById(userId).populate("friends", [
+            "_id",
+            "firstName",
+            "lastName",
+            "photo",
+        ]);
+        if (user) {
+            // const friendIds = user.friends;
+            // console.log(friendIds);
+            console.log(user.friends);
+            return user.friends;
+        } else {
+            res.status(500).send({ message: "Cannot find user" });
+        }
+    } catch (error: any) {
+        res.status(500).send({ message: error.message });
+    }
+});
+
 userRouter.post("/", fileUpload.single("photo"), async (req, res) => {
     const userData = req.body;
     if (req.file) {

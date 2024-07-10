@@ -3,8 +3,8 @@ import {
     getAuthStatus,
     getMessages,
     getAllMessages,
-    getUsers,
     queryClient,
+    getUser,
 } from "../lib/requests";
 import { UserIcon } from "./icons/UserIcon";
 import { AuthStatus, User } from "../lib/types";
@@ -22,15 +22,17 @@ export const MessageBoxAllUsers = () => {
 
     const userId = authStatus!.userData!._id;
 
-    const { data: users } = useQuery<User[]>({
-        queryKey: ["users"],
-        queryFn: getUsers,
+    const { data: user } = useQuery<User>({
+        queryKey: ["users", { user: userId }],
+        queryFn: () => getUser(userId),
     });
 
+    const userFriends = user!.friends as User[];
+
     const { data: allMessages } = useQuery({
-        queryKey: ["messages"],
+        queryKey: ["messages", {user: userId}],
         queryFn: () => {
-            const userPairs = users!.map((user) => ({
+            const userPairs = userFriends.map((user) => ({
                 senderId: user._id,
                 recipientId: userId,
             }));
@@ -42,8 +44,6 @@ export const MessageBoxAllUsers = () => {
         queryClient.prefetchQuery({
             queryKey: ["messages", { user: userId, otherUser: otherUserId }],
             queryFn: () => getMessages(userId, otherUserId),
-            // Prefetch only fires when data is older than the staleTime,
-            // so in a case like this you definitely want to set one
             staleTime: 1000,
         });
     };
@@ -54,7 +54,7 @@ export const MessageBoxAllUsers = () => {
 
     return (
         <div>
-            {users!
+            {userFriends
                 .filter((user) => user._id !== userId)
                 .map((user) => {
                     const userMessages = allMessages?.find(

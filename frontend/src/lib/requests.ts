@@ -114,6 +114,18 @@ export const getUserActivity = async (userId: string) => {
     }
 };
 
+export const getUserFriends = async (userId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_API_URL + "users/" + userId + "/friends/",
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 export const getUsers = async () => {
     try {
         const response = await axios({

@@ -88,10 +88,13 @@ export const UserProfile = () => {
                             ).includes(visitingUser!._id) &&
                             !(
                                 visitingUser!.friendRequests as string[]
-                            ).includes(userId) && (
+                            ).includes(userId) &&
+                            !(pageUserData!.friends as string[]).includes(
+                                visitingUser!._id
+                            ) && (
                                 <li>
                                     <Button
-                                        text="Send a friend request"
+                                        text="Send friend request"
                                         style="dark"
                                         handleClick={() => {
                                             sendFriendRequestFn();

@@ -12,7 +12,7 @@ import { AuthStatus, User } from "../lib/types";
 import {
     getAllMessages,
     getAuthStatus,
-    getUsers,
+    getUser,
     queryClient,
 } from "../lib/requests";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -30,29 +30,31 @@ export const MessageBox = () => {
         enabled: false,
     });
 
-    const { data: users } = useQuery<User[]>({
-        queryKey: ["users"],
-        queryFn: getUsers,
-    });
-
     const userId = authStatus!.userData!._id;
 
-    const { data: allMessages } = useQuery({
-        queryKey: ["messages"],
-        queryFn: () => {
-            const userPairs = users!.map((user) => ({
-                senderId: user._id,
-                recipientId: userId,
-            }));
-            return getAllMessages(userPairs!);
-        },
-    });
+    // const { data: user } = useQuery<User>({
+    //     queryKey: ["users", { user: userId }],
+    //     queryFn: () => getUser(userId),
+    // });
 
-    const hasUnreadMessages = allMessages?.find((usersMessages) =>
-        usersMessages!.messages.find(
-            (message) => message.sender._id !== userId && !message.read
-        )
-    );
+    // const userFriends = user!.friends as User[];
+
+    // const { data: allMessages } = useQuery({
+    //     queryKey: ["messages", { user: userId }],
+    //     queryFn: () => {
+    //         const userPairs = userFriends.map((user) => ({
+    //             senderId: user._id,
+    //             recipientId: userId,
+    //         }));
+    //         return getAllMessages(userPairs!);
+    //     },
+    // });
+
+    // const hasUnreadMessages = allMessages?.find((usersMessages) =>
+    //     usersMessages!.messages.find(
+    //         (message) => message.sender._id !== userId && !message.read
+    //     )
+    // );
 
     useEffect(() => {
         socket.emit("join-room", userId);
@@ -72,6 +74,16 @@ export const MessageBox = () => {
         });
     }, [socket]);
 
+    const prefetchUser = (userId: string) => {
+        queryClient.prefetchQuery({
+            queryKey: ["users", { user: userId }],
+            queryFn: () => getUser(userId),
+            // Prefetch only fires when data is older than the staleTime,
+            // so in a case like this you definitely want to set one
+            staleTime: 1000,
+        });
+    };
+
     return (
         <Popover>
             {({ open }) => (
@@ -83,11 +95,17 @@ export const MessageBox = () => {
                                 ? dispatch(messageBoxActions.close())
                                 : dispatch(messageBoxActions.open());
                         }}
+                        onMouseEnter={() => {
+                            !open && prefetchUser(userId);
+                        }}
+                        onFocus={() => {
+                            !open && prefetchUser(userId);
+                        }}
                     >
                         <MessageIcon />
-                        <CircleIcon
+                        {/* <CircleIcon
                             className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${hasUnreadMessages ? "" : "hidden"}`}
-                        />
+                        /> */}
                     </Popover.Button>
                     <Popover.Panel className="flex flex-col absolute top-[90px] right-0 z-10 w-96 h-[87vh] bg-amber-50 rounded-md rounded-r-none shadow-md">
                         <MessageBoxTopPanel />

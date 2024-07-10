@@ -5,7 +5,7 @@ import { Button } from "./Button";
 import { AccountMenu } from "./AccountMenu";
 import { BASE_URL } from "../lib/urls";
 import { MessageBox } from "./MessageBox";
-import { getAuthStatus, getUsers, queryClient } from "../lib/requests";
+import { getAuthStatus, queryClient } from "../lib/requests";
 import { AuthStatus } from "../lib/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { infoBarActions } from "../store";
@@ -48,7 +48,9 @@ export const TopNavBar = () => {
         staleTime: 1000 * 60,
     });
 
-    useQuery({ queryKey: ["users"], queryFn: getUsers });
+    // const userId = authStatus!.userData._id ?? "";
+
+    // useQuery({ queryKey: ["user"], queryFn: () => getUser(userId) });
 
     const isAuthenticated = authStatus!.isAuthenticated;
 
