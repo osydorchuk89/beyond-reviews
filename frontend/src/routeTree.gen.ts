@@ -17,6 +17,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as MoviesIndexImport } from './routes/movies.index'
 import { Route as LoginIndexImport } from './routes/login.index'
 import { Route as MoviesMovieIdImport } from './routes/movies.$movieId'
+import { Route as LoginSuccessImport } from './routes/login.success'
 import { Route as UsersUserIdSavedMoviesImport } from './routes/users_.$userId.saved-movies'
 import { Route as UsersUserIdProfileImport } from './routes/users_.$userId.profile'
 import { Route as UsersUserIdFriendsImport } from './routes/users_.$userId.friends'
@@ -51,6 +52,11 @@ const LoginIndexRoute = LoginIndexImport.update({
 
 const MoviesMovieIdRoute = MoviesMovieIdImport.update({
   path: '/movies/$movieId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginSuccessRoute = LoginSuccessImport.update({
+  path: '/login/success',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -90,6 +96,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegistrationImport
       parentRoute: typeof rootRoute
     }
+    '/login/success': {
+      preLoaderRoute: typeof LoginSuccessImport
+      parentRoute: typeof rootRoute
+    }
     '/movies/$movieId': {
       preLoaderRoute: typeof MoviesMovieIdImport
       parentRoute: typeof rootRoute
@@ -127,6 +137,7 @@ export const routeTree = rootRoute.addChildren([
   IndexRoute,
   GetmoviesRoute,
   RegistrationRoute,
+  LoginSuccessRoute,
   MoviesMovieIdRoute,
   LoginIndexRoute,
   MoviesIndexRoute,

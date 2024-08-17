@@ -1,13 +1,13 @@
-// import { BASE_URL } from "../lib/urls";
+import { BASE_URL } from "../lib/urls";
 
 export const SocialLoginButton = () => {
     return (
         <button
             className="flex justify-center items-center relative py-2 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-200"
             type="button"
-            // onClick={() => {
-            //     location.href = BASE_URL + "auth/google";
-            // }}
+            onClick={() => {
+                location.href = BASE_URL + "auth/google";
+            }}
         >
             <div className="absolute left-3">
                 <svg

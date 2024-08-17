@@ -12,6 +12,7 @@ import { messageRouter } from "./routes/messages";
 import { authRouter } from "./routes/auth";
 import { createServer } from "http";
 import { socket } from "./socket";
+import { BASE_CLIENT_URL } from "./util/urls";
 require("./util/auth");
 
 const app = express();
@@ -63,17 +64,18 @@ app.post("/auth/login", passport.authenticate("local"), (req, res) => {
     res.send(req.user);
 });
 
-// app.get("/auth/google", passport.authenticate("google"));
+app.get("/auth/google", passport.authenticate("google"));
 
-// app.get(
-//     "/auth/google/callback",
-//     passport.authenticate("google", {
-//         successRedirect: BASE_CLIENT_URL + "/login/success",
-//     }),
-//     (req, res) => {
-//         res.send(req.user);
-//     }
-// );
+app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", {
+        successRedirect: BASE_CLIENT_URL,
+        failureRedirect: BASE_CLIENT_URL + "/login",
+    }),
+    (req, res) => {
+        res.send(req.user);
+    }
+);
 
 app.get("/logout", (req, res, next) => {
     req.logout((err) => {
