@@ -71,10 +71,10 @@ app.get(
     passport.authenticate("google", {
         successRedirect: BASE_CLIENT_URL,
         failureRedirect: BASE_CLIENT_URL + "/login",
-    }),
-    (req, res) => {
-        res.send(req.user);
-    }
+    })
+    // (req, res) => {
+    //     res.send(req.user);
+    // }
 );
 
 app.get("/logout", (req, res, next) => {

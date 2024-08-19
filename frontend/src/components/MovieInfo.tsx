@@ -8,6 +8,8 @@ import { useState } from "react";
 import axios from "axios";
 import { BASE_API_URL } from "../lib/urls";
 import { DarkLink } from "./DarkLink";
+import { useAppDispatch } from "../store/hooks";
+import { infoBarActions } from "../store";
 
 export const MovieMainInfo = () => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };
@@ -58,6 +60,7 @@ export const MovieAddInfo = () => {
 
     const [iconFilled, setIconFilled] = useState(hasUserSavedMovie);
     const [hasSaved, setHasSaved] = useState(hasUserSavedMovie);
+    const dispatch = useAppDispatch();
 
     const saveMovie = async () => {
         try {
@@ -68,6 +71,10 @@ export const MovieAddInfo = () => {
                 data: { saved: hasSaved ? false : true, userId },
             });
             setHasSaved((prevState) => !prevState);
+            hasSaved
+                ? dispatch(infoBarActions.showRemovedFromoWatchListBar())
+                : dispatch(infoBarActions.showAddedToWatchListBar());
+            console.log(hasSaved);
             queryClient.invalidateQueries({
                 queryKey: ["movie", { movieId: movieId }],
             });
@@ -117,7 +124,7 @@ export const MovieAddInfo = () => {
             )}
             <p>
                 {genres.slice(0, -1).map((item) => (
-                    <span>
+                    <span key={item}>
                         <DarkLink
                             search={(prevState) => ({
                                 ...prevState,

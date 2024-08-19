@@ -10,7 +10,7 @@ import { useAppSelector } from "../store/hooks";
 import { AnimatePresence } from "framer-motion";
 
 const Root = () => {
-    const { justLoggedIn, justLoggedOut, justRegistered } = useAppSelector(
+    const { justLoggedIn, justLoggedOut, justRegistered, addedToWatchList, removedFromWatchList } = useAppSelector(
         (state) => state.infoBar
     );
 
@@ -22,6 +22,8 @@ const Root = () => {
                 {justLoggedIn && <InfoBar action="justLoggedIn" />}
                 {justLoggedOut && <InfoBar action="justLoggedOut" />}
                 {justRegistered && <InfoBar action="justRegistered" />}
+                {addedToWatchList && <InfoBar action="addedToWatchLater" />}
+                {removedFromWatchList && <InfoBar action="removedFromWatchLater" />}
             </AnimatePresence>
             <Outlet />
             <BottomNavBar />

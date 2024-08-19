@@ -17,6 +17,8 @@ interface InfoBarState {
     justRegistered: boolean;
     justLoggedIn: boolean;
     justLoggedOut: boolean;
+    addedToWatchList: boolean;
+    removedFromWatchList: boolean;
 }
 
 const initialMessageBoxState: MessageBoxState = {
@@ -34,6 +36,8 @@ const initialInfoBarState: InfoBarState = {
     justRegistered: false,
     justLoggedIn: false,
     justLoggedOut: false,
+    addedToWatchList: false,
+    removedFromWatchList: false,
 };
 
 const messageBoxSlice = createSlice({
@@ -91,7 +95,7 @@ const infoBarSlice = createSlice({
             state.justRegistered = true;
         },
         hideRegisteredBar(state) {
-            state.justRegistered = true;
+            state.justRegistered = false;
         },
         showLoggedInBar(state) {
             state.justLoggedIn = true;
@@ -104,6 +108,18 @@ const infoBarSlice = createSlice({
         },
         hideLoggedOutBar(state) {
             state.justLoggedOut = false;
+        },
+        showAddedToWatchListBar(state) {
+            state.addedToWatchList = true;
+        },
+        hideAddedToWatchListBar(state) {
+            state.addedToWatchList = false;
+        },
+        showRemovedFromoWatchListBar(state) {
+            state.removedFromWatchList = true;
+        },
+        hideRemovedFromoWatchListBar(state) {
+            state.removedFromWatchList = false;
         },
     },
 });

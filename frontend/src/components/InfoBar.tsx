@@ -13,6 +13,8 @@ interface ValuesType {
     justLoggedIn: ValuesElementsType;
     justLoggedOut: ValuesElementsType;
     justRegistered: ValuesElementsType;
+    addedToWatchLater: ValuesElementsType;
+    removedFromWatchLater: ValuesElementsType;
 }
 
 export const InfoBar = ({ action }: { action: string }) => {
@@ -28,6 +30,16 @@ export const InfoBar = ({ action }: { action: string }) => {
         justRegistered: {
             text: "You successfully registered",
             closeFunction: () => dispatch(infoBarActions.hideRegisteredBar()),
+        },
+        addedToWatchLater: {
+            text: "You added the movie to your watchlist",
+            closeFunction: () =>
+                dispatch(infoBarActions.hideAddedToWatchListBar()),
+        },
+        removedFromWatchLater: {
+            text: "You removed the movie from your watchlist",
+            closeFunction: () =>
+                dispatch(infoBarActions.hideRemovedFromoWatchListBar()),
         },
     };
     const dispatch = useAppDispatch();

@@ -60,9 +60,11 @@ app.get("/auth/google", passport_1.default.authenticate("google"));
 app.get("/auth/google/callback", passport_1.default.authenticate("google", {
     successRedirect: urls_1.BASE_CLIENT_URL,
     failureRedirect: urls_1.BASE_CLIENT_URL + "/login",
-}), (req, res) => {
-    res.send(req.user);
-});
+})
+// (req, res) => {
+//     res.send(req.user);
+// }
+);
 app.get("/logout", (req, res, next) => {
     req.logout((err) => {
         if (err) {

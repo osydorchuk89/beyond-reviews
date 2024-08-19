@@ -71,7 +71,6 @@ export const Movies = () => {
         );
     } else if (filter?.startsWith("director")) {
         const director = filter.split("-")[1];
-        console.log(director);
         sortedMovies = sortedMovies.filter(
             (item) => item.director === director
         );

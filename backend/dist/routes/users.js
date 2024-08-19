@@ -22,7 +22,13 @@ exports.userRouter.get("/:userId", async (req, res) => {
     try {
         const user = await user_1.User.findById(userId)
             .populate("friends", ["_id", "firstName", "lastName", "photo"])
-            .populate("friendRequests", [
+            .populate("receivedFriendRequests", [
+            "_id",
+            "firstName",
+            "lastName",
+            "photo",
+        ])
+            .populate("sentFriendRequests", [
             "_id",
             "firstName",
             "lastName",
@@ -106,9 +112,11 @@ exports.userRouter.post("/:userId/friend-requests", async (req, res) => {
         const user = await user_1.User.findById(userId);
         const otherUser = await user_1.User.findById(otherUserId);
         if (user && otherUser) {
-            if (!user.friendRequests.includes(otherUser._id)) {
-                user.friendRequests.push(otherUser._id);
+            if (!user.receivedFriendRequests.includes(otherUser._id)) {
+                otherUser.sentFriendRequests.push(user._id);
+                user.receivedFriendRequests.push(otherUser._id);
                 await user.save();
+                await otherUser.save();
                 res.status(200).send();
             }
             else
@@ -132,8 +140,10 @@ exports.userRouter.post("/:userId/friends", async (req, res) => {
         const otherUser = await user_1.User.findById(otherUserId);
         if (user && otherUser) {
             if (!user.friends.includes(otherUser._id)) {
-                const updatedUserFriendRequests = user.friendRequests.filter((requestUser) => requestUser.toString() !== otherUser._id.toString());
-                user.friendRequests = updatedUserFriendRequests;
+                const updatedUserReceivedFriendRequests = user.receivedFriendRequests.filter((requestUser) => requestUser.toString() !== otherUser._id.toString());
+                const updatedUserSentRequests = user.sentFriendRequests.filter((requestUser) => requestUser.toString() !== user._id.toString());
+                user.receivedFriendRequests = updatedUserReceivedFriendRequests;
+                otherUser.sentFriendRequests = updatedUserSentRequests;
                 user.friends.push(otherUser._id);
                 otherUser.friends.push(user._id);
                 await user.save();

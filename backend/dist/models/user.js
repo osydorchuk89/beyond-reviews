@@ -11,7 +11,8 @@ const userSchema = new mongoose_1.Schema({
     googleId: String,
     ratings: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "UserRating" }],
     watchList: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "Movie" }],
-    friendRequests: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
+    receivedFriendRequests: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
+    sentFriendRequests: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
     friends: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
 });
 exports.User = (0, mongoose_1.model)("User", userSchema);

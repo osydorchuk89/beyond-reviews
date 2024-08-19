@@ -56,6 +56,9 @@ export const UserProfile = () => {
 
     const dispatch = useAppDispatch();
 
+    console.log(pageUserData!.receivedFriendRequests);
+    console.log(visitingUser!.receivedFriendRequests);
+
     return (
         <div className="flex flex-col my-20 mx-60 p-5 rounded-lg shadow-lg bg-amber-100 gap-10">
             <p className="text-center text-2xl font-bold">
@@ -84,13 +87,13 @@ export const UserProfile = () => {
                         <li>User ratings</li>
                         {isAuthenticated &&
                             !(
-                                pageUserData!.friendRequests as string[]
-                            ).includes(visitingUser!._id) &&
+                                pageUserData!.receivedFriendRequests as User[]
+                            ).some((user) => user._id === visitingUser!._id) &&
                             !(
-                                visitingUser!.friendRequests as string[]
+                                visitingUser!.receivedFriendRequests as string[]
                             ).includes(userId) &&
-                            !(pageUserData!.friends as string[]).includes(
-                                visitingUser!._id
+                            !(pageUserData!.friends as User[]).some(
+                                (user) => user._id === visitingUser!._id
                             ) && (
                                 <li>
                                     <Button
@@ -106,9 +109,9 @@ export const UserProfile = () => {
                                 </li>
                             )}
                         {isAuthenticated &&
-                            (visitingUser!.friendRequests as string[]).includes(
-                                userId
-                            ) && (
+                            (
+                                visitingUser!.receivedFriendRequests as string[]
+                            ).includes(userId) && (
                                 <li>
                                     <Button
                                         text="Accept friend request"
