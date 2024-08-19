@@ -141,9 +141,9 @@ exports.userRouter.post("/:userId/friends", async (req, res) => {
         if (user && otherUser) {
             if (!user.friends.includes(otherUser._id)) {
                 const updatedUserReceivedFriendRequests = user.receivedFriendRequests.filter((requestUser) => requestUser.toString() !== otherUser._id.toString());
-                const updatedUserSentRequests = user.sentFriendRequests.filter((requestUser) => requestUser.toString() !== user._id.toString());
+                const updatedUserSentFriendRequests = otherUser.sentFriendRequests.filter((requestUser) => requestUser.toString() !== user._id.toString());
                 user.receivedFriendRequests = updatedUserReceivedFriendRequests;
-                otherUser.sentFriendRequests = updatedUserSentRequests;
+                otherUser.sentFriendRequests = updatedUserSentFriendRequests;
                 user.friends.push(otherUser._id);
                 otherUser.friends.push(user._id);
                 await user.save();
