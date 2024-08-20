@@ -76,6 +76,9 @@ export const MessageBoxSingleUser = () => {
                     // { user: userId, otherUser: otherUserId },
                 ],
             });
+            queryClient.invalidateQueries({
+                queryKey: ["users"],
+            });
         },
     });
 

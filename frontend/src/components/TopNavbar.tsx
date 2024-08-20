@@ -5,8 +5,8 @@ import { Button } from "./Button";
 import { AccountMenu } from "./AccountMenu";
 import { BASE_URL } from "../lib/urls";
 import { MessageBox } from "./MessageBox";
-import { getAuthStatus, queryClient } from "../lib/requests";
-import { AuthStatus } from "../lib/types";
+import { getAuthStatus, getUser, queryClient } from "../lib/requests";
+import { AuthStatus, User } from "../lib/types";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { infoBarActions } from "../store";
 
@@ -44,13 +44,19 @@ export const TopNavBar = () => {
 
     const { data: authStatus } = useQuery<AuthStatus>({
         queryKey: ["authState"],
-        queryFn: getAuthStatus,
+        queryFn: async () => {
+            const data = await getAuthStatus();
+            if (data.userData) {
+                const userId = data.userData._id;
+                useQuery<User>({
+                    queryKey: ["users", { user: userId }],
+                    queryFn: () => getUser(userId),
+                });
+            }
+            return data;
+        },
         staleTime: 1000 * 60,
     });
-
-    // const userId = authStatus!.userData._id ?? "";
-
-    // useQuery({ queryKey: ["user"], queryFn: () => getUser(userId) });
 
     const isAuthenticated = authStatus!.isAuthenticated;
 

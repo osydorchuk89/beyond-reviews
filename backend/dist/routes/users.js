@@ -33,7 +33,8 @@ exports.userRouter.get("/:userId", async (req, res) => {
             "firstName",
             "lastName",
             "photo",
-        ]);
+        ])
+            .populate("receivedMessages", ["_id", "read"]);
         res.send(user);
     }
     catch (error) {

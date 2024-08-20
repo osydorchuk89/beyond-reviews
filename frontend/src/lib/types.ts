@@ -10,6 +10,8 @@ export interface User {
     friends: User[] | string[];
     receivedFriendRequests: User[] | string[];
     sentFriendRequests: User[] | string[];
+    sentMessages: Message[];
+    receivedMessages: Message[];
     __v: number;
 }
 

@@ -48,6 +48,12 @@ messageRouter.post("/", async (req, res) => {
             read: false,
         });
         await message.save();
+        if (sender && recipient) {
+            sender.sentMessages.push(message._id);
+            recipient.receivedMessages.push(message._id);
+            await sender.save();
+            await recipient.save();
+        }
         const senderId = sender!._id.toString();
         const recipientId = recipient!._id.toString();
         const io = socket.getIO();

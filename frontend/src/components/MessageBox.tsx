@@ -7,10 +7,15 @@ import { MessageBoxTopPanel } from "./MessageBoxTopPanel";
 import { BASE_URL } from "../lib/urls";
 import { io } from "socket.io-client";
 import { useQuery } from "@tanstack/react-query";
-import { AuthStatus } from "../lib/types";
-import { getAuthStatus, getUser, queryClient } from "../lib/requests";
+import { AuthStatus, User } from "../lib/types";
+import {
+    getAuthStatus,
+    getUser,
+    queryClient,
+} from "../lib/requests";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { messageBoxActions } from "../store";
+import { CircleIcon } from "./icons/CircleIcon";
 
 const socket = io(BASE_URL);
 
@@ -26,29 +31,14 @@ export const MessageBox = () => {
 
     const userId = authStatus!.userData!._id;
 
-    // const { data: user } = useQuery<User>({
-    //     queryKey: ["users", { user: userId }],
-    //     queryFn: () => getUser(userId),
-    // });
+    const { data: user } = useQuery<User>({
+        queryKey: ["users", { user: userId }],
+        queryFn: () => getUser(userId),
+    });
 
-    // const userFriends = user!.friends as User[];
-
-    // const { data: allMessages } = useQuery({
-    //     queryKey: ["messages", { user: userId }],
-    //     queryFn: () => {
-    //         const userPairs = userFriends.map((user) => ({
-    //             senderId: user._id,
-    //             recipientId: userId,
-    //         }));
-    //         return getAllMessages(userPairs!);
-    //     },
-    // });
-
-    // const hasUnreadMessages = allMessages?.find((usersMessages) =>
-    //     usersMessages!.messages.find(
-    //         (message) => message.sender._id !== userId && !message.read
-    //     )
-    // );
+    const hasUnreadMessages = user?.receivedMessages.some(
+        (message) => !message.read
+    );
 
     useEffect(() => {
         socket.emit("join-room", userId);
@@ -97,9 +87,9 @@ export const MessageBox = () => {
                         }}
                     >
                         <MessageIcon />
-                        {/* <CircleIcon
+                        <CircleIcon
                             className={`w-3 h-3 absolute -top-[2px] -right-[2px] ${hasUnreadMessages ? "" : "hidden"}`}
-                        /> */}
+                        />
                     </Popover.Button>
                     <Popover.Panel className="flex flex-col absolute top-[90px] right-0 z-10 w-96 h-[87vh] bg-amber-50 rounded-md rounded-r-none shadow-md">
                         <MessageBoxTopPanel />

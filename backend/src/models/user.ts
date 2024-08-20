@@ -12,6 +12,8 @@ export interface IUser {
     receivedFriendRequests: Types.ObjectId[];
     sentFriendRequests: Types.ObjectId[];
     friends: Types.ObjectId[];
+    sentMessages: Types.ObjectId[];
+    receivedMessages: Types.ObjectId[];
 }
 
 const userSchema = new Schema<IUser>({
@@ -26,6 +28,8 @@ const userSchema = new Schema<IUser>({
     receivedFriendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
     sentFriendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    sentMessages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
+    receivedMessages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
 });
 
 export const User = model<IUser>("User", userSchema);
