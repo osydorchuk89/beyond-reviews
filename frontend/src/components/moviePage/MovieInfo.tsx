@@ -1,15 +1,15 @@
 import { useParams } from "@tanstack/react-router";
-import { StarIcon } from "./icons/StarIcon";
+import { StarIcon } from "../icons/StarIcon";
 import { useQuery } from "@tanstack/react-query";
-import { getAuthStatus, getMovie, queryClient } from "../lib/requests";
-import { AuthStatus, Movie, MovieRating } from "../lib/types";
-import { BookMarkIcon } from "./icons/BookMarkIcon";
+import { getAuthStatus, getMovie, queryClient } from "../../lib/requests";
+import { AuthStatus, Movie, MovieRating } from "../../lib/types";
+import { BookMarkIcon } from "../icons/BookMarkIcon";
 import { useState } from "react";
 import axios from "axios";
-import { BASE_API_URL } from "../lib/urls";
-import { DarkLink } from "./DarkLink";
-import { useAppDispatch } from "../store/hooks";
-import { infoBarActions } from "../store";
+import { BASE_API_URL } from "../../lib/urls";
+import { DarkLink } from "../DarkLink";
+import { useAppDispatch } from "../../store/hooks";
+import { infoBarActions } from "../../store";
 
 export const MovieMainInfo = () => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };

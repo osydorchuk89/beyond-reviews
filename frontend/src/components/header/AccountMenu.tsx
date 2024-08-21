@@ -1,8 +1,8 @@
 import { Menu, Transition } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { AuthStatus } from "../lib/types";
-import { getAuthStatus, getUser, queryClient } from "../lib/requests";
+import { AuthStatus } from "../../lib/types";
+import { getAuthStatus, getUser, queryClient } from "../../lib/requests";
 
 interface AccountMenuProps {
     text: string;

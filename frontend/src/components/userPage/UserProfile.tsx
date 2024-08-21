@@ -6,12 +6,12 @@ import {
     getUser,
     queryClient,
     acceptFriendRequest,
-} from "../lib/requests";
-import { AuthStatus, User } from "../lib/types";
-import { DarkLink } from "./DarkLink";
-import { Button } from "./Button";
-import { useAppDispatch } from "../store/hooks";
-import { popUpActions } from "../store";
+} from "../../lib/requests";
+import { AuthStatus, User } from "../../lib/types";
+import { DarkLink } from "../DarkLink";
+import { Button } from "../Button";
+import { useAppDispatch } from "../../store/hooks";
+import { popUpActions } from "../../store";
 
 export const UserProfile = () => {
     const { userId } = useParams({ strict: false }) as {

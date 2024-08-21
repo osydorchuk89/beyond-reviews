@@ -1,5 +1,5 @@
 import { Link, getRouteApi, useNavigate } from "@tanstack/react-router";
-import { CloseIcon } from "./icons/CloseIcon";
+import { CloseIcon } from "../icons/CloseIcon";
 
 interface Item {
     type: string;

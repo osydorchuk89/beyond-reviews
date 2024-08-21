@@ -21,6 +21,10 @@ interface InfoBarState {
     removedFromWatchList: boolean;
 }
 
+interface DropDownMenuState {
+    isOpen: boolean;
+}
+
 const initialMessageBoxState: MessageBoxState = {
     isOpen: false,
     allUsers: true,
@@ -38,6 +42,9 @@ const initialInfoBarState: InfoBarState = {
     justLoggedOut: false,
     addedToWatchList: false,
     removedFromWatchList: false,
+};
+const initialDropDownMenuState: DropDownMenuState = {
+    isOpen: false,
 };
 
 const messageBoxSlice = createSlice({
@@ -124,16 +131,31 @@ const infoBarSlice = createSlice({
     },
 });
 
+const dropDownMenuSlice = createSlice({
+    name: "dropDownMenu",
+    initialState: initialDropDownMenuState,
+    reducers: {
+        openDropDownMenu(state) {
+            state.isOpen = true;
+        },
+        closeDropDownMenu(state) {
+            state.isOpen = false;
+        },
+    },
+});
+
 export const store = configureStore({
     reducer: {
         messageBox: messageBoxSlice.reducer,
         popUp: popUpSlice.reducer,
         infoBar: infoBarSlice.reducer,
+        dropDownMenu: dropDownMenuSlice.reducer,
     },
 });
 export const messageBoxActions = messageBoxSlice.actions;
 export const popUpActions = popUpSlice.actions;
 export const infoBarActions = infoBarSlice.actions;
+export const dropDownMenuActions = dropDownMenuSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

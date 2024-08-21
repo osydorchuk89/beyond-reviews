@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { LoadingComponent } from "../components/LoadingComponent";
 import { getMovies, queryClient } from "../lib/requests";
-import { Movies } from "../components/Movies";
+import { Movies } from "../components/movies/Movies";
 
 const movieSearchSchema = z.object({
     search: z.string().optional().catch(""),

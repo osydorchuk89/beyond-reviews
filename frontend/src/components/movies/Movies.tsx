@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Movie } from "../lib/types";
-import { getMovies } from "../lib/requests";
+import { Movie } from "../../lib/types";
+import { getMovies } from "../../lib/requests";
 import { SearchBar } from "./SearchBar";
 import { SortFilterBar } from "./SortFilterBar";
-import { sideBarFilterList, sideBarSortList } from "../lib/data";
-import { MovieCard } from "./MovieCard";
-import { Button } from "./Button";
-import { Route } from "../routes/movies.index";
+import { sideBarFilterList, sideBarSortList } from "../../lib/data";
+import { MovieCard } from "../moviePage/MovieCard";
+import { Button } from "../Button";
+import { Route } from "../../routes/movies.index";
 
 export const Movies = () => {
     const navigate = useNavigate();
@@ -75,34 +75,6 @@ export const Movies = () => {
             (item) => item.director === director
         );
     }
-
-    // switch (filter) {
-    //     case "year2023":
-    //         sortedMovies = sortedMovies.filter(
-    //             (item) => item.releaseYear === 2023
-    //         );
-    //         break;
-    //     case "year2024":
-    //         sortedMovies = sortedMovies.filter(
-    //             (item) => item.releaseYear === 2024
-    //         );
-    //         break;
-    //     case "genreAction":
-    //         sortedMovies = sortedMovies.filter((item) =>
-    //             item.genres.includes("Action")
-    //         );
-    //         break;
-    //     case "genreDrama":
-    //         sortedMovies = sortedMovies.filter((item) =>
-    //             item.genres.includes("Drama")
-    //         );
-    //         break;
-    //     case "director-denis-villeneuve":
-    //         sortedMovies = sortedMovies.filter(
-    //             (item) => item.director === "Denis Villeneuve"
-    //         );
-    //         break;
-    // }
 
     if (search) {
         const searchTerm = search.toLowerCase();

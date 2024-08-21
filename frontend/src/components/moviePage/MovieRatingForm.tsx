@@ -1,19 +1,19 @@
 import axios from "axios";
 import { useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getAuthStatus, getMovie, queryClient } from "../lib/requests";
+import { getAuthStatus, getMovie, queryClient } from "../../lib/requests";
 import { useParams } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
-import { UserRatingSchema } from "../lib/schemas";
+import { UserRatingSchema } from "../../lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "./Button";
-import { DarkLink } from "./DarkLink";
-import { StarIcon } from "./icons/StarIcon";
-import { useTruncatedElement } from "../hooks/useTuncatedElement";
-import { BASE_API_URL } from "../lib/urls";
-import { Movie, MovieRating, User } from "../lib/types";
-import { useAppDispatch } from "../store/hooks";
-import { popUpActions } from "../store";
+import { Button } from "../Button";
+import { DarkLink } from "../DarkLink";
+import { StarIcon } from "../icons/StarIcon";
+import { useTruncatedElement } from "../../hooks/useTuncatedElement";
+import { BASE_API_URL } from "../../lib/urls";
+import { Movie, MovieRating, User } from "../../lib/types";
+import { useAppDispatch } from "../../store/hooks";
+import { popUpActions } from "../../store";
 
 interface RatingInputs {
     movieRating: number;

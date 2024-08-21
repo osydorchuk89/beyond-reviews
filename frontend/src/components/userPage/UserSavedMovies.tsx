@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { MovieCard } from "./MovieCard";
-import { Movie } from "../lib/types";
-import { getUserSavedMovies } from "../lib/requests";
-import { Button } from "./Button";
+import { MovieCard } from "../moviePage/MovieCard";
+import { Movie } from "../../lib/types";
+import { getUserSavedMovies } from "../../lib/requests";
+import { Button } from "../Button";
 
 export const SavedMovies = () => {
     const { userId } = useParams({ strict: false }) as { userId: string };

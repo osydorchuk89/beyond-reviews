@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { getAuthStatus, getMovieRatings } from "../lib/requests";
-import { MovieRating, User, AuthStatus } from "../lib/types";
-import { ReviewCard } from "./ReviewCard";
+import { getAuthStatus, getMovieRatings } from "../../lib/requests";
+import { MovieRating, User, AuthStatus } from "../../lib/types";
+import { ReviewCard } from "./MovieReviewCard";
 
 export const MovieReviews = () => {
     const { movieId } = useParams({ strict: false }) as { movieId: string };

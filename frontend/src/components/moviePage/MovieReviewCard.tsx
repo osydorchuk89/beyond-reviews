@@ -1,15 +1,19 @@
 import axios from "axios";
 import { useParams } from "@tanstack/react-router";
-import { AuthStatus, MovieRating, User } from "../lib/types";
+import { AuthStatus, MovieRating, User } from "../../lib/types";
 import { useQuery } from "@tanstack/react-query";
-import { getAuthStatus, getMovieRatings, queryClient } from "../lib/requests";
+import {
+    getAuthStatus,
+    getMovieRatings,
+    queryClient,
+} from "../../lib/requests";
 import { useRef, useState } from "react";
-import { BASE_API_URL } from "../lib/urls";
-import { StarIcon } from "./icons/StarIcon";
-import { LikeIcon } from "./icons/LikeIcon";
-import { useTruncatedElement } from "../hooks/useTuncatedElement";
-import { Button } from "./Button";
-import { DarkLink } from "./DarkLink";
+import { BASE_API_URL } from "../../lib/urls";
+import { StarIcon } from "../icons/StarIcon";
+import { LikeIcon } from "../icons/LikeIcon";
+import { useTruncatedElement } from "../../hooks/useTuncatedElement";
+import { Button } from "../Button";
+import { DarkLink } from "../DarkLink";
 
 interface ReviewCardProps {
     reviewId: string;

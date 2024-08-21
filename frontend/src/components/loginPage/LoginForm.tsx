@@ -4,14 +4,14 @@ import { useRouter, getRouteApi } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema } from "../lib/schemas";
-import { DarkLink } from "./DarkLink";
-import { Button } from "./Button";
+import { LoginSchema } from "../../lib/schemas";
+import { DarkLink } from "../DarkLink";
+import { Button } from "../Button";
 import { SocialLoginButton } from "./SocialLoginButton";
-import { BASE_CLIENT_URL, BASE_URL } from "../lib/urls";
-import { queryClient } from "../lib/requests";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { infoBarActions } from "../store";
+import { BASE_CLIENT_URL, BASE_URL } from "../../lib/urls";
+import { queryClient } from "../../lib/requests";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { dropDownMenuActions, infoBarActions } from "../../store";
 
 interface LoginInputs {
     email: string;
@@ -64,6 +64,7 @@ export const LoginForm = () => {
                 justLoggedOut && dispatch(infoBarActions.hideLoggedOutBar());
                 justRegistered && dispatch(infoBarActions.hideRegisteredBar());
                 dispatch(infoBarActions.showLoggedInBar());
+                dispatch(dropDownMenuActions.closeDropDownMenu());
             }
         } catch (error: any) {
             if (error.response.status === 500) {

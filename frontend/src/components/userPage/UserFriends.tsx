@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { User } from "../lib/types";
+import { User } from "../../lib/types";
 import { useParams } from "@tanstack/react-router";
-import { acceptFriendRequest, getUser, queryClient } from "../lib/requests";
-import { DarkLink } from "./DarkLink";
-import { Button } from "./Button";
-import { useAppDispatch } from "../store/hooks";
-import { popUpActions } from "../store";
+import { acceptFriendRequest, getUser, queryClient } from "../../lib/requests";
+import { DarkLink } from "../DarkLink";
+import { Button } from "../Button";
+import { useAppDispatch } from "../../store/hooks";
+import { popUpActions } from "../../store";
 
 export const UserFriends = () => {
     const { userId } = useParams({ strict: false }) as {

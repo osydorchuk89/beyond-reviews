@@ -1,8 +1,8 @@
-import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { popUpActions } from "../store";
+import { useAppSelector, useAppDispatch } from "../../store/hooks";
+import { popUpActions } from "../../store";
 import { Dialog } from "@headlessui/react";
-import { Button } from "./Button";
-import { CloseIcon } from "./icons/CloseIcon";
+import { Button } from "../Button";
+import { CloseIcon } from "../icons/CloseIcon";
 
 export const SuccessDialog = () => {
     const {

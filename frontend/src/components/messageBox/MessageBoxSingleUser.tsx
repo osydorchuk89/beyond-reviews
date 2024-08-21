@@ -6,14 +6,14 @@ import {
     getMessages,
     markMessageRead,
     queryClient,
-} from "../lib/requests";
-import { Button } from "./Button";
+} from "../../lib/requests";
+import { Button } from "../Button";
 import { MessageBoxItem } from "./MessageBoxItem";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { BASE_API_URL } from "../lib/urls";
-import { AuthStatus, Message } from "../lib/types";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { messageBoxActions } from "../store";
+import { BASE_API_URL } from "../../lib/urls";
+import { AuthStatus, Message } from "../../lib/types";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { messageBoxActions } from "../../store";
 
 interface MessageInput {
     message: string;

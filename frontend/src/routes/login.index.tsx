@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LoginForm } from "../components/LoginForm";
+import { LoginForm } from "../components/loginPage/LoginForm";
 import { z } from "zod";
 
 const redirectSchema = z.object({

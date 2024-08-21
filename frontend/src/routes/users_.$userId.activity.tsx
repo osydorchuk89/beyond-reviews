@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getUserActivity, queryClient } from "../lib/requests";
-import { UserActivity } from "../components/UserActivity";
+import { UserActivity } from "../components/userPage/UserActivity";
 // import { redirectIfNotAuthenticated } from "../lib/auth";
 
 export const Route = createFileRoute("/users/$userId/activity")({

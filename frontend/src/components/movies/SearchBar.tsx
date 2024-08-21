@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "./Button";
-import { CloseIcon } from "./icons/CloseIcon";
+import { Button } from "../Button";
+import { CloseIcon } from "../icons/CloseIcon";
 
 interface SearchInput {
     title: string;

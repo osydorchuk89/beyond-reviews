@@ -3,11 +3,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserSchema } from "../lib/schemas";
-import { Button } from "./Button";
-import { BASE_API_URL } from "../lib/urls";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { infoBarActions } from "../store";
+import { UserSchema } from "../../lib/schemas";
+import { Button } from "../Button";
+import { BASE_API_URL } from "../../lib/urls";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { infoBarActions } from "../../store";
 
 type RegistrationInputs = {
     firstName: string;

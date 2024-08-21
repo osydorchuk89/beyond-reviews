@@ -1,21 +1,17 @@
 import { useEffect } from "react";
 import { Popover } from "@headlessui/react";
-import { MessageIcon } from "./icons/MessageIcon";
+import { MessageIcon } from "../icons/MessageIcon";
 import { MessageBoxAllUsers } from "./MessageBoxAllUsers";
 import { MessageBoxSingleUser } from "./MessageBoxSingleUser";
 import { MessageBoxTopPanel } from "./MessageBoxTopPanel";
-import { BASE_URL } from "../lib/urls";
+import { BASE_URL } from "../../lib/urls";
 import { io } from "socket.io-client";
 import { useQuery } from "@tanstack/react-query";
-import { AuthStatus, User } from "../lib/types";
-import {
-    getAuthStatus,
-    getUser,
-    queryClient,
-} from "../lib/requests";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { messageBoxActions } from "../store";
-import { CircleIcon } from "./icons/CircleIcon";
+import { AuthStatus, User } from "../../lib/types";
+import { getAuthStatus, getUser, queryClient } from "../../lib/requests";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { messageBoxActions } from "../../store";
+import { CircleIcon } from "../icons/CircleIcon";
 
 const socket = io(BASE_URL);
 

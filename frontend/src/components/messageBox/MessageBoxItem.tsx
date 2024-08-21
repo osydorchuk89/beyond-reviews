@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAuthStatus } from "../lib/requests";
-import { AuthStatus, Message } from "../lib/types";
+import { getAuthStatus } from "../../lib/requests";
+import { AuthStatus, Message } from "../../lib/types";
 
 interface MessageProps {
     message: Message;

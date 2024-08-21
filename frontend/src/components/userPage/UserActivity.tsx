@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
-import { Activity, AuthStatus, Movie, User } from "../lib/types";
-import { getAuthStatus, getUserActivity } from "../lib/requests";
-import { DarkLink } from "./DarkLink";
+import { Activity, AuthStatus, Movie, User } from "../../lib/types";
+import { getAuthStatus, getUserActivity } from "../../lib/requests";
+import { DarkLink } from "./../DarkLink";
 import { useRef } from "react";
-import { useTruncatedElement } from "../hooks/useTuncatedElement";
-import { Button } from "./Button";
+import { useTruncatedElement } from "../../hooks/useTuncatedElement";
+import { Button } from "./../Button";
 
 export const UserActivity = () => {
     const { userId } = useParams({ strict: false }) as { userId: string };

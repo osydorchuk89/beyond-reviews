@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getUserSavedMovies, queryClient } from "../lib/requests";
-import { SavedMovies } from "../components/SavedMovies";
+import { SavedMovies } from "../components/userPage/UserSavedMovies";
 import { redirectIfNotAuthenticated } from "../lib/auth";
 import { LoadingComponent } from "../components/LoadingComponent";
 

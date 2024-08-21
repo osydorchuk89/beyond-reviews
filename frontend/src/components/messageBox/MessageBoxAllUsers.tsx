@@ -5,11 +5,11 @@ import {
     getAllMessages,
     queryClient,
     getUser,
-} from "../lib/requests";
-import { UserIcon } from "./icons/UserIcon";
-import { AuthStatus, User } from "../lib/types";
-import { useAppDispatch } from "../store/hooks";
-import { messageBoxActions } from "../store/index";
+} from "../../lib/requests";
+import { UserIcon } from "../icons/UserIcon";
+import { AuthStatus, User } from "../../lib/types";
+import { useAppDispatch } from "../../store/hooks";
+import { messageBoxActions } from "../../store/index";
 
 export const MessageBoxAllUsers = () => {
     const dispatch = useAppDispatch();
@@ -30,7 +30,7 @@ export const MessageBoxAllUsers = () => {
     const userFriends = user!.friends as User[];
 
     const { data: allMessages } = useQuery({
-        queryKey: ["messages", {user: userId}],
+        queryKey: ["messages", { user: userId }],
         queryFn: () => {
             const userPairs = userFriends.map((user) => ({
                 senderId: user._id,

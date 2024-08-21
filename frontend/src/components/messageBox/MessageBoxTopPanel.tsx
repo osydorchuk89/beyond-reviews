@@ -1,8 +1,8 @@
-import { BackIcon } from "./BackIcon";
+import { BackIcon } from "../icons/BackIcon";
 import { Popover } from "@headlessui/react";
-import { CloseIconAlt } from "./icons/CloseIconAlt";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { messageBoxActions } from "../store";
+import { CloseIconAlt } from "../icons/CloseIconAlt";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { messageBoxActions } from "../../store";
 
 export const MessageBoxTopPanel = () => {
     const { allUsers } = useAppSelector((state) => state.messageBox);

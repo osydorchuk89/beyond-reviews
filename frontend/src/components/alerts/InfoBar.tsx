@@ -1,6 +1,6 @@
-import { CloseIcon } from "./icons/CloseIcon";
-import { useAppDispatch } from "../store/hooks";
-import { infoBarActions } from "../store";
+import { CloseIcon } from "../icons/CloseIcon";
+import { useAppDispatch } from "../../store/hooks";
+import { infoBarActions } from "../../store";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 
