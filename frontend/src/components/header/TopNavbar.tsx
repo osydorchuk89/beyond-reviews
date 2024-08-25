@@ -21,7 +21,10 @@ const topLinks = [
 export const TopNavBar = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const { infoBar, dropDownMenu } = useAppSelector((state) => state);
+    const { justLoggedIn, justRegistered } = useAppSelector(
+        (state) => state.infoBar
+    );
+    const { isOpen } = useAppSelector((state) => state.dropDownMenu);
 
     const logout = async () => {
         try {
@@ -34,9 +37,8 @@ export const TopNavBar = () => {
                 queryKey: ["authState"],
             });
             navigate({ to: "/" });
-            infoBar.justLoggedIn && dispatch(infoBarActions.hideLoggedInBar());
-            infoBar.justRegistered &&
-                dispatch(infoBarActions.hideRegisteredBar());
+            justLoggedIn && dispatch(infoBarActions.hideLoggedInBar());
+            justRegistered && dispatch(infoBarActions.hideRegisteredBar());
             dispatch(infoBarActions.showLoggedOutBar());
             dispatch(dropDownMenuActions.closeDropDownMenu());
         } catch (error) {
@@ -71,7 +73,7 @@ export const TopNavBar = () => {
     const dropDownMenuItemClassName =
         "w-full flex justify-center text-xl py-2 hover:bg-amber-300";
 
-    const dropDownMenuDisplay = dropDownMenu.isOpen ? "" : "hidden";
+    const dropDownMenuDisplay = isOpen ? "" : "hidden";
     const dropDownMenuClassName =
         "flex items-center justify-center md:hidden " + dropDownMenuDisplay;
 
@@ -81,7 +83,7 @@ export const TopNavBar = () => {
 
     return (
         <div className="sticky top-0 bg-amber-50 w-full z-10">
-            <nav className="flex items-center justify-between px-20 md:px-5 py-5">
+            <nav className="flex items-center justify-between px-10 md:px-5 py-5">
                 <Link to="/">
                     <span className="text-2xl text-amber-950 font-bold hover:text-amber-700">
                         Beyond Reviews
@@ -123,7 +125,7 @@ export const TopNavBar = () => {
                     </div>
                 )}
                 <div className="flex flex-col md:hidden">
-                    {dropDownMenu.isOpen ? (
+                    {isOpen ? (
                         <CloseIcon
                             className="size-8 hover:bg-amber-300 hover:rounded-md hover:cursor-pointer"
                             handleClick={() =>

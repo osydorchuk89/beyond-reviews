@@ -47,15 +47,10 @@ export const LoginForm = () => {
                 data,
             });
             if (response) {
-                // const user = response.data;
                 setInvalidCredentials(false);
                 await queryClient.invalidateQueries({
                     queryKey: ["authState"],
                 });
-                // await queryClient.prefetchQuery({
-                //     queryKey: ["users", { userId: user._id }],
-                //     queryFn: () => getUser(user._id),
-                // });
                 if (redirect) {
                     history.push(redirect.replace(BASE_CLIENT_URL, ""));
                 } else {
@@ -80,7 +75,7 @@ export const LoginForm = () => {
     });
 
     return (
-        <div className="flex flex-col justify-center items-center py-10">
+        <div className="flex flex-col justify-center items-center py-10 h-[720px]">
             <div className="flex flex-col justify-center items-center">
                 {invalidCredentials && (
                     <div
@@ -108,7 +103,7 @@ export const LoginForm = () => {
                 )}
                 <form
                     noValidate
-                    className="flex flex-col justify-start w-[26rem] bg-amber-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5"
+                    className="flex flex-col justify-start md:w-[26rem] bg-amber-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5"
                     onSubmit={handleSubmit((data) => {
                         mutate(data);
                     })}

@@ -14,8 +14,10 @@ export const Home = () => {
 
     return (
         <div className="flex flex-col justify-center items-center py-20 px-10 gap-20">
-            <p className="text-5xl font-bold">Welcome to Beyond Reviews!</p>
-            <p className="text-3xl text-center">
+            <p className="text-4xl text-center md:text-5xl font-bold">
+                Welcome to Beyond Reviews!
+            </p>
+            <p className="text-2xl md:text-3xl text-center">
                 Not just another social network. Not just another review
                 website.
             </p>

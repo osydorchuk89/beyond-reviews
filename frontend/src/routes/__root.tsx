@@ -19,7 +19,7 @@ const Root = () => {
     } = useAppSelector((state) => state.infoBar);
 
     return (
-        <>
+        <div className="h-full">
             <ScrollRestoration />
             <TopNavBar />
             <AnimatePresence>
@@ -34,7 +34,7 @@ const Root = () => {
             <Outlet />
             <BottomNavBar />
             <SuccessDialog />
-        </>
+        </div>
     );
 };
 
