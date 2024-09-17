@@ -1,4 +1,10 @@
-import { Menu, Transition } from "@headlessui/react";
+import {
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
+    Transition,
+} from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { AuthStatus } from "../../lib/types";
@@ -40,16 +46,16 @@ export const AccountMenu = ({ text }: AccountMenuProps) => {
         >
             {({ open }) => (
                 <>
-                    <Menu.Button
+                    <MenuButton
                         className="w-12 h-12 rounded-full overflow-hidden bg-amber-300 mb-4"
                         onClick={() => {
                             !open && prefetchUserData(userId);
                         }}
                     >
                         {text}
-                    </Menu.Button>
+                    </MenuButton>
                     <Transition
-                        className="w-full"
+                        // className="w-full"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -57,9 +63,9 @@ export const AccountMenu = ({ text }: AccountMenuProps) => {
                         leaveFrom="transform scale-100 opacity-100"
                         leaveTo="transform scale-95 opacity-0"
                     >
-                        <Menu.Items className="flex flex-col rounded-md shadow-md w-full overflow-hidden">
+                        <MenuItems className="flex flex-col rounded-md shadow-md w-full overflow-hidden">
                             {menuList.map((item) => (
-                                <Menu.Item
+                                <MenuItem
                                     as={Link}
                                     key={item.text}
                                     to={item.href}
@@ -67,9 +73,9 @@ export const AccountMenu = ({ text }: AccountMenuProps) => {
                                     params={{ userId }}
                                 >
                                     {item.text}
-                                </Menu.Item>
+                                </MenuItem>
                             ))}
-                        </Menu.Items>
+                        </MenuItems>
                     </Transition>
                 </>
             )}
