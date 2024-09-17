@@ -36,7 +36,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
             <p className="bg-amber-700 text-amber-50 text-center text-xl font-bold py-2">
                 {title}
             </p>
-            <div className="flex flex-col justify-between font-bold px-5 py-2 items-stretch">
+            <div className="flex flex-col justify-between font-bold px-5 py-2 items-center md:items-stretch">
                 {itemsList.map((item) => (
                     <div
                         key={item.value}

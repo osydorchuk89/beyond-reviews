@@ -88,8 +88,8 @@ export const Movies = () => {
             <p className="text-4xl text-center font-bold py-10 mb-5 border-b border-b-amber-700">
                 Popular Movies
             </p>
-            <div className="flex">
-                <div className="flex flex-col w-1/4 ml-5 gap-2 mb-5">
+            <div className="flex flex-col md:flex-row items-center md:items-start">
+                <div className="flex flex-col w-5/6 md:w-1/4 ml-5 gap-2 mb-5">
                     <SearchBar />
                     <SortFilterBar
                         itemsList={sideBarSortList}
@@ -100,11 +100,11 @@ export const Movies = () => {
                         title="Filter:"
                     />
                 </div>
-                <div className="flex flex-col w-3/4">
+                <div className="flex flex-col w-full md:w-3/4">
                     <div className="flex-col">
-                        <div className="flex flex-col gap-10 mb-10">
+                        <div className="flex flex-col gap-10 mb-10 items-center">
                             {sortedMovies.length > 0 ? (
-                                <div className="grid grid-cols-3 items-center gap-16 mx-5">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 xxl:grid-cols-3 items-center gap-16 mx-5">
                                     {sortedMovies
                                         .slice(0, numberMovies)
                                         .map((movie: Movie) => (

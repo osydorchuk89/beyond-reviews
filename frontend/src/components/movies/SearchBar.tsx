@@ -47,7 +47,7 @@ export const SearchBar = () => {
                     placeholder="enter movie title"
                     type="text"
                 />
-                <div className="flex justify-start gap-2 w-full">
+                <div className="flex justify-center md:justify-start gap-2 w-full">
                     <Button style="dark" text="Search" type="submit" />
                     {searchTerm && (
                         <div className="flex items-center gap-2 bg-amber-300 rounded-md text-amber-950 font-bold p-2 overflow-hidden">
