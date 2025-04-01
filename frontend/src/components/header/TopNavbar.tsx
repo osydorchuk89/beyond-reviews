@@ -62,7 +62,7 @@ export const TopNavBar = () => {
         staleTime: 1000 * 60,
     });
 
-    const isAuthenticated = authStatus!.isAuthenticated;
+    const isAuthenticated = !!authStatus?.isAuthenticated;
 
     const router = useRouterState();
     const currentPath = router.location.pathname;

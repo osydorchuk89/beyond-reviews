@@ -23,6 +23,7 @@ const routeApi = getRouteApi("/login/");
 export const LoginForm = () => {
     const { redirect } = routeApi.useSearch();
 
+    const [fetching, setFetching] = useState(false);
     const [invalidCredentials, setInvalidCredentials] = useState(false);
     const {
         register,
@@ -40,6 +41,7 @@ export const LoginForm = () => {
 
     const sendLoginFormData = async (data: LoginInputs) => {
         try {
+            setFetching(true);
             const response = await axios({
                 method: "post",
                 url: BASE_URL + "auth/login",
@@ -56,6 +58,7 @@ export const LoginForm = () => {
                 } else {
                     history.back();
                 }
+                setFetching(false);
                 justLoggedOut && dispatch(infoBarActions.hideLoggedOutBar());
                 justRegistered && dispatch(infoBarActions.hideRegisteredBar());
                 dispatch(infoBarActions.showLoggedInBar());
@@ -134,7 +137,15 @@ export const LoginForm = () => {
                         <p>{errors.password?.message}</p>
                     </div>
                     <div className="flex justify-center">
-                        <Button type="submit" style="dark" text="LOGIN" />
+                        <Button
+                            type="submit"
+                            style={
+                                fetching
+                                    ? "px-8 py-2 rounded-md text-amber-50 bg-amber-500 text-lg uppercase cursor-not-allowed"
+                                    : "dark"
+                            }
+                            text={fetching ? "Please wait..." : "LOGIN"}
+                        />
                     </div>
                     <p className="text-center">
                         Don't have an account?{" "}

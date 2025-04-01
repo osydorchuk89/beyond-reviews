@@ -13,7 +13,7 @@ export const Home = () => {
     const isAuthenticated = authStatus!.isAuthenticated;
 
     return (
-        <div className="flex flex-col justify-center items-center py-20 px-10 gap-20">
+        <div className="flex flex-col justify-center items-center py-20 px-10 gap-20 min-h-screen">
             <p className="text-4xl text-center md:text-5xl font-bold">
                 Welcome to Beyond Reviews!
             </p>
