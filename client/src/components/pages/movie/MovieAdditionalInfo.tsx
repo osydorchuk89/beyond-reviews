@@ -1,34 +1,87 @@
+import { useState } from "react";
+
 import { Movie } from "../../../lib/entities";
 import { StarIcon } from "../../icons/StarIcon";
 import { QueryLink } from "../../ui/QueryLink";
 import { useQueryClick } from "../../../hooks/useQueryClick";
+import { BookMarkIcon } from "../../icons/BookMarkIcon";
+import { AuthData } from "../../layout/Header";
+import { sendMovieToOrFromWatchlist } from "../../../lib/actions";
+import { useAppDispatch } from "../../../store/hooks";
+import { triggerReviewEvent } from "../../../store";
 
-export const MovieAdditionalInfo = ({ movie }: { movie: Movie }) => {
+interface MovieAdditionalInfoProps {
+    movie: Movie;
+    authData: AuthData;
+}
+
+export const MovieAdditionalInfo = ({
+    movie,
+    authData,
+}: MovieAdditionalInfoProps) => {
     const handleQueryClick = useQueryClick();
+
+    const userId = authData.user?.id;
+
+    const hasUserSavedMovie = movie.onWatchList.some(
+        (like) => like.userId === userId
+    );
+
+    const [iconFilled, setIconFilled] = useState(hasUserSavedMovie);
+    const [hasSaved, setHasSaved] = useState(hasUserSavedMovie);
+
+    const toolTipStyle =
+        "w-fit bg-sky-500 text-sky-50 text-center text-sm py-1 px-2 rounded-md";
+
+    const dispatch = useAppDispatch();
+
+    const saveMovie = async () => {
+        const date = new Date();
+        try {
+            await sendMovieToOrFromWatchlist(movie.id, userId!, hasSaved);
+            setHasSaved((prevState) => !prevState);
+            dispatch(
+                triggerReviewEvent(
+                    `added to watchlist on ${date.toISOString()}`
+                )
+            );
+        } catch (error: any) {
+            console.log(error);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-5 text-lg mb-5 relative">
-            {/* <div className="absolute w-40 top-0 right-0 flex flex-col justify-center items-center transition-opacity">
-                <BookMarkIcon
-                    color={iconFilled ? "#f59e0b" : "#ffffff"}
-                    handleMouseEnter={() => {
-                        hasSaved ? setIconFilled(false) : setIconFilled(true);
-                    }}
-                    handleMouseLeave={() => {
-                        hasSaved ? setIconFilled(true) : setIconFilled(false);
-                    }}
-                    handleClick={saveMovie}
-                />
-                <div
-                    className={
-                        (iconFilled && !hasSaved) || (!iconFilled && hasSaved)
-                            ? toolTipStyle
-                            : toolTipStyle + " invisible"
-                    }
-                >
-                    {!hasSaved ? "Add to watchlist" : "Remove from watchlist"}
+            {authData.user && (
+                <div className="absolute w-40 top-0 right-0 flex flex-col justify-center items-center transition-opacity">
+                    <BookMarkIcon
+                        color={iconFilled ? "#0ea5e9" : "#ffffff"}
+                        handleMouseEnter={() => {
+                            hasSaved
+                                ? setIconFilled(false)
+                                : setIconFilled(true);
+                        }}
+                        handleMouseLeave={() => {
+                            hasSaved
+                                ? setIconFilled(true)
+                                : setIconFilled(false);
+                        }}
+                        handleClick={saveMovie}
+                    />
+                    <div
+                        className={
+                            (iconFilled && !hasSaved) ||
+                            (!iconFilled && hasSaved)
+                                ? toolTipStyle
+                                : toolTipStyle + " invisible"
+                        }
+                    >
+                        {!hasSaved
+                            ? "Add to watchlist"
+                            : "Remove from watchlist"}
+                    </div>
                 </div>
-            </div> */}
+            )}
             <p className="font-semibold">
                 Directed by:{" "}
                 <QueryLink
@@ -59,7 +112,7 @@ export const MovieAdditionalInfo = ({ movie }: { movie: Movie }) => {
                 <span>{movie.runtime} min</span>
                 <span className="flex">
                     <StarIcon className="w-6 h-6 fill-sky-500 border-none" />{" "}
-                    {movie.avgRating}
+                    {movie.avgRating.toPrecision(2)}
                 </span>
                 <span>
                     {movie.numRatings}{" "}

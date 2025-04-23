@@ -4,7 +4,9 @@ export type User = {
     lastName: string;
     email: string;
     password?: string;
-    photoUrl: string;
+    photo: string;
+    likes: { movieId: string }[];
+    watchList: { movieId: string }[];
 };
 
 export type Movie = {
@@ -20,15 +22,31 @@ export type Movie = {
     numRatings: number;
     reviews: MovieReview[];
     poster: string;
+    onWatchList: { userId: string }[];
 };
 
 export type MovieReview = {
     id: string;
-    movieId: string | Movie;
+    movieId: string;
+    movie: Movie;
     userId: string;
     user: { firstName: string; lastName: string };
     date: Date;
     rating: number;
     text?: string;
     likedBy: { userId: string }[];
+};
+
+export type UserActivity = {
+    id: string;
+    userId: string;
+    user: User;
+    movieId: string;
+    movie: Movie;
+    movieReviewId: string;
+    movieReview: MovieReview;
+    action: string;
+    reviewRating: string;
+    reviewText: string;
+    date: Date;
 };

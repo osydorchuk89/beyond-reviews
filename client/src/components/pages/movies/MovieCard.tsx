@@ -23,7 +23,6 @@ export const MovieCard = ({
     numRatings,
     poster,
 }: MovieCardProps) => {
-
     const displayedTitle =
         title?.length > 45 ? `${title.substring(0, 45)}...` : title;
 
@@ -63,7 +62,9 @@ export const MovieCard = ({
                     <StarIcon className="w-6 h-6 fill-sky-500 border-none" />
                 </span>
                 <span className="text-sky-950">{avgRating.toPrecision(2)}</span>
-                <span className="text-gray-600 ml-5">{numRatings} votes</span>
+                <span className="text-gray-600 ml-5">
+                    {numRatings} {numRatings === 1 ? "vote" : "votes"}
+                </span>
             </div>
         </div>
     );

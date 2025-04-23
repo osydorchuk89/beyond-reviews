@@ -6,10 +6,10 @@ export const HeroSection = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="bg-sky-800 flex gap-8 py-24 px-48 text-white">
+        <div className="bg-sky-800 flex gap-8 py-20 px-48 text-white">
             <div className="flex flex-col gap-20 w-1/2">
                 <p className="text-6xl font-bold">Discover, Review, Connect</p>
-                <p>
+                <p className="text-xl">
                     Dive into books, movies, and music with personalized
                     ratings, real user insights, and a community that shares
                     your taste. Find friends, spark conversations, and go{" "}
@@ -18,7 +18,7 @@ export const HeroSection = () => {
                 <div className="flex justify-start">
                     <Button
                         text="Start browsing"
-                        style="sky"
+                        style="orange"
                         handleClick={() => navigate("/movies")}
                     />
                 </div>

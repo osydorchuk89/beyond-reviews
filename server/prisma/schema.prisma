@@ -15,41 +15,46 @@ datasource db {
 }
 
 model User {
-    id        String            @id @default(auto()) @map("_id") @db.ObjectId
-    firstName String
-    lastName  String
-    email     String            @unique
-    password  String?
-    photo     String?
-    reviews   MovieReview[]
-    likes     MovieReviewLike[]
+    id         String            @id @default(auto()) @map("_id") @db.ObjectId
+    firstName  String
+    lastName   String
+    email      String            @unique
+    password   String?
+    photo      String?
+    reviews    MovieReview[]
+    likes      MovieReviewLike[]
+    watchList  MovieWatchList[]
+    activities Activity[]
 }
 
 model Movie {
-    id          String        @id @default(auto()) @map("_id") @db.ObjectId
-    title       String
-    releaseYear Int
-    director    String
-    overview    String
-    language    String
-    genres      String[]
-    runtime     Int
-    reviews     MovieReview[]
-    avgRating   Float
-    numRatings  Int
-    poster      String
+    id             String           @id @default(auto()) @map("_id") @db.ObjectId
+    title          String
+    releaseYear    Int
+    director       String
+    overview       String
+    language       String
+    genres         String[]
+    runtime        Int
+    reviews        MovieReview[]
+    avgRating      Float
+    numRatings     Int
+    poster         String
+    onWatchList    MovieWatchList[]
+    userActivities Activity[]
 }
 
 model MovieReview {
-    id      String            @id @default(auto()) @map("_id") @db.ObjectId
-    movie   Movie             @relation(fields: [movieId], references: [id])
-    movieId String            @db.ObjectId
-    user    User              @relation(fields: [userId], references: [id])
-    userId  String            @db.ObjectId
-    date    DateTime
-    rating  Int
-    text    String?
-    likedBy MovieReviewLike[]
+    id             String            @id @default(auto()) @map("_id") @db.ObjectId
+    movie          Movie             @relation(fields: [movieId], references: [id])
+    movieId        String            @db.ObjectId
+    user           User              @relation(fields: [userId], references: [id])
+    userId         String            @db.ObjectId
+    date           DateTime
+    rating         Int
+    text           String?
+    likedBy        MovieReviewLike[]
+    userActivities Activity[]
 
     @@unique([movieId, userId])
 }
@@ -62,4 +67,28 @@ model MovieReviewLike {
     userId   String      @db.ObjectId
 
     @@unique([reviewId, userId])
+}
+
+model MovieWatchList {
+    id      String @id @default(auto()) @map("_id") @db.ObjectId
+    user    User   @relation(fields: [userId], references: [id])
+    userId  String @db.ObjectId
+    movie   Movie  @relation(fields: [movieId], references: [id])
+    movieId String @db.ObjectId
+
+    @@unique([movieId, userId])
+}
+
+model Activity {
+    id            String       @id @default(auto()) @map("_id") @db.ObjectId
+    user          User         @relation(fields: [userId], references: [id])
+    userId        String       @db.ObjectId
+    action        String
+    reviewRating  Int?
+    reviewText    String?
+    movie         Movie?       @relation(fields: [movieId], references: [id])
+    movieId       String?      @db.ObjectId
+    movieReview   MovieReview? @relation(fields: [movieReviewId], references: [id])
+    movieReviewId String?      @db.ObjectId
+    date          DateTime
 }

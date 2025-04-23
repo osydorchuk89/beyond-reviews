@@ -110,7 +110,7 @@ export const sendMovieReview = async (
     }
 };
 
-export const sendMovieReviewLike = async (
+export const sendLikeOrUnlike = async (
     movieId: string,
     reviewId: string,
     userId: string,
@@ -123,6 +123,36 @@ export const sendMovieReviewLike = async (
             withCredentials: true,
             data: { like: !hasLiked, userId },
         });
+    } catch (error: any) {
+        console.log(error);
+    }
+};
+
+export const sendMovieToOrFromWatchlist = async (
+    movieId: string,
+    userId: string,
+    hasSaved: boolean
+) => {
+    try {
+        await axios({
+            method: "put",
+            url: BASE_URL + `/api/movies/${movieId}`,
+            withCredentials: true,
+            data: { saved: hasSaved ? false : true, userId },
+        });
+    } catch (error: any) {
+        console.log(error);
+    }
+};
+
+export const getUserActivities = async (userId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_URL + `/api/users/${userId}/activities`,
+            withCredentials: true,
+        });
+        return response.data;
     } catch (error: any) {
         console.log(error);
     }

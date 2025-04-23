@@ -5,10 +5,10 @@ import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
 import { NavLink } from "../../ui/NavLink";
 import { StarIcon } from "../../icons/StarIcon";
 import { LikeIcon } from "../../icons/LikeIcon";
-import { sendMovieReviewLike } from "../../../lib/actions";
 import { useAppDispatch } from "../../../store/hooks";
 import { triggerReviewEvent } from "../../../store";
 import { MovieReview } from "../../../lib/entities";
+import { sendLikeOrUnlike } from "../../../lib/actions";
 
 interface MovieReviewCardProps {
     movieReview: MovieReview;
@@ -37,9 +37,9 @@ export const MovieReviewCard = ({
 
     const dispatch = useAppDispatch();
 
-    const likeReview = async () => {
+    const likeOrUnlikeMovieReview = async () => {
         const date = new Date();
-        await sendMovieReviewLike(movieId, movieReview.id, userId!, hasLiked);
+        await sendLikeOrUnlike(movieId, movieReview.id, userId!, hasLiked);
         setHasLiked((prevState) => !prevState);
         dispatch(triggerReviewEvent(`liked review at ${date.toISOString()}`));
     };
@@ -110,7 +110,7 @@ export const MovieReviewCard = ({
                             ? likeClassName + " fill-sky-600"
                             : likeClassName + " fill-sky-50"
                     }
-                    handleClick={likeReview}
+                    handleClick={likeOrUnlikeMovieReview}
                     handleMouseEnter={() => {
                         hasLiked ? setIconFilled(false) : setIconFilled(true);
                     }}

@@ -1,8 +1,9 @@
-import { useLoaderData } from "react-router";
-import { User } from "../../../lib/entities";
+import { useRouteLoaderData } from "react-router";
+import { profileNavLinks } from "../../../lib/data";
+import { NavLink } from "../../ui/NavLink";
 
 export const ProfilePage = () => {
-    let { user }: { user: User } = useLoaderData();
+    const { user } = useRouteLoaderData("profile");
 
     return (
         <div className="flex flex-col my-20 mx-48 p-5 rounded-lg shadow-lg bg-sky-100 gap-10">
@@ -14,11 +15,9 @@ export const ProfilePage = () => {
                 className="object-cover object-top w-32 h-32 rounded-full self-center"
             />
             <ul className="flex flex-col items-center gap-5 text-lg">
-                <li>Reviews</li>
-                <li>Favorites</li>
-                <li>Friends</li>
-                <li>Profile</li>
-                <li>Settings</li>
+                {profileNavLinks.map((link) => (
+                    <NavLink key={link.text} to={link.to} text={link.text} />
+                ))}
             </ul>
         </div>
     );

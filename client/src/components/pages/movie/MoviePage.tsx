@@ -69,7 +69,10 @@ export const MoviePage = () => {
             <div className="flex gap-10 py-10">
                 <MovieMainInfo movie={movie} />
                 <div className="flex flex-col w-2/3 text-lg mt-2">
-                    <MovieAdditionalInfo movie={movieData} />
+                    <MovieAdditionalInfo
+                        movie={movieData}
+                        authData={authData}
+                    />
                     <MovieReviewSection
                         movie={movieData}
                         movieReviews={movieReviewsData}

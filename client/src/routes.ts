@@ -12,7 +12,11 @@ import {
     getMovie,
     getMovieReviews,
     getMovies,
+    getUserActivities,
 } from "./lib/actions";
+import { BooksPage } from "./components/pages/books/BooksPage";
+import { MusicPage } from "./components/pages/music/MusicPage";
+import { UserActivities } from "./components/pages/profile/UserActivities";
 
 export const router = createBrowserRouter([
     {
@@ -31,6 +35,14 @@ export const router = createBrowserRouter([
             {
                 path: "registration",
                 Component: RegistrationPage,
+            },
+            {
+                path: "books",
+                Component: BooksPage,
+            },
+            {
+                path: "music",
+                Component: MusicPage,
             },
             {
                 path: "movies",
@@ -62,18 +74,29 @@ export const router = createBrowserRouter([
             },
             {
                 path: "profile",
+                id: "profile",
+                loader: async () => {
+                    const authData = await getAuthData();
+                    if (authData.user) {
+                        const userActivities = await getUserActivities(
+                            authData.user.id
+                        );
+                        return {
+                            user: authData.user,
+                            userActivities: userActivities,
+                        };
+                    } else {
+                        return redirect("/");
+                    }
+                },
                 children: [
                     {
                         index: true,
                         Component: ProfilePage,
-                        loader: async () => {
-                            const response = await getAuthData();
-                            if (response.isAuthenticated) {
-                                return { user: response.user };
-                            } else {
-                                return redirect("/");
-                            }
-                        },
+                    },
+                    {
+                        path: "activities",
+                        Component: UserActivities,
                     },
                 ],
             },

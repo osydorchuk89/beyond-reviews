@@ -1,7 +1,15 @@
 export const headerNavLinks = [
-    { text: "Books", to: "/" },
+    { text: "Books", to: "/books" },
     { text: "Movies", to: "/movies" },
-    { text: "Music", to: "/" },
+    { text: "Music", to: "/music" },
+];
+
+export const profileNavLinks = [
+    { text: "Activities", to: "/profile/activities" },
+    { text: "Reviews", to: "#" },
+    { text: "Watchlist", to: "#" },
+    { text: "Friends", to: "#" },
+    { text: "Settings", to: "#" },
 ];
 
 export const sideBarFilterList = [

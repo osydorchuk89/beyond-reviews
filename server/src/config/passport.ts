@@ -62,7 +62,9 @@ passport.use(
                             firstName: profile._json.given_name!,
                             lastName: profile._json.family_name!,
                             email: profile._json.email!,
-                            photo: profile.photos && profile.photos[0].value,
+                            photo: profile.photos
+                                ? profile.photos[0].value
+                                : "https://beyond-reviews-os.s3.eu-central-1.amazonaws.com/user-icon.png",
                         },
                     });
                     return cb(null, newUser);

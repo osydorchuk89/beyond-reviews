@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
     Link,
     useLocation,
@@ -7,7 +8,6 @@ import {
 
 import { Button } from "../ui/Button";
 import { headerNavLinks } from "../../lib/data";
-import { useEffect, useState } from "react";
 import { getAuthData } from "../../lib/actions";
 import { useAppSelector } from "../../store/hooks";
 import { LogoutButton } from "../ui/LogoutButton";
@@ -56,7 +56,7 @@ export const Header = () => {
             className={pathname === "/" ? baseHeaderStyle : stickyHeaderStyle}
         >
             <Link
-                className="text-xl font-semibold hover:text-orange-500"
+                className="text-2xl font-semibold hover:text-orange-500"
                 to="/"
             >
                 Beyond Reviews
@@ -64,7 +64,7 @@ export const Header = () => {
             <li className="flex gap-8">
                 {headerNavLinks.map((link) => (
                     <ul key={link.text}>
-                        <Link className="hover:text-orange-500" to={link.to}>
+                        <Link className="text-xl hover:text-orange-500" to={link.to}>
                             {link.text}
                         </Link>
                     </ul>

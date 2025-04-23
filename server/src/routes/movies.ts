@@ -5,6 +5,7 @@ import { ReviewSchema } from "../lib/schemas";
 export const movieRouter = Router();
 const prisma = new PrismaClient();
 
+// get all movies
 movieRouter.get("/", async (req, res) => {
     try {
         const movies = await prisma.movie.findMany();
@@ -14,12 +15,16 @@ movieRouter.get("/", async (req, res) => {
     }
 });
 
+// get a specific movie
 movieRouter.get("/:movieId", async (req, res) => {
     const { movieId } = req.params;
     try {
         const movie = await prisma.movie.findUnique({
             where: {
                 id: movieId,
+            },
+            include: {
+                onWatchList: true,
             },
         });
         res.send(movie);
@@ -28,45 +33,51 @@ movieRouter.get("/:movieId", async (req, res) => {
     }
 });
 
-// movieRouter.put("/:movieId", async (req, res) => {
-//     const { movieId } = req.params;
-//     const { saved, userId } = req.body;
-//     try {
-//         const movie = await Movie.findById(movieId);
-//         const user = await User.findById(userId);
-//         if (movie && user) {
-//             if (saved) {
-//                 movie.onWatchList?.push(userId);
-//                 user.watchList?.push(movie._id);
-//             } else {
-//                 movie.onWatchList = movie.onWatchList!.filter(
-//                     (item) => item.toString() !== userId
-//                 );
-//                 user.watchList = user.watchList!.filter(
-//                     (item) => item.toString() !== movie._id.toString()
-//                 );
-//             }
-//             const userActivityParams = {
-//                 userId,
-//                 movieId,
-//                 action: saved ? "saved" : "unsaved",
-//                 date: new Date(),
-//             };
-//             const userActivity = new Activity(userActivityParams);
-//             await movie.save();
-//             await user.save();
-//             await userActivity.save();
-//         } else {
-//             res.status(500).send({
-//                 message: "Could not find movie and/or user",
-//             });
-//         }
-//         res.status(200).send();
-//     } catch (error) {
-//         res.send(error);
-//     }
-// });
+// add/remove a movie on/from a watchlist
+movieRouter.put("/:movieId", async (req, res) => {
+    const { movieId } = req.params;
+    const { saved, userId } = req.body;
+    try {
+        const movie = await prisma.movie.findUnique({ where: { id: movieId } });
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (movie && user) {
+            if (saved) {
+                await prisma.movieWatchList.create({
+                    data: {
+                        userId: userId,
+                        movieId: movieId,
+                    },
+                });
+            } else {
+                await prisma.movieWatchList.delete({
+                    where: {
+                        movieId_userId: {
+                            movieId: movieId,
+                            userId: userId,
+                        },
+                    },
+                });
+            }
+            await prisma.activity.create({
+                data: {
+                    userId: userId,
+                    action: saved ? "saved" : "unsaved",
+                    movieId: movieId,
+                    date: new Date(),
+                },
+            });
+        } else {
+            res.status(500).send({
+                message: "Could not find movie and/or user",
+            });
+        }
+        res.status(200).send();
+    } catch (error) {
+        res.send(error);
+    }
+});
 
+// get reviews of a specific movie
 movieRouter.get("/:movieId/reviews", async (req, res) => {
     const { movieId } = req.params;
     try {
@@ -87,11 +98,10 @@ movieRouter.get("/:movieId/reviews", async (req, res) => {
             },
         });
         if (movieReviews) {
-            // const sortedMovieReviews = movieReviews.sort(
-            //     (a, b) => b.likedBy.length - a.likedBy.length
-            // );
-            // res.send(sortedMovieReviews);
-            res.send(movieReviews);
+            const sortedMovieReviews = movieReviews.sort(
+                (a, b) => b.likedBy.length - a.likedBy.length
+            );
+            res.send(sortedMovieReviews);
         } else {
             res.status(500).send({
                 message: "Could not get movie reviews",
@@ -102,6 +112,7 @@ movieRouter.get("/:movieId/reviews", async (req, res) => {
     }
 });
 
+// post or update a movie review
 movieRouter.post("/:movieId/reviews", async (req, res) => {
     const { rating, text } = req.body;
     const validationResult = ReviewSchema.safeParse({
@@ -112,7 +123,7 @@ movieRouter.post("/:movieId/reviews", async (req, res) => {
         res.status(500).send({ message: "Validation failed" });
     } else {
         try {
-            const userReview = await prisma.movieReview.upsert({
+            const movieReview = await prisma.movieReview.upsert({
                 where: {
                     movieId_userId: {
                         userId: req.body.userId,
@@ -138,11 +149,11 @@ movieRouter.post("/:movieId/reviews", async (req, res) => {
             });
             if (movie) {
                 //adding rating to movie ratings array
-                if (movie.reviews.includes(userReview)) {
-                    const userReviewIndex = movie.reviews.indexOf(userReview);
-                    movie.reviews.splice(userReviewIndex, 1);
+                if (movie.reviews.includes(movieReview)) {
+                    const movieReviewIndex = movie.reviews.indexOf(movieReview);
+                    movie.reviews.splice(movieReviewIndex, 1);
                 }
-                movie.reviews.push(userReview);
+                movie.reviews.push(movieReview);
                 //adding rating to movie ratings array
                 //updating average rating and number of ratings
 
@@ -177,11 +188,11 @@ movieRouter.post("/:movieId/reviews", async (req, res) => {
             });
             if (user) {
                 //adding rating to user ratings array
-                if (user.reviews.includes(userReview)) {
-                    const userRatingIndex = user.reviews.indexOf(userReview);
+                if (user.reviews.includes(movieReview)) {
+                    const userRatingIndex = user.reviews.indexOf(movieReview);
                     user.reviews.splice(userRatingIndex, 1);
                 }
-                user.reviews.push(userReview);
+                user.reviews.push(movieReview);
                 //adding rating to user ratings array
                 // await user.save();
             } else {
@@ -189,19 +200,19 @@ movieRouter.post("/:movieId/reviews", async (req, res) => {
                     message: "Could not find user",
                 });
             }
-            // adding user action to the respective collection
-            // if (user && movie) {
-            //     const userActivityParams = {
-            //         userId: user._id,
-            //         movieId: movie._id,
-            //         action: "rated",
-            //         rating: movieRating,
-            //         review: movieReview,
-            //         date: new Date(),
-            //     };
-            //     const userActivity = new Activity(userActivityParams);
-            //     await userActivity.save();
-            // }
+            // creating user action
+            if (user && movie) {
+                await prisma.activity.create({
+                    data: {
+                        userId: user.id,
+                        movieId: movie.id,
+                        action: "rated",
+                        reviewRating: movieReview.rating,
+                        reviewText: movieReview.text,
+                        date: new Date(),
+                    },
+                });
+            }
             res.status(200).send();
         } catch (error) {
             res.send(error);
@@ -209,6 +220,7 @@ movieRouter.post("/:movieId/reviews", async (req, res) => {
     }
 });
 
+// like or unlike a movie review
 movieRouter.put("/:movieId/reviews/:reviewId", async (req, res) => {
     const reviewId = req.params.reviewId;
     const { like, userId } = req.body;
@@ -238,14 +250,14 @@ movieRouter.put("/:movieId/reviews/:reviewId", async (req, res) => {
                     },
                 });
             }
-            // const userActivityParams = {
-            //     userId,
-            //     ratingId: rating._id,
-            //     action: like ? "liked" : "unliked",
-            //     date: new Date(),
-            // };
-            // const userActivity = new Activity(userActivityParams);
-            // await userActivity.save();
+            await prisma.activity.create({
+                data: {
+                    userId: userId,
+                    movieReviewId: movieReview.id,
+                    action: like ? "liked" : "unliked",
+                    date: new Date(),
+                },
+            });
             res.status(200).send();
         } else {
             res.status(500).send({

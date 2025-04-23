@@ -46,3 +46,77 @@ userRouter.post("/", fileUpload.single("photo"), async (req, res) => {
         }
     }
 });
+
+userRouter.get("/:userId/activities", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (user) {
+            const activities = await prisma.activity.findMany({
+                where: {
+                    userId: userId,
+                },
+                include: {
+                    movie: {
+                        select: {
+                            title: true,
+                            releaseYear: true,
+                            poster: true,
+                        },
+                    },
+                    user: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            photo: true,
+                        },
+                    },
+                    movieReview: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                },
+                            },
+                            movie: {
+                                select: {
+                                    id: true,
+                                    title: true,
+                                    releaseYear: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+            // const activities = await Activity.find({ userId })
+            //     .populate("movieId", ["title", "releaseYear", "poster"])
+            //     .populate("userId", ["firstName", "lastName", "photo"])
+            //     .populate("otherUserId", ["firstName", "lastName"])
+            //     .populate({
+            //         path: "ratingId",
+            //         populate: {
+            //             path: "userId",
+            //             select: "firstName lastName",
+            //         },
+            //     })
+            //     .populate({
+            //         path: "ratingId",
+            //         populate: {
+            //             path: "movieId",
+            //             select: "_id title releaseYear",
+            //         },
+            //     });
+            // res.send({ activities, user });
+            res.send(activities);
+        } else {
+            res.status(500).send({
+                message: "Could not find user",
+            });
+        }
+    } catch (error) {
+        res.send(error);
+    }
+});
