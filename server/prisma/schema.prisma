@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String            @id @default(auto()) @map("_id") @db.ObjectId
+    firstName String
+    lastName  String
+    email     String            @unique
+    password  String?
+    photo     String?
+    reviews   MovieReview[]
+    likes     MovieReviewLike[]
+}
+
+model Movie {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    title       String
+    releaseYear Int
+    director    String
+    overview    String
+    language    String
+    genres      String[]
+    runtime     Int
+    reviews     MovieReview[]
+    avgRating   Float
+    numRatings  Int
+    poster      String
+}
+
+model MovieReview {
+    id      String            @id @default(auto()) @map("_id") @db.ObjectId
+    movie   Movie             @relation(fields: [movieId], references: [id])
+    movieId String            @db.ObjectId
+    user    User              @relation(fields: [userId], references: [id])
+    userId  String            @db.ObjectId
+    date    DateTime
+    rating  Int
+    text    String?
+    likedBy MovieReviewLike[]
+
+    @@unique([movieId, userId])
+}
+
+model MovieReviewLike {
+    id       String      @id @default(auto()) @map("_id") @db.ObjectId
+    review   MovieReview @relation(fields: [reviewId], references: [id])
+    reviewId String      @db.ObjectId
+    user     User        @relation(fields: [userId], references: [id])
+    userId   String      @db.ObjectId
+
+    @@unique([reviewId, userId])
+}
