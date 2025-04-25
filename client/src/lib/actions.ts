@@ -145,6 +145,19 @@ export const sendMovieToOrFromWatchlist = async (
     }
 };
 
+export const getUser = async (userId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_URL + `/api/users/${userId}`,
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error: any) {
+        console.log(error);
+    }
+};
+
 export const getUserActivities = async (userId: string) => {
     try {
         const response = await axios({
@@ -154,6 +167,36 @@ export const getUserActivities = async (userId: string) => {
         });
         return response.data;
     } catch (error: any) {
+        console.log(error);
+    }
+};
+
+export const sendFriendRequest = async (
+    userId: string,
+    otherUserId: string
+) => {
+    try {
+        await axios({
+            method: "post",
+            url: BASE_URL + `/api/users/${userId}/friend-requests/`,
+            data: { otherUserId },
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const acceptFriendRequest = async (
+    userId: string,
+    otherUserId: string
+) => {
+    try {
+        await axios({
+            method: "post",
+            url: BASE_URL + `/api/users/${userId}/friends/`,
+            data: { otherUserId },
+        });
+    } catch (error) {
         console.log(error);
     }
 };

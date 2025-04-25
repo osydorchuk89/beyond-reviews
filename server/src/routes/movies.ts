@@ -149,11 +149,11 @@ movieRouter.post("/:movieId/reviews", async (req, res) => {
             });
             if (movie) {
                 //adding rating to movie ratings array
-                if (movie.reviews.includes(movieReview)) {
-                    const movieReviewIndex = movie.reviews.indexOf(movieReview);
-                    movie.reviews.splice(movieReviewIndex, 1);
-                }
-                movie.reviews.push(movieReview);
+                // if (movie.reviews.includes(movieReview)) {
+                //     const movieReviewIndex = movie.reviews.indexOf(movieReview);
+                //     movie.reviews.splice(movieReviewIndex, 1);
+                // }
+                // movie.reviews.push(movieReview);
                 //adding rating to movie ratings array
                 //updating average rating and number of ratings
 
@@ -192,7 +192,7 @@ movieRouter.post("/:movieId/reviews", async (req, res) => {
                     const userRatingIndex = user.reviews.indexOf(movieReview);
                     user.reviews.splice(userRatingIndex, 1);
                 }
-                user.reviews.push(movieReview);
+                // user.reviews.push(movieReview);
                 //adding rating to user ratings array
                 // await user.save();
             } else {

@@ -3,14 +3,20 @@ import { NavLink } from "../../ui/NavLink";
 
 interface ActivityDetailsProps {
     activity: UserActivity;
+    userName: string;
     ratingUserName: string;
+    ratingUserId: string;
     parsedDate: string;
+    isSameUser: boolean;
 }
 
 export const ActivityDetails = ({
     activity,
+    userName,
     ratingUserName,
+    ratingUserId,
     parsedDate,
+    isSameUser,
 }: ActivityDetailsProps) => {
     return (
         <>
@@ -22,7 +28,8 @@ export const ActivityDetails = ({
                     />
                     {activity.movieId && activity.action === "rated" && (
                         <span className="font-bold">
-                            You rated {activity.reviewRating}/10{" "}
+                            {isSameUser ? "You" : userName} rated{" "}
+                            {activity.reviewRating}/10{" "}
                             <NavLink
                                 text={`${activity.movie.title} (${activity.movie.releaseYear})`}
                                 to={`/movies/${activity.movieId}`}
@@ -31,7 +38,7 @@ export const ActivityDetails = ({
                     )}
                     {activity.movieId && activity.action !== "rated" && (
                         <span className="font-bold">
-                            You{" "}
+                            {isSameUser ? "You" : userName}{" "}
                             {activity.action === "saved" ? "added" : "removed"}{" "}
                             <NavLink
                                 text={`${activity.movie.title} (${activity.movie.releaseYear})`}
@@ -43,13 +50,12 @@ export const ActivityDetails = ({
                     )}
                     {activity.movieReviewId && (
                         <span className="font-bold">
-                            You{" "}
+                            {isSameUser ? "You" : userName}{" "}
                             {activity.action === "liked" ? "liked" : "unliked"}{" "}
                             a review by{" "}
                             <NavLink
                                 text={ratingUserName}
-                                // to={`/users/${ratingUserId}/profile`}
-                                to="#"
+                                to={`/users/${ratingUserId}/profile`}
                             />
                         </span>
                     )}

@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from "react-router";
+import { createBrowserRouter } from "react-router";
 
 import { MainLayout } from "./components/MainLayout";
 import { HeroSection } from "./components/pages/main/HeroSection";
@@ -12,11 +12,13 @@ import {
     getMovie,
     getMovieReviews,
     getMovies,
+    getUser,
     getUserActivities,
 } from "./lib/actions";
 import { BooksPage } from "./components/pages/books/BooksPage";
 import { MusicPage } from "./components/pages/music/MusicPage";
 import { UserActivities } from "./components/pages/profile/UserActivities";
+import { UserFriends } from "./components/pages/profile/UserFriends";
 
 export const router = createBrowserRouter([
     {
@@ -73,30 +75,38 @@ export const router = createBrowserRouter([
                 ],
             },
             {
-                path: "profile",
-                id: "profile",
-                loader: async () => {
-                    const authData = await getAuthData();
-                    if (authData.user) {
-                        const userActivities = await getUserActivities(
-                            authData.user.id
-                        );
-                        return {
-                            user: authData.user,
-                            userActivities: userActivities,
-                        };
-                    } else {
-                        return redirect("/");
-                    }
-                },
+                path: "users",
                 children: [
                     {
-                        index: true,
-                        Component: ProfilePage,
-                    },
-                    {
-                        path: "activities",
-                        Component: UserActivities,
+                        path: ":userId",
+                        id: "userProfile",
+                        loader: async ({ params }) => {
+                            const { userId } = params as { userId: string };
+                            const user = await getUser(userId);
+                            return { user };
+                        },
+                        children: [
+                            {
+                                path: "profile",
+                                Component: ProfilePage,
+                            },
+                            {
+                                path: "activities",
+                                Component: UserActivities,
+                                loader: async ({ params }) => {
+                                    const { userId } = params as {
+                                        userId: string;
+                                    };
+                                    const userActivities =
+                                        await getUserActivities(userId);
+                                    return { userActivities };
+                                },
+                            },
+                            {
+                                path: "friends",
+                                Component: UserFriends,
+                            },
+                        ],
                     },
                 ],
             },

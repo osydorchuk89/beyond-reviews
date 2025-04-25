@@ -1,5 +1,4 @@
-import { MovieReview } from "../../../lib/entities";
-import { AuthData } from "../../layout/Header";
+import { AuthData, MovieReview } from "../../../lib/entities";
 import { MovieReviewCard } from "./MovieReviewCard";
 
 interface MovieReviewsProps {

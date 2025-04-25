@@ -1,11 +1,10 @@
 import { useState } from "react";
 
-import { Movie } from "../../../lib/entities";
+import { AuthData, Movie } from "../../../lib/entities";
 import { StarIcon } from "../../icons/StarIcon";
 import { QueryLink } from "../../ui/QueryLink";
 import { useQueryClick } from "../../../hooks/useQueryClick";
 import { BookMarkIcon } from "../../icons/BookMarkIcon";
-import { AuthData } from "../../layout/Header";
 import { sendMovieToOrFromWatchlist } from "../../../lib/actions";
 import { useAppDispatch } from "../../../store/hooks";
 import { triggerReviewEvent } from "../../../store";
@@ -41,9 +40,7 @@ export const MovieAdditionalInfo = ({
             await sendMovieToOrFromWatchlist(movie.id, userId!, hasSaved);
             setHasSaved((prevState) => !prevState);
             dispatch(
-                triggerReviewEvent(
-                    `added to watchlist on ${date.toISOString()}`
-                )
+                triggerReviewEvent(`new review event at ${date.toISOString()}`)
             );
         } catch (error: any) {
             console.log(error);

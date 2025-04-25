@@ -41,7 +41,9 @@ export const MovieReviewCard = ({
         const date = new Date();
         await sendLikeOrUnlike(movieId, movieReview.id, userId!, hasLiked);
         setHasLiked((prevState) => !prevState);
-        dispatch(triggerReviewEvent(`liked review at ${date.toISOString()}`));
+        dispatch(
+            triggerReviewEvent(`new review event at ${date.toISOString()}`)
+        );
     };
 
     let likeClassName = "w-6 h-6 hover:cursor-pointer";

@@ -2,14 +2,13 @@ import { useRef, useState, RefObject } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Movie, MovieReview } from "../../../lib/entities";
+import { AuthData, Movie, MovieReview } from "../../../lib/entities";
 import { NavLink } from "../../ui/NavLink";
 import { ReviewSchema } from "../../../lib/schemas";
 import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
 import { StarIcon } from "../../icons/StarIcon";
 import { Button } from "../../ui/Button";
 import { sendMovieReview } from "../../../lib/actions";
-import { AuthData } from "../../layout/Header";
 import { useAppDispatch } from "../../../store/hooks";
 import { triggerReviewEvent } from "../../../store";
 
@@ -59,7 +58,7 @@ export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData)
         const date = new Date();
         try {
             await sendMovieReview(movie.id, authData.user!.id, data);
-            dispatch(triggerReviewEvent(`new review at ${date.toISOString()}`));
+            dispatch(triggerReviewEvent(`new review event at ${date.toISOString()}`));
             setHasRated(true);
             setIsEditing(false);
             reset();

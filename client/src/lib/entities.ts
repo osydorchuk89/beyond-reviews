@@ -1,3 +1,8 @@
+export type AuthData = {
+    isAuthenticated: boolean;
+    user: User;
+};
+
 export type User = {
     id: string;
     firstName: string;
@@ -7,6 +12,24 @@ export type User = {
     photo: string;
     likes: { movieId: string }[];
     watchList: { movieId: string }[];
+    receivedFriendRequests: {
+        id: string;
+        sentUserId: string;
+        receivedUserId: string;
+        sentUser: { firstName: string; lastName: string; photo: string };
+    }[];
+    sentFriendRequests: {
+        id: string;
+        sentUserId: string;
+        receivedUserId: string;
+        receivedUser: { firstName: string; lastName: string; photo: string };
+    }[];
+    friends: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        photo: string;
+    }[];
 };
 
 export type Movie = {
@@ -30,7 +53,7 @@ export type MovieReview = {
     movieId: string;
     movie: Movie;
     userId: string;
-    user: { firstName: string; lastName: string };
+    user: { id: string; firstName: string; lastName: string };
     date: Date;
     rating: number;
     text?: string;

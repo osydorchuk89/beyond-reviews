@@ -15,16 +15,21 @@ datasource db {
 }
 
 model User {
-    id         String            @id @default(auto()) @map("_id") @db.ObjectId
-    firstName  String
-    lastName   String
-    email      String            @unique
-    password   String?
-    photo      String?
-    reviews    MovieReview[]
-    likes      MovieReviewLike[]
-    watchList  MovieWatchList[]
-    activities Activity[]
+    id                     String            @id @default(auto()) @map("_id") @db.ObjectId
+    firstName              String
+    lastName               String
+    email                  String            @unique
+    password               String?
+    photo                  String?
+    reviews                MovieReview[]
+    likes                  MovieReviewLike[]
+    watchList              MovieWatchList[]
+    activities             Activity[]
+    sentFriendRequests     FriendRequest[]   @relation("sentUser")
+    receivedFriendRequests FriendRequest[]   @relation("receivedUser")
+    friend                 User?             @relation(fields: [friendId], references: [id], name: "userFriends", onDelete: NoAction, onUpdate: NoAction)
+    friendId               String?           @db.ObjectId
+    friends                User[]            @relation(name: "userFriends")
 }
 
 model Movie {
@@ -91,4 +96,14 @@ model Activity {
     movieReview   MovieReview? @relation(fields: [movieReviewId], references: [id])
     movieReviewId String?      @db.ObjectId
     date          DateTime
+}
+
+model FriendRequest {
+    id             String @id @default(auto()) @map("_id") @db.ObjectId
+    sentUser       User   @relation(fields: [sentUserId], references: [id], name: "sentUser")
+    sentUserId     String @db.ObjectId
+    receivedUser   User   @relation(fields: [receivedUserId], references: [id], name: "receivedUser")
+    receivedUserId String @db.ObjectId
+
+    @@unique([sentUserId, receivedUserId])
 }

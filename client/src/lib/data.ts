@@ -5,10 +5,10 @@ export const headerNavLinks = [
 ];
 
 export const profileNavLinks = [
-    { text: "Activities", to: "/profile/activities" },
+    { text: "Activities", to: "../activities" },
     { text: "Reviews", to: "#" },
     { text: "Watchlist", to: "#" },
-    { text: "Friends", to: "#" },
+    { text: "Friends", to: "../friends" },
     { text: "Settings", to: "#" },
 ];
 

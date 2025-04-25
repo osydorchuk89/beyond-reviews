@@ -3,11 +3,10 @@ import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
-import { Movie, MovieReview } from "../../../lib/entities";
+import { AuthData, Movie, MovieReview } from "../../../lib/entities";
 import { getAuthData, getMovie, getMovieReviews } from "../../../lib/actions";
 import { useAppSelector } from "../../../store/hooks";
 import { MovieReviewSection } from "./MovieReviewSection";
-import { AuthData } from "../../layout/Header";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { MovieReviews } from "./MovieReviews";
 

@@ -11,12 +11,7 @@ import { headerNavLinks } from "../../lib/data";
 import { getAuthData } from "../../lib/actions";
 import { useAppSelector } from "../../store/hooks";
 import { LogoutButton } from "../ui/LogoutButton";
-import { User } from "../../lib/entities";
-
-export interface AuthData {
-    isAuthenticated: boolean;
-    user: User | null;
-}
+import { AuthData } from "../../lib/entities";
 
 export const Header = () => {
     let { pathname } = useLocation();
@@ -64,17 +59,22 @@ export const Header = () => {
             <li className="flex gap-8">
                 {headerNavLinks.map((link) => (
                     <ul key={link.text}>
-                        <Link className="text-xl hover:text-orange-500" to={link.to}>
+                        <Link
+                            className="text-xl hover:text-orange-500"
+                            to={link.to}
+                        >
                             {link.text}
                         </Link>
                     </ul>
                 ))}
             </li>
-            {authStatus.isAuthenticated ? (
+            {authStatus.user ? (
                 <div className="flex gap-4 justify-center items-center">
                     <div
                         className="flex justify-center items-center w-12 h-12 rounded-full overflow-hidden bg-orange-300 hover:bg-orange-500 cursor-pointer"
-                        onClick={() => navigate("/profile")}
+                        onClick={() =>
+                            navigate(`/users/${authStatus.user!.id}/profile`)
+                        }
                     >
                         <p className="text-orange-950">{userInitials}</p>
                     </div>
