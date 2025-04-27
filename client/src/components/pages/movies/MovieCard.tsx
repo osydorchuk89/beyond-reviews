@@ -31,7 +31,10 @@ export const MovieCard = ({
     return (
         <div className="flex flex-col w-80 justify-start items-center bg-sky-100 rounded-lg shadow-lg p-5 relative">
             <p className="w-full text-center text-xl font-bold h-16 bg-sky-700 rounded-t-lg flex justify-center items-center absolute top-0 p-4">
-                <Link className="hover:underline text-sky-50" to={id}>
+                <Link
+                    className="hover:underline text-sky-50"
+                    to={`/movies/${id}`}
+                >
                     {displayedTitle}
                 </Link>
             </p>

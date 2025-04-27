@@ -50,10 +50,10 @@ export const UserFriends = () => {
 
     return (
         <div className="flex flex-col my-20 mx-60 gap-10 min-h-[60vh]">
-            <p className="text-2xl text-center font-bold">
-                {isSameUser ? "Your" : `${userName}'s`} Friends
-            </p>
-            {user.receivedFriendRequests.length > 0 && (
+            <h2 className="text-2xl text-center font-bold">
+                {isSameUser ? "Your" : `${userName}'s`} wriends
+            </h2>
+            {user.receivedFriendRequests.length > 0 && isSameUser && (
                 <div className="flex flex-col gap-2">
                     <p className="text-xl font-medium text-center">
                         Received friend requests
@@ -95,7 +95,7 @@ export const UserFriends = () => {
                     </div>
                 </div>
             )}
-            {user.sentFriendRequests.length > 0 && (
+            {user.sentFriendRequests.length > 0 && isSameUser && (
                 <div className="flex flex-col gap-2">
                     <p className="text-xl font-medium text-center">
                         Sent friend requests

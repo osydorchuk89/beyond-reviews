@@ -200,3 +200,16 @@ export const acceptFriendRequest = async (
         console.log(error);
     }
 };
+
+export const getWatchList = async (userId: string) => {
+    try {
+        const response = await axios({
+            method: "get",
+            url: BASE_URL + `/api/users/${userId}/watch-list`,
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error: any) {
+        console.log(error);
+    }
+}

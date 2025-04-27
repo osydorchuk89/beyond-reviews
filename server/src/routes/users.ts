@@ -274,3 +274,38 @@ userRouter.post("/:userId/friends", async (req, res) => {
         res.status(500).send({ message: error.message });
     }
 });
+
+//get user watchlist
+userRouter.get("/:userId/watch-list", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                watchList: {
+                    include: {
+                        movie: {
+                            select: {
+                                title: true,
+                                releaseYear: true,
+                                genres: true,
+                                avgRating: true,
+                                numRatings: true,
+                                poster: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        if (user) {
+            res.send(user.watchList);
+        } else {
+            res.status(500).send({
+                message: "Could not find user",
+            });
+        }
+    } catch (error) {
+        res.send(error);
+    }
+});

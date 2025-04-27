@@ -14,11 +14,13 @@ import {
     getMovies,
     getUser,
     getUserActivities,
+    getWatchList,
 } from "./lib/actions";
 import { BooksPage } from "./components/pages/books/BooksPage";
 import { MusicPage } from "./components/pages/music/MusicPage";
 import { UserActivities } from "./components/pages/profile/UserActivities";
 import { UserFriends } from "./components/pages/profile/UserFriends";
+import { UserWatchList } from "./components/pages/profile/UserWatchList";
 
 export const router = createBrowserRouter([
     {
@@ -105,6 +107,19 @@ export const router = createBrowserRouter([
                             {
                                 path: "friends",
                                 Component: UserFriends,
+                            },
+                            {
+                                path: "watch-list",
+                                Component: UserWatchList,
+                                loader: async ({ params }) => {
+                                    const { userId } = params as {
+                                        userId: string;
+                                    };
+                                    const userWatchList = await getWatchList(
+                                        userId
+                                    );
+                                    return { userWatchList };
+                                },
                             },
                         ],
                     },

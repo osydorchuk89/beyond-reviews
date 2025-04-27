@@ -73,3 +73,10 @@ export type UserActivity = {
     reviewText: string;
     date: Date;
 };
+
+export type MovieWatchList = {
+    id: string;
+    movie: Movie;
+    movieId: string;
+    userId: string;
+};

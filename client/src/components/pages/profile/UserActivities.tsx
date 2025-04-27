@@ -36,7 +36,7 @@ export const UserActivities = () => {
     return (
         <div className="flex flex-col my-20 mx-60 gap-10">
             <p className="text-center text-2xl font-bold">
-                {isSameUser ? "Your" : `${userName}'s`} Activity
+                {isSameUser ? "Your" : `${userName}'s`} activities
             </p>
             {reversedActivityData.length > 0 &&
                 reversedActivityData.map((activity) => {
