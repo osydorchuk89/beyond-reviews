@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 
 import { MainLayout } from "./components/MainLayout";
 import { HeroSection } from "./components/pages/main/HeroSection";
@@ -7,6 +7,12 @@ import { MoviePage } from "./components/pages/movie/MoviePage";
 import { LoginPage } from "./components/pages/login/LoginPage";
 import { RegistrationPage } from "./components/pages/registration/RegistrationPage";
 import { ProfilePage } from "./components/pages/profile/ProfilePage";
+import { BooksPage } from "./components/pages/books/BooksPage";
+import { MusicPage } from "./components/pages/music/MusicPage";
+import { UserActivities } from "./components/pages/profile/UserActivities";
+import { UserFriends } from "./components/pages/profile/UserFriends";
+import { UserWatchList } from "./components/pages/profile/UserWatchList";
+import { UserMessages } from "./components/pages/profile/UserMessages";
 import {
     getAuthData,
     getMovie,
@@ -16,11 +22,6 @@ import {
     getUserActivities,
     getWatchList,
 } from "./lib/actions";
-import { BooksPage } from "./components/pages/books/BooksPage";
-import { MusicPage } from "./components/pages/music/MusicPage";
-import { UserActivities } from "./components/pages/profile/UserActivities";
-import { UserFriends } from "./components/pages/profile/UserFriends";
-import { UserWatchList } from "./components/pages/profile/UserWatchList";
 
 export const router = createBrowserRouter([
     {
@@ -107,11 +108,31 @@ export const router = createBrowserRouter([
                             {
                                 path: "friends",
                                 Component: UserFriends,
+                                loader: async () => {
+                                    const authData = await getAuthData();
+                                    if (!authData.isAuthenticated) {
+                                        return redirect("/");
+                                    }
+                                },
+                            },
+                            {
+                                path: "messages",
+                                Component: UserMessages,
+                                loader: async () => {
+                                    const authData = await getAuthData();
+                                    if (!authData.isAuthenticated) {
+                                        return redirect("/");
+                                    }
+                                },
                             },
                             {
                                 path: "watch-list",
                                 Component: UserWatchList,
                                 loader: async ({ params }) => {
+                                    const authData = await getAuthData();
+                                    if (!authData.isAuthenticated) {
+                                        return redirect("/");
+                                    }
                                     const { userId } = params as {
                                         userId: string;
                                     };

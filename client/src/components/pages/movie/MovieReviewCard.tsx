@@ -42,7 +42,7 @@ export const MovieReviewCard = ({
         await sendLikeOrUnlike(movieId, movieReview.id, userId!, hasLiked);
         setHasLiked((prevState) => !prevState);
         dispatch(
-            triggerReviewEvent(`new review event at ${date.toISOString()}`)
+            triggerReviewEvent(`new review event at ${date.toString()}`)
         );
     };
 

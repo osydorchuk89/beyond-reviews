@@ -88,9 +88,9 @@ userRouter.get("/:userId", async (req, res) => {
                 },
             },
         });
-        res.send(user);
+        res.status(200).send(user);
     } catch (error) {
-        res.send(error);
+        res.status(500).send(error);
     }
 });
 
@@ -166,6 +166,34 @@ userRouter.get("/:userId/activities", async (req, res) => {
         }
     } catch (error) {
         res.send(error);
+    }
+});
+
+//
+userRouter.get("/:userId/friends", async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const user = await prisma.user
+            .findUnique({
+                where: { id: userId },
+                include: {
+                    friends: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            photo: true,
+                        },
+                    },
+                },
+            })
+        if (user) {
+            res.status(200).send(user.friends);
+        } else {
+            res.status(500).send({ message: "Cannot find user" });
+        }
+    } catch (error: any) {
+        res.status(500).send({ message: error.message });
     }
 });
 

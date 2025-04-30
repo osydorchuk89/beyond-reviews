@@ -6,8 +6,9 @@ import bodyParser from "body-parser";
 
 import { movieRouter } from "./routes/movies.ts";
 import { userRouter } from "./routes/users.ts";
-import "./config/passport";
+import { messageRouter } from "./routes/messages.ts";
 import { authRouter } from "./routes/auth.ts";
+import "./config/passport";
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use(passport.session());
 
 app.use("/api/movies", movieRouter);
 app.use("/api/users", userRouter);
+app.use("/api/messages", messageRouter);
 app.use("/auth", authRouter);
 
 app.get("/", (_, res) => {

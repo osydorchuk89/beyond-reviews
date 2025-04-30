@@ -25,11 +25,17 @@ model User {
     likes                  MovieReviewLike[]
     watchList              MovieWatchList[]
     activities             Activity[]
+    friends                User[]            @relation(fields: [friendsIds], references: [id], name: "friends")
+    friendsIds             String[]          @db.ObjectId
+    friendOf               User[]            @relation(fields: [friendOfIds], references: [id], name: "friends")
+    friendOfIds            String[]          @db.ObjectId
     sentFriendRequests     FriendRequest[]   @relation("sentUser")
     receivedFriendRequests FriendRequest[]   @relation("receivedUser")
-    friend                 User?             @relation(fields: [friendId], references: [id], name: "userFriends", onDelete: NoAction, onUpdate: NoAction)
-    friendId               String?           @db.ObjectId
-    friends                User[]            @relation(name: "userFriends")
+    // friend                 User?             @relation(fields: [friendId], references: [id], name: "userFriends", onDelete: NoAction, onUpdate: NoAction)
+    // friendId               String?           @db.ObjectId
+    // friends                User[]            @relation(name: "userFriends")
+    sentMessages           Message[]         @relation("sender")
+    receivedMessages       Message[]         @relation("recipient")
 }
 
 model Movie {
@@ -106,4 +112,15 @@ model FriendRequest {
     receivedUserId String @db.ObjectId
 
     @@unique([sentUserId, receivedUserId])
+}
+
+model Message {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    sender      User     @relation(fields: [senderId], references: [id], name: "sender")
+    senderId    String   @db.ObjectId
+    recipient   User     @relation(fields: [recipientId], references: [id], name: "recipient")
+    recipientId String   @db.ObjectId
+    text        String
+    date        DateTime
+    wasRead     Boolean
 }

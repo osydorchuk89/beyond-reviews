@@ -27,7 +27,7 @@ export const UserFriends = () => {
         const date = new Date();
         await acceptFriendRequest(userId, otherUserId);
         dispatch(
-            triggerFriendEvent(`new friend event at ${date.toISOString()}`)
+            triggerFriendEvent(`new friend event at ${date.toString()}`)
         );
     };
 
@@ -51,7 +51,7 @@ export const UserFriends = () => {
     return (
         <div className="flex flex-col my-20 mx-60 gap-10 min-h-[60vh]">
             <h2 className="text-2xl text-center font-bold">
-                {isSameUser ? "Your" : `${userName}'s`} wriends
+                {isSameUser ? "Your" : `${userName}'s`} friends
             </h2>
             {user.receivedFriendRequests.length > 0 && isSameUser && (
                 <div className="flex flex-col gap-2">

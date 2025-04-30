@@ -1,14 +1,10 @@
-import { useEffect, useState } from "react";
 import {
     useLoaderData,
     useNavigate,
-    useParams,
     useRouteLoaderData,
 } from "react-router";
 
 import { MovieWatchList, User } from "../../../lib/entities";
-import { useAppSelector } from "../../../store/hooks";
-import { getUser } from "../../../lib/actions";
 import { MovieCard } from "../movies/MovieCard";
 import { Button } from "../../ui/Button";
 import { useAuthData } from "../../../hooks/useAuthData";

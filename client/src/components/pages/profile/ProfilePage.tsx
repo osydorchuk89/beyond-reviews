@@ -35,7 +35,7 @@ export const ProfilePage = () => {
         const date = new Date();
         await sendFriendRequest(authData.user.id, user.id);
         dispatch(
-            triggerFriendEvent(`new friend event at ${date.toISOString()}`)
+            triggerFriendEvent(`new friend event at ${date.toString()}`)
         );
     };
 

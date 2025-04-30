@@ -30,17 +30,29 @@ const friendEventSlice = createSlice({
     },
 });
 
+const messageEventSlice = createSlice({
+    name: "messageEvent",
+    initialState: "none",
+    reducers: {
+        triggerMessageEvent: (_, action) => {
+            return action.payload;
+        },
+    },
+});
+
 export const store = configureStore({
     reducer: {
         authEvent: authEventSlice.reducer,
         reviewEvent: reviewEventSlice.reducer,
         friendEvent: friendEventSlice.reducer,
+        messageEvent: messageEventSlice.reducer,
     },
 });
 
 export const { triggerAuthEvent } = authEventSlice.actions;
 export const { triggerReviewEvent } = reviewEventSlice.actions;
 export const { triggerFriendEvent } = friendEventSlice.actions;
+export const { triggerMessageEvent } = messageEventSlice.actions;
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

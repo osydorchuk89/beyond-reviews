@@ -58,7 +58,7 @@ export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData)
         const date = new Date();
         try {
             await sendMovieReview(movie.id, authData.user!.id, data);
-            dispatch(triggerReviewEvent(`new review event at ${date.toISOString()}`));
+            dispatch(triggerReviewEvent(`new review event at ${date.toString()}`));
             setHasRated(true);
             setIsEditing(false);
             reset();

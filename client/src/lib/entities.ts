@@ -80,3 +80,28 @@ export type MovieWatchList = {
     movieId: string;
     userId: string;
 };
+
+export type Message = {
+    id: string;
+    senderId: string;
+    sender: User;
+    recipientId: string;
+    recipient: User;
+    text: string;
+    date: Date | string;
+    wasRead: boolean;
+    dateSeparator?: string;
+};
+
+export type UsersMessages = {
+    senderId: string;
+    recipientId: string;
+    messages: Message[];
+};
+
+export type Friend = {
+    id: string;
+    firstName: string;
+    lastName: string;
+    photo: string;
+};

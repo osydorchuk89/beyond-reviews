@@ -40,7 +40,7 @@ export const MovieAdditionalInfo = ({
             await sendMovieToOrFromWatchlist(movie.id, userId!, hasSaved);
             setHasSaved((prevState) => !prevState);
             dispatch(
-                triggerReviewEvent(`new review event at ${date.toISOString()}`)
+                triggerReviewEvent(`new review event at ${date.toString()}`)
             );
         } catch (error: any) {
             console.log(error);

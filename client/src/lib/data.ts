@@ -9,6 +9,7 @@ export const profileNavLinks = [
     { text: "Reviews", to: "#" },
     { text: "Watchlist", to: "../watch-list" },
     { text: "Friends", to: "../friends" },
+    { text: "Messages", to: "../messages" },
     { text: "Settings", to: "#" },
 ];
 
