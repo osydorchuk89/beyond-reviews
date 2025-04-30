@@ -4,8 +4,9 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"npx tsc -w\"  \"nodemon dist/app.js\"",
-    "dev": "nodemon src/app.ts"
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",

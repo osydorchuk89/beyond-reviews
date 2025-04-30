@@ -6,7 +6,10 @@ import { ObjectId } from "mongodb";
 
 import { PrismaClient } from "../../generated/prisma";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL =
+    process.env.NODE_ENV === "production"
+        ? "http://beyond-reviews.eu-central-1.elasticbeanstalk.com"
+        : "http://localhost:3000";
 
 const prisma = new PrismaClient();
 

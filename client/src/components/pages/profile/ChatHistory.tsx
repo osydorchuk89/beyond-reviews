@@ -2,13 +2,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useForm } from "react-hook-form";
 
-import {
-    getChatHistory,
-    markMessageAsRead,
-    sendMessage,
-} from "../../../lib/actions";
+import { getChatHistory, sendMessage } from "../../../lib/actions";
 import { Button } from "../../ui/Button";
-import { Message, UsersMessages } from "../../../lib/entities";
+import { UsersMessages } from "../../../lib/entities";
 import { ChatHistoryMessage } from "./ChatHistoryMessage";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { triggerMessageEvent } from "../../../store";

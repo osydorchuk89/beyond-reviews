@@ -4,11 +4,11 @@ import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
 
-import { movieRouter } from "./routes/movies.ts";
-import { userRouter } from "./routes/users.ts";
-import { messageRouter } from "./routes/messages.ts";
-import { authRouter } from "./routes/auth.ts";
 import "./config/passport";
+import { movieRouter } from "./routes/movies";
+import { userRouter } from "./routes/users";
+import { messageRouter } from "./routes/messages";
+import { authRouter } from "./routes/auth";
 
 const app = express();
 
@@ -48,4 +48,4 @@ app.get("/", (_, res) => {
     res.send("Hello World!!!");
 });
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
