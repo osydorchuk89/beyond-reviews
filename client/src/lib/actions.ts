@@ -2,7 +2,7 @@ import axios from "axios";
 import { Message, UsersMessages } from "./entities";
 
 export const BASE_URL = import.meta.env.PROD
-    ? "http://beyond-reviews.eu-central-1.elasticbeanstalk.com"
+    ? "https://beyond-reviews.onrender.com"
     : "http://localhost:3000";
 
 export const sendRegistrationData = async (userData: FormData) => {

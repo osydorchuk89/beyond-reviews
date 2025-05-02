@@ -8,7 +8,7 @@ import { PrismaClient } from "../../generated/prisma";
 
 const BASE_URL =
     process.env.NODE_ENV === "production"
-        ? "http://beyond-reviews.eu-central-1.elasticbeanstalk.com"
+        ? "https://beyond-reviews.onrender.com"
         : "http://localhost:3000";
 
 const prisma = new PrismaClient();
