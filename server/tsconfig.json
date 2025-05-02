@@ -6,8 +6,6 @@
     "module": "NodeNext",
     "outDir": "dist",
     "lib": ["ES2022", "DOM"],
-    "strict": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "strict": true
   }
 }

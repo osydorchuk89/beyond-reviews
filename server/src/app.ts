@@ -4,11 +4,11 @@ import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
 
-import "./config/passport";
 import { movieRouter } from "./routes/movies";
 import { userRouter } from "./routes/users";
 import { messageRouter } from "./routes/messages";
 import { authRouter } from "./routes/auth";
+import "./config/passport";
 
 const app = express();
 
