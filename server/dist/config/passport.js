@@ -10,7 +10,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongodb_1 = require("mongodb");
 const prisma_1 = require("../../generated/prisma");
 const BASE_URL = process.env.NODE_ENV === "production"
-    ? "http://beyond-reviews.eu-central-1.elasticbeanstalk.com"
+    ? "https://beyond-reviews.onrender.com"
     : "http://localhost:3000";
 const prisma = new prisma_1.PrismaClient();
 passport_1.default.use(new passport_local_1.Strategy({ usernameField: "email", passwordField: "password" }, async (email, password, cb) => {

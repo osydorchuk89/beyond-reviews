@@ -8,11 +8,11 @@ const express_session_1 = __importDefault(require("express-session"));
 const passport_1 = __importDefault(require("passport"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
-require("./config/passport");
 const movies_1 = require("./routes/movies");
 const users_1 = require("./routes/users");
 const messages_1 = require("./routes/messages");
 const auth_1 = require("./routes/auth");
+require("./config/passport");
 const app = (0, express_1.default)();
 const corsOptions = {
     origin: [
