@@ -3,6 +3,7 @@ import session from "express-session";
 import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
+import MongoStore from "connect-mongo";
 
 import { movieRouter } from "./routes/movies";
 import { userRouter } from "./routes/users";
@@ -34,12 +35,7 @@ app.use(
         secret: process.env.EXPRESS_SESSION_SECRET!,
         resave: false,
         saveUninitialized: false,
-        cookie: {
-            secure: process.env.NODE_ENV === "production" ? true : false,
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            // httpOnly: true,
-            // maxAge: 1000 * 60 * 24,
-        },
+        store: MongoStore.create({ mongoUrl: process.env.DATABASE_URL! }),
     })
 );
 app.use(passport.initialize());
