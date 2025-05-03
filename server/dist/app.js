@@ -31,11 +31,16 @@ app.use((0, express_session_1.default)({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    // cookie: {
-    //     secure: process.env.NODE_ENV === "production" ? true : false,
-    //     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    // },
-    store: connect_mongo_1.default.create({ mongoUrl: process.env.DATABASE_URL }),
+    cookie: {
+        secure: process.env.NODE_ENV === "production" ? true : false,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        httpOnly: true,
+        maxAge: 1000 * 60 * 24,
+    },
+    store: connect_mongo_1.default.create({
+        mongoUrl: process.env.DATABASE_URL,
+        collectionName: "sessions",
+    }),
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
