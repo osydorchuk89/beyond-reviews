@@ -8,6 +8,7 @@ const express_session_1 = __importDefault(require("express-session"));
 const passport_1 = __importDefault(require("passport"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const connect_mongo_1 = __importDefault(require("connect-mongo"));
 const movies_1 = require("./routes/movies");
 const users_1 = require("./routes/users");
 const messages_1 = require("./routes/messages");
@@ -30,6 +31,11 @@ app.use((0, express_session_1.default)({
     secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    // cookie: {
+    //     secure: process.env.NODE_ENV === "production" ? true : false,
+    //     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    // },
+    store: connect_mongo_1.default.create({ mongoUrl: process.env.DATABASE_URL }),
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
