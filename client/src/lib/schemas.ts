@@ -52,9 +52,9 @@ export const LoginSchema = z.object({
     email: z
         .string()
         .trim()
-        .min(1, { message: "This field is required" })
+        .min(1, { message: "Email is required" })
         .email({ message: "Please enter a valid email" }),
-    password: z.string().trim().min(1, { message: "This field is required" }),
+    password: z.string().trim().min(1, { message: "Password is required" }),
 });
 
 export const ReviewSchema = z.object({

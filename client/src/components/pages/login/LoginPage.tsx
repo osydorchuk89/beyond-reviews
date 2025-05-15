@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "../../../lib/schemas";
 import { Button } from "../../ui/Button";
 import { NavLink } from "../../ui/NavLink";
 import { SocialLoginButton } from "../../ui/SocialLoginButton";
 import { sendLoginData } from "../../../lib/actions";
-import { useNavigate } from "react-router";
 import { useAppDispatch } from "../../../store/hooks";
 import { triggerAuthEvent } from "../../../store";
 import { CloseIcon } from "../../icons/CloseIcon";
@@ -55,6 +56,7 @@ export const LoginPage = () => {
                         <button
                             className="ml-3"
                             onClick={() => setInvalidCredentials(false)}
+                            data-testid="close-button"
                         >
                             <CloseIcon />
                         </button>
@@ -64,6 +66,7 @@ export const LoginPage = () => {
                     noValidate
                     className="flex flex-col justify-start md:w-[26rem] bg-sky-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5"
                     onSubmit={handleLogin}
+                    data-testid="login-form"
                 >
                     <p className="text-2xl font-bold text-center">
                         Login to your account

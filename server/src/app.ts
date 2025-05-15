@@ -4,6 +4,7 @@ import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
 import MongoStore from "connect-mongo";
+import "dotenv/config";
 
 import { movieRouter } from "./routes/movies";
 import { userRouter } from "./routes/users";
