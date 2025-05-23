@@ -1,5 +1,6 @@
-import bcrypt from "bcrypt";
 import { Router } from "express";
+import bcrypt from "bcryptjs";
+
 import { PrismaClient } from "../../generated/prisma";
 import { fileUpload } from "../lib/upload";
 import { UserSchema } from "../lib/schemas";
@@ -139,25 +140,6 @@ userRouter.get("/:userId/activities", async (req, res) => {
                     },
                 },
             });
-            // const activities = await Activity.find({ userId })
-            //     .populate("movieId", ["title", "releaseYear", "poster"])
-            //     .populate("userId", ["firstName", "lastName", "photo"])
-            //     .populate("otherUserId", ["firstName", "lastName"])
-            //     .populate({
-            //         path: "ratingId",
-            //         populate: {
-            //             path: "userId",
-            //             select: "firstName lastName",
-            //         },
-            //     })
-            //     .populate({
-            //         path: "ratingId",
-            //         populate: {
-            //             path: "movieId",
-            //             select: "_id title releaseYear",
-            //         },
-            //     });
-            // res.send({ activities, user });
             res.send(activities);
         } else {
             res.status(500).send({
@@ -241,15 +223,6 @@ userRouter.post("/:userId/friends", async (req, res) => {
     const { userId } = req.params;
     const { otherUserId } = req.body;
     try {
-        // const user = await prisma.user.findUnique({
-        //     where: { id: userId },
-        //     include: { friends: true },
-        // });
-        // const otherUser = await prisma.user.findUnique({
-        //     where: { id: otherUserId },
-        //     include: { friends: true },
-        // });
-        // if (user && otherUser) {
         const userWithFriend = await prisma.user.findUnique({
             where: { id: userId },
             select: {
@@ -295,9 +268,6 @@ userRouter.post("/:userId/friends", async (req, res) => {
             res.status(409).send({
                 message: "The user is already on the friend list",
             });
-        // } else {
-        //     res.status(500).send({ message: "Cannot find user" });
-        // }
     } catch (error: any) {
         res.status(500).send({ message: error.message });
     }

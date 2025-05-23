@@ -9,6 +9,7 @@ const passport_1 = __importDefault(require("passport"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const connect_mongo_1 = __importDefault(require("connect-mongo"));
+require("dotenv/config");
 const movies_1 = require("./routes/movies");
 const users_1 = require("./routes/users");
 const messages_1 = require("./routes/messages");
@@ -51,4 +52,4 @@ app.use("/auth", auth_1.authRouter);
 app.get("/", (_, res) => {
     res.send("Hello World!!!");
 });
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 8080);

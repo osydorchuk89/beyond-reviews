@@ -6,12 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const passport_1 = __importDefault(require("passport"));
 const passport_local_1 = require("passport-local");
 const passport_google_oauth20_1 = require("passport-google-oauth20");
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongodb_1 = require("mongodb");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const prisma_1 = require("../../generated/prisma");
 const BASE_URL = process.env.NODE_ENV === "production"
-    ? "https://beyond-reviews.onrender.com"
-    : "http://localhost:3000";
+    ? "https://beyond-reviews-193634881435.europe-west1.run.app"
+    : "http://localhost:8080";
 const prisma = new prisma_1.PrismaClient();
 passport_1.default.use(new passport_local_1.Strategy({ usernameField: "email", passwordField: "password" }, async (email, password, cb) => {
     try {
@@ -20,7 +20,7 @@ passport_1.default.use(new passport_local_1.Strategy({ usernameField: "email", p
             return cb(null, false, { message: "User not found" });
         }
         if (user.password) {
-            const isValid = await bcrypt_1.default.compare(password, user.password);
+            const isValid = await bcryptjs_1.default.compare(password, user.password);
             if (!isValid) {
                 return cb(null, false, { message: "Invalid password" });
             }

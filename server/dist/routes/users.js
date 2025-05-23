@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const express_1 = require("express");
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const prisma_1 = require("../../generated/prisma");
 const upload_1 = require("../lib/upload");
 const schemas_1 = require("../lib/schemas");
@@ -39,7 +39,7 @@ exports.userRouter.post("/", upload_1.fileUpload.single("photo"), async (req, re
             });
         }
         else {
-            const hashedPassword = await bcrypt_1.default.hash(validatedData.password, 12);
+            const hashedPassword = await bcryptjs_1.default.hash(validatedData.password, 12);
             validatedData.password = hashedPassword;
             // const user = new User(validatedData);
             try {
@@ -143,25 +143,6 @@ exports.userRouter.get("/:userId/activities", async (req, res) => {
                     },
                 },
             });
-            // const activities = await Activity.find({ userId })
-            //     .populate("movieId", ["title", "releaseYear", "poster"])
-            //     .populate("userId", ["firstName", "lastName", "photo"])
-            //     .populate("otherUserId", ["firstName", "lastName"])
-            //     .populate({
-            //         path: "ratingId",
-            //         populate: {
-            //             path: "userId",
-            //             select: "firstName lastName",
-            //         },
-            //     })
-            //     .populate({
-            //         path: "ratingId",
-            //         populate: {
-            //             path: "movieId",
-            //             select: "_id title releaseYear",
-            //         },
-            //     });
-            // res.send({ activities, user });
             res.send(activities);
         }
         else {
@@ -249,15 +230,6 @@ exports.userRouter.post("/:userId/friends", async (req, res) => {
     const { userId } = req.params;
     const { otherUserId } = req.body;
     try {
-        // const user = await prisma.user.findUnique({
-        //     where: { id: userId },
-        //     include: { friends: true },
-        // });
-        // const otherUser = await prisma.user.findUnique({
-        //     where: { id: otherUserId },
-        //     include: { friends: true },
-        // });
-        // if (user && otherUser) {
         const userWithFriend = await prisma.user.findUnique({
             where: { id: userId },
             select: {
@@ -304,9 +276,6 @@ exports.userRouter.post("/:userId/friends", async (req, res) => {
             res.status(409).send({
                 message: "The user is already on the friend list",
             });
-        // } else {
-        //     res.status(500).send({ message: "Cannot find user" });
-        // }
     }
     catch (error) {
         res.status(500).send({ message: error.message });

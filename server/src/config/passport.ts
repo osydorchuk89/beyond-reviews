@@ -1,15 +1,15 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
+import bcrypt from "bcryptjs";
 
 import { PrismaClient } from "../../generated/prisma";
 
 const BASE_URL =
     process.env.NODE_ENV === "production"
-        ? "https://beyond-reviews.onrender.com"
-        : "http://localhost:3000";
+        ? "https://beyond-reviews-193634881435.europe-west1.run.app"
+        : "http://localhost:8080";
 
 const prisma = new PrismaClient();
 

@@ -2,8 +2,8 @@ import axios from "axios";
 import { Message, UsersMessages } from "./entities";
 
 export const BASE_URL = import.meta.env.PROD
-    ? "https://beyond-reviews.onrender.com"
-    : "http://localhost:3000";
+    ? "https://beyond-reviews-193634881435.europe-west1.run.app"
+    : "http://localhost:8080";
 
 export const sendRegistrationData = async (userData: FormData) => {
     try {
