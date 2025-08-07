@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import { AuthData, Movie } from "../../../../lib/entities";
-import { useQueryClick } from "../../../../hooks/useQueryClick";
 import { useAppDispatch } from "../../../../store/hooks";
 import { triggerReviewEvent } from "../../../../store";
 import { addOrRemoveMovieFromWatchlist } from "../../../../lib/actions";
@@ -19,7 +18,6 @@ export const MovieAdditionalInfo = ({
     movie,
     authData,
 }: MovieAdditionalInfoProps) => {
-    // const handleQueryClick = useQueryClick();
     const navigate = useNavigate();
     const userId = authData.user?.id;
 
