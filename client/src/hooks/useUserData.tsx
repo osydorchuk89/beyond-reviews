@@ -6,15 +6,23 @@ import { getUser } from "../lib/actions";
 
 export const useUserData = (userId: string, initialUserData: User) => {
     const [user, setUser] = useState<User>(initialUserData);
+    const [isLoading, setIsLoading] = useState(false);
     const friendEvent = useAppSelector((state) => state.friendEvent);
 
     useEffect(() => {
         const fetchUser = async () => {
-            const userData = await getUser(userId);
-            setUser(userData);
+            setIsLoading(true);
+            try {
+                const userData = await getUser(userId);
+                setUser(userData);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            } finally {
+                setIsLoading(false);
+            }
         };
         fetchUser();
     }, [userId, friendEvent]);
 
-    return { user, setUser };
+    return { user, setUser, isLoading };
 };

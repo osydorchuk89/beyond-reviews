@@ -4,7 +4,6 @@ import { User, UserActivity } from "../../../../lib/entities";
 import { BaseButton } from "../../../ui/BaseButton";
 import { ActivityDetails } from "./ActivityDetails";
 import { ActivityOtherReview } from "./ActivityOtherReview";
-import { useAuthData } from "../../../../hooks/useAuthData";
 import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 import { useUserIdentity } from "../../../../hooks/useUserIdentity";
 
@@ -14,13 +13,12 @@ export const UserActivities = () => {
         userActivities: UserActivity[];
     };
 
-    const { authDataFetching } = useAuthData();
-    const { isSameUser, userName } = useUserIdentity(user);
+    const { isSameUser, userName, isLoading } = useUserIdentity(user);
 
     const reversedActivityData = [...userActivities].reverse();
     const navigate = useNavigate();
 
-    if (authDataFetching) {
+    if (isLoading) {
         return (
             <div className="flex justify-center items-center min-h-[80vh]">
                 <LoadingSpinner />

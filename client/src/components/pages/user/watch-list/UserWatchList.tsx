@@ -4,6 +4,7 @@ import { MovieWatchList, User } from "../../../../lib/entities";
 import { useUserIdentity } from "../../../../hooks/useUserIdentity";
 import { MovieCard } from "../../movies/MovieCard";
 import { BaseButton } from "../../../ui/BaseButton";
+import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 
 export const UserWatchList = () => {
     const { user } = useRouteLoaderData("userProfile") as {
@@ -12,9 +13,17 @@ export const UserWatchList = () => {
     const { userWatchList } = useLoaderData() as {
         userWatchList: MovieWatchList[];
     };
-    const { isSameUser, userName } = useUserIdentity(user);
+    const { isSameUser, userName, isLoading } = useUserIdentity(user);
 
     const navigate = useNavigate();
+
+    if (isLoading) {
+            return (
+                <div className="flex justify-center items-center min-h-[80vh]">
+                    <LoadingSpinner />
+                </div>
+            );
+        }
 
     return (
         <div className="flex flex-col gap-10 justify-center items-center min-h-[70vh]">

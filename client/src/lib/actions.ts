@@ -16,14 +16,15 @@ import {
 // Registration
 export const sendRegistrationData = async (userData: FormData) => {
     try {
-        await axiosInstance.post("/api/users/", userData, {
+        const response = await axiosInstance.post("/api/users/", userData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
-            withCredentials: false,
         });
+        return response;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 

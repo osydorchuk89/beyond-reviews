@@ -5,6 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UserSchema } from "../../../lib/schemas";
 import { BaseButton } from "../../ui/BaseButton";
 import { sendRegistrationData } from "../../../lib/actions";
+import { useAppDispatch } from "../../../store/hooks";
+import { triggerAuthEvent } from "../../../store";
 
 export type RegistrationInputs = {
     firstName: string;
@@ -25,6 +27,8 @@ export const RegistrationForm = () => {
         resolver: zodResolver(UserSchema),
     });
 
+    const dispatch = useAppDispatch();
+
     const handleRegistration = handleSubmit(async (data) => {
         const registrationData = new FormData();
         registrationData.append("firstName", data.firstName);
@@ -34,8 +38,14 @@ export const RegistrationForm = () => {
         data.photo && registrationData.append("photo", data.photo[0]);
 
         try {
-            await sendRegistrationData(registrationData);
-            navigate("/movies");
+            const response = await sendRegistrationData(registrationData);
+            dispatch(triggerAuthEvent("registered"));
+            if (response.status === 200 && response.data) {
+                dispatch(triggerAuthEvent("loggedIn"));
+                navigate("/");
+            } else {
+                console.log("Registration successful but auto-login failes");
+            }
         } catch (error: any) {
             if (error.response.status === 409) {
                 setError("email", {

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { PrismaClient } from "../../prisma/generated/prisma";
 import { UserSchema } from "../lib/schemas";
+import { login } from "./authController";
 
 const prisma = new PrismaClient();
 
@@ -36,8 +37,25 @@ export const registerNewUser = async (req: Request, res: Response) => {
             );
             validatedData.password = hashedPassword;
             try {
-                await prisma.user.create({ data: validatedData });
-                res.status(200).send();
+                const newUser = await prisma.user.create({
+                    data: validatedData,
+                    omit: { password: true },
+                });
+
+                req.login(newUser, (err) => {
+                    if (err) {
+                        console.error(
+                            "Auto-login error after registration:",
+                            err
+                        );
+                        return res.status(201).send({
+                            message:
+                                "User created successfully, please login manually",
+                        });
+                    }
+
+                    login(req, res);
+                });
             } catch (error: any) {
                 res.status(500).send({ message: error.message });
             }

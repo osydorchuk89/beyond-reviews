@@ -19,7 +19,10 @@ export const ProfilePage = () => {
     };
     const { authData, authDataFetching } = useAuthData();
 
-    const { user } = useUserData(userId, initialUserData);
+    const { user, isLoading: userDataLoading } = useUserData(
+        userId,
+        initialUserData
+    );
     const { isSameUser } = useUserIdentity(user);
 
     const friendRequestSent = user.receivedFriendRequests.some(
@@ -37,7 +40,7 @@ export const ProfilePage = () => {
         dispatch(triggerFriendEvent(`new friend event at ${date.toString()}`));
     };
 
-    if (authDataFetching) {
+    if (authDataFetching || userDataLoading) {
         return (
             <div className="flex justify-center items-center min-h-[80vh]">
                 <LoadingSpinner />

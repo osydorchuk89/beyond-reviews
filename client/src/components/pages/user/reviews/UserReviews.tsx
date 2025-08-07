@@ -1,7 +1,6 @@
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { MovieReview, User } from "../../../../lib/entities";
-import { useAuthData } from "../../../../hooks/useAuthData";
 import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 import { MovieReviewDetails } from "./MovieReviewDetails";
 import { useUserIdentity } from "../../../../hooks/useUserIdentity";
@@ -13,11 +12,9 @@ export const UserReviews = () => {
         userMovieReviews: MovieReview[];
     };
 
-    const { authDataFetching } = useAuthData();
+    const { isSameUser, userName, isLoading } = useUserIdentity(user);
 
-    const { isSameUser, userName } = useUserIdentity(user);
-
-    if (authDataFetching) {
+    if (isLoading) {
         return (
             <div className="flex justify-center items-center min-h-[80vh]">
                 <LoadingSpinner />
@@ -37,7 +34,9 @@ export const UserReviews = () => {
                     ))}
                 </ul>
             ) : (
-                <p>No movie reviews yet</p>
+                <div className="flex items-center justify-center">
+                    <p>No movie reviews yet</p>
+                </div>
             )}
         </div>
     );
