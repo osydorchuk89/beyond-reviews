@@ -1,8 +1,8 @@
 # Beyond Reviews
 
-A full-stack web application for reviewing movies built with React, express, and MongoDB.
+A full-stack web application for reviewing movies built with React, express, and MongoDB. The live app is available [here](https://beyond-reviews-smoc.onrender.com/).
 
-## 🚀 Features
+## Features
 
 -   User authentication with Google OAuth
 -   Browse and filter movies by genre, year, and director
@@ -11,7 +11,7 @@ A full-stack web application for reviewing movies built with React, express, and
 -   Messaging between users
 -   Friend system and activity feeds
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 **Frontend:**
 
@@ -27,7 +27,9 @@ A full-stack web application for reviewing movies built with React, express, and
 -   Prisma ORM with MongoDB
 -   Passport.js for authentication
 
-## 📋 Prerequisites
+## Local Installation
+
+### Prerequisites
 
 Before running this application, make sure you have the following installed:
 
@@ -35,12 +37,10 @@ Before running this application, make sure you have the following installed:
 -   [MongoDB](https://www.mongodb.com/) (local installation or MongoDB Atlas account)
 -   [Git](https://git-scm.com/)
 
-## 🚀 Getting Started
-
 ### 1. Clone the Repository
 
 ```bash
-git clone -b v2 https://github.com/osydorchuk89/beyond-reviews.git
+git clone https://github.com/osydorchuk89/beyond-reviews.git
 cd beyond-reviews
 ```
 
