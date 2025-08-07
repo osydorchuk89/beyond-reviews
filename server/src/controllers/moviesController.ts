@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "../../prisma/generated/prisma";
 import { ReviewSchema } from "../lib/schemas";
 
 const prisma = new PrismaClient();

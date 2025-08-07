@@ -27,6 +27,14 @@ A full-stack web application for reviewing movies built with React, express, and
 -   Prisma ORM with MongoDB
 -   Passport.js for authentication
 
+## 📋 Prerequisites
+
+Before running this application, make sure you have the following installed:
+
+-   [Node.js](https://nodejs.org/)
+-   [MongoDB](https://www.mongodb.com/) (local installation or MongoDB Atlas account)
+-   [Git](https://git-scm.com/)
+
 ## 🚀 Getting Started
 
 ### 1. Clone the Repository
@@ -45,26 +53,14 @@ cd server
 npm install
 ```
 
-Create a .env file in the server directory:
+Create a .env file in the server directory and add the following environment variables:
 
-# Database
-
-DATABASE_URL="your_mongodb_connection_string"
-
-# Google OAuth
-
-GOOGLE_CLIENT_ID="your_google_client_id"
-GOOGLE_CLIENT_SECRET="your_google_client_secret"
-
-# Session Secret
-
-SESSION_SECRET="your_session_secret_key"
-
-Generate Prisma client:
-
-```bash
-npx prisma generate
-```
+-   `AWS_S3_ACCESS_KEY`
+-   `AWS_S3_SECRET_ACCESS_KEY`
+-   `DATABASE_URL`
+-   `EXPRESS_SESSION_SECRET`
+-   `GOOGLE_CLIENT_ID`
+-   `GOOGLE_CLIENT_SECRET`
 
 ### 3. Set Up the Client
 
@@ -73,12 +69,6 @@ Open a new terminal, navigate to the client directory and install dependencies:
 ```bash
 cd client
 npm install
-```
-
-Create a .env file in the client directory (if needed):
-
-```bash
-VITE_API_BASE_URL="http://localhost:8080"
 ```
 
 ### 4. Run the Application

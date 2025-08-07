@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "../../prisma/generated/prisma";
 import { UserSchema } from "../lib/schemas";
 
 const prisma = new PrismaClient();

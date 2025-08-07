@@ -32,9 +32,6 @@ model User {
     friendOfIds            String[]          @db.ObjectId
     sentFriendRequests     FriendRequest[]   @relation("sentUser")
     receivedFriendRequests FriendRequest[]   @relation("receivedUser")
-    // friend                 User?             @relation(fields: [friendId], references: [id], name: "userFriends", onDelete: NoAction, onUpdate: NoAction)
-    // friendId               String?           @db.ObjectId
-    // friends                User[]            @relation(name: "userFriends")
     sentMessages           Message[]         @relation("sender")
     receivedMessages       Message[]         @relation("recipient")
 }

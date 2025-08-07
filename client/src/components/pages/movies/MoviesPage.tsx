@@ -28,7 +28,7 @@ export const MoviesPage = () => {
         filters.push(`Year: ${moviesData.appliedFilters.releaseYear}`);
     }
     if (moviesData.appliedFilters.director) {
-        filters.push(`Director: ${moviesData.appliedFilters.director}`); // Add director to subtitle
+        filters.push(`Director: ${moviesData.appliedFilters.director}`);
     }
     if (moviesData.appliedFilters.search) {
         filters.push(`Search: "${moviesData.appliedFilters.search}"`);

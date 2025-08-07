@@ -4,7 +4,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "../../prisma/generated/prisma";
 
 const BASE_URL =
     process.env.NODE_ENV === "production"
