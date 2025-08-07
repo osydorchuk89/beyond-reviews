@@ -1,4 +1,4 @@
-import { Movie } from "../../../lib/entities";
+import { Movie } from "../../../../lib/entities";
 
 export const MovieMainInfo = ({ movie }: { movie: Movie }) => {
     return (

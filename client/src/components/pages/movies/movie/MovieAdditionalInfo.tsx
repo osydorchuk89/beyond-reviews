@@ -1,13 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
-import { AuthData, Movie } from "../../../lib/entities";
-import { StarIcon } from "../../icons/StarIcon";
-import { QueryLink } from "../../ui/QueryLink";
-import { useQueryClick } from "../../../hooks/useQueryClick";
-import { BookMarkIcon } from "../../icons/BookMarkIcon";
-import { sendMovieToOrFromWatchlist } from "../../../lib/actions";
-import { useAppDispatch } from "../../../store/hooks";
-import { triggerReviewEvent } from "../../../store";
+import { AuthData, Movie } from "../../../../lib/entities";
+import { useQueryClick } from "../../../../hooks/useQueryClick";
+import { useAppDispatch } from "../../../../store/hooks";
+import { triggerReviewEvent } from "../../../../store";
+import { addOrRemoveMovieFromWatchlist } from "../../../../lib/actions";
+import { BookMarkIcon } from "../../../icons/BookMarkIcon";
+import { QueryLink } from "../../../ui/QueryLink";
+import { StarIcon } from "../../../icons/StarIcon";
 
 interface MovieAdditionalInfoProps {
     movie: Movie;
@@ -18,8 +19,8 @@ export const MovieAdditionalInfo = ({
     movie,
     authData,
 }: MovieAdditionalInfoProps) => {
-    const handleQueryClick = useQueryClick();
-
+    // const handleQueryClick = useQueryClick();
+    const navigate = useNavigate();
     const userId = authData.user?.id;
 
     const hasUserSavedMovie = movie.onWatchList.some(
@@ -34,10 +35,24 @@ export const MovieAdditionalInfo = ({
 
     const dispatch = useAppDispatch();
 
+    const handleFilterNavigation = (paramType: string, value: string) => {
+        const searchParams = new URLSearchParams();
+
+        if (paramType === "genre") {
+            searchParams.set("genre", value);
+        } else if (paramType === "releaseYear") {
+            searchParams.set("releaseYear", value);
+        } else if (paramType === "director") {
+            searchParams.set("director", value);
+        }
+
+        navigate(`/movies?${searchParams.toString()}`);
+    };
+
     const saveMovie = async () => {
         const date = new Date();
         try {
-            await sendMovieToOrFromWatchlist(movie.id, userId!, hasSaved);
+            await addOrRemoveMovieFromWatchlist(movie.id, userId!, hasSaved);
             setHasSaved((prevState) => !prevState);
             dispatch(
                 triggerReviewEvent(`new review event at ${date.toString()}`)
@@ -83,14 +98,19 @@ export const MovieAdditionalInfo = ({
                 Directed by:{" "}
                 <QueryLink
                     text={movie.director}
-                    onClick={() => handleQueryClick("director", movie.director)}
+                    onClick={() =>
+                        handleFilterNavigation("director", movie.director)
+                    }
                 />
             </p>
             <p>
                 <QueryLink
                     text={movie.releaseYear.toString()}
                     onClick={() =>
-                        handleQueryClick("year", movie.releaseYear.toString())
+                        handleFilterNavigation(
+                            "releaseYear",
+                            movie.releaseYear.toString()
+                        )
                     }
                 />
             </p>
@@ -99,7 +119,9 @@ export const MovieAdditionalInfo = ({
                     <span key={item}>
                         <QueryLink
                             text={item}
-                            onClick={() => handleQueryClick("genre", item)}
+                            onClick={() =>
+                                handleFilterNavigation("genre", item)
+                            }
                         />
                         {index !== movie.genres.length - 1 && " | "}
                     </span>

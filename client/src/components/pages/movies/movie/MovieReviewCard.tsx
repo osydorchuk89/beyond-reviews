@@ -1,14 +1,14 @@
 import { RefObject, useRef, useState } from "react";
 import { useLocation } from "react-router";
 
-import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
-import { NavLink } from "../../ui/NavLink";
-import { StarIcon } from "../../icons/StarIcon";
-import { LikeIcon } from "../../icons/LikeIcon";
-import { useAppDispatch } from "../../../store/hooks";
-import { triggerReviewEvent } from "../../../store";
-import { MovieReview } from "../../../lib/entities";
-import { sendLikeOrUnlike } from "../../../lib/actions";
+import { MovieReview } from "../../../../lib/entities";
+import { useAppDispatch } from "../../../../store/hooks";
+import { sendLikeOrUnlike } from "../../../../lib/actions";
+import { triggerReviewEvent } from "../../../../store";
+import { useTruncatedElement } from "../../../../hooks/useTruncatedElements";
+import { NavLink } from "../../../ui/NavLink";
+import { StarIcon } from "../../../icons/StarIcon";
+import { LikeIcon } from "../../../icons/LikeIcon";
 
 interface MovieReviewCardProps {
     movieReview: MovieReview;
@@ -41,9 +41,7 @@ export const MovieReviewCard = ({
         const date = new Date();
         await sendLikeOrUnlike(movieId, movieReview.id, userId!, hasLiked);
         setHasLiked((prevState) => !prevState);
-        dispatch(
-            triggerReviewEvent(`new review event at ${date.toString()}`)
-        );
+        dispatch(triggerReviewEvent(`new review event at ${date.toString()}`));
     };
 
     let likeClassName = "w-6 h-6 hover:cursor-pointer";

@@ -2,15 +2,15 @@ import { useRef, useState, RefObject } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { AuthData, Movie, MovieReview } from "../../../lib/entities";
-import { NavLink } from "../../ui/NavLink";
-import { ReviewSchema } from "../../../lib/schemas";
-import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
-import { StarIcon } from "../../icons/StarIcon";
-import { Button } from "../../ui/Button";
-import { sendMovieReview } from "../../../lib/actions";
-import { useAppDispatch } from "../../../store/hooks";
-import { triggerReviewEvent } from "../../../store";
+import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
+import { ReviewSchema } from "../../../../lib/schemas";
+import { useAppDispatch } from "../../../../store/hooks";
+import { sendMovieReview } from "../../../../lib/actions";
+import { triggerReviewEvent } from "../../../../store";
+import { useTruncatedElement } from "../../../../hooks/useTruncatedElements";
+import { StarIcon } from "../../../icons/StarIcon";
+import { BaseButton } from "../../../ui/BaseButton";
+import { NavLink } from "../../../ui/NavLink";
 
 interface MovieData {
     movie: Movie;
@@ -23,25 +23,30 @@ interface ReviewInputs {
     text?: string;
 }
 
-export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData) => {
+export const MovieReviewSection = ({
+    movie,
+    movieReviews,
+    authData,
+}: MovieData) => {
     let userRating = 0;
     let userReview = "";
 
     if (authData.user) {
         userRating =
-            movieReviews?.filter(
-                (item) => item.userId === authData.user?.id
-            )[0]?.rating || 0;
+            movieReviews?.filter((item) => item.userId === authData.user?.id)[0]
+                ?.rating || 0;
         userReview =
-            movieReviews?.filter(
-                (item) => item.userId === authData.user?.id
-            )[0]?.text || "";
+            movieReviews?.filter((item) => item.userId === authData.user?.id)[0]
+                ?.text || "";
     }
 
     const [isEditing, setIsEditing] = useState(false);
     const [rating, setRating] = useState(userRating);
     const [hover, setHover] = useState(userRating);
     const [hasRated, setHasRated] = useState(userRating > 0 ? true : false);
+
+    const [localUserRating, setLocalUserRating] = useState(userRating);
+    const [localUserReview, setLocalUserReview] = useState(userReview);
 
     const {
         register,
@@ -54,18 +59,31 @@ export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData)
     });
 
     const dispatch = useAppDispatch();
+
     const handleUserReview = handleSubmit(async (data: ReviewInputs) => {
         const date = new Date();
         try {
+            setLocalUserRating(data.rating);
+            setLocalUserReview(data.text || "");
+
             await sendMovieReview(movie.id, authData.user!.id, data);
-            dispatch(triggerReviewEvent(`new review event at ${date.toString()}`));
+            dispatch(
+                triggerReviewEvent(`new review event at ${date.toString()}`)
+            );
             setHasRated(true);
             setIsEditing(false);
             reset();
-        } catch (error: any) {
+        } catch (error) {
+            setLocalUserRating(userRating);
+            setLocalUserReview(userReview);
             console.log(error);
         }
     });
+
+    // local state for display
+    const displayRating = localUserRating;
+    const displayReview = localUserReview;
+
     const editUserReview = () => {
         setValue("rating", userRating, {
             shouldValidate: true,
@@ -81,10 +99,6 @@ export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData)
     const ref = useRef<HTMLParagraphElement>(null);
     const { isTruncated, isShowingMore, toggleIsShowingMore } =
         useTruncatedElement({ ref: ref as RefObject<HTMLParagraphElement> });
-
-    // if (authStatusFetching) {
-    //     return;
-    // }
 
     return (
         <div>
@@ -139,19 +153,23 @@ export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData)
                         </div>
                         {isEditing ? (
                             <div className="flex gap-10">
-                                <Button
+                                <BaseButton
                                     style="orange"
                                     type="submit"
                                     text="EDIT"
                                 />
-                                <Button
+                                <BaseButton
                                     style="orange"
                                     text="CANCEL"
                                     handleClick={() => setIsEditing(false)}
                                 />
                             </div>
                         ) : (
-                            <Button style="orange" type="submit" text="SEND" />
+                            <BaseButton
+                                style="orange"
+                                type="submit"
+                                text="SEND"
+                            />
                         )}
                     </form>
                 )}
@@ -161,18 +179,17 @@ export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData)
                             <span className="font-bold">
                                 Your rating:{" "}
                                 <span className="font-normal">
-                                    {userRating}/10
+                                    {displayRating}/10
                                 </span>
                             </span>
                         </div>
                         <div>
-                            {" "}
                             <p className="font-bold">Your review: </p>
                             <p
                                 ref={ref}
                                 className={!isShowingMore ? "line-clamp-5" : ""}
                             >
-                                {userReview || "N/A"}
+                                {displayReview || "N/A"}
                             </p>
                             {isTruncated && (
                                 <div>
@@ -188,7 +205,7 @@ export const MovieReviewSection = ({ movie, movieReviews, authData }: MovieData)
                             )}
                         </div>
                         <div className="flex justify-start">
-                            <Button
+                            <BaseButton
                                 text="EDIT YOUR REVIEW"
                                 style="orange"
                                 handleClick={editUserReview}

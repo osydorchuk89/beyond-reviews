@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
 import { useParams, useRouteLoaderData } from "react-router";
 
-import { NavLink } from "../../ui/NavLink";
-import { Button } from "../../ui/Button";
-import { useAuthData } from "../../../hooks/useAuthData";
-import { getUser, sendFriendRequest } from "../../../lib/actions";
-import { User } from "../../../lib/entities";
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
-import { profileNavLinks } from "../../../lib/data";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { triggerFriendEvent } from "../../../store";
+import { User } from "../../../../lib/entities";
+import { useAuthData } from "../../../../hooks/useAuthData";
+import { useUserData } from "../../../../hooks/useUserData";
+import { useUserIdentity } from "../../../../hooks/useUserIdentity";
+import { useAppDispatch } from "../../../../store/hooks";
+import { sendFriendRequest } from "../../../../lib/actions";
+import { triggerFriendEvent } from "../../../../store";
+import { LoadingSpinner } from "../../../ui/LoadingSpinner";
+import { profileNavLinks } from "../../../../lib/data";
+import { NavLink } from "../../../ui/NavLink";
+import { BaseButton } from "../../../ui/BaseButton";
 
 export const ProfilePage = () => {
     const { userId } = useParams() as { userId: string };
@@ -18,36 +19,23 @@ export const ProfilePage = () => {
     };
     const { authData, authDataFetching } = useAuthData();
 
-    const [user, setUser] = useState(initialUserData);
+    const { user } = useUserData(userId, initialUserData);
+    const { isSameUser } = useUserIdentity(user);
 
-    const isSameUser = (authData.user && user.id === authData.user.id) || false;
     const friendRequestSent = user.receivedFriendRequests.some(
-        (request) => request.sentUserId === authData.user.id
+        (request) => request.sentUserId === authData.user?.id
     );
 
     const areFriends =
-        (authData.user &&
-            user.friends.some((friend) => friend.id === authData.user.id)) ||
-        false;
+        authData.user &&
+        user.friends.some((friend) => friend.id === authData.user.id);
 
     const dispatch = useAppDispatch();
     const handleFriendRequest = async () => {
         const date = new Date();
         await sendFriendRequest(authData.user.id, user.id);
-        dispatch(
-            triggerFriendEvent(`new friend event at ${date.toString()}`)
-        );
+        dispatch(triggerFriendEvent(`new friend event at ${date.toString()}`));
     };
-
-    const friendEvent = useAppSelector((state) => state.friendEvent);
-    console.log(friendEvent);
-    useEffect(() => {
-        const fetchUser = async () => {
-            const user = await getUser(userId);
-            setUser(user);
-        };
-        fetchUser();
-    }, [friendEvent]);
 
     if (authDataFetching) {
         return (
@@ -56,9 +44,8 @@ export const ProfilePage = () => {
             </div>
         );
     }
-
     return (
-        <div className="flex flex-col justify-between my-20 mx-48 p-5 rounded-lg shadow-lg bg-sky-100 gap-10 min-h-[60vh]">
+        <div className="flex flex-col justify-between p-5 rounded-lg shadow-lg bg-sky-100 gap-10 min-h-[70vh] md:w-2/3">
             <p className="text-center text-2xl font-bold">
                 {user.firstName} {user.lastName}
             </p>
@@ -67,13 +54,24 @@ export const ProfilePage = () => {
                 className="object-cover object-top w-32 h-32 rounded-full self-center"
             />
             <ul className="flex flex-col items-center gap-5 text-lg">
-                {profileNavLinks.map((link) => (
-                    <NavLink key={link.text} to={link.to} text={link.text} />
-                ))}
+                {profileNavLinks
+                    .filter(
+                        (link) =>
+                            isSameUser ||
+                            (link.text !== "Messages" &&
+                                link.text !== "Settings")
+                    )
+                    .map((link) => (
+                        <NavLink
+                            key={link.text}
+                            to={link.to}
+                            text={link.text}
+                        />
+                    ))}
             </ul>
             <div className="flex justify-center">
                 {authData.user && !isSameUser && !areFriends && (
-                    <Button
+                    <BaseButton
                         text={
                             friendRequestSent
                                 ? "FRIEND REQUEST SENT"
@@ -85,7 +83,6 @@ export const ProfilePage = () => {
                         }
                     />
                 )}
-                {areFriends && <p>You are friends!</p>}
             </div>
         </div>
     );

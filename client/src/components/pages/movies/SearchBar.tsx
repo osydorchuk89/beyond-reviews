@@ -1,7 +1,8 @@
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "../../ui/Button";
-import { CloseIcon } from "../../icons/CloseIcon";
 import { useSearchParams } from "react-router";
+import { useForm, SubmitHandler } from "react-hook-form";
+
+import { BaseButton } from "../../ui/BaseButton";
+import { CloseIcon } from "../../icons/CloseIcon";
 
 interface SearchInput {
     title: string;
@@ -47,7 +48,7 @@ export const SearchBar = () => {
                     type="text"
                 />
                 <div className="flex justify-center md:justify-start gap-2 w-full">
-                    <Button style="orange" text="Search" type="submit" />
+                    <BaseButton style="orange" text="Search" type="submit" />
                     {searchTerm && searchTerm !== "" && (
                         <div className="flex items-center gap-2 bg-orange-300 rounded-md text-orange-950 p-2 overflow-hidden">
                             <span className="truncate">{searchTerm}</span>

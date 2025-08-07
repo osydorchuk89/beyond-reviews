@@ -6,7 +6,7 @@ import {
     useRouteLoaderData,
 } from "react-router";
 
-import { Button } from "../ui/Button";
+import { BaseButton } from "../ui/BaseButton";
 import { headerNavLinks } from "../../lib/data";
 import { getAuthData } from "../../lib/actions";
 import { useAppSelector } from "../../store/hooks";
@@ -81,7 +81,7 @@ export const Header = () => {
                     <LogoutButton />
                 </div>
             ) : (
-                <Button
+                <BaseButton
                     text="LOGIN"
                     style="orange"
                     handleClick={() => navigate("/login")}

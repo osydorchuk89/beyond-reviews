@@ -45,9 +45,9 @@ app.use((0, express_session_1.default)({
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
-app.use("/api/movies", movies_1.movieRouter);
-app.use("/api/users", users_1.userRouter);
-app.use("/api/messages", messages_1.messageRouter);
+app.use("/api/movies", movies_1.moviesRouter);
+app.use("/api/users", users_1.usersRouter);
+app.use("/api/messages", messages_1.messagesRouter);
 app.use("/auth", auth_1.authRouter);
 app.get("/", (_, res) => {
     res.send("Hello World!!!");

@@ -6,9 +6,9 @@ import bodyParser from "body-parser";
 import MongoStore from "connect-mongo";
 import "dotenv/config";
 
-import { movieRouter } from "./routes/movies";
-import { userRouter } from "./routes/users";
-import { messageRouter } from "./routes/messages";
+import { moviesRouter } from "./routes/movies";
+import { usersRouter } from "./routes/users";
+import { messagesRouter } from "./routes/messages";
 import { authRouter } from "./routes/auth";
 import "./config/passport";
 
@@ -51,9 +51,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api/movies", movieRouter);
-app.use("/api/users", userRouter);
-app.use("/api/messages", messageRouter);
+app.use("/api/movies", moviesRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/messages", messagesRouter);
 app.use("/auth", authRouter);
 
 app.get("/", (_, res) => {

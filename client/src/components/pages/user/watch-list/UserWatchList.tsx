@@ -1,13 +1,9 @@
-import {
-    useLoaderData,
-    useNavigate,
-    useRouteLoaderData,
-} from "react-router";
+import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router";
 
-import { MovieWatchList, User } from "../../../lib/entities";
-import { MovieCard } from "../movies/MovieCard";
-import { Button } from "../../ui/Button";
-import { useAuthData } from "../../../hooks/useAuthData";
+import { MovieWatchList, User } from "../../../../lib/entities";
+import { useUserIdentity } from "../../../../hooks/useUserIdentity";
+import { MovieCard } from "../../movies/MovieCard";
+import { BaseButton } from "../../../ui/BaseButton";
 
 export const UserWatchList = () => {
     const { user } = useRouteLoaderData("userProfile") as {
@@ -16,15 +12,12 @@ export const UserWatchList = () => {
     const { userWatchList } = useLoaderData() as {
         userWatchList: MovieWatchList[];
     };
-
-    const { authData } = useAuthData();
-    const isSameUser = (authData.user && user.id === authData.user.id) || false;
-    const userName = `${user.firstName} ${user.lastName}`;
+    const { isSameUser, userName } = useUserIdentity(user);
 
     const navigate = useNavigate();
 
     return (
-        <div className="flex flex-col my-20 mx-60 gap-10 justify-center items-center min-h-[60vh]">
+        <div className="flex flex-col gap-10 justify-center items-center min-h-[70vh]">
             <h2 className="text-2xl text-center font-bold">
                 {isSameUser ? "Your" : `${userName}'s`} watchlist
             </h2>
@@ -50,7 +43,7 @@ export const UserWatchList = () => {
                         {isSameUser ? "your" : `${userName}'s`} watchlist
                     </p>
                     {isSameUser && (
-                        <Button
+                        <BaseButton
                             text="EXPLORE MOVIES"
                             style="orange"
                             handleClick={() => navigate("/movies")}

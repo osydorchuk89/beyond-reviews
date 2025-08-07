@@ -1,29 +1,24 @@
-import {
-    useLoaderData,
-    useNavigate,
-    useParams,
-    useRouteLoaderData,
-} from "react-router";
+import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router";
 
-import { User, UserActivity } from "../../../lib/entities";
-import { Button } from "../../ui/Button";
+import { User, UserActivity } from "../../../../lib/entities";
+import { BaseButton } from "../../../ui/BaseButton";
 import { ActivityDetails } from "./ActivityDetails";
 import { ActivityOtherReview } from "./ActivityOtherReview";
-import { useAuthData } from "../../../hooks/useAuthData";
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
+import { useAuthData } from "../../../../hooks/useAuthData";
+import { LoadingSpinner } from "../../../ui/LoadingSpinner";
+import { useUserIdentity } from "../../../../hooks/useUserIdentity";
 
 export const UserActivities = () => {
     const { user } = useRouteLoaderData("userProfile") as { user: User };
-    const { userActivities } = useLoaderData();
-    const userName = `${user.firstName} ${user.lastName}`;
+    const { userActivities } = useLoaderData() as {
+        userActivities: UserActivity[];
+    };
 
-    const reversedActivityData: UserActivity[] = [...userActivities].reverse();
+    const { authDataFetching } = useAuthData();
+    const { isSameUser, userName } = useUserIdentity(user);
+
+    const reversedActivityData = [...userActivities].reverse();
     const navigate = useNavigate();
-
-    const { authData, authDataFetching } = useAuthData();
-
-    const { userId } = useParams();
-    const isSameUser = (authData.user && userId === authData.user.id) || false;
 
     if (authDataFetching) {
         return (
@@ -34,7 +29,7 @@ export const UserActivities = () => {
     }
 
     return (
-        <div className="flex flex-col my-20 mx-60 gap-10">
+        <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
             <p className="text-center text-2xl font-bold">
                 {isSameUser ? "Your" : `${userName}'s`} activities
             </p>
@@ -78,10 +73,11 @@ export const UserActivities = () => {
             {userActivities.length === 0 && (
                 <div className="flex flex-col items-center justify-center gap-10">
                     <p className="text-center text-lg">
-                        {isSameUser ? "You" : userName} have no activities
+                        {isSameUser ? "You have" : `${userName} has`} no
+                        activities
                     </p>
                     {isSameUser && (
-                        <Button
+                        <BaseButton
                             text="Explore movies"
                             style="orange"
                             handleClick={() => navigate("/movies")}

@@ -3,12 +3,16 @@ import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
-import { AuthData, Movie, MovieReview } from "../../../lib/entities";
-import { getAuthData, getMovie, getMovieReviews } from "../../../lib/actions";
-import { useAppSelector } from "../../../store/hooks";
 import { MovieReviewSection } from "./MovieReviewSection";
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { MovieReviews } from "./MovieReviews";
+import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
+import { useAppSelector } from "../../../../store/hooks";
+import {
+    getAuthData,
+    getMovie,
+    getMovieReviews,
+} from "../../../../lib/actions";
+import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 
 interface MovieData {
     movie: Movie;
@@ -16,23 +20,22 @@ interface MovieData {
 }
 
 export const MoviePage = () => {
-    let { movie, movieReviews }: MovieData = useLoaderData();
+    let { movie, movieReviews } = useLoaderData() as MovieData;
     const [movieData, setMovieData] = useState<Movie>(movie);
     const [movieReviewsData, setMovieReviewsData] =
         useState<MovieReview[]>(movieReviews);
     const reviewEvent = useAppSelector((state) => state.reviewEvent);
 
     useEffect(() => {
-        const fetchMovie = async () => {
-            const movieData = await getMovie(movie.id);
+        const fetchMovieData = async () => {
+            const [movieData, movieReviewsData] = await Promise.all([
+                getMovie(movie.id),
+                getMovieReviews(movie.id),
+            ]);
             setMovieData(movieData);
-        };
-        const fetchMovieReviews = async () => {
-            const movieReviewsData = await getMovieReviews(movie.id);
             setMovieReviewsData(movieReviewsData);
         };
-        fetchMovie();
-        fetchMovieReviews();
+        fetchMovieData();
     }, [reviewEvent]);
 
     const { authData: initialAuthData } = useRouteLoaderData("root");

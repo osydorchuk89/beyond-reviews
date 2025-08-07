@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { UserSchema } from "../../../lib/schemas";
-import { Button } from "../../ui/Button";
+import { BaseButton } from "../../ui/BaseButton";
 import { sendRegistrationData } from "../../../lib/actions";
 
 export type RegistrationInputs = {
@@ -129,7 +129,7 @@ export const RegistrationForm = () => {
                 </p>
             </div>
             <div className="flex justify-center">
-                <Button type="submit" style="sky" text="REGISTER" />
+                <BaseButton type="submit" style="sky" text="REGISTER" />
             </div>
         </form>
     );

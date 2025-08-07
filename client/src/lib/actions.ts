@@ -1,96 +1,115 @@
-import axios from "axios";
-import { Message, UsersMessages } from "./entities";
+import { AxiosResponse } from "axios";
 
-export const BASE_URL = import.meta.env.PROD
-    ? "https://beyond-reviews-193634881435.europe-west1.run.app"
-    : "http://localhost:8080";
+import axiosInstance from "./axiosInstance";
+import {
+    AuthData,
+    Message,
+    Movie,
+    MovieReview,
+    MoviesData,
+    MovieWatchList,
+    User,
+    UserActivity,
+    UsersMessages,
+} from "./entities";
 
+// Registration
 export const sendRegistrationData = async (userData: FormData) => {
     try {
-        await axios({
-            method: "post",
-            url: BASE_URL + "/api/users/",
+        await axiosInstance.post("/api/users/", userData, {
             headers: {
-                "Content-Type": "multi-part/formdata",
+                "Content-Type": "multipart/form-data",
             },
-            data: userData,
+            withCredentials: false,
         });
     } catch (error) {
         console.log(error);
     }
 };
 
+// Authentification
 export const sendLoginData = async (loginData: {
     email: string;
     password: string;
-}) => {
+}): Promise<AxiosResponse> => {
     try {
-        const response = await axios({
-            method: "post",
-            url: BASE_URL + "/auth/login",
-            withCredentials: true,
-            data: loginData,
-        });
+        const response = await axiosInstance.post("/auth/login", loginData);
         return response;
     } catch (error: any) {
         return error;
     }
 };
 
-export const getAuthData = async () => {
+export const getAuthData = async (): Promise<AuthData> => {
     try {
-        const response = await axios({
-            method: "get",
-            url: BASE_URL + "/auth/status",
-            withCredentials: true,
-        });
+        const response = await axiosInstance.get("/auth/status");
         return response.data;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 
-export const logout = async () => {
+export const logout = async (): Promise<AxiosResponse> => {
     try {
-        const response = await axios({
-            method: "get",
-            url: BASE_URL + "/auth/logout",
-            withCredentials: true,
-        });
+        const response = await axiosInstance.get("/auth/logout");
+        return response;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+// Movies
+export const getMovies = async (
+    page: number = 1,
+    limit: number = 15,
+    genre?: string,
+    releaseYear?: string,
+    director?: string,
+    sortBy?: string,
+    sortOrder?: string,
+    search?: string
+): Promise<MoviesData> => {
+    try {
+        const params: any = { page, limit };
+        if (genre) params.genre = genre;
+        if (releaseYear) params.releaseYear = releaseYear;
+        if (director) params.director = director;
+        if (sortBy) params.sortBy = sortBy;
+        if (sortOrder) params.sortOrder = sortOrder;
+        if (search) params.search = search;
+
+        const response = await axiosInstance.get("/api/movies", { params });
         return response.data;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 
-export const getMovies = async () => {
+export const getMovie = async (movieId: string): Promise<Movie> => {
     try {
-        const moviesResult = await axios.get(BASE_URL + "/api/movies/");
-        return moviesResult.data;
+        const response = await axiosInstance.get(`/api/movies/${movieId}`);
+        return response.data;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 
-export const getMovie = async (movieId: string) => {
+// Movie reviews
+export const getMovieReviews = async (
+    movieId: string
+): Promise<MovieReview[]> => {
     try {
-        const movieResult = await axios.get(
-            BASE_URL + `/api/movies/${movieId}`
+        const response = await axiosInstance.get(
+            `/api/movies/${movieId}/reviews`
         );
-        return movieResult.data;
+        return response.data;
     } catch (error) {
         console.log(error);
-    }
-};
-
-export const getMovieReviews = async (movieId: string) => {
-    try {
-        const movieReviewsResult = await axios.get(
-            BASE_URL + `/api/movies/${movieId}/reviews`
-        );
-        return movieReviewsResult.data;
-    } catch (error) {
-        console.log(error);
+        throw error;
     }
 };
 
@@ -101,18 +120,31 @@ export const sendMovieReview = async (
 ) => {
     const date = new Date();
     try {
-        const response = await axios({
-            method: "post",
-            url: `${BASE_URL}/api/movies/${movieId}/reviews`,
-            withCredentials: true,
-            data: { ...movieReviewData, userId: userId, date },
+        await axiosInstance.post(`/api/movies/${movieId}/reviews`, {
+            ...movieReviewData,
+            userId: userId,
+            date,
         });
-        return response;
-    } catch (error: any) {
-        return error;
+    } catch (error) {
+        console.log(error);
     }
 };
 
+export const getUserMovieReviews = async (
+    userId: string
+): Promise<MovieReview[]> => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/movie-reviews`
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+// Review likes
 export const sendLikeOrUnlike = async (
     movieId: string,
     reviewId: string,
@@ -120,69 +152,79 @@ export const sendLikeOrUnlike = async (
     hasLiked: boolean
 ) => {
     try {
-        await axios({
-            method: "put",
-            url: BASE_URL + `/api/movies/${movieId}/reviews/${reviewId}`,
-            withCredentials: true,
-            data: { like: !hasLiked, userId },
+        await axiosInstance.put(`/api/movies/${movieId}/reviews/${reviewId}`, {
+            like: !hasLiked,
+            userId,
         });
     } catch (error: any) {
         console.log(error);
     }
 };
 
-export const sendMovieToOrFromWatchlist = async (
+// Watch lists
+export const addOrRemoveMovieFromWatchlist = async (
     movieId: string,
     userId: string,
     hasSaved: boolean
 ) => {
     try {
-        await axios({
-            method: "put",
-            url: BASE_URL + `/api/movies/${movieId}`,
-            withCredentials: true,
-            data: { saved: hasSaved ? false : true, userId },
+        await axiosInstance.put(`/api/movies/${movieId}`, {
+            saved: !hasSaved,
+            userId,
         });
     } catch (error: any) {
         console.log(error);
     }
 };
 
-export const getUser = async (userId: string) => {
+export const getWatchList = async (userId: string): Promise<MovieWatchList> => {
     try {
-        const response = await axios({
-            method: "get",
-            url: BASE_URL + `/api/users/${userId}`,
-            withCredentials: true,
-        });
-        return response.data;
-    } catch (error: any) {
-        console.log(error);
-    }
-};
-
-export const getUserActivities = async (userId: string) => {
-    try {
-        const response = await axios({
-            method: "get",
-            url: BASE_URL + `/api/users/${userId}/activities`,
-            withCredentials: true,
-        });
-        return response.data;
-    } catch (error: any) {
-        console.log(error);
-    }
-};
-
-export const getUserFriends = async (userId: string) => {
-    try {
-        const response = await axios({
-            method: "get",
-            url: BASE_URL + `/api/users/${userId}/friends/`,
-        });
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/watch-list`
+        );
         return response.data;
     } catch (error) {
         console.log(error);
+        throw error;
+    }
+};
+
+// Users
+export const getUser = async (userId: string): Promise<User> => {
+    try {
+        const response = await axiosInstance.get(`/api/users/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+// User activities
+export const getUserActivities = async (
+    userId: string
+): Promise<UserActivity[]> => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/activities`
+        );
+        return response.data;
+    } catch (error: any) {
+        console.log(error);
+        throw error;
+    }
+};
+
+// User friends
+export const getUserFriends = async (userId: string): Promise<User[]> => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/friends/`
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
     }
 };
 
@@ -191,10 +233,8 @@ export const sendFriendRequest = async (
     otherUserId: string
 ) => {
     try {
-        await axios({
-            method: "post",
-            url: BASE_URL + `/api/users/${userId}/friend-requests/`,
-            data: { otherUserId },
+        await axiosInstance.post(`/api/users/${userId}/friend-requests/`, {
+            otherUserId,
         });
     } catch (error) {
         console.log(error);
@@ -206,34 +246,18 @@ export const acceptFriendRequest = async (
     otherUserId: string
 ) => {
     try {
-        await axios({
-            method: "post",
-            url: BASE_URL + `/api/users/${userId}/friends/`,
-            data: { otherUserId },
+        await axiosInstance.post(`/api/users/${userId}/friends/`, {
+            otherUserId,
         });
     } catch (error) {
         console.log(error);
     }
 };
 
-export const getWatchList = async (userId: string) => {
-    try {
-        const response = await axios({
-            method: "get",
-            url: BASE_URL + `/api/users/${userId}/watch-list`,
-            withCredentials: true,
-        });
-        return response.data;
-    } catch (error: any) {
-        console.log(error);
-    }
-};
-
+// Messages
 export const getChatHistory = async (senderId: string, recipientId: string) => {
     try {
-        const response = await axios({
-            method: "get",
-            url: BASE_URL + "/api/messages",
+        const response = await axiosInstance.get("/api/messages", {
             params: {
                 senderId,
                 recipientId,
@@ -259,18 +283,8 @@ export const getChatHistory = async (senderId: string, recipientId: string) => {
         return usersMessages;
     } catch (error) {
         console.log(error);
+        throw error;
     }
-};
-
-export const getAllMessages = async (
-    users: { senderId: string; recipientId: string }[]
-) => {
-    const allMessages = [];
-    for (const { senderId, recipientId } of users) {
-        const messages = await getChatHistory(senderId, recipientId);
-        allMessages.push(messages);
-    }
-    return allMessages;
 };
 
 export const sendMessage = async (
@@ -280,31 +294,28 @@ export const sendMessage = async (
 ) => {
     const date = new Date();
     try {
-        await axios({
-            method: "post",
-            url: BASE_URL + "/api/messages",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            data: {
+        await axiosInstance.post(
+            "/api/messages",
+            {
                 senderId,
                 recipientId,
                 text,
                 date,
             },
-        });
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
     } catch (error) {
         console.log(error);
     }
 };
 
 export const markMessageAsRead = async (messageId: string) => {
-    console.log("here");
     try {
-        await axios({
-            method: "put",
-            url: BASE_URL + `/api/messages/${messageId}`,
-        });
+        await axiosInstance.put(`/api/messages/${messageId}`);
     } catch (error) {
         console.log(error);
     }

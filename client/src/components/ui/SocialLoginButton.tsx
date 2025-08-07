@@ -1,4 +1,4 @@
-import { BASE_URL } from "../../lib/actions";
+import { BASE_URL } from "../../lib/axiosInstance";
 
 export const SocialLoginButton = () => {
     return (

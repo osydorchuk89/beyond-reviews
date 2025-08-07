@@ -1,4 +1,4 @@
-import { Friend, User } from "../../../lib/entities";
+import { Friend, User } from "../../../../lib/entities";
 
 interface ChatSidePanelProps {
     user: User;

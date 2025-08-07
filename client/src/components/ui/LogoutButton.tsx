@@ -1,4 +1,4 @@
-import { Button } from "./Button";
+import { BaseButton } from "./BaseButton";
 import { logout } from "../../lib/actions";
 import { triggerAuthEvent } from "../../store";
 import { useAppDispatch } from "../../store/hooks";
@@ -10,11 +10,13 @@ export const LogoutButton = () => {
 
     const handleLogout = async () => {
         const response = await logout();
-        if (response) {
+        if (response.data) {
             dispatch(triggerAuthEvent("loggedOut"));
             navigate("/");
         }
     };
 
-    return <Button text="LOGOUT" style="orange" handleClick={handleLogout} />;
+    return (
+        <BaseButton text="LOGOUT" style="orange" handleClick={handleLogout} />
+    );
 };

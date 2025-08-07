@@ -2,12 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useForm } from "react-hook-form";
 
-import { getChatHistory, sendMessage } from "../../../lib/actions";
-import { Button } from "../../ui/Button";
-import { UsersMessages } from "../../../lib/entities";
+import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { UsersMessages } from "../../../../lib/entities";
+import { getChatHistory, sendMessage } from "../../../../lib/actions";
+import { triggerMessageEvent } from "../../../../store";
 import { ChatHistoryMessage } from "./ChatHistoryMessage";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { triggerMessageEvent } from "../../../store";
+import { BaseButton } from "../../../ui/BaseButton";
+
 
 interface ChatHistoryProps {
     friendId: string;
@@ -87,41 +88,16 @@ export const ChatHistory = ({ friendId, friendName }: ChatHistoryProps) => {
     const handleSendMessage = handleSubmit(async (data) => {
         const date = new Date();
         await sendMessage(userId, friendId, data.text);
-        // if (chatHistory) {
-        //     markMessagesAsRead(chatHistory.messages);
-        // }
         dispatch(
             triggerMessageEvent(`new message event at ${date.toString()}`)
         );
         reset();
     });
 
-    // const markMessagesAsRead = (messages: Message[]) => {
-    //     messages.forEach(async (msg) => {
-    //         if (!msg.wasRead && msg.sender.id !== userId) {
-    //             await markMessageAsRead(msg.id);
-    //         }
-    //     });
-    // };
-
     const messagesRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div
-            className="flex flex-col justify-between w-3/4 shadow-lg bg-sky-100"
-            // onClick={() => {
-            //     console.log("clicked");
-            //     if (chatHistory) {
-            //         markMessagesAsRead(chatHistory.messages);
-            //         const date = new Date();
-            //         dispatch(
-            //             triggerMessageEvent(
-            //                 `new message event at ${date.toString()}`
-            //             )
-            //         );
-            //     }
-            // }}
-        >
+        <div className="flex flex-col justify-between w-3/4 shadow-lg bg-sky-100">
             <h3 className="text-lg px-2 py-5 text-center font-medium border-b-1 border-b-sky-500">
                 {friendName}
             </h3>
@@ -139,6 +115,9 @@ export const ChatHistory = ({ friendId, friendName }: ChatHistoryProps) => {
                                 key={message.id}
                             />
                         ))}
+                {!chatHistory?.messages.length && (
+                    <p className="text-center italic">No messages yet</p>
+                )}
             </div>
             <div className="w-full flex flex-col gap-5 mb-5">
                 <form
@@ -154,7 +133,7 @@ export const ChatHistory = ({ friendId, friendName }: ChatHistoryProps) => {
                         name="text"
                         placeholder="type your message here"
                     />
-                    <Button style="orange" text="SEND" type="submit" />
+                    <BaseButton style="orange" text="SEND" type="submit" />
                 </form>
             </div>
         </div>

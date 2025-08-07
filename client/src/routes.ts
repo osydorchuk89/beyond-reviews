@@ -1,36 +1,37 @@
-import { createBrowserRouter, redirect } from "react-router";
+import { createBrowserRouter } from "react-router";
 
 import { MainLayout } from "./components/MainLayout";
 import { HeroSection } from "./components/pages/main/HeroSection";
 import { MoviesPage } from "./components/pages/movies/MoviesPage";
-import { MoviePage } from "./components/pages/movie/MoviePage";
+import { MoviePage } from "./components/pages/movies/movie/MoviePage";
 import { LoginPage } from "./components/pages/login/LoginPage";
 import { RegistrationPage } from "./components/pages/registration/RegistrationPage";
-import { ProfilePage } from "./components/pages/profile/ProfilePage";
 import { BooksPage } from "./components/pages/books/BooksPage";
 import { MusicPage } from "./components/pages/music/MusicPage";
-import { UserActivities } from "./components/pages/profile/UserActivities";
-import { UserFriends } from "./components/pages/profile/UserFriends";
-import { UserWatchList } from "./components/pages/profile/UserWatchList";
-import { UserMessages } from "./components/pages/profile/UserMessages";
+import { UserLayout } from "./components/pages/user/UserLayout";
+import { ProfilePage } from "./components/pages/user/profile/ProfilePage";
+import { UserActivities } from "./components/pages/user/activities/UserActivities";
+import { UserFriends } from "./components/pages/user/friends/UserFriends";
+import { UserMessages } from "./components/pages/user/messages/UserMessages";
+import { UserWatchList } from "./components/pages/user/watch-list/UserWatchList";
+import { UserReviews } from "./components/pages/user/reviews/UserReviews";
+import { UserSettings } from "./components/pages/user/settings/UserSettings";
 import {
-    getAuthData,
-    getMovie,
-    getMovieReviews,
-    getMovies,
-    getUser,
-    getUserActivities,
-    getWatchList,
-} from "./lib/actions";
+    movieLoader,
+    moviesLoader,
+    protectedLoader,
+    rootLoader,
+    userActivitiesLoader,
+    userProfileLoader,
+    userReviewsLoader,
+    userWatchListLoader,
+} from "./lib/loaders";
 
 export const router = createBrowserRouter([
     {
         Component: MainLayout,
         id: "root",
-        loader: async () => {
-            const authData = await getAuthData();
-            return { authData };
-        },
+        loader: rootLoader,
         children: [
             { index: true, Component: HeroSection },
             {
@@ -52,28 +53,16 @@ export const router = createBrowserRouter([
             {
                 path: "movies",
                 id: "movies",
-                loader: async () => {
-                    const movies = await getMovies();
-                    return { movies };
-                },
                 children: [
                     {
                         index: true,
                         Component: MoviesPage,
-                        loader: async () => {
-                            const movies = await getMovies();
-                            return { movies };
-                        },
+                        loader: moviesLoader,
                     },
                     {
                         path: ":movieId",
                         Component: MoviePage,
-                        loader: async ({ params }) => {
-                            const { movieId } = params as { movieId: string };
-                            const movie = await getMovie(movieId);
-                            const movieReviews = await getMovieReviews(movieId);
-                            return { movie, movieReviews };
-                        },
+                        loader: movieLoader,
                     },
                 ],
             },
@@ -83,11 +72,8 @@ export const router = createBrowserRouter([
                     {
                         path: ":userId",
                         id: "userProfile",
-                        loader: async ({ params }) => {
-                            const { userId } = params as { userId: string };
-                            const user = await getUser(userId);
-                            return { user };
-                        },
+                        loader: userProfileLoader,
+                        Component: UserLayout,
                         children: [
                             {
                                 path: "profile",
@@ -96,51 +82,31 @@ export const router = createBrowserRouter([
                             {
                                 path: "activities",
                                 Component: UserActivities,
-                                loader: async ({ params }) => {
-                                    const { userId } = params as {
-                                        userId: string;
-                                    };
-                                    const userActivities =
-                                        await getUserActivities(userId);
-                                    return { userActivities };
-                                },
+                                loader: userActivitiesLoader,
                             },
                             {
                                 path: "friends",
                                 Component: UserFriends,
-                                loader: async () => {
-                                    const authData = await getAuthData();
-                                    if (!authData.isAuthenticated) {
-                                        return redirect("/");
-                                    }
-                                },
+                                loader: protectedLoader,
                             },
                             {
                                 path: "messages",
                                 Component: UserMessages,
-                                loader: async () => {
-                                    const authData = await getAuthData();
-                                    if (!authData.isAuthenticated) {
-                                        return redirect("/");
-                                    }
-                                },
+                                loader: protectedLoader,
                             },
                             {
                                 path: "watch-list",
                                 Component: UserWatchList,
-                                loader: async ({ params }) => {
-                                    const authData = await getAuthData();
-                                    if (!authData.isAuthenticated) {
-                                        return redirect("/");
-                                    }
-                                    const { userId } = params as {
-                                        userId: string;
-                                    };
-                                    const userWatchList = await getWatchList(
-                                        userId
-                                    );
-                                    return { userWatchList };
-                                },
+                                loader: userWatchListLoader,
+                            },
+                            {
+                                path: "reviews",
+                                Component: UserReviews,
+                                loader: userReviewsLoader,
+                            },
+                            {
+                                path: "settings",
+                                Component: UserSettings,
                             },
                         ],
                     },

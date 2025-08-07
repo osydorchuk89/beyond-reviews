@@ -22,6 +22,15 @@ vi.mock("../../../lib/actions", () => ({
     sendLoginData: vi.fn(),
 }));
 
+const createMockAxiosResponse = (status: number): any => ({
+    status,
+    statusText: status === 200 ? "OK" : "Error",
+    data: {},
+    headers: {},
+    config: {} as any,
+    request: {},
+});
+
 describe("LoginPage", () => {
     beforeEach(() => {
         render(
@@ -68,7 +77,7 @@ describe("LoginPage", () => {
     it("disables login button and shows 'Please wait...' when submitting login data", async () => {
         vi.mocked(sendLoginData).mockImplementationOnce(() => {
             return new Promise((resolve) =>
-                setTimeout(() => resolve({ status: 200 }), 100)
+                setTimeout(() => resolve(createMockAxiosResponse(200)), 100)
             );
         });
 
@@ -92,7 +101,7 @@ describe("LoginPage", () => {
     it("shows 'Invalid credentials' message on failed login attempt", async () => {
         vi.mocked(sendLoginData).mockImplementationOnce(() => {
             return new Promise((resolve) =>
-                setTimeout(() => resolve({ status: 401 }), 100)
+                setTimeout(() => resolve(createMockAxiosResponse(401)), 100)
             );
         });
 
@@ -115,7 +124,7 @@ describe("LoginPage", () => {
     it("removes 'Invalid credentials' message when a close icon is clicked", async () => {
         vi.mocked(sendLoginData).mockImplementationOnce(() => {
             return new Promise((resolve) =>
-                setTimeout(() => resolve({ status: 401 }), 100)
+                setTimeout(() => resolve(createMockAxiosResponse(401)), 100)
             );
         });
 
@@ -144,7 +153,7 @@ describe("LoginPage", () => {
     it("navigates back upon successful login", async () => {
         vi.mocked(sendLoginData).mockImplementationOnce(() => {
             return new Promise((resolve) =>
-                setTimeout(() => resolve({ status: 200 }), 500)
+                setTimeout(() => resolve(createMockAxiosResponse(200)), 500)
             );
         });
 

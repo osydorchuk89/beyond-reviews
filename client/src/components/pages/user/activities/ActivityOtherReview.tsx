@@ -1,5 +1,5 @@
-import { UserActivity } from "../../../lib/entities";
-import { NavLink } from "../../ui/NavLink";
+import { UserActivity } from "../../../../lib/entities";
+import { NavLink } from "../../../ui/NavLink";
 
 export const ActivityOtherReview = ({
     activity,

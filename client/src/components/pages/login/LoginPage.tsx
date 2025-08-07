@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
-
+import { useNavigate, useLocation } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { LoginSchema } from "../../../lib/schemas";
-import { Button } from "../../ui/Button";
+import { BaseButton } from "../../ui/BaseButton";
 import { NavLink } from "../../ui/NavLink";
 import { SocialLoginButton } from "../../ui/SocialLoginButton";
 import { sendLoginData } from "../../../lib/actions";
@@ -19,6 +19,8 @@ interface LoginInputs {
 
 export const LoginPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
     const [fetching, setFetching] = useState(false);
     const [invalidCredentials, setInvalidCredentials] = useState(false);
     const {
@@ -42,6 +44,11 @@ export const LoginPage = () => {
             setInvalidCredentials(false);
             dispatch(triggerAuthEvent("loggedIn"));
             navigate(-1);
+            setTimeout(() => {
+                if (location.pathname === "/login") {
+                    navigate("/", { replace: true });
+                }
+            }, 100);
         }
     });
 
@@ -97,7 +104,7 @@ export const LoginPage = () => {
                             {errors.password?.message}
                         </p>
                     </div>
-                    <Button
+                    <BaseButton
                         type="submit"
                         style="orange"
                         text={fetching ? "Please wait..." : "LOGIN"}

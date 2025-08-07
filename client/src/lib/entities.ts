@@ -48,6 +48,22 @@ export type Movie = {
     onWatchList: { userId: string }[];
 };
 
+export type MoviesData = {
+    movies: Movie[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+    hasMore: boolean;
+    appliedFilters: {
+        genre?: string;
+        releaseYear?: string;
+        director?: string;
+        sortBy?: string;
+        sortOrder?: string;
+        search?: string;
+    };
+};
+
 export type MovieReview = {
     id: string;
     movieId: string;

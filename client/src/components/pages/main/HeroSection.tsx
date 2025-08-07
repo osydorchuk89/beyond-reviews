@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-import { Button } from "../../ui/Button";
+import { BaseButton } from "../../ui/BaseButton";
 
 export const HeroSection = () => {
     const navigate = useNavigate();
@@ -16,7 +16,7 @@ export const HeroSection = () => {
                     <span className="italic">beyond</span> ordinary reviews!
                 </p>
                 <div className="flex justify-start">
-                    <Button
+                    <BaseButton
                         text="Start browsing"
                         style="orange"
                         handleClick={() => navigate("/movies")}

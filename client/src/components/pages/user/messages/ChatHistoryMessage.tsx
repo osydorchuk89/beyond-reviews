@@ -1,6 +1,7 @@
 import { useParams } from "react-router";
 
-import { Message } from "../../../lib/entities";
+import { Message } from "../../../../lib/entities";
+
 
 interface MessageProps {
     message: Message;

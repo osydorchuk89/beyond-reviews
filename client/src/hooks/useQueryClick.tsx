@@ -1,15 +1,21 @@
-import { createSearchParams, useNavigate } from "react-router";
+import { useSearchParams } from "react-router";
 
 export const useQueryClick = () => {
-    const navigate = useNavigate();
+    const [_, setSearchParams] = useSearchParams();
 
-    const handleQueryClick = (filteredBy: string, value: string) =>
-        navigate({
-            pathname: "/movies",
-            search: createSearchParams({
-                filter: `${filteredBy}-${value}`,
-            }).toString(),
+    const handleQueryClick = (paramType: string, value: string) => {
+        setSearchParams((searchParams) => {
+            if (paramType === "genre") {
+                searchParams.set("genre", value);
+            } else if (paramType === "releaseYear") {
+                searchParams.set("releaseYear", value);
+            }
+
+            searchParams.delete("page");
+
+            return searchParams;
         });
+    };
 
     return handleQueryClick;
 };

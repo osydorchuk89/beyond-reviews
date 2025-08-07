@@ -1,44 +1,32 @@
-import { useEffect, useState } from "react";
 import { useParams, useRouteLoaderData } from "react-router";
 
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { User } from "../../../lib/entities";
-import { NavLink } from "../../ui/NavLink";
-import { Button } from "../../ui/Button";
-import { acceptFriendRequest, getUser } from "../../../lib/actions";
-import { useAuthData } from "../../../hooks/useAuthData";
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
-import { triggerFriendEvent } from "../../../store";
+import { User } from "../../../../lib/entities";
+import { useAuthData } from "../../../../hooks/useAuthData";
+import { useUserData } from "../../../../hooks/useUserData";
+import { useUserIdentity } from "../../../../hooks/useUserIdentity";
+import { useAppDispatch } from "../../../../store/hooks";
+import { acceptFriendRequest } from "../../../../lib/actions";
+import { triggerFriendEvent } from "../../../../store";
+import { LoadingSpinner } from "../../../ui/LoadingSpinner";
+import { NavLink } from "../../../ui/NavLink";
+import { BaseButton } from "../../../ui/BaseButton";
 
 export const UserFriends = () => {
     const { userId } = useParams() as { userId: string };
     const { user: initialUserData } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { authData, authDataFetching } = useAuthData();
+    const { authDataFetching } = useAuthData();
 
-    const [user, setUser] = useState(initialUserData);
-
-    const isSameUser = (authData.user && user.id === authData.user.id) || false;
-    const userName = `${user.firstName} ${user.lastName}`;
+    const { user } = useUserData(userId, initialUserData);
+    const { isSameUser, userName } = useUserIdentity(user);
 
     const dispatch = useAppDispatch();
     const handleFriendRequest = async (userId: string, otherUserId: string) => {
         const date = new Date();
         await acceptFriendRequest(userId, otherUserId);
-        dispatch(
-            triggerFriendEvent(`new friend event at ${date.toString()}`)
-        );
+        dispatch(triggerFriendEvent(`new friend event at ${date.toString()}`));
     };
-
-    const friendEvent = useAppSelector((state) => state.friendEvent);
-    useEffect(() => {
-        const fetchUser = async () => {
-            const user = await getUser(userId);
-            setUser(user);
-        };
-        fetchUser();
-    }, [friendEvent]);
 
     if (authDataFetching) {
         return (
@@ -49,7 +37,7 @@ export const UserFriends = () => {
     }
 
     return (
-        <div className="flex flex-col my-20 mx-60 gap-10 min-h-[60vh]">
+        <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
             <h2 className="text-2xl text-center font-bold">
                 {isSameUser ? "Your" : `${userName}'s`} friends
             </h2>
@@ -77,7 +65,7 @@ export const UserFriends = () => {
                                             />
                                         </div>
                                         {isSameUser && (
-                                            <Button
+                                            <BaseButton
                                                 text="Accept friend request"
                                                 style="sky"
                                                 handleClick={() => {
