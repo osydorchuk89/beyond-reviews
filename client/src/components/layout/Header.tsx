@@ -56,28 +56,29 @@ export const Header = () => {
             >
                 Beyond Reviews
             </Link>
-            <li className="flex gap-8">
+            <ul className="flex gap-8">
                 {headerNavLinks.map((link) => (
-                    <ul key={link.text}>
+                    <li key={link.text}>
                         <Link
                             className="text-xl hover:text-orange-500"
                             to={link.to}
                         >
                             {link.text}
                         </Link>
-                    </ul>
+                    </li>
                 ))}
-            </li>
+            </ul>
             {authStatus.user ? (
                 <div className="flex gap-4 justify-center items-center">
-                    <div
-                        className="flex justify-center items-center w-12 h-12 rounded-full overflow-hidden bg-orange-300 hover:bg-orange-500 cursor-pointer"
+                    <button
                         onClick={() =>
                             navigate(`/users/${authStatus.user!.id}/profile`)
                         }
                     >
-                        <p className="text-orange-950">{userInitials}</p>
-                    </div>
+                        <div className="flex justify-center items-center w-12 h-12 rounded-full overflow-hidden bg-orange-300 hover:bg-orange-500 cursor-pointer">
+                            <p className="text-orange-950">{userInitials}</p>
+                        </div>
+                    </button>
                     <LogoutButton />
                 </div>
             ) : (

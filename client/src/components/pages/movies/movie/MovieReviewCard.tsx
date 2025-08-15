@@ -38,13 +38,19 @@ export const MovieReviewCard = ({
     const dispatch = useAppDispatch();
 
     const likeOrUnlikeMovieReview = async () => {
-        const date = new Date();
-        await sendLikeOrUnlike(movieId, movieReview.id, userId!, hasLiked);
         setHasLiked((prevState) => !prevState);
-        dispatch(triggerReviewEvent(`new review event at ${date.toString()}`));
-    };
 
-    let likeClassName = "w-6 h-6 hover:cursor-pointer";
+        const date = new Date();
+        try {
+            await sendLikeOrUnlike(movieId, movieReview.id, userId!, hasLiked);
+            dispatch(
+                triggerReviewEvent(`new review event at ${date.toString()}`)
+            );
+        } catch (error) {
+            setHasLiked((prevState) => !prevState);
+            console.log(error);
+        }
+    };
 
     const ref = useRef<HTMLParagraphElement>(null);
     const { isTruncated, isShowingMore, toggleIsShowingMore } =
@@ -54,6 +60,8 @@ export const MovieReviewCard = ({
 
     const movieReviewUserName =
         movieReview.user.firstName + " " + movieReview.user.lastName;
+
+    const likeClassName = "w-6 h-6 hover:cursor-pointer";
 
     return (
         <div className="flex flex-col items-start bg-sky-100 rounded-lg shadow-lg p-5">
@@ -87,12 +95,12 @@ export const MovieReviewCard = ({
                     </p>
                     {isTruncated && (
                         <div>
-                            <p
+                            <a
                                 className="mt-1 text-sky-700 hover:text-green-950 text-base font-medium uppercase cursor-pointer"
                                 onClick={toggleIsShowingMore}
                             >
                                 {isShowingMore ? "Show less" : "Show more"}
-                            </p>
+                            </a>
                         </div>
                     )}
                 </div>

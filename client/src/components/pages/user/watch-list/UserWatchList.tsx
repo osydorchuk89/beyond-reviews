@@ -7,28 +7,25 @@ import { BaseButton } from "../../../ui/BaseButton";
 import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 
 export const UserWatchList = () => {
-    const { user } = useRouteLoaderData("userProfile") as {
+    const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
     const { userWatchList } = useLoaderData() as {
         userWatchList: MovieWatchList[];
     };
-    const { isSameUser, userName, isLoading } = useUserIdentity(user);
+    const { isSameUser, profileUserName, isLoading } =
+        useUserIdentity(profileUser);
 
     const navigate = useNavigate();
 
     if (isLoading) {
-            return (
-                <div className="flex justify-center items-center min-h-[80vh]">
-                    <LoadingSpinner />
-                </div>
-            );
-        }
+        return <LoadingSpinner />;
+    }
 
     return (
         <div className="flex flex-col gap-10 justify-center items-center min-h-[70vh]">
             <h2 className="text-2xl text-center font-bold">
-                {isSameUser ? "Your" : `${userName}'s`} watchlist
+                {isSameUser ? "Your" : `${profileUserName}'s`} watchlist
             </h2>
             {userWatchList.length > 0 ? (
                 <div className="grid grid-cols-3 items-center gap-16 mx-5">
@@ -49,7 +46,7 @@ export const UserWatchList = () => {
                 <div className="flex flex-col justify-center items-center gap-10 my-32">
                     <p className="text-lg">
                         There are no movies on{" "}
-                        {isSameUser ? "your" : `${userName}'s`} watchlist
+                        {isSameUser ? "your" : `${profileUserName}'s`} watchlist
                     </p>
                     {isSameUser && (
                         <BaseButton

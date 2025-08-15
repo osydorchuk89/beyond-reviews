@@ -6,26 +6,23 @@ import { MovieReviewDetails } from "./MovieReviewDetails";
 import { useUserIdentity } from "../../../../hooks/useUserIdentity";
 
 export const UserReviews = () => {
-    const { user } = useRouteLoaderData("userProfile") as { user: User };
-
+    const { user: profileUser } = useRouteLoaderData("userProfile") as {
+        user: User;
+    };
     const { userMovieReviews } = useLoaderData() as {
         userMovieReviews: MovieReview[];
     };
-
-    const { isSameUser, userName, isLoading } = useUserIdentity(user);
+    const { isSameUser, profileUserName, isLoading } =
+        useUserIdentity(profileUser);
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-[80vh]">
-                <LoadingSpinner />
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
             <p className="text-center text-2xl font-bold">
-                {isSameUser ? "Your" : `${userName}'s`} movie reviews
+                {isSameUser ? "Your" : `${profileUserName}'s`} movie reviews
             </p>
             {userMovieReviews.length ? (
                 <ul className="flex flex-col gap-4">

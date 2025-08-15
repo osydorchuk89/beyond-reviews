@@ -5,7 +5,7 @@ import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
 import { MovieReviewSection } from "./MovieReviewSection";
 import { MovieReviews } from "./MovieReviews";
-import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
+import { AuthData, Movie, MovieData, MovieReview } from "../../../../lib/entities";
 import { useAppSelector } from "../../../../store/hooks";
 import {
     getAuthData,
@@ -14,16 +14,13 @@ import {
 } from "../../../../lib/actions";
 import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 
-interface MovieData {
-    movie: Movie;
-    movieReviews: MovieReview[];
-}
-
 export const MoviePage = () => {
-    let { movie, movieReviews } = useLoaderData() as MovieData;
+    // Movie and movie reviews data fetching logic
+    const { movie, movieReviews } = useLoaderData() as MovieData;
     const [movieData, setMovieData] = useState<Movie>(movie);
     const [movieReviewsData, setMovieReviewsData] =
         useState<MovieReview[]>(movieReviews);
+
     const reviewEvent = useAppSelector((state) => state.reviewEvent);
 
     useEffect(() => {
@@ -38,16 +35,19 @@ export const MoviePage = () => {
         fetchMovieData();
     }, [reviewEvent]);
 
+    // Authentification data fetcing logic
     const { authData: initialAuthData } = useRouteLoaderData("root");
     const [authData, setAuthData] = useState<AuthData>({
         isAuthenticated: initialAuthData.isAuthenticated,
         user: initialAuthData.user,
     });
-    const [authDataFetching, setAuthDataFetching] = useState(true);
+    const [authDataFetching, setAuthDataFetching] = useState(false);
+
     const authEvent = useAppSelector((state) => state.authEvent);
 
     useEffect(() => {
         const checkAuthStatus = async () => {
+            setAuthDataFetching(true);
             const authData = await getAuthData();
             setAuthData({
                 isAuthenticated: authData.isAuthenticated,
@@ -59,11 +59,7 @@ export const MoviePage = () => {
     }, [authEvent]);
 
     if (authDataFetching) {
-        return (
-            <div className="flex min-h-[80vh] justify-center items-center">
-                <LoadingSpinner />
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     return (

@@ -2,7 +2,6 @@ import { useParams } from "react-router";
 
 import { Message } from "../../../../lib/entities";
 
-
 interface MessageProps {
     message: Message;
 }
@@ -31,7 +30,11 @@ export const ChatHistoryMessage = ({ message }: MessageProps) => {
             >
                 <span className="mr-6">{message.text}</span>
                 <span className="absolute right-1 bottom-1 text-[10px]">
-                    {(message.date as string).split(",")[1]}
+                    {new Date(message.date).toLocaleTimeString("default", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                    })}
                 </span>
             </div>
         </>

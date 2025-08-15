@@ -3,7 +3,7 @@ import { Friend, User } from "../../../../lib/entities";
 interface ChatSidePanelProps {
     user: User;
     selectedFriend: Friend | null;
-    setSelectedFriend: (friend: Friend) => void;
+    setSelectedFriend: (friend: Friend) => Promise<void>;
 }
 
 export const ChatSidePanel = ({
@@ -21,7 +21,7 @@ export const ChatSidePanel = ({
             </h3>
             <ul className="flex flex-col bg-sky-200 flex-1">
                 {user.friends.map((friend) => (
-                    <li
+                    <a
                         key={friend.id}
                         className={
                             selectedFriend?.id === friend.id
@@ -33,7 +33,7 @@ export const ChatSidePanel = ({
                         <p>
                             {friend.firstName} {friend.lastName}
                         </p>
-                    </li>
+                    </a>
                 ))}
             </ul>
         </div>

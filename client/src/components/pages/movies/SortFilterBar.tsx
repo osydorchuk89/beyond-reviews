@@ -81,6 +81,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
                     >
                         <div
                             className="w-full py-2"
+                            tabIndex={0}
                             onClick={() => handleItemClick(item)}
                         >
                             {item.text}

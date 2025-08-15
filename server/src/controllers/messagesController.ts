@@ -62,7 +62,7 @@ export const postMessage = async (req: Request, res: Response) => {
     const recipientId = req.body.recipientId;
 
     try {
-        await prisma.message.create({
+        const message = await prisma.message.create({
             data: {
                 senderId,
                 recipientId,
@@ -71,7 +71,7 @@ export const postMessage = async (req: Request, res: Response) => {
                 wasRead: false,
             },
         });
-        res.status(200).send();
+        res.status(200).send(message);
     } catch (error: any) {
         res.status(500).send({ message: error.message });
     }

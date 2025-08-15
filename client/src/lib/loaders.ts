@@ -43,8 +43,10 @@ export const moviesLoader = async ({ request }: LoaderFunctionArgs) => {
 
 export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
     const { movieId } = params as { movieId: string };
-    const movie = await getMovie(movieId);
-    const movieReviews = await getMovieReviews(movieId);
+    const [movie, movieReviews] = await Promise.all([
+        getMovie(movieId),
+        getMovieReviews(movieId),
+    ]);
     return { movie, movieReviews };
 };
 
@@ -63,17 +65,13 @@ export const userActivitiesLoader = async ({ params }: LoaderFunctionArgs) => {
 export const protectedLoader = async ({ params }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
     const authData = await getAuthData();
-    if (!authData.isAuthenticated || authData.user.id !== userId) {
+    if (!authData.isAuthenticated || authData.user?.id !== userId) {
         return redirect("/");
     }
     return null;
 };
 
 export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {
-    const authData = await getAuthData();
-    if (!authData.isAuthenticated) {
-        return redirect("/");
-    }
     const { userId } = params as { userId: string };
     const userWatchList = await getWatchList(userId);
     return { userWatchList };

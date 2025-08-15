@@ -1,9 +1,9 @@
-export type AuthData = {
+export interface AuthData {
     isAuthenticated: boolean;
-    user: User;
-};
+    user: User | undefined;
+}
 
-export type User = {
+export interface User {
     id: string;
     firstName: string;
     lastName: string;
@@ -30,9 +30,9 @@ export type User = {
         lastName: string;
         photo: string;
     }[];
-};
+}
 
-export type Movie = {
+export interface Movie {
     id: string;
     title: string;
     releaseYear: number;
@@ -46,9 +46,14 @@ export type Movie = {
     reviews: MovieReview[];
     poster: string;
     onWatchList: { userId: string }[];
-};
+}
 
-export type MoviesData = {
+export interface MovieData {
+    movie: Movie;
+    movieReviews: MovieReview[];
+}
+
+export interface MoviesData {
     movies: Movie[];
     totalCount: number;
     currentPage: number;
@@ -62,9 +67,9 @@ export type MoviesData = {
         sortOrder?: string;
         search?: string;
     };
-};
+}
 
-export type MovieReview = {
+export interface MovieReview {
     id: string;
     movieId: string;
     movie: Movie;
@@ -74,9 +79,9 @@ export type MovieReview = {
     rating: number;
     text?: string;
     likedBy: { userId: string }[];
-};
+}
 
-export type UserActivity = {
+export interface UserActivity {
     id: string;
     userId: string;
     user: User;
@@ -88,16 +93,37 @@ export type UserActivity = {
     reviewRating: string;
     reviewText: string;
     date: Date;
-};
+}
 
-export type MovieWatchList = {
+export interface FriendRequest {
+    sentUserId: string;
+    receivedUserId: string;
+}
+
+export interface ReceivedFriendRequest extends FriendRequest {
+    sentUser: {
+        firstName: string;
+        lastName: string;
+        photo: string;
+    };
+}
+
+export interface SentFriendRequest extends FriendRequest {
+    receivedUser: {
+        firstName: string;
+        lastName: string;
+        photo: string;
+    };
+}
+
+export interface MovieWatchList {
     id: string;
     movie: Movie;
     movieId: string;
     userId: string;
-};
+}
 
-export type Message = {
+export interface Message {
     id: string;
     senderId: string;
     sender: User;
@@ -107,17 +133,35 @@ export type Message = {
     date: Date | string;
     wasRead: boolean;
     dateSeparator?: string;
-};
+}
 
-export type UsersMessages = {
+export interface UsersMessages {
     senderId: string;
     recipientId: string;
     messages: Message[];
-};
+}
 
-export type Friend = {
+export interface Friend {
     id: string;
     firstName: string;
     lastName: string;
     photo: string;
-};
+}
+
+export interface RegistrationInputs {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    photo?: File[];
+}
+
+export interface LoginInputs {
+    email: string;
+    password: string;
+}
+
+export interface MovieReviewInputs {
+    rating: number;
+    text?: string;
+}

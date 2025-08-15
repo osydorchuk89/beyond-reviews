@@ -292,10 +292,10 @@ export const sendMessage = async (
     senderId: string,
     recipientId: string,
     text: string
-) => {
+): Promise<Message> => {
     const date = new Date();
     try {
-        await axiosInstance.post(
+        const response = await axiosInstance.post(
             "/api/messages",
             {
                 senderId,
@@ -309,8 +309,10 @@ export const sendMessage = async (
                 },
             }
         );
+        return response.data;
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 

@@ -7,17 +7,12 @@ import { BaseButton } from "../../ui/BaseButton";
 import { sendRegistrationData } from "../../../lib/actions";
 import { useAppDispatch } from "../../../store/hooks";
 import { triggerAuthEvent } from "../../../store";
-
-export type RegistrationInputs = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    photo?: File[];
-};
+import { RegistrationInputs } from "../../../lib/entities";
 
 export const RegistrationForm = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    
     const {
         register,
         handleSubmit,
@@ -27,7 +22,6 @@ export const RegistrationForm = () => {
         resolver: zodResolver(UserSchema),
     });
 
-    const dispatch = useAppDispatch();
 
     const handleRegistration = handleSubmit(async (data) => {
         const registrationData = new FormData();

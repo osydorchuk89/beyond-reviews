@@ -107,6 +107,7 @@ export const router = createBrowserRouter([
                             {
                                 path: "settings",
                                 Component: UserSettings,
+                                loader: protectedLoader,
                             },
                         ],
                     },

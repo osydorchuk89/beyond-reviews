@@ -8,28 +8,26 @@ import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 import { useUserIdentity } from "../../../../hooks/useUserIdentity";
 
 export const UserActivities = () => {
-    const { user } = useRouteLoaderData("userProfile") as { user: User };
+    const { user: profileUser } = useRouteLoaderData("userProfile") as {
+        user: User;
+    };
     const { userActivities } = useLoaderData() as {
         userActivities: UserActivity[];
     };
-
-    const { isSameUser, userName, isLoading } = useUserIdentity(user);
+    const { isSameUser, profileUserName, isLoading } =
+        useUserIdentity(profileUser);
 
     const reversedActivityData = [...userActivities].reverse();
     const navigate = useNavigate();
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-[80vh]">
-                <LoadingSpinner />
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
             <p className="text-center text-2xl font-bold">
-                {isSameUser ? "Your" : `${userName}'s`} activities
+                {isSameUser ? "Your" : `${profileUserName}'s`} activities
             </p>
             {reversedActivityData.length > 0 &&
                 reversedActivityData.map((activity) => {
@@ -41,7 +39,7 @@ export const UserActivities = () => {
                         ratingUserId = ratingUser.id;
                     }
                     const activityDate = new Date(activity.date);
-                    const parsedDate = activityDate.toLocaleString("en-GB", {
+                    const parsedDate = activityDate.toLocaleString("default", {
                         day: "2-digit",
                         month: "long",
                         year: "numeric",
@@ -56,7 +54,7 @@ export const UserActivities = () => {
                         >
                             <ActivityDetails
                                 activity={activity}
-                                userName={userName}
+                                userName={profileUserName}
                                 ratingUserName={ratingUserName}
                                 ratingUserId={ratingUserId}
                                 parsedDate={parsedDate}
@@ -71,7 +69,7 @@ export const UserActivities = () => {
             {userActivities.length === 0 && (
                 <div className="flex flex-col items-center justify-center gap-10">
                     <p className="text-center text-lg">
-                        {isSameUser ? "You have" : `${userName} has`} no
+                        {isSameUser ? "You have" : `${profileUserName} has`} no
                         activities
                     </p>
                     {isSameUser && (

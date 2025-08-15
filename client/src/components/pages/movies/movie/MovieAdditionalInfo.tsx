@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { AuthData, Movie } from "../../../../lib/entities";
@@ -21,43 +21,47 @@ export const MovieAdditionalInfo = ({
     const navigate = useNavigate();
     const userId = authData.user?.id;
 
-    const hasUserSavedMovie = movie.onWatchList.some(
-        (like) => like.userId === userId
+    const hasUserSavedMovie = useMemo(
+        () => movie.onWatchList.some((like) => like.userId === userId),
+        [movie.onWatchList, userId]
     );
 
     const [iconFilled, setIconFilled] = useState(hasUserSavedMovie);
     const [hasSaved, setHasSaved] = useState(hasUserSavedMovie);
 
-    const toolTipStyle =
-        "w-fit bg-sky-500 text-sky-50 text-center text-sm py-1 px-2 rounded-md";
-
     const dispatch = useAppDispatch();
 
-    const handleFilterNavigation = (paramType: string, value: string) => {
-        const searchParams = new URLSearchParams();
-
-        if (paramType === "genre") {
-            searchParams.set("genre", value);
-        } else if (paramType === "releaseYear") {
-            searchParams.set("releaseYear", value);
-        } else if (paramType === "director") {
-            searchParams.set("director", value);
-        }
-
-        navigate(`/movies?${searchParams.toString()}`);
-    };
+    const handleFilterNavigation = useCallback(
+        (filterType: string, filterValue: string) => {
+            navigate(
+                `/movies?${filterType}=${encodeURIComponent(filterValue)}`
+            );
+        },
+        [navigate]
+    );
 
     const saveMovie = async () => {
+        setHasSaved((prevState) => !prevState);
+        setIconFilled((prevState) => !prevState);
+
         const date = new Date();
         try {
             await addOrRemoveMovieFromWatchlist(movie.id, userId!, hasSaved);
-            setHasSaved((prevState) => !prevState);
             dispatch(
                 triggerReviewEvent(`new review event at ${date.toString()}`)
             );
-        } catch (error: any) {
+        } catch (error) {
+            setHasSaved((prevState) => !prevState);
+            setIconFilled((prevState) => !prevState);
             console.log(error);
         }
+    };
+
+    const getIconColor = () => {
+        if (hasSaved && iconFilled) return "#0ea5e9"; // saved, not hovering
+        if (hasSaved && !iconFilled) return "#38bdf8"; // saved, hovering
+        if (!hasSaved && iconFilled) return "#e0f2fe"; // not saved, hovering
+        return "#ffffff"; // not saved, not hovering
     };
 
     return (
@@ -65,7 +69,7 @@ export const MovieAdditionalInfo = ({
             {authData.user && (
                 <div className="absolute w-40 top-0 right-0 flex flex-col justify-center items-center transition-opacity">
                     <BookMarkIcon
-                        color={iconFilled ? "#0ea5e9" : "#ffffff"}
+                        color={getIconColor()}
                         handleMouseEnter={() => {
                             hasSaved
                                 ? setIconFilled(false)
@@ -78,18 +82,6 @@ export const MovieAdditionalInfo = ({
                         }}
                         handleClick={saveMovie}
                     />
-                    <div
-                        className={
-                            (iconFilled && !hasSaved) ||
-                            (!iconFilled && hasSaved)
-                                ? toolTipStyle
-                                : toolTipStyle + " invisible"
-                        }
-                    >
-                        {!hasSaved
-                            ? "Add to watchlist"
-                            : "Remove from watchlist"}
-                    </div>
                 </div>
             )}
             <p className="font-semibold">

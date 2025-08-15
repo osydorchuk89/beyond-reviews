@@ -4,8 +4,8 @@ import { useSearchParams } from "react-router";
 import { MovieCard } from "./MovieCard";
 import { Movie } from "../../../lib/entities";
 import { BaseButton } from "../../ui/BaseButton";
-import { CloseIcon } from "../../icons/CloseIcon";
 import { getMovies } from "../../../lib/actions";
+import { FilterTags } from "./FilterTags";
 
 interface MoviesListProps {
     movies: Movie[];
@@ -90,23 +90,15 @@ export const MoviesList = ({
     return (
         <div className="flex flex-col w-full">
             {filters && filters.length > 0 && (
-                <ul className="flex flex-row justify-center gap-4">
-                    {filters.map((filter) => (
-                        <li className="flex gap-4 items-center w-fit self-center px-4 py-3 mb-8 bg-orange-300 rounded-md">
-                            <span className="text-orange-950 text-xl text-center leading-0">
-                                {filter}
-                            </span>
-                            <CloseIcon
-                                handleClick={() => handleCloseFilterTag(filter)}
-                            />
-                        </li>
-                    ))}
-                </ul>
+                <FilterTags
+                    filters={filters}
+                    onRemoveFilter={handleCloseFilterTag}
+                />
             )}
             <div className="flex flex-col gap-10 mb-10 items-center">
                 {allMovies.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 lg:grid-cols-3 items-center gap-16 mx-5">
+                        <ul className="grid grid-cols-1 lg:grid-cols-3 items-center gap-16 mx-5">
                             {allMovies.map((movie: Movie) => (
                                 <MovieCard
                                     key={movie.id}
@@ -119,7 +111,7 @@ export const MoviesList = ({
                                     poster={movie.poster}
                                 />
                             ))}
-                        </div>
+                        </ul>
                         {hasMoreMovies && (
                             <div className="flex justify-center mb-10">
                                 <BaseButton
