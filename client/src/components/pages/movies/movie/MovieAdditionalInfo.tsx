@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import { ToastContainer, toast } from "react-toastify";
 
 import { AuthData, Movie } from "../../../../lib/entities";
 import { useAppDispatch } from "../../../../store/hooks";
@@ -8,6 +9,7 @@ import { addOrRemoveMovieFromWatchlist } from "../../../../lib/actions";
 import { BookMarkIcon } from "../../../icons/BookMarkIcon";
 import { QueryLink } from "../../../ui/QueryLink";
 import { StarIcon } from "../../../icons/StarIcon";
+import { ToastNotification } from "../../../ui/ToastNotification";
 
 interface MovieAdditionalInfoProps {
     movie: Movie;
@@ -21,13 +23,13 @@ export const MovieAdditionalInfo = ({
     const navigate = useNavigate();
     const userId = authData.user?.id;
 
-    const hasUserSavedMovie = useMemo(
+    const userHasSavedMovie = useMemo(
         () => movie.onWatchList.some((like) => like.userId === userId),
         [movie.onWatchList, userId]
     );
 
-    const [iconFilled, setIconFilled] = useState(hasUserSavedMovie);
-    const [hasSaved, setHasSaved] = useState(hasUserSavedMovie);
+    const [iconFilled, setIconFilled] = useState(userHasSavedMovie);
+    const [hasSaved, setHasSaved] = useState(userHasSavedMovie);
 
     const dispatch = useAppDispatch();
 
@@ -46,6 +48,7 @@ export const MovieAdditionalInfo = ({
 
         const date = new Date();
         try {
+            showNotificationToast();
             await addOrRemoveMovieFromWatchlist(movie.id, userId!, hasSaved);
             dispatch(
                 triggerReviewEvent(`new review event at ${date.toString()}`)
@@ -64,10 +67,37 @@ export const MovieAdditionalInfo = ({
         return "#ffffff"; // not saved, not hovering
     };
 
+    const showNotificationToast = () => {
+        console.log(userHasSavedMovie);
+        toast.dismiss();
+        return toast(
+            ({ closeToast }) => (
+                <ToastNotification
+                    text={`Movie was ${
+                        userHasSavedMovie ? "removed from" : "added to"
+                    } your watchlist`}
+                    closeToast={closeToast}
+                />
+            ),
+            {
+                closeButton: false,
+            }
+        );
+    };
+
     return (
         <div className="flex flex-col gap-5 text-lg mb-5 relative">
             {authData.user && (
                 <div className="absolute w-40 top-0 right-0 flex flex-col justify-center items-center transition-opacity">
+                    <ToastContainer
+                        autoClose={3000}
+                        hideProgressBar
+                        toastStyle={{
+                            backgroundColor: "#bae6fd",
+                            paddingBlock: 0,
+                            paddingInline: 20,
+                        }}
+                    />
                     <BookMarkIcon
                         color={getIconColor()}
                         handleMouseEnter={() => {
