@@ -31,37 +31,23 @@ app.use(bodyParser.json());
 
 app.set("trust proxy", 1);
 
-// Create session middleware but don't crash if MongoDB isn't available yet
-let sessionStore: any = undefined;
-
-if (process.env.DATABASE_URL) {
-    sessionStore = MongoStore.create({
-        mongoUrl: process.env.DATABASE_URL,
-        collectionName: "sessions",
-        touchAfter: 24 * 3600,
-    });
-    
-    // Log connection errors but don't crash
-    sessionStore.on('error', (error: Error) => {
-        console.error('MongoDB session store error:', error);
-    });
-}
-
-const sessionMiddleware = session({
-    secret: process.env.EXPRESS_SESSION_SECRET || "fallback-secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        httpOnly: true,
-        maxAge: 1000 * 60 * 24,
-    },
-    store: sessionStore,
-});
-
-app.use(sessionMiddleware);
-
+app.use(
+    session({
+        secret: process.env.EXPRESS_SESSION_SECRET!,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === "production" ? true : false,
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            httpOnly: true,
+            maxAge: 1000 * 60 * 24,
+        },
+        store: MongoStore.create({
+            mongoUrl: process.env.DATABASE_URL!,
+            collectionName: "sessions",
+        }),
+    })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
