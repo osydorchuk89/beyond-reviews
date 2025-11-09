@@ -37,3 +37,6 @@ usersRouter.get("/:userId/watch-list", getUserWatchlist);
 
 // get user movie reviews
 usersRouter.get("/:userId/movie-reviews", getUserMovieReviews);
+
+// create new users - for dev purposes
+usersRouter.post("/seed", registerNewUser);

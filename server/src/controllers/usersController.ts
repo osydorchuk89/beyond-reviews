@@ -344,3 +344,14 @@ export const getUserMovieReviews = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const createUsers = async (req: Request, res: Response) => {
+    try {
+        const response = await prisma.user.createMany({
+            data: req.body,
+        });
+        res.send(response);
+    } catch (error) {
+        console.log(error);
+    }
+};

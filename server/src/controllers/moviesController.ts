@@ -337,11 +337,11 @@ export const likeOrUnlikeMovieReview = async (req: Request, res: Response) => {
 };
 
 export const createMovies = async (req: Request, res: Response) => {
-    console.log(req.body);
     try {
-        await prisma.movie.createMany({
+        const response = await prisma.movie.createMany({
             data: req.body,
         });
+        res.send(response);
     } catch (error) {
         console.log(error);
     }

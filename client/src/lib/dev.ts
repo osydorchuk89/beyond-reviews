@@ -1,4 +1,6 @@
 import axios from "axios";
+import { faker } from "@faker-js/faker";
+
 import axiosInstance, { BASE_URL } from "./axiosInstance";
 
 const BASE_TMDB_URL = "https://api.themoviedb.org/3/movie/";
@@ -51,11 +53,29 @@ export const fetchMovies = async (page: Number) => {
             });
         }
         try {
-            await axiosInstance.post(`${BASE_URL}/api/movies`, moviesData);
+            const response = await axiosInstance.post(
+                `${BASE_URL}/api/movies`,
+                moviesData
+            );
+            console.log(response);
         } catch (error) {
             console.log(error);
         }
     } catch (error) {
         console.log(error);
     }
+};
+
+export const createUsers = async () => {
+    const NUM_USERS = 100;
+
+    const users = Array.from({ length: NUM_USERS }, (_, i) => ({
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        email: `user${i + 1}@example.com`,
+        password: faker.internet.password(),
+        photo: faker.image.avatar(),
+    }));
+
+    await axiosInstance.post(`${BASE_URL}/api/users/seed`, users);
 };
