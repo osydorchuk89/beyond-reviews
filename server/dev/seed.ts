@@ -15,7 +15,6 @@ const users = Array.from({ length: NUM_USERS }, (_, i) => ({
 async function main() {
     await prisma.user.createMany({
         data: users,
-        skipDuplicates: true, // in case you run it multiple times
     });
     console.log(`Seeded ${users.length} users`);
 }
