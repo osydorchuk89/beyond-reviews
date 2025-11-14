@@ -4,14 +4,11 @@ FROM node:22-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
-
-# Install dependencies to leverage Docker cache
+# Copy package files and install dependencies
+COPY package.json package-lock.json prisma ./
 RUN npm install
 
-# Copy prisma schema and source code
-COPY prisma ./prisma/
+# Copy source code
 COPY . .
 
 # Build TypeScript
