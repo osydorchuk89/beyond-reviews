@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "module": "CommonJS", // Changed for better compatibility
+    "rootDir": "./src",    // Added to define source root
+    "outDir": "./dist",    // Correctly points to dist
+    "lib": ["ES2022"],
+    "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "module": "NodeNext",
-    "outDir": "dist",
-    "lib": ["ES2022", "DOM"],
-    "strict": true
-  }
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"] // Added to specify what to compile
 }
