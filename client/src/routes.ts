@@ -26,6 +26,7 @@ import {
     userReviewsLoader,
     userWatchListLoader,
 } from "./lib/loaders";
+import { loginAction, logoutAction } from "./lib/actions";
 
 export const router = createBrowserRouter([
     {
@@ -37,6 +38,11 @@ export const router = createBrowserRouter([
             {
                 path: "login",
                 Component: LoginPage,
+                action: loginAction
+            },
+            {
+                path: "logout",
+                action: logoutAction,
             },
             {
                 path: "registration",

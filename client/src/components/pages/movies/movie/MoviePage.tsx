@@ -5,14 +5,14 @@ import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
 import { MovieReviewSection } from "./MovieReviewSection";
 import { MovieReviews } from "./MovieReviews";
-import { AuthData, Movie, MovieData, MovieReview } from "../../../../lib/entities";
-import { useAppSelector } from "../../../../store/hooks";
 import {
-    getAuthData,
-    getMovie,
-    getMovieReviews,
-} from "../../../../lib/actions";
-import { LoadingSpinner } from "../../../ui/LoadingSpinner";
+    AuthData,
+    Movie,
+    MovieData,
+    MovieReview,
+} from "../../../../lib/entities";
+import { useAppSelector } from "../../../../store/hooks";
+import { getMovie, getMovieReviews } from "../../../../lib/actions";
 
 export const MoviePage = () => {
     // Movie and movie reviews data fetching logic
@@ -22,6 +22,11 @@ export const MoviePage = () => {
         useState<MovieReview[]>(movieReviews);
 
     const reviewEvent = useAppSelector((state) => state.reviewEvent);
+
+    // Authentification data fetching logic
+    const { authData } = useRouteLoaderData("root") as {
+        authData: AuthData;
+    };
 
     useEffect(() => {
         const fetchMovieData = async () => {
@@ -33,34 +38,7 @@ export const MoviePage = () => {
             setMovieReviewsData(movieReviewsData);
         };
         fetchMovieData();
-    }, [reviewEvent]);
-
-    // Authentification data fetcing logic
-    const { authData: initialAuthData } = useRouteLoaderData("root");
-    const [authData, setAuthData] = useState<AuthData>({
-        isAuthenticated: initialAuthData.isAuthenticated,
-        user: initialAuthData.user,
-    });
-    const [authDataFetching, setAuthDataFetching] = useState(false);
-
-    const authEvent = useAppSelector((state) => state.authEvent);
-
-    useEffect(() => {
-        const checkAuthStatus = async () => {
-            setAuthDataFetching(true);
-            const authData = await getAuthData();
-            setAuthData({
-                isAuthenticated: authData.isAuthenticated,
-                user: authData.user,
-            });
-            setAuthDataFetching(false);
-        };
-        checkAuthStatus();
-    }, [authEvent]);
-
-    if (authDataFetching) {
-        return <LoadingSpinner />;
-    }
+    }, [reviewEvent, authData]);
 
     return (
         <div className="flex flex-col mx-48 text-sky-950">

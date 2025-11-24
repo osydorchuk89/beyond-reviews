@@ -165,3 +165,7 @@ export interface MovieReviewInputs {
     rating: number;
     text?: string;
 }
+
+export interface LocationState {
+    from?: string;
+}

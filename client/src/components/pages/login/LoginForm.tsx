@@ -1,18 +1,28 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+    Form,
+    Location,
+    useLocation,
+    useNavigation,
+    useSubmit,
+} from "react-router";
 
 import { LoginSchema } from "../../../lib/schemas";
 import { BaseButton } from "../../ui/BaseButton";
 import { NavLink } from "../../ui/NavLink";
 import { SocialLoginButton } from "../../ui/SocialLoginButton";
-import { LoginInputs } from "../../../lib/entities";
+import { LocationState, LoginInputs } from "../../../lib/entities";
 
-interface LoginFormProps {
-    onSubmit: (data: LoginInputs) => Promise<void>;
-    fetching: boolean;
-}
+export const LoginForm = () => {
+    const navigation = useNavigation();
+    const submit = useSubmit();
+    const loginPending =
+        navigation.state === "submitting" || navigation.state === "loading";
 
-export const LoginForm = ({ onSubmit, fetching }: LoginFormProps) => {
+    const location = useLocation() as Location<LocationState>;
+    const from = location.state?.from ?? "/";
+
     const {
         register,
         handleSubmit,
@@ -21,15 +31,19 @@ export const LoginForm = ({ onSubmit, fetching }: LoginFormProps) => {
         resolver: zodResolver(LoginSchema),
     });
 
-    const handleFormSubmit = handleSubmit(async (data) => {
-        await onSubmit(data);
-    });
+    const onSubmit = (data: LoginInputs) => {
+        const formData = new FormData();
+        formData.append("email", data.email);
+        formData.append("password", data.password);
+        formData.append("from", from);
+        submit(formData, { method: "post" });
+    };
 
     return (
-        <form
+        <Form
             noValidate
             className="flex flex-col justify-start md:w-[26rem] bg-sky-100 shadow-lg px-10 pt-8 pb-10 rounded-md gap-5"
-            onSubmit={handleFormSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             data-testid="login-form"
         >
             <p className="text-2xl font-bold text-center">
@@ -67,8 +81,8 @@ export const LoginForm = ({ onSubmit, fetching }: LoginFormProps) => {
             <BaseButton
                 type="submit"
                 style="orange"
-                text={fetching ? "Please wait..." : "LOGIN"}
-                disabled={fetching}
+                text={loginPending ? "Please wait..." : "LOGIN"}
+                disabled={loginPending}
             />
 
             <p className="text-center">
@@ -82,6 +96,6 @@ export const LoginForm = ({ onSubmit, fetching }: LoginFormProps) => {
                 <span className="bg-sky-100 px-2">or</span>
             </p>
             <SocialLoginButton />
-        </form>
+        </Form>
     );
 };

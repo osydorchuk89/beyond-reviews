@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { redirect } from "react-router";
 
 import axiosInstance from "./axiosInstance";
 import {
@@ -29,15 +29,23 @@ export const sendRegistrationData = async (userData: FormData) => {
 };
 
 // Authentification
-export const sendLoginData = async (loginData: {
-    email: string;
-    password: string;
-}): Promise<AxiosResponse> => {
+export const loginAction = async ({ request }: { request: Request }) => {
+    const formData = await request.formData();
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const from = (formData.get("from") as string) ?? "/";
+
     try {
-        const response = await axiosInstance.post("/auth/login", loginData);
-        return response;
+        await axiosInstance.post("/auth/login", {
+            email,
+            password,
+        });
+        return redirect(from ? from : "/");
     } catch (error: any) {
-        return error;
+        if (error.response?.status === 401) {
+            return { error: "Invalid credentials" };
+        }
+        return { error: error.response?.data?.message || "Login failed" };
     }
 };
 
@@ -51,13 +59,12 @@ export const getAuthData = async (): Promise<AuthData> => {
     }
 };
 
-export const logout = async (): Promise<AxiosResponse> => {
+export const logoutAction = async () => {
     try {
-        const response = await axiosInstance.get("/auth/logout");
-        return response;
-    } catch (error) {
-        console.log(error);
-        throw error;
+        await axiosInstance.get("/auth/logout");
+        return null;
+    } catch (error: any) {
+        return { error: "Logout failed" };
     }
 };
 

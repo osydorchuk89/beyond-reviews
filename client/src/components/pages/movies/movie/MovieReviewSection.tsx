@@ -85,7 +85,11 @@ export const MovieReviewSection = ({
                     <p className="px-4 py-2">
                         To rate the movie or post a review, please{" "}
                         <span className="font-semibold">
-                            <NavLink to="/login" text="login to your account" />
+                            <NavLink
+                                to="/login"
+                                text="login to your account"
+                                state={{ from: location.pathname }}
+                            />
                         </span>
                     </p>
                 )}

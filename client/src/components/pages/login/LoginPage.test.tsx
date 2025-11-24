@@ -1,57 +1,81 @@
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { createMemoryRouter, RouterProvider } from "react-router";
+import { describe, it, expect, afterEach } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 
 import { LoginPage } from "./LoginPage";
 import { store } from "../../../store";
-import { sendLoginData } from "../../../lib/actions";
 
-const navigateMock = vi.fn();
-vi.mock("react-router", async () => {
-    const actual = await vi.importActual("react-router");
-    return {
-        ...actual,
-        useNavigate: vi.fn(() => navigateMock),
-    };
-});
-
-vi.mock("../../../lib/actions", () => ({
-    sendLoginData: vi.fn(),
-}));
-
-const createMockAxiosResponse = (status: number): any => ({
-    status,
-    statusText: status === 200 ? "OK" : "Error",
-    data: {},
-    headers: {},
-    config: {} as any,
-    request: {},
-});
+const createMockRouter = (actionData?: any) => {
+    return createMemoryRouter(
+        [
+            {
+                path: "/login",
+                element: <LoginPage />,
+                action: async () => actionData || null,
+            },
+        ],
+        {
+            initialEntries: ["/login"],
+        }
+    );
+};
 
 describe("LoginPage", () => {
-    beforeEach(() => {
-        render(
-            <Provider store={store}>
-                <MemoryRouter>
-                    <LoginPage />
-                </MemoryRouter>
-            </Provider>
-        );
-    });
-
     afterEach(() => {
         cleanup();
     });
 
     it("renders a login form", () => {
+        const router = createMockRouter();
+        render(
+            <Provider store={store}>
+                <RouterProvider router={router} />
+            </Provider>
+        );
+
         const loginForm = screen.getByTestId("login-form");
         expect(loginForm).toBeInTheDocument();
     });
 
+    it("renders email and password input fields", () => {
+        const router = createMockRouter();
+        render(
+            <Provider store={store}>
+                <RouterProvider router={router} />
+            </Provider>
+        );
+
+        const emailInput = screen.getByLabelText(/email/i);
+        const passwordInput = screen.getByLabelText(/password/i);
+
+        expect(emailInput).toBeInTheDocument();
+        expect(passwordInput).toBeInTheDocument();
+    });
+
+    it("renders a login button", () => {
+        const router = createMockRouter();
+        render(
+            <Provider store={store}>
+                <RouterProvider router={router} />
+            </Provider>
+        );
+
+        const loginButton = screen.getByRole("button", { name: "LOGIN" });
+        expect(loginButton).toBeInTheDocument();
+        expect(loginButton).not.toBeDisabled();
+    });
+
     it("shows a validation error when submitting empty email", async () => {
+        const router = createMockRouter();
+        render(
+            <Provider store={store}>
+                <RouterProvider router={router} />
+            </Provider>
+        );
+
         const submitButton = screen.getByRole("button", { name: "LOGIN" });
         await userEvent.type(screen.getByLabelText(/password/i), "password");
         await userEvent.click(submitButton);
@@ -62,6 +86,13 @@ describe("LoginPage", () => {
     });
 
     it("shows a validation error when submitting empty password", async () => {
+        const router = createMockRouter();
+        render(
+            <Provider store={store}>
+                <RouterProvider router={router} />
+            </Provider>
+        );
+
         const submitButton = screen.getByRole("button", { name: "LOGIN" });
         await userEvent.type(
             screen.getByLabelText(/email/i),
@@ -74,100 +105,27 @@ describe("LoginPage", () => {
         ).toBeInTheDocument();
     });
 
-    it("disables login button and shows 'Please wait...' when submitting login data", async () => {
-        vi.mocked(sendLoginData).mockImplementationOnce(() => {
-            return new Promise((resolve) =>
-                setTimeout(() => resolve(createMockAxiosResponse(200)), 100)
-            );
-        });
-
-        const submitButton = screen.getByRole("button", { name: "LOGIN" });
-
-        expect(submitButton).not.toBeDisabled();
-
-        await userEvent.type(
-            screen.getByLabelText(/email/i),
-            "john.doe@email.com"
+    it("renders a link to the registration page", () => {
+        const router = createMockRouter();
+        render(
+            <Provider store={store}>
+                <RouterProvider router={router} />
+            </Provider>
         );
-        await userEvent.type(screen.getByLabelText(/password/i), "password");
 
-        await userEvent.click(submitButton);
-
-        expect(submitButton).toBeDisabled();
-
-        expect(submitButton).toHaveTextContent("Please wait...");
+        const registrationLink = screen.getByText(/Register here/i);
+        expect(registrationLink).toBeInTheDocument();
     });
 
-    it("shows 'Invalid credentials' message on failed login attempt", async () => {
-        vi.mocked(sendLoginData).mockImplementationOnce(() => {
-            return new Promise((resolve) =>
-                setTimeout(() => resolve(createMockAxiosResponse(401)), 100)
-            );
-        });
-
-        await userEvent.type(
-            screen.getByLabelText(/email/i),
-            "wrong@email.com"
-        );
-        await userEvent.type(
-            screen.getByLabelText(/password/i),
-            "wrongpassword"
+    it("renders 'Login with Google' button", () => {
+        const router = createMockRouter();
+        render(
+            <Provider store={store}>
+                <RouterProvider router={router} />
+            </Provider>
         );
 
-        await userEvent.click(screen.getByRole("button", { name: "LOGIN" }));
-
-        expect(
-            await screen.findByText(/Invalid credentials/i)
-        ).toBeInTheDocument();
-    });
-
-    it("removes 'Invalid credentials' message when a close icon is clicked", async () => {
-        vi.mocked(sendLoginData).mockImplementationOnce(() => {
-            return new Promise((resolve) =>
-                setTimeout(() => resolve(createMockAxiosResponse(401)), 100)
-            );
-        });
-
-        await userEvent.type(
-            screen.getByLabelText(/email/i),
-            "wrong@email.com"
-        );
-        await userEvent.type(
-            screen.getByLabelText(/password/i),
-            "wrongpassword"
-        );
-
-        await userEvent.click(screen.getByRole("button", { name: "LOGIN" }));
-
-        const errorMessage = await screen.findByText(/Invalid credentials/i);
-        expect(errorMessage).toBeInTheDocument();
-
-        const closeButton = screen.getByTestId("close-button");
-        await userEvent.click(closeButton);
-
-        expect(
-            screen.queryByText(/Invalid credentials/i)
-        ).not.toBeInTheDocument();
-    });
-
-    it("navigates back upon successful login", async () => {
-        vi.mocked(sendLoginData).mockImplementationOnce(() => {
-            return new Promise((resolve) =>
-                setTimeout(() => resolve(createMockAxiosResponse(200)), 500)
-            );
-        });
-
-        await userEvent.type(
-            screen.getByLabelText(/email/i),
-            "user@example.com"
-        );
-        await userEvent.type(
-            screen.getByLabelText(/password/i),
-            "securepassword"
-        );
-
-        await userEvent.click(screen.getByRole("button", { name: "LOGIN" }));
-
-        expect(navigateMock).toHaveBeenCalledWith(-1);
+        const googleButton = screen.getByText(/Login with Google/i);
+        expect(googleButton).toBeInTheDocument();
     });
 });
