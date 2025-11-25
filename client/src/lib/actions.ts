@@ -14,17 +14,28 @@ import {
 } from "./entities";
 
 // Registration
-export const sendRegistrationData = async (userData: FormData) => {
+export const registrationAction = async ({ request }: { request: Request }) => {
+    const formData = await request.formData();
+
     try {
-        const response = await axiosInstance.post("/api/users/", userData, {
+        const response = await axiosInstance.post("/api/users/", formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
             },
         });
-        return response;
-    } catch (error) {
-        console.log(error);
-        throw error;
+
+        if (response.status === 200 && response.data) {
+            return redirect("/");
+        } else {
+            return { error: "Registration successful but auto-login failed" };
+        }
+    } catch (error: any) {
+        if (error.response?.status === 409) {
+            return { error: "User with this email already exists" };
+        }
+        return {
+            error: error.response?.data?.message || "Registration failed",
+        };
     }
 };
 
@@ -40,7 +51,7 @@ export const loginAction = async ({ request }: { request: Request }) => {
             email,
             password,
         });
-        return redirect(from ? from : "/");
+        return redirect(from);
     } catch (error: any) {
         if (error.response?.status === 401) {
             return { error: "Invalid credentials" };

@@ -2,11 +2,10 @@ import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import { User } from "../../../../lib/entities";
-import { useUserIdentity } from "../../../../hooks/useUserIdentity";
+import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { useAppDispatch } from "../../../../store/hooks";
 import { sendFriendRequest } from "../../../../lib/actions";
 import { triggerFriendEvent } from "../../../../store";
-import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 import { profileNavLinks } from "../../../../lib/data";
 import { NavLink } from "../../../ui/NavLink";
 import { BaseButton } from "../../../ui/BaseButton";
@@ -15,8 +14,8 @@ export const ProfilePage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { visitingUser, isSameUser, profileUserName, isLoading } =
-        useUserIdentity(profileUser);
+    const { visitingUser, isSameUser, profileUserName } =
+        useIsSameUser(profileUser);
 
     const dispatch = useAppDispatch();
 
@@ -59,10 +58,6 @@ export const ProfilePage = () => {
             console.error("Failed to send friend request:", error);
         }
     };
-
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
 
     return (
         <div className="flex flex-col justify-between p-5 rounded-lg shadow-lg bg-sky-100 gap-10 min-h-[70vh] md:w-2/3">

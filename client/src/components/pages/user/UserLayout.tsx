@@ -1,12 +1,21 @@
-import { Outlet, useNavigate, useParams } from "react-router";
+import {
+    Outlet,
+    useNavigate,
+    useParams,
+    useRouteLoaderData,
+} from "react-router";
 
-import { useAuthData } from "../../../hooks/useAuthData";
 import { BaseButton } from "../../ui/BaseButton";
+import { AuthData } from "../../../lib/entities";
 
 export const UserLayout = () => {
-    const { userId: profileUserId } = useParams() as { userId: string };
-    const { user: visitingUser } = useAuthData();
     const navigate = useNavigate();
+    const { userId: profileUserId } = useParams() as { userId: string };
+
+    const { authData } = useRouteLoaderData("root") as {
+        authData: AuthData;
+    };
+    const visitingUser = authData.user;
 
     const isSameUser = visitingUser && profileUserId === visitingUser.id;
 

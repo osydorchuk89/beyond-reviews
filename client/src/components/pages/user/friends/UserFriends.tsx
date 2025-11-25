@@ -2,11 +2,10 @@ import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import { Friend, User } from "../../../../lib/entities";
-import { useUserIdentity } from "../../../../hooks/useUserIdentity";
+import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { useAppDispatch } from "../../../../store/hooks";
 import { acceptFriendRequest } from "../../../../lib/actions";
 import { triggerFriendEvent } from "../../../../store";
-import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 import { FriendRequestsSection } from "./FriendRequestsSection";
 import { FriendsList } from "./FriendsList";
 
@@ -15,8 +14,7 @@ export const UserFriends = () => {
         user: User;
     };
 
-    const { isSameUser, profileUserName, isLoading } =
-        useUserIdentity(profileUser);
+    const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     const dispatch = useAppDispatch();
 
@@ -64,10 +62,6 @@ export const UserFriends = () => {
             console.error("Failed to accept friend request:", error);
         }
     };
-
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">

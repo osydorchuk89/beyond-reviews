@@ -4,8 +4,7 @@ import { User, UserActivity } from "../../../../lib/entities";
 import { BaseButton } from "../../../ui/BaseButton";
 import { ActivityDetails } from "./ActivityDetails";
 import { ActivityOtherReview } from "./ActivityOtherReview";
-import { LoadingSpinner } from "../../../ui/LoadingSpinner";
-import { useUserIdentity } from "../../../../hooks/useUserIdentity";
+import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 
 export const UserActivities = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
@@ -14,15 +13,10 @@ export const UserActivities = () => {
     const { userActivities } = useLoaderData() as {
         userActivities: UserActivity[];
     };
-    const { isSameUser, profileUserName, isLoading } =
-        useUserIdentity(profileUser);
+    const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     const reversedActivityData = [...userActivities].reverse();
     const navigate = useNavigate();
-
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
@@ -66,7 +60,7 @@ export const UserActivities = () => {
                         </div>
                     );
                 })}
-            {userActivities.length === 0 && (
+            {reversedActivityData.length === 0 && (
                 <div className="flex flex-col items-center justify-center gap-10">
                     <p className="text-center text-lg">
                         {isSameUser ? "You have" : `${profileUserName} has`} no

@@ -1,18 +1,18 @@
-import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, useActionData, useNavigation, useSubmit } from "react-router";
 
 import { UserSchema } from "../../../lib/schemas";
 import { BaseButton } from "../../ui/BaseButton";
-import { sendRegistrationData } from "../../../lib/actions";
-import { useAppDispatch } from "../../../store/hooks";
-import { triggerAuthEvent } from "../../../store";
 import { RegistrationInputs } from "../../../lib/entities";
 
 export const RegistrationForm = () => {
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    
+    const actionData = useActionData() as { error?: string } | undefined;
+    const navigation = useNavigation();
+    const submit = useSubmit();
+    const isSubmitting =
+        navigation.state === "submitting" || navigation.state === "loading";
+
     const {
         register,
         handleSubmit,
@@ -22,42 +22,42 @@ export const RegistrationForm = () => {
         resolver: zodResolver(UserSchema),
     });
 
-
-    const handleRegistration = handleSubmit(async (data) => {
-        const registrationData = new FormData();
-        registrationData.append("firstName", data.firstName);
-        registrationData.append("lastName", data.lastName);
-        registrationData.append("email", data.email);
-        registrationData.append("password", data.password);
-        data.photo && registrationData.append("photo", data.photo[0]);
-
-        try {
-            const response = await sendRegistrationData(registrationData);
-            dispatch(triggerAuthEvent("registered"));
-            if (response.status === 200 && response.data) {
-                dispatch(triggerAuthEvent("loggedIn"));
-                navigate("/");
-            } else {
-                console.log("Registration successful but auto-login failes");
-            }
-        } catch (error: any) {
-            if (error.response.status === 409) {
-                setError("email", {
-                    type: "custom",
-                    message: "User with this email already exists",
-                });
-            } else {
-                console.log(error);
-            }
+    const onSubmit = (data: RegistrationInputs) => {
+        const formData = new FormData();
+        formData.append("firstName", data.firstName);
+        formData.append("lastName", data.lastName);
+        formData.append("email", data.email);
+        formData.append("password", data.password);
+        if (data.photo && data.photo[0]) {
+            formData.append("photo", data.photo[0]);
         }
-    });
+        submit(formData, { method: "post" });
+    };
+
+    // Show email error if returned from action
+    if (
+        actionData?.error &&
+        actionData.error.includes("email already exists")
+    ) {
+        if (!errors.email) {
+            setError("email", {
+                type: "custom",
+                message: actionData.error,
+            });
+        }
+    }
 
     return (
-        <form
+        <Form
             noValidate
             className="flex flex-col justify-start w-[36rem] px-5 pt-5 pb-10 gap-5"
-            onSubmit={handleRegistration}
+            onSubmit={handleSubmit(onSubmit)}
         >
+            {actionData?.error && !actionData.error.includes("email") && (
+                <p className="text-red-700 font-medium text-center">
+                    {actionData.error}
+                </p>
+            )}
             <div className="flex flex-col gap-2">
                 <label htmlFor="firstName" className="font-semibold">
                     First Name:
@@ -133,8 +133,13 @@ export const RegistrationForm = () => {
                 </p>
             </div>
             <div className="flex justify-center">
-                <BaseButton type="submit" style="sky" text="REGISTER" />
+                <BaseButton
+                    type="submit"
+                    style="sky"
+                    text={isSubmitting ? "Please wait..." : "REGISTER"}
+                    disabled={isSubmitting}
+                />
             </div>
-        </form>
+        </Form>
     );
 };

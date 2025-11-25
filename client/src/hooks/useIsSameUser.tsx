@@ -1,10 +1,13 @@
 import { useMemo } from "react";
 
-import { User } from "../lib/entities";
-import { useAuthData } from "./useAuthData";
+import { AuthData, User } from "../lib/entities";
+import { useRouteLoaderData } from "react-router";
 
-export const useUserIdentity = (profileUser: User) => {
-    const { user: visitingUser, authDataFetching } = useAuthData();
+export const useIsSameUser = (profileUser: User) => {
+    const { authData } = useRouteLoaderData("root") as {
+        authData: AuthData;
+    };
+    const visitingUser = authData.user;
 
     const isSameUser = useMemo(() => {
         if (!visitingUser) return false;
@@ -20,6 +23,5 @@ export const useUserIdentity = (profileUser: User) => {
         visitingUser,
         isSameUser,
         profileUserName,
-        isLoading: authDataFetching,
     };
 };

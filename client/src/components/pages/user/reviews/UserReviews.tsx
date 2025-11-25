@@ -1,9 +1,8 @@
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { MovieReview, User } from "../../../../lib/entities";
-import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 import { MovieReviewDetails } from "./MovieReviewDetails";
-import { useUserIdentity } from "../../../../hooks/useUserIdentity";
+import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 
 export const UserReviews = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
@@ -12,12 +11,7 @@ export const UserReviews = () => {
     const { userMovieReviews } = useLoaderData() as {
         userMovieReviews: MovieReview[];
     };
-    const { isSameUser, profileUserName, isLoading } =
-        useUserIdentity(profileUser);
-
-    if (isLoading) {
-        return <LoadingSpinner />;
-    }
+    const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">

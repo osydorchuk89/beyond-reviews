@@ -26,7 +26,7 @@ import {
     userReviewsLoader,
     userWatchListLoader,
 } from "./lib/loaders";
-import { loginAction, logoutAction } from "./lib/actions";
+import { loginAction, logoutAction, registrationAction } from "./lib/actions";
 
 export const router = createBrowserRouter([
     {
@@ -47,6 +47,7 @@ export const router = createBrowserRouter([
             {
                 path: "registration",
                 Component: RegistrationPage,
+                action: registrationAction,
             },
             {
                 path: "books",
