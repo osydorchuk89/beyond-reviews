@@ -1,10 +1,10 @@
-import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router";
+import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { User, UserActivity } from "../../../../lib/entities";
-import { BaseButton } from "../../../ui/BaseButton";
 import { ActivityDetails } from "./ActivityDetails";
 import { ActivityOtherReview } from "./ActivityOtherReview";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
+import { ButtonLink } from "../../../ui/ButtonLink";
 
 export const UserActivities = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
@@ -16,7 +16,6 @@ export const UserActivities = () => {
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     const reversedActivityData = [...userActivities].reverse();
-    const navigate = useNavigate();
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
@@ -67,10 +66,10 @@ export const UserActivities = () => {
                         activities
                     </p>
                     {isSameUser && (
-                        <BaseButton
+                        <ButtonLink
                             text="Explore movies"
                             style="orange"
-                            handleClick={() => navigate("/movies")}
+                            to="/movies"
                         />
                     )}
                 </div>

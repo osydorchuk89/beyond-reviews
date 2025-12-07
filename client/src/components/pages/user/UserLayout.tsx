@@ -1,15 +1,9 @@
-import {
-    Outlet,
-    useNavigate,
-    useParams,
-    useRouteLoaderData,
-} from "react-router";
+import { Outlet, useParams, useRouteLoaderData } from "react-router";
 
-import { BaseButton } from "../../ui/BaseButton";
 import { AuthData } from "../../../lib/entities";
+import { ButtonLink } from "../../ui/ButtonLink";
 
 export const UserLayout = () => {
-    const navigate = useNavigate();
     const { userId: profileUserId } = useParams() as { userId: string };
 
     const { authData } = useRouteLoaderData("root") as {
@@ -24,12 +18,10 @@ export const UserLayout = () => {
             <Outlet key={profileUserId} />
             {visitingUser && !isSameUser && (
                 <div>
-                    <BaseButton
+                    <ButtonLink
                         text="BACK TO YOUR PROFILE"
                         style="orange"
-                        handleClick={() =>
-                            navigate(`/users/${visitingUser.id}/profile`)
-                        }
+                        to={`/users/${visitingUser.id}/profile`}
                     />
                 </div>
             )}

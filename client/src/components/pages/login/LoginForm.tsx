@@ -18,7 +18,7 @@ export const LoginForm = () => {
     const navigation = useNavigation();
     const submit = useSubmit();
     const loginPending =
-        navigation.state === "submitting" || navigation.state === "loading";
+        navigation.state !== "idle" && navigation.formAction === "/login";
 
     const location = useLocation() as Location<LocationState>;
     const from = location.state?.from ?? "/";

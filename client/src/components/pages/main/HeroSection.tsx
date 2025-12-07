@@ -1,10 +1,6 @@
-import { useNavigate } from "react-router";
-
-import { BaseButton } from "../../ui/BaseButton";
+import { ButtonLink } from "../../ui/ButtonLink";
 
 export const HeroSection = () => {
-    const navigate = useNavigate();
-
     return (
         <div className="bg-sky-800 flex gap-8 py-20 px-48 text-white">
             <div className="flex flex-col gap-20 w-1/2">
@@ -16,10 +12,10 @@ export const HeroSection = () => {
                     <span className="italic">beyond</span> ordinary reviews!
                 </p>
                 <div className="flex justify-start">
-                    <BaseButton
+                    <ButtonLink
                         text="Start browsing"
                         style="orange"
-                        handleClick={() => navigate("/movies")}
+                        to="/movies"
                     />
                 </div>
             </div>

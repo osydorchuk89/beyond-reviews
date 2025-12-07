@@ -2,12 +2,9 @@ import { BASE_URL } from "../../lib/axiosInstance";
 
 export const SocialLoginButton = () => {
     return (
-        <button
-            className="flex justify-center items-center relative py-2 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-200 cursor-pointer"
-            type="button"
-            onClick={() => {
-                window.location.href = BASE_URL + "/auth/google";
-            }}
+        <a
+            href={BASE_URL + "/auth/google"}
+            className="flex justify-center items-center relative py-2 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-200 cursor-pointer no-underline"
         >
             <div className="absolute left-3">
                 <svg
@@ -39,6 +36,6 @@ export const SocialLoginButton = () => {
             <div>
                 <p className="text-xl">Login with Google </p>
             </div>
-        </button>
+        </a>
     );
 };

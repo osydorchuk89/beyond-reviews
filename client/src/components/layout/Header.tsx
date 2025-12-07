@@ -5,10 +5,10 @@ import {
     useRouteLoaderData,
 } from "react-router";
 
-import { BaseButton } from "../ui/BaseButton";
 import { headerNavLinks } from "../../lib/data";
 import { LogoutButton } from "../ui/LogoutButton";
 import { AuthData } from "../../lib/entities";
+import { ButtonLink } from "../ui/ButtonLink";
 
 export const Header = () => {
     let { pathname } = useLocation();
@@ -61,10 +61,11 @@ export const Header = () => {
                     <LogoutButton />
                 </div>
             ) : (
-                <BaseButton
+                <ButtonLink
                     text="LOGIN"
                     style="orange"
-                    handleClick={() => navigate("/login")}
+                    to="/login"
+                    state={{ from: location.pathname }}
                 />
             )}
         </header>

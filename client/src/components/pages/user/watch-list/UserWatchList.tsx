@@ -1,9 +1,9 @@
-import { useLoaderData, useNavigate, useRouteLoaderData } from "react-router";
+import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { MovieWatchList, User } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { MovieCard } from "../../movies/MovieCard";
-import { BaseButton } from "../../../ui/BaseButton";
+import { ButtonLink } from "../../../ui/ButtonLink";
 
 export const UserWatchList = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
@@ -13,8 +13,6 @@ export const UserWatchList = () => {
         userWatchList: MovieWatchList[];
     };
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
-
-    const navigate = useNavigate();
 
     return (
         <div className="flex flex-col gap-10 justify-center items-center min-h-[70vh]">
@@ -43,10 +41,10 @@ export const UserWatchList = () => {
                         {isSameUser ? "your" : `${profileUserName}'s`} watchlist
                     </p>
                     {isSameUser && (
-                        <BaseButton
+                        <ButtonLink
                             text="EXPLORE MOVIES"
                             style="orange"
-                            handleClick={() => navigate("/movies")}
+                            to="/movies"
                         />
                     )}
                 </div>

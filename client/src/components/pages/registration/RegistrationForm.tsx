@@ -11,7 +11,8 @@ export const RegistrationForm = () => {
     const navigation = useNavigation();
     const submit = useSubmit();
     const isSubmitting =
-        navigation.state === "submitting" || navigation.state === "loading";
+        navigation.state !== "idle" &&
+        navigation.formAction === "/registration";
 
     const {
         register,
