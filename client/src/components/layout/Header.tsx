@@ -62,11 +62,12 @@ export const Header = () => {
                 </div>
             ) : (
                 <ButtonLink
-                    text="LOGIN"
                     style="orange"
                     to="/login"
                     state={{ from: location.pathname }}
-                />
+                >
+                    LOGIN
+                </ButtonLink>
             )}
         </header>
     );

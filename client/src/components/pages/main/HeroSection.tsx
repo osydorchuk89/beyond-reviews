@@ -12,11 +12,9 @@ export const HeroSection = () => {
                     <span className="italic">beyond</span> ordinary reviews!
                 </p>
                 <div className="flex justify-start">
-                    <ButtonLink
-                        text="Start browsing"
-                        style="orange"
-                        to="/movies"
-                    />
+                    <ButtonLink style="orange" to="/movies">
+                        Start browsing
+                    </ButtonLink>
                 </div>
             </div>
             <div className="w-1/2">

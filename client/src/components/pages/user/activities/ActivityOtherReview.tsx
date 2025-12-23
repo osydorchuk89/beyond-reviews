@@ -1,19 +1,20 @@
 import { UserActivity } from "../../../../lib/entities";
 import { NavLink } from "../../../ui/NavLink";
 
-export const ActivityOtherReview = ({
-    activity,
-}: {
+interface ActivityOtherReviewProps {
     activity: UserActivity;
-}) => {
+}
+
+export const ActivityOtherReview = ({ activity }: ActivityOtherReviewProps) => {
+    const movieReviewLinkText = `${activity.movieReview.movie.title} (${activity.movieReview.movie.releaseYear})`;
+
     return (
         <div className="mt-2">
             <p>
                 <strong>Movie</strong>:{" "}
-                <NavLink
-                    text={`${activity.movieReview.movie.title} (${activity.movieReview.movie.releaseYear})`}
-                    to={`/movies/${activity.movieReview.movieId}`}
-                />
+                <NavLink to={`/movies/${activity.movieReview.movieId}`}>
+                    {movieReviewLinkText}
+                </NavLink>
             </p>
             <p>
                 <strong>Rating</strong>: {`${activity.movieReview.rating}/10`}

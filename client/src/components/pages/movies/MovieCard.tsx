@@ -42,20 +42,22 @@ export const MovieCard = ({
                 {genres.slice(0, 3).map((item, index) => (
                     <span key={item}>
                         <QueryLink
-                            text={item}
                             onClick={() => handleQueryClick("genre", item)}
-                        />
+                        >
+                            {item}
+                        </QueryLink>
                         {index !== genres.slice(0, 3).length - 1 && " | "}
                     </span>
                 ))}
             </p>
             <p className="mb-2 text-sky-950">
                 <QueryLink
-                    text={releaseYear.toString()}
                     onClick={() =>
                         handleQueryClick("releaseYear", releaseYear.toString())
                     }
-                />
+                >
+                    {releaseYear.toString()}
+                </QueryLink>
             </p>
             <Link to={`/movies/${id}`}>
                 <img src={poster} className="rounded-lg" />

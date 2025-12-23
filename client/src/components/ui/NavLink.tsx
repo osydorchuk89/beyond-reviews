@@ -3,14 +3,14 @@ import { LocationState } from "../../lib/entities";
 
 interface NavLinkProps {
     to: string;
-    text: string;
+    children: React.ReactNode;
     relative?: RelativeRoutingType;
     state?: LocationState;
 }
 
 export const NavLink = ({
     to,
-    text,
+    children,
     relative = "route",
     state,
 }: NavLinkProps) => {
@@ -21,7 +21,7 @@ export const NavLink = ({
             relative={relative}
             state={state}
         >
-            {text}
+            {children}
         </Link>
     );
 };

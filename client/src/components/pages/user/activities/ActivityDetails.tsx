@@ -31,9 +31,8 @@ export const ActivityDetails = ({
                             {isSameUser ? "You" : userName} rated{" "}
                             {activity.reviewRating}/10{" "}
                             <NavLink
-                                text={`${activity.movie.title} (${activity.movie.releaseYear})`}
                                 to={`/movies/${activity.movieId}`}
-                            />
+                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</NavLink>
                         </span>
                     )}
                     {activity.movieId && activity.action !== "rated" && (
@@ -41,9 +40,8 @@ export const ActivityDetails = ({
                             {isSameUser ? "You" : userName}{" "}
                             {activity.action === "saved" ? "added" : "removed"}{" "}
                             <NavLink
-                                text={`${activity.movie.title} (${activity.movie.releaseYear})`}
                                 to={`/movies/${activity.movieId}`}
-                            />{" "}
+                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</NavLink>{" "}
                             {activity.action === "saved" ? "to" : "from"} watch
                             list
                         </span>
@@ -53,10 +51,9 @@ export const ActivityDetails = ({
                             {isSameUser ? "You" : userName}{" "}
                             {activity.action === "liked" ? "liked" : "unliked"}{" "}
                             a review by{" "}
-                            <NavLink
-                                text={ratingUserName}
-                                to={`/users/${ratingUserId}/profile`}
-                            />
+                            <NavLink to={`/users/${ratingUserId}/profile`}>
+                                {ratingUserName}
+                            </NavLink>
                         </span>
                     )}
                 </p>

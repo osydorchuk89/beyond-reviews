@@ -22,10 +22,9 @@ export const FriendsList = ({
                             key={friend.id}
                             className="flex flex-col text-lg p-5 rounded-lg shadow-lg bg-sky-100 gap-8"
                         >
-                            <NavLink
-                                text={`${friend.firstName} ${friend.lastName}`}
-                                to={`/users/${friend.id}/profile`}
-                            />
+                            <NavLink to={`/users/${friend.id}/profile`}>
+                                {`${friend.firstName} ${friend.lastName}`}
+                            </NavLink>
                         </li>
                     ))}
                 </ul>

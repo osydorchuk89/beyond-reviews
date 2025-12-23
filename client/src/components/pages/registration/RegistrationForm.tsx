@@ -134,12 +134,9 @@ export const RegistrationForm = () => {
                 </p>
             </div>
             <div className="flex justify-center">
-                <BaseButton
-                    type="submit"
-                    style="sky"
-                    text={isSubmitting ? "Please wait..." : "REGISTER"}
-                    disabled={isSubmitting}
-                />
+                <BaseButton type="submit" style="sky" disabled={isSubmitting}>
+                    {isSubmitting ? "Please wait..." : "REGISTER"}
+                </BaseButton>
             </div>
         </Form>
     );

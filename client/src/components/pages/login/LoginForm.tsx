@@ -78,17 +78,14 @@ export const LoginForm = () => {
                 </p>
             </div>
 
-            <BaseButton
-                type="submit"
-                style="orange"
-                text={loginPending ? "Please wait..." : "LOGIN"}
-                disabled={loginPending}
-            />
+            <BaseButton type="submit" style="orange" disabled={loginPending}>
+                {loginPending ? "Please wait..." : "LOGIN"}
+            </BaseButton>
 
             <p className="text-center">
                 Don't have an account?{" "}
                 <span className="font-medium">
-                    <NavLink text="Register here" to="/registration" />
+                    <NavLink to="/registration">Register here</NavLink>
                 </span>
             </p>
 

@@ -48,7 +48,9 @@ export const SearchBar = () => {
                     type="text"
                 />
                 <div className="flex justify-center md:justify-start gap-2 w-full">
-                    <BaseButton style="orange" text="Search" type="submit" />
+                    <BaseButton style="orange" type="submit">
+                        Search
+                    </BaseButton>
                     {searchTerm && searchTerm !== "" && (
                         <div className="flex items-center gap-2 bg-orange-300 rounded-md text-orange-950 p-2 overflow-hidden">
                             <span className="truncate">{searchTerm}</span>

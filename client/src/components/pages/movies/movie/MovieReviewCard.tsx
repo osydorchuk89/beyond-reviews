@@ -68,10 +68,9 @@ export const MovieReviewCard = ({
             <div className="flex flex-col w-full mb-5">
                 <div className="flex justify-between">
                     <p className="font-semibold">
-                        <NavLink
-                            text={movieReviewUserName}
-                            to={`/users/${movieReview.userId}/profile`}
-                        />
+                        <NavLink to={`/users/${movieReview.userId}/profile`}>
+                            {movieReviewUserName}
+                        </NavLink>
                     </p>
                     <div className="flex">
                         <span>

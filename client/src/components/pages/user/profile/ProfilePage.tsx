@@ -68,22 +68,23 @@ export const ProfilePage = () => {
             />
             <ul className="flex flex-col items-center gap-5 text-lg">
                 {visibleNavLinks.map((link) => (
-                    <NavLink key={link.text} to={link.to} text={link.text} />
+                    <NavLink key={link.text} to={link.to}>
+                        {link.text}
+                    </NavLink>
                 ))}
             </ul>
             <div className="flex justify-center">
                 {visitingUser && !isSameUser && !areFriends && (
                     <BaseButton
-                        text={
-                            requestSent
-                                ? "FRIEND REQUEST SENT"
-                                : "SEND FRIEND REQUEST"
-                        }
                         style={requestSent ? "disabled" : "orange"}
                         handleClick={
                             requestSent ? undefined : handleFriendRequest
                         }
-                    />
+                    >
+                        {requestSent
+                            ? "FRIEND REQUEST SENT"
+                            : "SEND FRIEND REQUEST"}
+                    </BaseButton>
                 )}
             </div>
         </div>

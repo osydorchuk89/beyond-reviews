@@ -87,9 +87,10 @@ export const MovieReviewSection = ({
                         <span className="font-semibold">
                             <NavLink
                                 to="/login"
-                                text="login to your account"
                                 state={{ from: location.pathname }}
-                            />
+                            >
+                                login to your account
+                            </NavLink>
                         </span>
                     </p>
                 )}

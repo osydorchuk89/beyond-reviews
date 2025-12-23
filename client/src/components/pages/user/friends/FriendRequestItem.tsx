@@ -25,17 +25,14 @@ export const FriendRequestItem = ({
                     src={photo}
                     className="object-cover object-top w-8 h-8 rounded-full self-center mr-2"
                 />
-                <NavLink
-                    text={`${firstName} ${lastName}`}
-                    to={`/users/${userId}/profile`}
-                />
+                <NavLink to={`/users/${userId}/profile`}>
+                    {`${firstName} ${lastName}`}
+                </NavLink>
             </div>
             {showAcceptButton && onAccept && (
-                <BaseButton
-                    text="Accept friend request"
-                    style="sky"
-                    handleClick={onAccept}
-                />
+                <BaseButton style="sky" handleClick={onAccept}>
+                    Accept friend request
+                </BaseButton>
             )}
         </li>
     );

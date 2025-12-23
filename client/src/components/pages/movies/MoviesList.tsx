@@ -115,11 +115,12 @@ export const MoviesList = ({
                         {hasMoreMovies && (
                             <div className="flex justify-center mb-10">
                                 <BaseButton
-                                    text={loading ? "LOADING..." : "LOAD MORE"}
                                     style="sky"
                                     handleClick={handleLoadMore}
                                     disabled={loading}
-                                />
+                                >
+                                    {loading ? "LOADING..." : "LOAD MORE"}
+                                </BaseButton>
                             </div>
                         )}
                     </>

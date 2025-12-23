@@ -66,11 +66,9 @@ export const UserActivities = () => {
                         activities
                     </p>
                     {isSameUser && (
-                        <ButtonLink
-                            text="Explore movies"
-                            style="orange"
-                            to="/movies"
-                        />
+                        <ButtonLink style="orange" to="/movies">
+                            Explore movies
+                        </ButtonLink>
                     )}
                 </div>
             )}

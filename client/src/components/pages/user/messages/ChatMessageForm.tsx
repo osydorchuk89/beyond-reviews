@@ -25,7 +25,9 @@ export const ChatMessageForm = ({ onSend }: ChatMessageFormProps) => {
                 name="text"
                 placeholder="type your message here"
             />
-            <BaseButton style="orange" text="SEND" type="submit" />
+            <BaseButton style="orange" type="submit">
+                SEND
+            </BaseButton>
         </form>
     );
 };

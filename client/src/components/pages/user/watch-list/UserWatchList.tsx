@@ -41,11 +41,9 @@ export const UserWatchList = () => {
                         {isSameUser ? "your" : `${profileUserName}'s`} watchlist
                     </p>
                     {isSameUser && (
-                        <ButtonLink
-                            text="EXPLORE MOVIES"
-                            style="orange"
-                            to="/movies"
-                        />
+                        <ButtonLink style="orange" to="/movies">
+                            EXPLORE MOVIES
+                        </ButtonLink>
                     )}
                 </div>
             )}

@@ -117,32 +117,35 @@ export const MovieAdditionalInfo = ({
             <p className="font-semibold">
                 Directed by:{" "}
                 <QueryLink
-                    text={movie.director}
                     onClick={() =>
                         handleFilterNavigation("director", movie.director)
                     }
-                />
+                >
+                    {movie.director}
+                </QueryLink>
             </p>
             <p>
                 <QueryLink
-                    text={movie.releaseYear.toString()}
                     onClick={() =>
                         handleFilterNavigation(
                             "releaseYear",
                             movie.releaseYear.toString()
                         )
                     }
-                />
+                >
+                    {movie.releaseYear.toString()}
+                </QueryLink>
             </p>
             <p>
                 {movie.genres.map((item, index) => (
                     <span key={item}>
                         <QueryLink
-                            text={item}
                             onClick={() =>
                                 handleFilterNavigation("genre", item)
                             }
-                        />
+                        >
+                            {item}
+                        </QueryLink>
                         {index !== movie.genres.length - 1 && " | "}
                     </span>
                 ))}

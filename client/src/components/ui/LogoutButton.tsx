@@ -6,11 +6,12 @@ export const LogoutButton = () => {
 
     return (
         <BaseButton
-            text="LOGOUT"
             style="orange"
             handleClick={() => {
                 fetcher.submit(null, { method: "post", action: "/logout" });
             }}
-        />
+        >
+            LOGOUT
+        </BaseButton>
     );
 };

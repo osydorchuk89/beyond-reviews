@@ -95,15 +95,17 @@ export const MovieReviewForm = ({
             </div>
             {isEditing ? (
                 <div className="flex gap-10">
-                    <BaseButton style="orange" type="submit" text="EDIT" />
-                    <BaseButton
-                        style="orange"
-                        text="CANCEL"
-                        handleClick={onCancel}
-                    />
+                    <BaseButton style="orange" type="submit">
+                        EDIT
+                    </BaseButton>
+                    <BaseButton style="orange" handleClick={onCancel}>
+                        CANCEL
+                    </BaseButton>
                 </div>
             ) : (
-                <BaseButton style="orange" type="submit" text="SEND" />
+                <BaseButton style="orange" type="submit">
+                    SEND
+                </BaseButton>
             )}
         </form>
     );
