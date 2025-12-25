@@ -1,10 +1,12 @@
-import { useLoaderData, useSearchParams } from "react-router";
+import { Suspense } from "react";
+import { Await, useLoaderData, useSearchParams } from "react-router";
 
 import { MoviesList } from "./MoviesList";
 import { SearchBar } from "./SearchBar";
 import { MoviesData } from "../../../lib/entities";
 import { SortFilterBar } from "./SortFilterBar";
 import { sideBarFilterList, sideBarSortList } from "../../../lib/data";
+import { LoadingSpinner } from "../../ui/LoadingSpinner";
 
 export const MoviesPage = () => {
     const { moviesData } = useLoaderData() as {
@@ -19,20 +21,24 @@ export const MoviesPage = () => {
     const sortOrder = searchParams.get("sortOrder");
     const search = searchParams.get("search");
 
-    const filters = [];
+    const buildFilters = (appliedFilters: MoviesData["appliedFilters"]) => {
+        const filters = [];
 
-    if (moviesData.appliedFilters.genre) {
-        filters.push(`Genre: ${moviesData.appliedFilters.genre}`);
-    }
-    if (moviesData.appliedFilters.releaseYear) {
-        filters.push(`Year: ${moviesData.appliedFilters.releaseYear}`);
-    }
-    if (moviesData.appliedFilters.director) {
-        filters.push(`Director: ${moviesData.appliedFilters.director}`);
-    }
-    if (moviesData.appliedFilters.search) {
-        filters.push(`Search: "${moviesData.appliedFilters.search}"`);
-    }
+        if (appliedFilters.genre) {
+            filters.push(`Genre: ${appliedFilters.genre}`);
+        }
+        if (appliedFilters.releaseYear) {
+            filters.push(`Year: ${appliedFilters.releaseYear}`);
+        }
+        if (appliedFilters.director) {
+            filters.push(`Director: ${appliedFilters.director}`);
+        }
+        if (appliedFilters.search) {
+            filters.push(`Search: "${appliedFilters.search}"`);
+        }
+
+        return filters;
+    };
 
     return (
         <div className="flex flex-col w-full">
@@ -40,7 +46,7 @@ export const MoviesPage = () => {
                 Popular Movies
             </p>
             <div className="flex flex-col md:flex-row items-center md:items-start">
-                <div className="flex flex-col w-5/6 md:w-1/4 ml-5 gap-8 mb-5">
+                <aside className="flex flex-col w-5/6 md:w-1/4 ml-5 gap-8 mb-5">
                     <SearchBar />
                     <SortFilterBar
                         itemsList={sideBarSortList}
@@ -50,19 +56,30 @@ export const MoviesPage = () => {
                         itemsList={sideBarFilterList}
                         title="Filter:"
                     />
-                </div>
+                </aside>
                 <div className="flex flex-col w-full md:w-3/4">
-                    <MoviesList
-                        movies={moviesData.movies}
-                        filters={filters}
-                        hasMore={moviesData.hasMore}
-                        currentPage={moviesData.currentPage}
-                        genre={genre}
-                        releaseYear={releaseYear}
-                        sortBy={sortBy}
-                        sortOrder={sortOrder}
-                        search={search}
-                    />
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Await resolve={moviesData}>
+                            {(moviesData) => {
+                                const filters = buildFilters(
+                                    moviesData.appliedFilters
+                                );
+                                return (
+                                    <MoviesList
+                                        movies={moviesData.movies}
+                                        filters={filters}
+                                        hasMore={moviesData.hasMore}
+                                        currentPage={moviesData.currentPage}
+                                        genre={genre}
+                                        releaseYear={releaseYear}
+                                        sortBy={sortBy}
+                                        sortOrder={sortOrder}
+                                        search={search}
+                                    />
+                                );
+                            }}
+                        </Await>
+                    </Suspense>
                 </div>
             </div>
         </div>

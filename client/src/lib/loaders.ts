@@ -16,19 +16,19 @@ export const rootLoader = async () => {
     return { authData };
 };
 
-export const moviesLoader = async ({ request }: LoaderFunctionArgs) => {
+export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
     const url = new URL(request.url);
     const searchParams = url.searchParams;
 
-    const page = parseInt(searchParams.get("page") || "1");
-    const genre = searchParams.get("genre") || undefined;
-    const releaseYear = searchParams.get("releaseYear") || undefined;
-    const director = searchParams.get("director") || undefined;
-    const sortBy = searchParams.get("sortBy") || undefined;
-    const sortOrder = searchParams.get("sortOrder") || undefined;
-    const search = searchParams.get("search") || undefined;
+    const page = parseInt(searchParams.get("page") ?? "1");
+    const genre = searchParams.get("genre") ?? undefined;
+    const releaseYear = searchParams.get("releaseYear") ?? undefined;
+    const director = searchParams.get("director") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortOrder = searchParams.get("sortOrder") ?? undefined;
+    const search = searchParams.get("search") ?? undefined;
 
-    const moviesData = await getMovies(
+    const moviesData = getMovies(
         page,
         15,
         genre,
@@ -48,6 +48,13 @@ export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
         getMovieReviews(movieId),
     ]);
     return { movie, movieReviews };
+
+    // const movieData = getMovie(movieId);
+    // const movieReviewsData = getMovieReviews(movieId);
+    // return {
+    //     movie: movieData,
+    //     movieReviews: movieReviewsData,
+    // };
 };
 
 export const userProfileLoader = async ({ params }: LoaderFunctionArgs) => {

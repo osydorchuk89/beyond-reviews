@@ -34,7 +34,7 @@ export const registrationAction = async ({ request }: { request: Request }) => {
             return { error: "User with this email already exists" };
         }
         return {
-            error: error.response?.data?.message || "Registration failed",
+            error: error.response?.data?.message ?? "Registration failed",
         };
     }
 };
@@ -56,7 +56,7 @@ export const loginAction = async ({ request }: { request: Request }) => {
         if (error.response?.status === 401) {
             return { error: "Invalid credentials" };
         }
-        return { error: error.response?.data?.message || "Login failed" };
+        return { error: error.response?.data?.message ?? "Login failed" };
     }
 };
 
@@ -129,6 +129,30 @@ export const getMovieReviews = async (
     } catch (error) {
         console.log(error);
         throw error;
+    }
+};
+
+export const movieReviewAction = async ({ request }: { request: Request }) => {
+    const formData = await request.formData();
+    const movieId = formData.get("movieId");
+    const userId = formData.get("userId");
+    const rating = Number(formData.get("rating"));
+    const text = formData.get("text");
+    const date = new Date();
+
+    try {
+        await axiosInstance.post(`/api/movies/${movieId}/reviews`, {
+            movieId,
+            userId,
+            rating,
+            text,
+            date,
+        });
+        return { success: true };
+    } catch (error: any) {
+        return {
+            error: error.response?.data?.message ?? "Failed to submit review",
+        };
     }
 };
 

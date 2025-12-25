@@ -1,14 +1,6 @@
 import { useState } from "react";
 
-import {
-    AuthData,
-    Movie,
-    MovieReview,
-    MovieReviewInputs,
-} from "../../../../lib/entities";
-import { useAppDispatch } from "../../../../store/hooks";
-import { sendMovieReview } from "../../../../lib/actions";
-import { triggerReviewEvent } from "../../../../store";
+import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
 import { NavLink } from "../../../ui/NavLink";
 import { MovieReviewForm } from "./MovieReviewForm";
 import { MovieReviewDisplay } from "./MovieReviewDisplay";
@@ -24,54 +16,31 @@ export const MovieReviewSection = ({
     movieReviews,
     authData,
 }: MovieReviewSectionProps) => {
-    const initialUserRating =
+    const userRating =
         movieReviews?.filter((item) => item.userId === authData.user?.id)[0]
             ?.rating || 0;
-    const initialUserReview =
+    const userReview =
         movieReviews?.filter((item) => item.userId === authData.user?.id)[0]
             ?.text || "";
 
     const [isEditing, setIsEditing] = useState(false);
-    const [userRating, setUserRating] = useState(initialUserRating);
-    const [userReview, setUserReview] = useState(initialUserReview);
     const [hasRated, setHasRated] = useState(userRating > 0);
-
-    const dispatch = useAppDispatch();
-
-    const handleReviewSubmit = async (data: MovieReviewInputs) => {
-        const date = new Date();
-        const previousRating = userRating;
-        const previousReview = userReview;
-
-        try {
-            setUserRating(data.rating);
-            setUserReview(data.text || "");
-
-            await sendMovieReview(movie.id, authData.user!.id, data);
-            dispatch(
-                triggerReviewEvent(`new review event at ${date.toString()}`)
-            );
-
-            setHasRated(true);
-            setIsEditing(false);
-        } catch (error) {
-            setUserRating(previousRating);
-            setUserReview(previousReview);
-            console.log(error);
-            throw error;
-        }
-    };
 
     return (
         <div>
             <div className="bg-sky-200 rounded-lg shadow-lg p-5">
                 {authData.isAuthenticated && (!hasRated || isEditing) && (
                     <MovieReviewForm
+                        movieId={movie.id}
+                        userId={authData.user?.id ?? ""}
                         initialRating={userRating}
                         initialText={userReview}
                         isEditing={isEditing}
-                        onSubmit={handleReviewSubmit}
                         onCancel={() => setIsEditing(false)}
+                        onSuccess={() => {
+                            setIsEditing(false);
+                            setHasRated(true);
+                        }}
                     />
                 )}
                 {authData.isAuthenticated && hasRated && !isEditing && (

@@ -26,7 +26,12 @@ import {
     userReviewsLoader,
     userWatchListLoader,
 } from "./lib/loaders";
-import { loginAction, logoutAction, registrationAction } from "./lib/actions";
+import {
+    loginAction,
+    logoutAction,
+    movieReviewAction,
+    registrationAction,
+} from "./lib/actions";
 
 export const router = createBrowserRouter([
     {
@@ -38,7 +43,7 @@ export const router = createBrowserRouter([
             {
                 path: "login",
                 Component: LoginPage,
-                action: loginAction
+                action: loginAction,
             },
             {
                 path: "logout",
@@ -70,6 +75,7 @@ export const router = createBrowserRouter([
                         path: ":movieId",
                         Component: MoviePage,
                         loader: movieLoader,
+                        action: movieReviewAction,
                     },
                 ],
             },

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useFetcher } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -8,28 +9,32 @@ import { StarIcon } from "../../../icons/StarIcon";
 import { BaseButton } from "../../../ui/BaseButton";
 
 interface MovieReviewFormProps {
+    movieId: string;
+    userId: string;
     initialRating?: number;
     initialText?: string;
     isEditing: boolean;
-    onSubmit: (data: MovieReviewInputs) => Promise<void>;
     onCancel: () => void;
+    onSuccess: () => void;
 }
 
 export const MovieReviewForm = ({
+    movieId,
+    userId,
     initialRating = 0,
     initialText = "",
-    isEditing,
-    onSubmit,
     onCancel,
+    onSuccess,
 }: MovieReviewFormProps) => {
     const [userRating, setUserRating] = useState(initialRating);
     const [hover, setHover] = useState(initialRating);
 
+    const fetcher = useFetcher();
+    const isUpdating = fetcher.state !== "idle";
+
     const {
         register,
-        handleSubmit,
         setValue,
-        reset,
         formState: { errors },
     } = useForm<MovieReviewInputs>({
         resolver: zodResolver(ReviewSchema),
@@ -39,31 +44,32 @@ export const MovieReviewForm = ({
         },
     });
 
-    const handleFormSubmit = handleSubmit(async (data) => {
-        await onSubmit(data);
-        if (!isEditing) {
-            reset();
-            setUserRating(0);
-            setHover(0);
+    useEffect(() => {
+        if (fetcher.data?.success) {
+            onSuccess();
         }
-    });
-
-    const starClassName = "w-8 h-8 border-none hover:cursor-pointer";
+    }, [fetcher.data, onSuccess]);
 
     return (
-        <form noValidate onSubmit={handleFormSubmit}>
-            <p className="font-bold">Rate the movie:</p>
+        <fetcher.Form method="post" noValidate>
+            <input type="hidden" name="movieId" value={movieId} />
+            <input type="hidden" name="userId" value={userId} />
+
+            <label htmlFor="ratng" className="font-bold">
+                Rate the movie:
+            </label>
+            <input id="rating" type="hidden" name="rating" value={userRating} />
             <div className="flex">
                 {[...Array(10).keys()].map((index) => {
                     index += 1;
                     return (
                         <div key={index}>
                             <StarIcon
-                                className={
+                                className={`w-8 h-8 border-none hover:cursor-pointer ${
                                     index <= (hover || userRating)
-                                        ? starClassName + " fill-orange-500"
-                                        : starClassName + " fill-orange-300"
-                                }
+                                        ? "fill-orange-500"
+                                        : "fill-orange-300"
+                                }`}
                                 handleClick={() => {
                                     setValue("rating", index, {
                                         shouldValidate: true,
@@ -80,12 +86,12 @@ export const MovieReviewForm = ({
             <p className="text-red-800">{errors.rating?.message}</p>
 
             <div className="my-5">
-                <label htmlFor="movie-review" className="font-bold">
+                <label htmlFor="review" className="font-bold">
                     Post your review (optional):
                 </label>
                 <textarea
                     {...register("text")}
-                    id="movie-review"
+                    id="review"
                     name="text"
                     placeholder="Type your review here"
                     className="resize-none border border-gray-700 focus:border-orange-900 p-2 rounded-md"
@@ -93,20 +99,15 @@ export const MovieReviewForm = ({
                     cols={70}
                 />
             </div>
-            {isEditing ? (
-                <div className="flex gap-10">
-                    <BaseButton style="orange" type="submit">
-                        EDIT
-                    </BaseButton>
-                    <BaseButton style="orange" handleClick={onCancel}>
-                        CANCEL
-                    </BaseButton>
-                </div>
-            ) : (
-                <BaseButton style="orange" type="submit">
-                    SEND
+
+            <div className="flex gap-10">
+                <BaseButton style="sky" handleClick={onCancel}>
+                    CANCEL
                 </BaseButton>
-            )}
-        </form>
+                <BaseButton style="orange" type="submit">
+                    {isUpdating ? "Please wait..." : "EDIT"}
+                </BaseButton>
+            </div>
+        </fetcher.Form>
     );
 };
