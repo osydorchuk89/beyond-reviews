@@ -1,5 +1,5 @@
 import { UserActivity } from "../../../../lib/entities";
-import { NavLink } from "../../../ui/NavLink";
+import { BaseLink } from "../../../ui/BaseLink";
 
 interface ActivityOtherReviewProps {
     activity: UserActivity;
@@ -12,9 +12,9 @@ export const ActivityOtherReview = ({ activity }: ActivityOtherReviewProps) => {
         <div className="mt-2">
             <p>
                 <strong>Movie</strong>:{" "}
-                <NavLink to={`/movies/${activity.movieReview.movieId}`}>
+                <BaseLink to={`/movies/${activity.movieReview.movieId}`}>
                     {movieReviewLinkText}
-                </NavLink>
+                </BaseLink>
             </p>
             <p>
                 <strong>Rating</strong>: {`${activity.movieReview.rating}/10`}

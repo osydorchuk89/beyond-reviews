@@ -1,5 +1,5 @@
 import { UserActivity } from "../../../../lib/entities";
-import { NavLink } from "../../../ui/NavLink";
+import { BaseLink } from "../../../ui/BaseLink";
 
 interface ActivityDetailsProps {
     activity: UserActivity;
@@ -30,18 +30,18 @@ export const ActivityDetails = ({
                         <span className="font-bold">
                             {isSameUser ? "You" : userName} rated{" "}
                             {activity.reviewRating}/10{" "}
-                            <NavLink
+                            <BaseLink
                                 to={`/movies/${activity.movieId}`}
-                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</NavLink>
+                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</BaseLink>
                         </span>
                     )}
                     {activity.movieId && activity.action !== "rated" && (
                         <span className="font-bold">
                             {isSameUser ? "You" : userName}{" "}
                             {activity.action === "saved" ? "added" : "removed"}{" "}
-                            <NavLink
+                            <BaseLink
                                 to={`/movies/${activity.movieId}`}
-                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</NavLink>{" "}
+                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</BaseLink>{" "}
                             {activity.action === "saved" ? "to" : "from"} watch
                             list
                         </span>
@@ -51,9 +51,9 @@ export const ActivityDetails = ({
                             {isSameUser ? "You" : userName}{" "}
                             {activity.action === "liked" ? "liked" : "unliked"}{" "}
                             a review by{" "}
-                            <NavLink to={`/users/${ratingUserId}/profile`}>
+                            <BaseLink to={`/users/${ratingUserId}/profile`}>
                                 {ratingUserName}
-                            </NavLink>
+                            </BaseLink>
                         </span>
                     )}
                 </p>

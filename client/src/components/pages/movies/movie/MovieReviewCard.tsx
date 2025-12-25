@@ -3,7 +3,7 @@ import { RefObject, useRef, useState } from "react";
 import { MovieReview } from "../../../../lib/entities";
 import { sendLikeOrUnlike } from "../../../../lib/actions";
 import { useTruncatedElement } from "../../../../hooks/useTruncatedElements";
-import { NavLink } from "../../../ui/NavLink";
+import { BaseLink } from "../../../ui/BaseLink";
 import { StarIcon } from "../../../icons/StarIcon";
 import { LikeIcon } from "../../../icons/LikeIcon";
 
@@ -61,10 +61,10 @@ export const MovieReviewCard = ({
             <div className="flex flex-col w-full mb-5">
                 <div className="flex justify-between">
                     <p className="font-semibold">
-                        <NavLink to={`/users/${movieReview.userId}/profile`}>
+                        <BaseLink to={`/users/${movieReview.userId}/profile`}>
                             {movieReview.user.firstName}{" "}
                             {movieReview.user.lastName}
-                        </NavLink>
+                        </BaseLink>
                     </p>
                     <div className="flex">
                         <span>

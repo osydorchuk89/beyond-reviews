@@ -10,7 +10,7 @@ import {
 
 import { LoginSchema } from "../../../lib/schemas";
 import { BaseButton } from "../../ui/BaseButton";
-import { NavLink } from "../../ui/NavLink";
+import { BaseLink } from "../../ui/BaseLink";
 import { SocialLoginButton } from "../../ui/SocialLoginButton";
 import { LocationState, LoginInputs } from "../../../lib/entities";
 
@@ -85,7 +85,7 @@ export const LoginForm = () => {
             <p className="text-center">
                 Don't have an account?{" "}
                 <span className="font-medium">
-                    <NavLink to="/registration">Register here</NavLink>
+                    <BaseLink to="/registration">Register here</BaseLink>
                 </span>
             </p>
 

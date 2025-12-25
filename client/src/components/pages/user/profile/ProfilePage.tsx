@@ -7,7 +7,7 @@ import { useAppDispatch } from "../../../../store/hooks";
 import { sendFriendRequest } from "../../../../lib/actions";
 import { triggerFriendEvent } from "../../../../store";
 import { profileNavLinks } from "../../../../lib/data";
-import { NavLink } from "../../../ui/NavLink";
+import { BaseLink } from "../../../ui/BaseLink";
 import { BaseButton } from "../../../ui/BaseButton";
 
 export const ProfilePage = () => {
@@ -68,9 +68,9 @@ export const ProfilePage = () => {
             />
             <ul className="flex flex-col items-center gap-5 text-lg">
                 {visibleNavLinks.map((link) => (
-                    <NavLink key={link.text} to={link.to}>
+                    <BaseLink key={link.text} to={link.to}>
                         {link.text}
-                    </NavLink>
+                    </BaseLink>
                 ))}
             </ul>
             <div className="flex justify-center">

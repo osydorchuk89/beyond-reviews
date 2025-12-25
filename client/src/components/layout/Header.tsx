@@ -1,5 +1,6 @@
 import {
     Link,
+    NavLink,
     useLocation,
     useNavigate,
     useRouteLoaderData,
@@ -11,17 +12,10 @@ import { AuthData } from "../../lib/entities";
 import { ButtonLink } from "../ui/ButtonLink";
 
 export const Header = () => {
-    let { pathname } = useLocation();
+    const { pathname } = useLocation();
     const navigate = useNavigate();
 
     const { authData } = useRouteLoaderData("root") as { authData: AuthData };
-
-    let userInitials = "";
-    if (authData.user) {
-        userInitials =
-            authData.user.firstName.slice(0, 1) +
-            authData.user.lastName.slice(0, 1);
-    }
 
     return (
         <header
@@ -35,15 +29,19 @@ export const Header = () => {
             >
                 Beyond Reviews
             </Link>
-            <ul className="flex gap-8">
+            <ul className="flex flex-row gap-8">
                 {headerNavLinks.map((link) => (
                     <li key={link.text}>
-                        <Link
-                            className="text-xl hover:text-orange-500"
+                        <NavLink
+                            className={({ isActive }) =>
+                                `text-xl hover:text-orange-500 ${
+                                    isActive && "text-orange-500"
+                                }`
+                            }
                             to={link.to}
                         >
                             {link.text}
-                        </Link>
+                        </NavLink>
                     </li>
                 ))}
             </ul>
@@ -55,7 +53,10 @@ export const Header = () => {
                         }
                     >
                         <div className="flex justify-center items-center w-12 h-12 rounded-full overflow-hidden bg-orange-300 hover:bg-orange-500 cursor-pointer">
-                            <p className="text-orange-950">{userInitials}</p>
+                            <p className="text-orange-950">
+                                {authData.user.firstName[0] +
+                                    authData.user.lastName[0]}
+                            </p>
                         </div>
                     </button>
                     <LogoutButton />

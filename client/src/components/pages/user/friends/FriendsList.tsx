@@ -1,5 +1,5 @@
 import { Friend } from "../../../../lib/entities";
-import { NavLink } from "../../../ui/NavLink";
+import { BaseLink } from "../../../ui/BaseLink";
 
 interface FriendsListProps {
     friends: Friend[];
@@ -22,9 +22,9 @@ export const FriendsList = ({
                             key={friend.id}
                             className="flex flex-col text-lg p-5 rounded-lg shadow-lg bg-sky-100 gap-8"
                         >
-                            <NavLink to={`/users/${friend.id}/profile`}>
+                            <BaseLink to={`/users/${friend.id}/profile`}>
                                 {`${friend.firstName} ${friend.lastName}`}
-                            </NavLink>
+                            </BaseLink>
                         </li>
                     ))}
                 </ul>

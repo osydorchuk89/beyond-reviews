@@ -1,4 +1,4 @@
-import { NavLink } from "../../../ui/NavLink";
+import { BaseLink } from "../../../ui/BaseLink";
 import { BaseButton } from "../../../ui/BaseButton";
 
 interface FriendRequestItemProps {
@@ -25,9 +25,9 @@ export const FriendRequestItem = ({
                     src={photo}
                     className="object-cover object-top w-8 h-8 rounded-full self-center mr-2"
                 />
-                <NavLink to={`/users/${userId}/profile`}>
+                <BaseLink to={`/users/${userId}/profile`}>
                     {`${firstName} ${lastName}`}
-                </NavLink>
+                </BaseLink>
             </div>
             {showAcceptButton && onAccept && (
                 <BaseButton style="sky" handleClick={onAccept}>

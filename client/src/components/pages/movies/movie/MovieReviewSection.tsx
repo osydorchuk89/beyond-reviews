@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
-import { NavLink } from "../../../ui/NavLink";
+import { BaseLink } from "../../../ui/BaseLink";
 import { MovieReviewForm } from "./MovieReviewForm";
 import { MovieReviewDisplay } from "./MovieReviewDisplay";
 
@@ -54,12 +54,12 @@ export const MovieReviewSection = ({
                     <p className="px-4 py-2">
                         To rate the movie or post a review, please{" "}
                         <span className="font-semibold">
-                            <NavLink
+                            <BaseLink
                                 to="/login"
                                 state={{ from: location.pathname }}
                             >
                                 login to your account
-                            </NavLink>
+                            </BaseLink>
                         </span>
                     </p>
                 )}
