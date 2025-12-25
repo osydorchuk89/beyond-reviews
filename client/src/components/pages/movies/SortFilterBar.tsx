@@ -25,7 +25,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
         setSearchParams((searchParams) => {
             if (item.type === "sortBy") {
                 searchParams.set("sortBy", item.value);
-                searchParams.set("sortOrder", item.sortOrder || "desc");
+                searchParams.set("sortOrder", item.sortOrder ?? "desc");
             } else {
                 searchParams.set(item.type, item.value);
             }
@@ -58,12 +58,6 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
         });
     };
 
-    const baseLinkClassName =
-        "flex items-center gap-2 text-orange-950 px-2 rounded-md cursor-pointer";
-    const inactiveLinkClassName = baseLinkClassName + " hover:bg-orange-200";
-    const activeLinkClassName =
-        baseLinkClassName + " bg-orange-300 hover:bg-orange-300";
-
     return (
         <div className="flex flex-col rounded-md shadow-md bg-sky-100 overflow-hidden">
             <p className="bg-sky-700 text-sky-50 text-center text-xl font-bold py-2 mb-2">
@@ -73,11 +67,11 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
                 {itemsList.map((item) => (
                     <li
                         key={`${item.value}-${item.sortOrder || ""}`}
-                        className={
+                        className={`flex items-center gap-2 text-orange-950 px-2 rounded-md cursor-pointer ${
                             isItemActive(item)
-                                ? activeLinkClassName
-                                : inactiveLinkClassName
-                        }
+                                ? " bg-orange-300 hover:bg-orange-300"
+                                : " hover:bg-orange-200"
+                        }`}
                     >
                         <div
                             className="w-full py-2"

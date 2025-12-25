@@ -12,12 +12,6 @@ interface MoviesListProps {
     filters?: string[];
     hasMore: boolean;
     currentPage: number;
-    genre?: string | null;
-    releaseYear?: string | null;
-    director?: string | null;
-    sortBy?: string | null;
-    sortOrder?: string | null;
-    search?: string | null;
 }
 
 export const MoviesList = ({
@@ -25,18 +19,14 @@ export const MoviesList = ({
     filters,
     hasMore,
     currentPage,
-    genre,
-    releaseYear,
-    director,
-    sortBy,
-    sortOrder,
-    search,
 }: MoviesListProps) => {
-    const [_, setSearchParams] = useSearchParams();
-    const [allMovies, setAllMovies] = useState<Movie[]>(movies);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [additionalMovies, setAdditionalMovies] = useState<Movie[]>([]);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(currentPage);
     const [hasMoreMovies, setHasMoreMovies] = useState(hasMore);
+
+    const allMovies = [...movies, ...additionalMovies];
 
     const handleLoadMore = async () => {
         setLoading(true);
@@ -45,14 +35,14 @@ export const MoviesList = ({
             const moviesData = await getMovies(
                 nextPage,
                 15,
-                genre || undefined,
-                releaseYear || undefined,
-                director || undefined,
-                sortBy || undefined,
-                sortOrder || undefined,
-                search || undefined
+                searchParams.get("genre") ?? undefined,
+                searchParams.get("releaseYear") ?? undefined,
+                searchParams.get("director") ?? undefined,
+                searchParams.get("sortBy") ?? undefined,
+                searchParams.get("sortOrder") ?? undefined,
+                searchParams.get("search") ?? undefined
             );
-            setAllMovies((prev) => [...prev, ...moviesData.movies]);
+            setAdditionalMovies((prev) => [...prev, ...moviesData.movies]);
             setPage(nextPage);
             setHasMoreMovies(moviesData.hasMore);
         } catch (error) {
@@ -63,7 +53,7 @@ export const MoviesList = ({
     };
 
     useEffect(() => {
-        setAllMovies(movies);
+        setAdditionalMovies([]);
         setPage(currentPage);
         setHasMoreMovies(hasMore);
     }, [movies, currentPage, hasMore]);

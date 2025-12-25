@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Await, useLoaderData, useSearchParams } from "react-router";
+import { Await, useLoaderData } from "react-router";
 
 import { MoviesList } from "./MoviesList";
 import { SearchBar } from "./SearchBar";
@@ -12,14 +12,6 @@ export const MoviesPage = () => {
     const { moviesData } = useLoaderData() as {
         moviesData: MoviesData;
     };
-
-    const [searchParams] = useSearchParams();
-
-    const genre = searchParams.get("genre");
-    const releaseYear = searchParams.get("releaseYear");
-    const sortBy = searchParams.get("sortBy");
-    const sortOrder = searchParams.get("sortOrder");
-    const search = searchParams.get("search");
 
     const buildFilters = (appliedFilters: MoviesData["appliedFilters"]) => {
         const filters = [];
@@ -70,11 +62,6 @@ export const MoviesPage = () => {
                                         filters={filters}
                                         hasMore={moviesData.hasMore}
                                         currentPage={moviesData.currentPage}
-                                        genre={genre}
-                                        releaseYear={releaseYear}
-                                        sortBy={sortBy}
-                                        sortOrder={sortOrder}
-                                        search={search}
                                     />
                                 );
                             }}

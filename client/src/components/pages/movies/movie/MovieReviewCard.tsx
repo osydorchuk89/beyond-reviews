@@ -1,10 +1,7 @@
 import { RefObject, useRef, useState } from "react";
-import { useLocation } from "react-router";
 
 import { MovieReview } from "../../../../lib/entities";
-import { useAppDispatch } from "../../../../store/hooks";
 import { sendLikeOrUnlike } from "../../../../lib/actions";
-import { triggerReviewEvent } from "../../../../store";
 import { useTruncatedElement } from "../../../../hooks/useTruncatedElements";
 import { NavLink } from "../../../ui/NavLink";
 import { StarIcon } from "../../../icons/StarIcon";
@@ -19,14 +16,13 @@ export const MovieReviewCard = ({
     movieReview,
     userId,
 }: MovieReviewCardProps) => {
-    const { pathname } = useLocation();
-    const movieId = pathname.split("/")[2];
     const hasUserLikedReview = movieReview.likedBy.some(
         (like) => like.userId === userId
     );
 
     const [iconFilled, setIconFilled] = useState(hasUserLikedReview);
     const [hasLiked, setHasLiked] = useState(hasUserLikedReview);
+    const [likeCount, setLikeCount] = useState(movieReview.likedBy.length);
 
     const reviewDate = new Date(movieReview.date);
     const parsedDate = reviewDate.toLocaleString("default", {
@@ -35,19 +31,21 @@ export const MovieReviewCard = ({
         year: "numeric",
     });
 
-    const dispatch = useAppDispatch();
-
     const likeOrUnlikeMovieReview = async () => {
         setHasLiked((prevState) => !prevState);
-
-        const date = new Date();
+        setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
         try {
-            await sendLikeOrUnlike(movieId, movieReview.id, userId!, hasLiked);
-            dispatch(
-                triggerReviewEvent(`new review event at ${date.toString()}`)
-            );
+            if (userId) {
+                await sendLikeOrUnlike(
+                    movieReview.movieId,
+                    movieReview.id,
+                    userId,
+                    hasLiked
+                );
+            }
         } catch (error) {
             setHasLiked((prevState) => !prevState);
+            setLikeCount((prev) => (hasLiked ? prev + 1 : prev - 1));
             console.log(error);
         }
     };
@@ -58,18 +56,14 @@ export const MovieReviewCard = ({
             ref: ref as RefObject<HTMLParagraphElement>,
         });
 
-    const movieReviewUserName =
-        movieReview.user.firstName + " " + movieReview.user.lastName;
-
-    const likeClassName = "w-6 h-6 hover:cursor-pointer";
-
     return (
         <div className="flex flex-col items-start bg-sky-100 rounded-lg shadow-lg p-5">
             <div className="flex flex-col w-full mb-5">
                 <div className="flex justify-between">
                     <p className="font-semibold">
                         <NavLink to={`/users/${movieReview.userId}/profile`}>
-                            {movieReviewUserName}
+                            {movieReview.user.firstName}{" "}
+                            {movieReview.user.lastName}
                         </NavLink>
                     </p>
                     <div className="flex">
@@ -107,16 +101,13 @@ export const MovieReviewCard = ({
                 <p className="w-full text-gray-500 italic mb-5">no review</p>
             )}
             <p className="text-gray-500 text-sm mt-5 mb-1">
-                {movieReview.likedBy.length}{" "}
-                {movieReview.likedBy.length === 1 ? "like" : "likes"}
+                {likeCount} {likeCount === 1 ? "like" : "likes"}
             </p>
             {userId && movieReview.userId !== userId && (
                 <LikeIcon
-                    className={
-                        iconFilled
-                            ? likeClassName + " fill-sky-600"
-                            : likeClassName + " fill-sky-50"
-                    }
+                    className={`w-6 h-6 hover:cursor-pointer ${
+                        iconFilled ? " fill-sky-600" : " fill-sky-50"
+                    }`}
                     handleClick={likeOrUnlikeMovieReview}
                     handleMouseEnter={() => {
                         hasLiked ? setIconFilled(false) : setIconFilled(true);

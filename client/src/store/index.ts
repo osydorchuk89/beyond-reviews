@@ -1,15 +1,5 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
-const reviewEventSlice = createSlice({
-    name: "reviewEvent",
-    initialState: "none",
-    reducers: {
-        triggerReviewEvent: (_, action) => {
-            return action.payload;
-        },
-    },
-});
-
 const friendEventSlice = createSlice({
     name: "friendEvent",
     initialState: "none",
@@ -32,13 +22,11 @@ const messageEventSlice = createSlice({
 
 export const store = configureStore({
     reducer: {
-        reviewEvent: reviewEventSlice.reducer,
         friendEvent: friendEventSlice.reducer,
         messageEvent: messageEventSlice.reducer,
     },
 });
 
-export const { triggerReviewEvent } = reviewEventSlice.actions;
 export const { triggerFriendEvent } = friendEventSlice.actions;
 export const { triggerMessageEvent } = messageEventSlice.actions;
 

@@ -156,23 +156,6 @@ export const movieReviewAction = async ({ request }: { request: Request }) => {
     }
 };
 
-export const sendMovieReview = async (
-    movieId: string,
-    userId: string,
-    movieReviewData: any
-) => {
-    const date = new Date();
-    try {
-        await axiosInstance.post(`/api/movies/${movieId}/reviews`, {
-            ...movieReviewData,
-            userId: userId,
-            date,
-        });
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 export const getUserMovieReviews = async (
     userId: string
 ): Promise<MovieReview[]> => {
