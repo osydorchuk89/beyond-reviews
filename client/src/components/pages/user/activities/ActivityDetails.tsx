@@ -1,23 +1,29 @@
-import { UserActivity } from "../../../../lib/entities";
+import { useRouteLoaderData } from "react-router";
+import { User, UserActivity } from "../../../../lib/entities";
 import { BaseLink } from "../../../ui/BaseLink";
+import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 
 interface ActivityDetailsProps {
     activity: UserActivity;
-    userName: string;
     ratingUserName: string;
     ratingUserId: string;
     parsedDate: string;
-    isSameUser: boolean;
 }
 
 export const ActivityDetails = ({
     activity,
-    userName,
     ratingUserName,
     ratingUserId,
     parsedDate,
-    isSameUser,
 }: ActivityDetailsProps) => {
+    const { user: profileUser } = useRouteLoaderData("userProfile") as {
+        user: User;
+    };
+    const { isSameUser, profileUserName } = useIsSameUser(profileUser);
+
+    const movieUrl = `/movies/${activity.movieId}`;
+    const movieFullTitle = `${activity.movie.title} (${activity.movie.releaseYear})`;
+
     return (
         <>
             <div className="flex justify-between">
@@ -28,27 +34,23 @@ export const ActivityDetails = ({
                     />
                     {activity.movieId && activity.action === "rated" && (
                         <span className="font-bold">
-                            {isSameUser ? "You" : userName} rated{" "}
+                            {isSameUser ? "You" : profileUserName} rated{" "}
                             {activity.reviewRating}/10{" "}
-                            <BaseLink
-                                to={`/movies/${activity.movieId}`}
-                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</BaseLink>
+                            <BaseLink to={movieUrl}>{movieFullTitle}</BaseLink>
                         </span>
                     )}
                     {activity.movieId && activity.action !== "rated" && (
                         <span className="font-bold">
-                            {isSameUser ? "You" : userName}{" "}
+                            {isSameUser ? "You" : profileUserName}{" "}
                             {activity.action === "saved" ? "added" : "removed"}{" "}
-                            <BaseLink
-                                to={`/movies/${activity.movieId}`}
-                            >{`${activity.movie.title} (${activity.movie.releaseYear})`}</BaseLink>{" "}
+                            <BaseLink to={movieUrl}>{movieFullTitle}</BaseLink>{" "}
                             {activity.action === "saved" ? "to" : "from"} watch
                             list
                         </span>
                     )}
                     {activity.movieReviewId && (
                         <span className="font-bold">
-                            {isSameUser ? "You" : userName}{" "}
+                            {isSameUser ? "You" : profileUserName}{" "}
                             {activity.action === "liked" ? "liked" : "unliked"}{" "}
                             a review by{" "}
                             <BaseLink to={`/users/${ratingUserId}/profile`}>

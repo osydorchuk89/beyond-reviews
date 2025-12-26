@@ -8,7 +8,7 @@ import { getChatHistory, sendMessage } from "../../../../lib/actions";
 import { useAppDispatch } from "../../../../store/hooks";
 import { triggerMessageEvent } from "../../../../store";
 
-export const UserMessages = () => {
+export const UserMessagesPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
@@ -58,7 +58,7 @@ export const UserMessages = () => {
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full">
-            <h2 className="text-2xl text-center font-bold">Messages</h2>
+            <h2 className="text-xl text-center font-bold">Messages</h2>
             <div className="flex rounded-md overflow-hidden h-[600px]">
                 <ChatSidePanel
                     user={profileUser}

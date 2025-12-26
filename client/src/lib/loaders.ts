@@ -48,13 +48,6 @@ export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
         getMovieReviews(movieId),
     ]);
     return { movie, movieReviews };
-
-    // const movieData = getMovie(movieId);
-    // const movieReviewsData = getMovieReviews(movieId);
-    // return {
-    //     movie: movieData,
-    //     movieReviews: movieReviewsData,
-    // };
 };
 
 export const userProfileLoader = async ({ params }: LoaderFunctionArgs) => {
@@ -63,15 +56,22 @@ export const userProfileLoader = async ({ params }: LoaderFunctionArgs) => {
     return { user };
 };
 
-export const userActivitiesLoader = async ({ params }: LoaderFunctionArgs) => {
+export const userActivitiesLoader = async ({
+    params,
+    request,
+}: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
-    const userActivities = await getUserActivities(userId);
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") ?? "1");
+    const userActivities = await getUserActivities(userId, page);
     return { userActivities };
 };
 
 export const protectedLoader = async ({ params }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
+    console.log(userId);
     const authData = await getAuthData();
+    console.log(authData.user?.id);
     if (!authData.isAuthenticated || authData.user?.id !== userId) {
         return redirect("/");
     }
@@ -88,4 +88,12 @@ export const userReviewsLoader = async ({ params }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
     const userMovieReviews = await getUserMovieReviews(userId);
     return { userMovieReviews };
+};
+
+export const loginLoader = async () => {
+    const authData = await getAuthData();
+    if (authData.isAuthenticated) {
+        return redirect("/");
+    }
+    return null;
 };

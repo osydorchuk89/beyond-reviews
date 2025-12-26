@@ -5,7 +5,7 @@ import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { MovieCard } from "../../movies/MovieCard";
 import { ButtonLink } from "../../../ui/ButtonLink";
 
-export const UserWatchList = () => {
+export const UserWatchListPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
@@ -16,9 +16,7 @@ export const UserWatchList = () => {
 
     return (
         <div className="flex flex-col gap-10 justify-center items-center min-h-[70vh]">
-            <h2 className="text-2xl text-center font-bold">
-                {isSameUser ? "Your" : `${profileUserName}'s`} watchlist
-            </h2>
+            <h2 className="text-xl text-center font-bold">Watchlist</h2>
             {userWatchList.length > 0 ? (
                 <div className="grid grid-cols-3 items-center gap-16 mx-5">
                     {userWatchList.map((item) => (

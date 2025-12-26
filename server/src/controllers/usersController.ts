@@ -112,49 +112,71 @@ export const getUserData = async (req: Request, res: Response) => {
 
 export const getUserActivities = async (req: Request, res: Response) => {
     const { userId } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 15;
+    const skip = (page - 1) * limit;
+
     try {
         const user = await prisma.user.findUnique({ where: { id: userId } });
         if (user) {
-            const activities = await prisma.activity.findMany({
-                where: {
-                    userId: userId,
-                },
-                include: {
-                    movie: {
-                        select: {
-                            title: true,
-                            releaseYear: true,
-                            poster: true,
-                        },
+            const [activities, totalCount] = await Promise.all([
+                prisma.activity.findMany({
+                    where: {
+                        userId: userId,
                     },
-                    user: {
-                        select: {
-                            firstName: true,
-                            lastName: true,
-                            photo: true,
-                        },
-                    },
-                    movieReview: {
-                        include: {
-                            user: {
-                                select: {
-                                    id: true,
-                                    firstName: true,
-                                    lastName: true,
-                                },
-                            },
-                            movie: {
-                                select: {
-                                    id: true,
-                                    title: true,
-                                    releaseYear: true,
-                                },
+                    include: {
+                        movie: {
+                            select: {
+                                title: true,
+                                releaseYear: true,
+                                poster: true,
                             },
                         },
+                        user: {
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                                photo: true,
+                            },
+                        },
+                        movieReview: {
+                            include: {
+                                user: {
+                                    select: {
+                                        id: true,
+                                        firstName: true,
+                                        lastName: true,
+                                    },
+                                },
+                                movie: {
+                                    select: {
+                                        id: true,
+                                        title: true,
+                                        releaseYear: true,
+                                    },
+                                },
+                            },
+                        },
                     },
-                },
+                    orderBy: { date: "desc" },
+                    skip: skip,
+                    take: limit,
+                }),
+                prisma.activity.count({
+                    where: { userId: userId },
+                }),
+            ]);
+
+            const totalPages = Math.ceil(totalCount / limit);
+            const hasMore = page < totalPages;
+
+            res.status(200).send({
+                activities,
+                totalCount,
+                currentPage: page,
+                totalPages,
+                hasMore,
             });
-            res.send(activities);
         } else {
             res.status(500).send({
                 message: "Could not find user",

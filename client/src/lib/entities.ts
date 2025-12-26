@@ -95,6 +95,14 @@ export interface UserActivity {
     date: Date;
 }
 
+export interface UserActivities {
+    activities: UserActivity[];
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasMore: boolean;
+}
+
 export interface FriendRequest {
     sentUserId: string;
     receivedUserId: string;

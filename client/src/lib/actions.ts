@@ -9,7 +9,7 @@ import {
     MoviesData,
     MovieWatchList,
     User,
-    UserActivity,
+    UserActivities,
     UsersMessages,
 } from "./entities";
 
@@ -228,11 +228,12 @@ export const getUser = async (userId: string): Promise<User> => {
 
 // User activities
 export const getUserActivities = async (
-    userId: string
-): Promise<UserActivity[]> => {
+    userId: string,
+    page: number = 1
+): Promise<UserActivities> => {
     try {
         const response = await axiosInstance.get(
-            `/api/users/${userId}/activities`
+            `/api/users/${userId}/activities?page=${page}`
         );
         return response.data;
     } catch (error: any) {

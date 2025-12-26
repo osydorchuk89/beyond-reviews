@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 import { StarIcon } from "../../icons/StarIcon";
 import { useQueryClick } from "../../../hooks/useQueryClick";
@@ -27,6 +27,8 @@ export const MovieCard = ({
         title?.length > 45 ? `${title.substring(0, 45)}...` : title;
 
     const handleQueryClick = useQueryClick();
+    const location = useLocation();
+    const onUserPage = location.pathname.startsWith("/users");
 
     return (
         <div className="flex flex-col w-80 justify-start items-center bg-sky-100 rounded-lg shadow-lg p-5 relative">
@@ -38,23 +40,34 @@ export const MovieCard = ({
             <p className="mb-2 text-sky-950 mt-16">
                 {genres.slice(0, 3).map((item, index) => (
                     <span key={item}>
-                        <QueryLink
-                            onClick={() => handleQueryClick("genre", item)}
-                        >
-                            {item}
-                        </QueryLink>
+                        {onUserPage ? (
+                            <span>{item}</span>
+                        ) : (
+                            <QueryLink
+                                onClick={() => handleQueryClick("genre", item)}
+                            >
+                                {item}
+                            </QueryLink>
+                        )}
                         {index !== genres.slice(0, 3).length - 1 && " | "}
                     </span>
                 ))}
             </p>
             <p className="mb-2 text-sky-950">
-                <QueryLink
-                    onClick={() =>
-                        handleQueryClick("releaseYear", releaseYear.toString())
-                    }
-                >
-                    {releaseYear.toString()}
-                </QueryLink>
+                {onUserPage ? (
+                    <span>{releaseYear.toString()}</span>
+                ) : (
+                    <QueryLink
+                        onClick={() =>
+                            handleQueryClick(
+                                "releaseYear",
+                                releaseYear.toString()
+                            )
+                        }
+                    >
+                        {releaseYear.toString()}
+                    </QueryLink>
+                )}
             </p>
             <Link to={movieId}>
                 <img src={poster} className="rounded-lg" />

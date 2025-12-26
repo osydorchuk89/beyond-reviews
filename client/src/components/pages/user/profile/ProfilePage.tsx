@@ -14,7 +14,7 @@ export const ProfilePage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { visitingUser, isSameUser, profileUserName } =
+    const { visitingUser, isSameUser } =
         useIsSameUser(profileUser);
 
     const dispatch = useAppDispatch();
@@ -61,7 +61,6 @@ export const ProfilePage = () => {
 
     return (
         <div className="flex flex-col justify-between p-5 rounded-lg shadow-lg bg-sky-100 gap-10 min-h-[70vh] md:w-2/3">
-            <p className="text-center text-2xl font-bold">{profileUserName}</p>
             <img
                 src="https://beyond-reviews-os.s3.eu-central-1.amazonaws.com/user-icon.png"
                 className="object-cover object-top w-32 h-32 rounded-full self-center"

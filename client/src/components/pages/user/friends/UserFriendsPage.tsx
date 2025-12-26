@@ -9,7 +9,7 @@ import { triggerFriendEvent } from "../../../../store";
 import { FriendRequestsSection } from "./FriendRequestsSection";
 import { FriendsList } from "./FriendsList";
 
-export const UserFriends = () => {
+export const UserFriendsPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
@@ -65,9 +65,7 @@ export const UserFriends = () => {
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
-            <h2 className="text-2xl text-center font-bold">
-                {isSameUser ? "Your" : `${profileUserName}'s`} friends
-            </h2>
+            <h2 className="text-xl text-center font-bold">Friends</h2>
             {filteredReceivedRequests.length > 0 && isSameUser && (
                 <FriendRequestsSection
                     title="Received friend requests"

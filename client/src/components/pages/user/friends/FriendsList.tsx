@@ -14,7 +14,6 @@ export const FriendsList = ({
 }: FriendsListProps) => {
     return (
         <div className="flex flex-col gap-2">
-            <p className="text-xl font-medium text-center">Friends</p>
             {friends.length > 0 ? (
                 <ul className="flex flex-col gap-5">
                     {friends.map((friend) => (

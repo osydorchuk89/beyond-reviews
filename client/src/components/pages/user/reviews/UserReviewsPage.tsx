@@ -1,23 +1,16 @@
-import { useLoaderData, useRouteLoaderData } from "react-router";
+import { useLoaderData } from "react-router";
 
-import { MovieReview, User } from "../../../../lib/entities";
+import { MovieReview } from "../../../../lib/entities";
 import { MovieReviewDetails } from "./MovieReviewDetails";
-import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 
-export const UserReviews = () => {
-    const { user: profileUser } = useRouteLoaderData("userProfile") as {
-        user: User;
-    };
+export const UserReviewsPage = () => {
     const { userMovieReviews } = useLoaderData() as {
         userMovieReviews: MovieReview[];
     };
-    const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
-            <p className="text-center text-2xl font-bold">
-                {isSameUser ? "Your" : `${profileUserName}'s`} movie reviews
-            </p>
+            <p className="text-center text-xl font-bold">Reviews</p>
             {userMovieReviews.length ? (
                 <ul className="flex flex-col gap-4">
                     {userMovieReviews.map((review) => (

@@ -39,11 +39,17 @@ export const Header = () => {
                     <li key={link.text}>
                         <NavLink
                             className={({ isActive }) =>
-                                `text-xl hover:text-orange-500 ${
-                                    isActive && "text-orange-500"
+                                `text-xl hover:text-orange-500 before:content-[attr(data-text)] before:font-semibold before:block before:h-0 before:overflow-hidden before:invisible ${
+                                    isActive && "text-orange-500 font-semibold"
                                 }`
                             }
                             to={link.to}
+                            data-text={link.text}
+                            onClick={(e) => {
+                                if (pathname === link.to) {
+                                    e.preventDefault();
+                                }
+                            }}
                         >
                             {link.text}
                         </NavLink>

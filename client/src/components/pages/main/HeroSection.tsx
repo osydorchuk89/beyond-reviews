@@ -13,7 +13,7 @@ export const HeroSection = () => {
                 </p>
                 <div className="flex justify-start">
                     <ButtonLink style="orange" to="/movies">
-                        Start browsing
+                        START BROWSING
                     </ButtonLink>
                 </div>
             </div>

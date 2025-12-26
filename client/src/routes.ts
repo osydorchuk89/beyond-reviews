@@ -10,15 +10,16 @@ import { RegistrationPage } from "./components/pages/registration/RegistrationPa
 import { BooksPage } from "./components/pages/books/BooksPage";
 import { MusicPage } from "./components/pages/music/MusicPage";
 import { ProfilePage } from "./components/pages/user/profile/ProfilePage";
-import { UserActivities } from "./components/pages/user/activities/UserActivities";
-import { UserFriends } from "./components/pages/user/friends/UserFriends";
-import { UserMessages } from "./components/pages/user/messages/UserMessages";
-import { UserWatchList } from "./components/pages/user/watch-list/UserWatchList";
-import { UserReviews } from "./components/pages/user/reviews/UserReviews";
-import { UserSettings } from "./components/pages/user/settings/UserSettings";
+import { UserActivitiesPage } from "./components/pages/user/activities/UserActivitiesPage";
+import { UserFriendsPage } from "./components/pages/user/friends/UserFriendsPage";
+import { UserMessagesPage } from "./components/pages/user/messages/UserMessagesPage";
+import { UserWatchListPage } from "./components/pages/user/watch-list/UserWatchListPage";
+import { UserReviewsPage } from "./components/pages/user/reviews/UserReviewsPage";
+import { UserSettingsPage } from "./components/pages/user/settings/UserSettingsPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { ErrorPage } from "./components/pages/ErrorPage";
 import {
+    loginLoader,
     movieLoader,
     moviesLoader,
     protectedLoader,
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
                     {
                         path: "login",
                         Component: LoginPage,
+                        loader: loginLoader,
                         action: loginAction,
                     },
                     {
@@ -98,32 +100,32 @@ export const router = createBrowserRouter([
                                     },
                                     {
                                         path: "activities",
-                                        Component: UserActivities,
+                                        Component: UserActivitiesPage,
                                         loader: userActivitiesLoader,
                                     },
                                     {
                                         path: "friends",
-                                        Component: UserFriends,
+                                        Component: UserFriendsPage,
                                         loader: protectedLoader,
                                     },
                                     {
                                         path: "messages",
-                                        Component: UserMessages,
+                                        Component: UserMessagesPage,
                                         loader: protectedLoader,
                                     },
                                     {
                                         path: "watch-list",
-                                        Component: UserWatchList,
+                                        Component: UserWatchListPage,
                                         loader: userWatchListLoader,
                                     },
                                     {
                                         path: "reviews",
-                                        Component: UserReviews,
+                                        Component: UserReviewsPage,
                                         loader: userReviewsLoader,
                                     },
                                     {
                                         path: "settings",
-                                        Component: UserSettings,
+                                        Component: UserSettingsPage,
                                         loader: protectedLoader,
                                     },
                                 ],

@@ -7,16 +7,16 @@ const prisma = new PrismaClient();
 
 export const getAllMovies = async (req: Request, res: Response) => {
     try {
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 15;
+        const page = parseInt(req.query.page as string) ?? 1;
+        const limit = parseInt(req.query.limit as string) ?? 15;
         const skip = (page - 1) * limit;
 
         // get filter, sort, and search parameters
         const genre = req.query.genre as string;
         const releaseYear = req.query.releaseYear as string;
         const director = req.query.director as string;
-        const sortBy = (req.query.sortBy as string) || "id";
-        const sortOrder = (req.query.sortOrder as string) || "asc";
+        const sortBy = (req.query.sortBy as string) ?? "id";
+        const sortOrder = (req.query.sortOrder as string) ?? "asc";
         const search = req.query.search as string;
 
         const whereClause: any = {};
