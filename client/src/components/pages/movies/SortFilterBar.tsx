@@ -1,16 +1,10 @@
 import { useSearchParams } from "react-router";
 
 import { CloseIcon } from "../../icons/CloseIcon";
-
-interface Item {
-    type: string;
-    value: string;
-    text: string;
-    sortOrder?: string;
-}
+import { SearchItem } from "../../../lib/entities";
 
 interface SortFilterProps {
-    itemsList: Item[];
+    itemsList: SearchItem[];
     title: string;
 }
 
@@ -21,7 +15,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
     const sortBy = searchParams.get("sortBy");
     const sortOrder = searchParams.get("sortOrder");
 
-    const handleItemClick = (item: Item) => {
+    const handleItemClick = (item: SearchItem) => {
         setSearchParams((searchParams) => {
             if (item.type === "sortBy") {
                 searchParams.set("sortBy", item.value);
@@ -34,7 +28,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
         });
     };
 
-    const isItemActive = (item: Item) => {
+    const isItemActive = (item: SearchItem) => {
         if (item.type === "sortBy") {
             return sortBy === item.value && sortOrder === item.sortOrder;
         } else if (item.type === "genre") {

@@ -26,6 +26,11 @@ export const Header = () => {
             <Link
                 className="text-2xl font-semibold hover:text-orange-500"
                 to="/"
+                onClick={(e) => {
+                    if (pathname === "/") {
+                        e.preventDefault();
+                    }
+                }}
             >
                 Beyond Reviews
             </Link>

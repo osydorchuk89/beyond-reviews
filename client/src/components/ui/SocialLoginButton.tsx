@@ -1,9 +1,17 @@
+import { useLocation } from "react-router";
+
 import { BASE_URL } from "../../lib/axiosInstance";
 
 export const SocialLoginButton = () => {
+    const location = useLocation();
+    const from = location.state?.from ?? "/";
+    const googleAuthUrl = `${BASE_URL}/auth/google?from=${encodeURIComponent(
+        from
+    )}`;
+
     return (
         <a
-            href={BASE_URL + "/auth/google"}
+            href={googleAuthUrl}
             className="flex justify-center items-center relative py-2 border border-gray-300 rounded-md bg-gray-50 hover:bg-gray-200 cursor-pointer no-underline"
         >
             <div className="absolute left-3">

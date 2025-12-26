@@ -92,7 +92,7 @@ export const MoviesList = ({
                             {allMovies.map((movie: Movie) => (
                                 <MovieCard
                                     key={movie.id}
-                                    id={movie.id}
+                                    movieId={movie.id}
                                     title={movie.title}
                                     releaseYear={movie.releaseYear}
                                     genres={movie.genres}

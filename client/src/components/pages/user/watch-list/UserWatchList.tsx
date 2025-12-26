@@ -23,7 +23,7 @@ export const UserWatchList = () => {
                 <div className="grid grid-cols-3 items-center gap-16 mx-5">
                     {userWatchList.map((item) => (
                         <MovieCard
-                            id={item.movieId}
+                            movieId={item.movieId}
                             key={item.movieId}
                             title={item.movie.title}
                             releaseYear={item.movie.releaseYear}

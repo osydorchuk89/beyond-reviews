@@ -17,7 +17,12 @@ authRouter.get("/status", getAuthStatus);
 
 authRouter.get("/logout", logout);
 
-authRouter.get("/google", passport.authenticate("google"));
+authRouter.get("/google", (req, res, next) => {
+    const from = req.query.from || "/";
+    passport.authenticate("google", {
+        state: JSON.stringify({ from }),
+    })(req, res, next);
+});
 
 authRouter.get(
     "/google/callback",

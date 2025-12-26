@@ -5,7 +5,7 @@ import { useQueryClick } from "../../../hooks/useQueryClick";
 import { QueryLink } from "../../ui/QueryLink";
 
 interface MovieCardProps {
-    id: string;
+    movieId: string;
     title: string;
     releaseYear: number;
     genres: string[];
@@ -15,7 +15,7 @@ interface MovieCardProps {
 }
 
 export const MovieCard = ({
-    id,
+    movieId,
     title,
     releaseYear,
     genres,
@@ -31,10 +31,7 @@ export const MovieCard = ({
     return (
         <div className="flex flex-col w-80 justify-start items-center bg-sky-100 rounded-lg shadow-lg p-5 relative">
             <p className="w-full text-center text-xl font-bold h-16 bg-sky-700 rounded-t-lg flex justify-center items-center absolute top-0 p-4">
-                <Link
-                    className="hover:underline text-sky-50"
-                    to={`/movies/${id}`}
-                >
+                <Link className="hover:underline text-sky-50" to={movieId}>
                     {displayedTitle}
                 </Link>
             </p>
@@ -59,7 +56,7 @@ export const MovieCard = ({
                     {releaseYear.toString()}
                 </QueryLink>
             </p>
-            <Link to={`/movies/${id}`}>
+            <Link to={movieId}>
                 <img src={poster} className="rounded-lg" />
             </Link>
             <div className="flex mt-4">

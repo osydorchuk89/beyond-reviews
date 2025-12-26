@@ -51,7 +51,7 @@ passport.use(
             callbackURL: BASE_URL + "/auth/google/callback",
             scope: ["profile", "email"],
         },
-        async (accessToken, refreshToken, profile, cb) => {
+        async (_accessToken, _refreshToken, profile, cb) => {
             try {
                 const user = await prisma.user.findUnique({
                     where: { email: profile._json.email! },

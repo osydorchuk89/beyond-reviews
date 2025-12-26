@@ -23,5 +23,20 @@ export const logout = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const googleCallback = (req: Request, res: Response) => {
-    res.redirect(BASE_CLIENT_URL + "/movies");
+    let redirectPath = "/movies";
+
+    // Extract the 'from' parameter from the OAuth state
+    if (req.query.state) {
+        try {
+            const state = JSON.parse(req.query.state as string);
+            if (state.from) {
+                redirectPath = state.from;
+            }
+        } catch (err) {
+            // If state parsing fails, use default redirect
+            console.error("Failed to parse OAuth state:", err);
+        }
+    }
+
+    res.redirect(BASE_CLIENT_URL + redirectPath);
 };

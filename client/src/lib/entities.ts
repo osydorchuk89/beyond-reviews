@@ -169,3 +169,10 @@ export interface MovieReviewInputs {
 export interface LocationState {
     from?: string;
 }
+
+export interface SearchItem {
+    type: string;
+    value: string;
+    text: string;
+    sortOrder?: string;
+}
