@@ -3,8 +3,6 @@ import { useRouteLoaderData } from "react-router";
 
 import { User } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
-import { useAppDispatch } from "../../../../store/hooks";
-import { triggerFriendEvent } from "../../../../store";
 import { profileNavLinks } from "../../../../lib/data";
 import { BaseLink } from "../../../ui/BaseLink";
 import { BaseButton } from "../../../ui/BaseButton";
@@ -15,8 +13,6 @@ export const ProfilePage = () => {
         user: User;
     };
     const { visitingUser, isSameUser } = useIsSameUser(profileUser);
-
-    const dispatch = useAppDispatch();
 
     const areFriends =
         (visitingUser &&
@@ -47,11 +43,7 @@ export const ProfilePage = () => {
         setRequestSent(true);
 
         try {
-            const date = new Date();
             await sendFriendRequest(visitingUser.id, profileUser.id);
-            dispatch(
-                triggerFriendEvent(`new friend event at ${date.toString()}`)
-            );
         } catch (error) {
             setRequestSent(false);
             console.error("Failed to send friend request:", error);

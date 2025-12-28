@@ -41,8 +41,6 @@ export const MovieReviewForm = ({
         },
     });
 
-    console.log(fetcher);
-
     useEffect(() => {
         if (fetcher.data?.success) {
             onSuccess();

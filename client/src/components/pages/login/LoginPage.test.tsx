@@ -1,4 +1,3 @@
-import { Provider } from "react-redux";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, it, expect, afterEach } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
@@ -6,7 +5,6 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 
 import { LoginPage } from "./LoginPage";
-import { store } from "../../../store";
 
 const createMockRouter = (actionData?: any) => {
     return createMemoryRouter(
@@ -14,7 +12,7 @@ const createMockRouter = (actionData?: any) => {
             {
                 path: "/login",
                 element: <LoginPage />,
-                action: async () => actionData || null,
+                action: async () => actionData ?? null,
             },
         ],
         {
@@ -30,11 +28,7 @@ describe("LoginPage", () => {
 
     it("renders a login form", () => {
         const router = createMockRouter();
-        render(
-            <Provider store={store}>
-                <RouterProvider router={router} />
-            </Provider>
-        );
+        render(<RouterProvider router={router} />);
 
         const loginForm = screen.getByTestId("login-form");
         expect(loginForm).toBeInTheDocument();
@@ -42,11 +36,7 @@ describe("LoginPage", () => {
 
     it("renders email and password input fields", () => {
         const router = createMockRouter();
-        render(
-            <Provider store={store}>
-                <RouterProvider router={router} />
-            </Provider>
-        );
+        render(<RouterProvider router={router} />);
 
         const emailInput = screen.getByLabelText(/email/i);
         const passwordInput = screen.getByLabelText(/password/i);
@@ -57,11 +47,7 @@ describe("LoginPage", () => {
 
     it("renders a login button", () => {
         const router = createMockRouter();
-        render(
-            <Provider store={store}>
-                <RouterProvider router={router} />
-            </Provider>
-        );
+        render(<RouterProvider router={router} />);
 
         const loginButton = screen.getByRole("button", { name: "LOGIN" });
         expect(loginButton).toBeInTheDocument();
@@ -70,11 +56,7 @@ describe("LoginPage", () => {
 
     it("shows a validation error when submitting empty email", async () => {
         const router = createMockRouter();
-        render(
-            <Provider store={store}>
-                <RouterProvider router={router} />
-            </Provider>
-        );
+        render(<RouterProvider router={router} />);
 
         const submitButton = screen.getByRole("button", { name: "LOGIN" });
         await userEvent.type(screen.getByLabelText(/password/i), "password");
@@ -87,11 +69,7 @@ describe("LoginPage", () => {
 
     it("shows a validation error when submitting empty password", async () => {
         const router = createMockRouter();
-        render(
-            <Provider store={store}>
-                <RouterProvider router={router} />
-            </Provider>
-        );
+        render(<RouterProvider router={router} />);
 
         const submitButton = screen.getByRole("button", { name: "LOGIN" });
         await userEvent.type(
@@ -107,11 +85,7 @@ describe("LoginPage", () => {
 
     it("renders a link to the registration page", () => {
         const router = createMockRouter();
-        render(
-            <Provider store={store}>
-                <RouterProvider router={router} />
-            </Provider>
-        );
+        render(<RouterProvider router={router} />);
 
         const registrationLink = screen.getByText(/Register here/i);
         expect(registrationLink).toBeInTheDocument();
@@ -119,11 +93,7 @@ describe("LoginPage", () => {
 
     it("renders 'Login with Google' button", () => {
         const router = createMockRouter();
-        render(
-            <Provider store={store}>
-                <RouterProvider router={router} />
-            </Provider>
-        );
+        render(<RouterProvider router={router} />);
 
         const googleButton = screen.getByText(/Login with Google/i);
         expect(googleButton).toBeInTheDocument();

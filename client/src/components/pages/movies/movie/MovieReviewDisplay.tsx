@@ -28,7 +28,7 @@ export const MovieReviewDisplay = ({
             <div>
                 <p className="font-bold">Your review: </p>
                 <p ref={ref} className={!isShowingMore ? "line-clamp-5" : ""}>
-                    {userReview || "N/A"}
+                    {userReview ?? "N/A"}
                 </p>
                 {isTruncated && (
                     <div>

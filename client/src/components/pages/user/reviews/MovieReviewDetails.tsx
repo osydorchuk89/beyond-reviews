@@ -34,7 +34,7 @@ export const MovieReviewDetails = ({ review }: MovieReviewDetailsProps) => {
                 </p>
                 <p className="self-start">
                     <span className="font-semibold">Review:</span>{" "}
-                    {review.text || <span className="italic">no review</span>}
+                    {review.text ?? <span className="italic">no review</span>}
                 </p>
             </div>
         </div>

@@ -17,7 +17,6 @@ A full-stack web application for reviewing movies built with React, express, and
 
 -   React 18 with TypeScript
 -   React Router v7
--   Redux Toolkit for state management
 -   Tailwind CSS for styling
 
 **Backend:**

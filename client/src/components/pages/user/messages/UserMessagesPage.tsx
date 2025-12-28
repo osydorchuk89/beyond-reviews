@@ -4,15 +4,12 @@ import { useRouteLoaderData } from "react-router";
 import { Friend, Message, User, UsersMessages } from "../../../../lib/entities";
 import { ChatSidePanel } from "./ChatSidePanel";
 import { ChatHistory } from "./ChatHistory";
-import { useAppDispatch } from "../../../../store/hooks";
-import { triggerMessageEvent } from "../../../../store";
 import { getChatHistory, sendMessage } from "../../../../lib/api";
 
 export const UserMessagesPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const dispatch = useAppDispatch();
 
     const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
     const [chatHistory, setChatHistory] = useState<UsersMessages | null>(null);
@@ -35,11 +32,7 @@ export const UserMessagesPage = () => {
         const friendId = selectedFriend.id;
 
         // Send the message to the server
-        const date = new Date();
         const newMessage: Message = await sendMessage(userId, friendId, text);
-        dispatch(
-            triggerMessageEvent(`new message event at ${date.toString()}`)
-        );
 
         // Optimistically update chatHistory with the new message
         setChatHistory((prev) =>

@@ -35,7 +35,7 @@ export const fetchMovies = async (page: Number) => {
                 movieCrewData?.find(
                     (item: any) =>
                         item.job === "Director" || item.job === "Co-Director"
-                )?.name || "Unknown Director";
+                )?.name ?? "Unknown Director";
             const movieGenres = movieData.genres.map(
                 (item: { id: number; name: string }) => item.name
             );

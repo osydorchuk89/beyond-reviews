@@ -60,7 +60,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
             <ul className="flex flex-col justify-between font-bold px-5 py-2 items-center md:items-stretch">
                 {itemsList.map((item) => (
                     <li
-                        key={`${item.value}-${item.sortOrder || ""}`}
+                        key={`${item.value}-${item.sortOrder ?? ""}`}
                         className={`flex items-center gap-2 text-orange-950 px-2 rounded-md cursor-pointer ${
                             isItemActive(item)
                                 ? " bg-orange-300 hover:bg-orange-300"

@@ -3,8 +3,6 @@ import { useRouteLoaderData } from "react-router";
 
 import { Friend, User } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
-import { useAppDispatch } from "../../../../store/hooks";
-import { triggerFriendEvent } from "../../../../store";
 import { FriendRequestsSection } from "./FriendRequestsSection";
 import { FriendsList } from "./FriendsList";
 import { acceptFriendRequest } from "../../../../lib/api";
@@ -15,8 +13,6 @@ export const UserFriendsPage = () => {
     };
 
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
-
-    const dispatch = useAppDispatch();
 
     // Track accepted requests locally
     const [acceptedRequestIds, setAcceptedRequestIds] = useState<string[]>([]);
@@ -47,11 +43,7 @@ export const UserFriendsPage = () => {
         setUserFriends((prev) => [...prev, newFriend]);
 
         try {
-            const date = new Date();
             await acceptFriendRequest(userId, otherUserId);
-            dispatch(
-                triggerFriendEvent(`new friend event at ${date.toString()}`)
-            );
         } catch (error) {
             setAcceptedRequestIds((prev) =>
                 prev.filter((id) => id !== otherUserId)
