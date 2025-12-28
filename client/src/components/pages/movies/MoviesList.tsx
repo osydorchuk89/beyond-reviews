@@ -4,8 +4,8 @@ import { useSearchParams } from "react-router";
 import { MovieCard } from "./MovieCard";
 import { Movie } from "../../../lib/entities";
 import { BaseButton } from "../../ui/BaseButton";
-import { getMovies } from "../../../lib/actions";
 import { FilterTags } from "./FilterTags";
+import { getMovies } from "../../../lib/api";
 
 interface MoviesListProps {
     movies: Movie[];

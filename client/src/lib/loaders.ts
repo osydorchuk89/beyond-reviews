@@ -9,7 +9,7 @@ import {
     getUserActivities,
     getUserMovieReviews,
     getWatchList,
-} from "./actions";
+} from "./api";
 
 export const rootLoader = async () => {
     const authData = await getAuthData();

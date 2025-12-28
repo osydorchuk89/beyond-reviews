@@ -4,10 +4,10 @@ import { useRouteLoaderData } from "react-router";
 import { Friend, User } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { useAppDispatch } from "../../../../store/hooks";
-import { acceptFriendRequest } from "../../../../lib/actions";
 import { triggerFriendEvent } from "../../../../store";
 import { FriendRequestsSection } from "./FriendRequestsSection";
 import { FriendsList } from "./FriendsList";
+import { acceptFriendRequest } from "../../../../lib/api";
 
 export const UserFriendsPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {

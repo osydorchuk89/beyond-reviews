@@ -4,18 +4,17 @@ import { useRouteLoaderData } from "react-router";
 import { User } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { useAppDispatch } from "../../../../store/hooks";
-import { sendFriendRequest } from "../../../../lib/actions";
 import { triggerFriendEvent } from "../../../../store";
 import { profileNavLinks } from "../../../../lib/data";
 import { BaseLink } from "../../../ui/BaseLink";
 import { BaseButton } from "../../../ui/BaseButton";
+import { sendFriendRequest } from "../../../../lib/api";
 
 export const ProfilePage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { visitingUser, isSameUser } =
-        useIsSameUser(profileUser);
+    const { visitingUser, isSameUser } = useIsSameUser(profileUser);
 
     const dispatch = useAppDispatch();
 

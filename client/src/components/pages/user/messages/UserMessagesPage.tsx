@@ -4,9 +4,9 @@ import { useRouteLoaderData } from "react-router";
 import { Friend, Message, User, UsersMessages } from "../../../../lib/entities";
 import { ChatSidePanel } from "./ChatSidePanel";
 import { ChatHistory } from "./ChatHistory";
-import { getChatHistory, sendMessage } from "../../../../lib/actions";
 import { useAppDispatch } from "../../../../store/hooks";
 import { triggerMessageEvent } from "../../../../store";
+import { getChatHistory, sendMessage } from "../../../../lib/api";
 
 export const UserMessagesPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {

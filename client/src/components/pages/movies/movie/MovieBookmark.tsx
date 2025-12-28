@@ -4,7 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { BookMarkIcon } from "../../../icons/BookMarkIcon";
 import { AuthData, Movie } from "../../../../lib/entities";
 import { ToastNotification } from "../../../ui/ToastNotification";
-import { addOrRemoveMovieFromWatchlist } from "../../../../lib/actions";
+import { addOrRemoveMovieFromWatchlist } from "../../../../lib/api";
 
 interface MovieBookmarkProps {
     movie: Movie;
