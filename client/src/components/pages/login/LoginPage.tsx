@@ -7,6 +7,7 @@ export const LoginPage = () => {
     const actionData = useActionData() as { error?: string } | undefined;
     const [showError, setShowError] = useState(false);
 
+    // TODO: Think if I need to be able to close LoginErrorAlert
     useEffect(() => {
         if (actionData?.error) {
             setShowError(true);

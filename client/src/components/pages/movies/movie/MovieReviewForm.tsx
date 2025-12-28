@@ -9,27 +9,24 @@ import { StarIcon } from "../../../icons/StarIcon";
 import { BaseButton } from "../../../ui/BaseButton";
 
 interface MovieReviewFormProps {
-    movieId: string;
-    userId: string;
     initialRating?: number;
     initialText?: string;
-    isEditing: boolean;
+    hasRated: boolean;
     onCancel: () => void;
     onSuccess: () => void;
 }
 
 export const MovieReviewForm = ({
-    movieId,
-    userId,
     initialRating = 0,
     initialText = "",
+    hasRated,
     onCancel,
     onSuccess,
 }: MovieReviewFormProps) => {
     const [userRating, setUserRating] = useState(initialRating);
     const [hover, setHover] = useState(initialRating);
 
-    const fetcher = useFetcher();
+    const fetcher = useFetcher({ key: "movie-review" });
     const isUpdating = fetcher.state !== "idle";
 
     const {
@@ -44,6 +41,8 @@ export const MovieReviewForm = ({
         },
     });
 
+    console.log(fetcher);
+
     useEffect(() => {
         if (fetcher.data?.success) {
             onSuccess();
@@ -52,9 +51,6 @@ export const MovieReviewForm = ({
 
     return (
         <fetcher.Form method="post" noValidate>
-            <input type="hidden" name="movieId" value={movieId} />
-            <input type="hidden" name="userId" value={userId} />
-
             <label htmlFor="ratng" className="font-bold">
                 Rate the movie:
             </label>
@@ -104,8 +100,12 @@ export const MovieReviewForm = ({
                 <BaseButton style="sky" handleClick={onCancel}>
                     CANCEL
                 </BaseButton>
-                <BaseButton style="orange" type="submit">
-                    {isUpdating ? "Please wait..." : "EDIT"}
+                <BaseButton style="orange" type="submit" disabled={isUpdating}>
+                    {isUpdating
+                        ? "Please wait..."
+                        : hasRated
+                        ? "EDIT"
+                        : "SUBMIT"}
                 </BaseButton>
             </div>
         </fetcher.Form>

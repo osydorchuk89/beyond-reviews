@@ -1,14 +1,11 @@
-import { AuthData, MovieReview } from "../../../../lib/entities";
+import { MovieReview } from "../../../../lib/entities";
 import { MovieReviewCard } from "./MovieReviewCard";
 
 interface MovieReviewsProps {
     movieReviews: MovieReview[];
-    authData: AuthData;
 }
 
-export const MovieReviews = ({ movieReviews, authData }: MovieReviewsProps) => {
-    const userId = authData.user?.id;
-
+export const MovieReviews = ({ movieReviews }: MovieReviewsProps) => {
     return (
         <div>
             <hr className="h-px mb-5 bg-sky-400 border-0" />
@@ -16,11 +13,7 @@ export const MovieReviews = ({ movieReviews, authData }: MovieReviewsProps) => {
             <div className="flex flex-col my-5 gap-5">
                 {movieReviews.length > 0 &&
                     movieReviews.map((review) => (
-                        <MovieReviewCard
-                            key={review.id}
-                            movieReview={review}
-                            userId={userId}
-                        />
+                        <MovieReviewCard key={review.id} movieReview={review} />
                     ))}
                 {movieReviews.length === 0 && (
                     <div className="flex justify-center italic">

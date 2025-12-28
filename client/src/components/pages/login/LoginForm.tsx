@@ -32,11 +32,14 @@ export const LoginForm = () => {
     });
 
     const onSubmit = (data: LoginInputs) => {
-        const formData = new FormData();
-        formData.append("email", data.email);
-        formData.append("password", data.password);
-        formData.append("from", from);
-        submit(formData, { method: "post" });
+        submit(
+            {
+                email: data.email,
+                password: data.password,
+                from,
+            },
+            { method: "post" }
+        );
     };
 
     return (

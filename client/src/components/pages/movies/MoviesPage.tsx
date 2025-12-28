@@ -9,8 +9,8 @@ import { sideBarFilterList, sideBarSortList } from "../../../lib/data";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 
 export const MoviesPage = () => {
-    const { moviesData } = useLoaderData() as {
-        moviesData: MoviesData;
+    const { moviesDataPromise } = useLoaderData() as {
+        moviesDataPromise: Promise<MoviesData>;
     };
 
     const buildFilters = (appliedFilters: MoviesData["appliedFilters"]) => {
@@ -51,7 +51,7 @@ export const MoviesPage = () => {
                 </aside>
                 <div className="flex flex-col w-full md:w-3/4">
                     <Suspense fallback={<LoadingSpinner />}>
-                        <Await resolve={moviesData}>
+                        <Await resolve={moviesDataPromise}>
                             {(moviesData) => {
                                 const filters = buildFilters(
                                     moviesData.appliedFilters

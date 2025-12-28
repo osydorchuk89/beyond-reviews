@@ -12,7 +12,7 @@ export const BookMarkIcon = ({
     handleMouseLeave,
 }: BookMarkIconProps) => {
     return (
-        <button onClick={handleClick}>
+        <button onClick={handleClick} className="z-5">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill={color}

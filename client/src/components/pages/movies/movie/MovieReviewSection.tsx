@@ -1,18 +1,16 @@
 import { useState } from "react";
 
-import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
+import { AuthData, MovieReview } from "../../../../lib/entities";
 import { BaseLink } from "../../../ui/BaseLink";
 import { MovieReviewForm } from "./MovieReviewForm";
 import { MovieReviewDisplay } from "./MovieReviewDisplay";
 
 interface MovieReviewSectionProps {
-    movie: Movie;
     movieReviews: MovieReview[];
     authData: AuthData;
 }
 
 export const MovieReviewSection = ({
-    movie,
     movieReviews,
     authData,
 }: MovieReviewSectionProps) => {
@@ -31,11 +29,9 @@ export const MovieReviewSection = ({
             <div className="bg-sky-200 rounded-lg shadow-lg p-5">
                 {authData.isAuthenticated && (!hasRated || isEditing) && (
                     <MovieReviewForm
-                        movieId={movie.id}
-                        userId={authData.user?.id ?? ""}
                         initialRating={userRating}
                         initialText={userReview}
-                        isEditing={isEditing}
+                        hasRated={hasRated}
                         onCancel={() => setIsEditing(false)}
                         onSuccess={() => {
                             setIsEditing(false);

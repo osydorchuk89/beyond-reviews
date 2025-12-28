@@ -35,6 +35,7 @@ import {
     movieReviewAction,
     registrationAction,
 } from "./lib/actions";
+import { MoviesLayout } from "./components/pages/movies/MoviesLayout";
 
 export const router = createBrowserRouter([
     {
@@ -71,6 +72,7 @@ export const router = createBrowserRouter([
                     {
                         path: "movies",
                         id: "movies",
+                        Component: MoviesLayout,
                         children: [
                             {
                                 index: true,

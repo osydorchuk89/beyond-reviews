@@ -2,7 +2,7 @@ import { CloseIcon } from "../../icons/CloseIcon";
 
 interface LoginErrorAlertProps {
     message: string;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export const LoginErrorAlert = ({ message, onClose }: LoginErrorAlertProps) => {

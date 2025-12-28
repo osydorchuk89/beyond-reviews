@@ -28,7 +28,7 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
     const sortOrder = searchParams.get("sortOrder") ?? undefined;
     const search = searchParams.get("search") ?? undefined;
 
-    const moviesData = getMovies(
+    const moviesDataPromise = getMovies(
         page,
         15,
         genre,
@@ -38,7 +38,7 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
         sortOrder,
         search
     );
-    return { moviesData };
+    return { moviesDataPromise };
 };
 
 export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
@@ -69,9 +69,7 @@ export const userActivitiesLoader = async ({
 
 export const protectedLoader = async ({ params }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
-    console.log(userId);
     const authData = await getAuthData();
-    console.log(authData.user?.id);
     if (!authData.isAuthenticated || authData.user?.id !== userId) {
         return redirect("/");
     }

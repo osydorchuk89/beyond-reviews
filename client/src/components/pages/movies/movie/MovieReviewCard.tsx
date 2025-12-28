@@ -1,21 +1,25 @@
 import { RefObject, useRef, useState } from "react";
 
-import { MovieReview } from "../../../../lib/entities";
+import { AuthData, MovieReview } from "../../../../lib/entities";
 import { sendLikeOrUnlike } from "../../../../lib/actions";
 import { useTruncatedElement } from "../../../../hooks/useTruncatedElements";
 import { BaseLink } from "../../../ui/BaseLink";
 import { StarIcon } from "../../../icons/StarIcon";
 import { LikeIcon } from "../../../icons/LikeIcon";
+import { useRouteLoaderData } from "react-router";
 
 interface MovieReviewCardProps {
     movieReview: MovieReview;
-    userId?: string;
 }
 
 export const MovieReviewCard = ({
     movieReview,
-    userId,
 }: MovieReviewCardProps) => {
+    const { authData } = useRouteLoaderData("root") as {
+        authData: AuthData;
+    };
+    const userId = authData.user?.id;
+    
     const hasUserLikedReview = movieReview.likedBy.some(
         (like) => like.userId === userId
     );

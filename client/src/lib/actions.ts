@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { ActionFunctionArgs, redirect } from "react-router";
 
 import axiosInstance from "./axiosInstance";
 import {
@@ -79,6 +79,7 @@ export const logoutAction = async () => {
     }
 };
 
+// TODO: outsource to a different file
 // Movies
 export const getMovies = async (
     page: number = 1,
@@ -132,10 +133,16 @@ export const getMovieReviews = async (
     }
 };
 
-export const movieReviewAction = async ({ request }: { request: Request }) => {
+export const movieReviewAction = async ({
+    params,
+    request,
+}: ActionFunctionArgs) => {
+    const { movieId } = params;
+
+    const authData = await getAuthData();
+    const userId = authData?.user?.id;
+
     const formData = await request.formData();
-    const movieId = formData.get("movieId");
-    const userId = formData.get("userId");
     const rating = Number(formData.get("rating"));
     const text = formData.get("text");
     const date = new Date();

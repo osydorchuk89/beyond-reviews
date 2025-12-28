@@ -45,20 +45,22 @@ export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
     };
 
     const saveMovie = async () => {
-        setHasSaved((prevState) => !prevState);
-        setIconFilled((prevState) => !prevState);
-        try {
-            showNotificationToast();
-            await addOrRemoveMovieFromWatchlist(movie.id, userId!, hasSaved);
-        } catch (error) {
+        if (userId) {
             setHasSaved((prevState) => !prevState);
             setIconFilled((prevState) => !prevState);
-            console.log(error);
+            try {
+                showNotificationToast();
+                await addOrRemoveMovieFromWatchlist(movie.id, userId, hasSaved);
+            } catch (error) {
+                setHasSaved((prevState) => !prevState);
+                setIconFilled((prevState) => !prevState);
+                console.log(error);
+            }
         }
     };
 
     return (
-        <div className="absolute w-40 top-10 right-0 flex flex-col justify-center items-end transition-opacity z-10">
+        <div className="absolute w-40 top-10 right-0 flex flex-col justify-center items-end transition-opacity">
             <ToastContainer
                 autoClose={3000}
                 hideProgressBar

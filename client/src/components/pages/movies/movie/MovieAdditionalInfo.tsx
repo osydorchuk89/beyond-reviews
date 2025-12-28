@@ -1,77 +1,43 @@
-import { useCallback } from "react";
-import { useNavigate } from "react-router";
+import { useFetchers, useRouteLoaderData } from "react-router";
 
-import { AuthData, Movie } from "../../../../lib/entities";
-import { QueryLink } from "../../../ui/QueryLink";
-import { StarIcon } from "../../../icons/StarIcon";
+import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
+import { MovieBookmark } from "./MovieBookmark";
+import { MovieDetails } from "./MovieDetails";
+import { MovieReviewSection } from "./MovieReviewSection";
+import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 
 interface MovieAdditionalInfoProps {
     movie: Movie;
-    authData: AuthData;
+    movieReviews: MovieReview[];
 }
 
-export const MovieAdditionalInfo = ({ movie }: MovieAdditionalInfoProps) => {
-    const navigate = useNavigate();
+export const MovieAdditionalInfo = ({
+    movie,
+    movieReviews,
+}: MovieAdditionalInfoProps) => {
+    const { authData } = useRouteLoaderData("root") as {
+        authData: AuthData;
+    };
 
-    const handleFilterNavigation = useCallback(
-        (filterType: string, filterValue: string) => {
-            navigate(
-                `/movies?${filterType}=${encodeURIComponent(filterValue)}`
-            );
-        },
-        [navigate]
-    );
+    const fetchers = useFetchers();
+    const isUpdating = fetchers.some((f) => f.state !== "idle");
 
     return (
-        <div className="flex flex-col gap-5 text-lg mb-5 relative">
-            <p className="font-semibold">
-                Directed by:{" "}
-                <QueryLink
-                    onClick={() =>
-                        handleFilterNavigation("director", movie.director)
-                    }
-                >
-                    {movie.director}
-                </QueryLink>
-            </p>
-            <p>
-                <QueryLink
-                    onClick={() =>
-                        handleFilterNavigation(
-                            "releaseYear",
-                            movie.releaseYear.toString()
-                        )
-                    }
-                >
-                    {movie.releaseYear.toString()}
-                </QueryLink>
-            </p>
-            <p>
-                {movie.genres.map((item, index) => (
-                    <span key={item}>
-                        <QueryLink
-                            onClick={() =>
-                                handleFilterNavigation("genre", item)
-                            }
-                        >
-                            {item}
-                        </QueryLink>
-                        {index !== movie.genres.length - 1 && " | "}
-                    </span>
-                ))}
-            </p>
-            <div className="flex gap-5 text-gray-600 ">
-                <span>{movie.runtime} min</span>
-                <span className="flex">
-                    <StarIcon className="w-6 h-6 fill-sky-500 border-none" />{" "}
-                    {movie.avgRating.toPrecision(2)}
-                </span>
-                <span>
-                    {movie.numRatings}{" "}
-                    {movie.numRatings === 1 ? "vote" : "votes"}
-                </span>
-            </div>
-            <p>{movie.overview}</p>
+        <div className="flex flex-col w-2/3 text-lg">
+            {isUpdating ? (
+                <LoadingSpinner />
+            ) : (
+                <>
+                    {authData.user && (
+                        <MovieBookmark movie={movie} authData={authData} />
+                    )}
+                    <MovieDetails movie={movie} authData={authData} />
+                    <MovieReviewSection
+                        movieReviews={movieReviews}
+                        authData={authData}
+                    />
+                </>
+            )}
         </div>
     );
 };
