@@ -117,74 +117,68 @@ export const getUserActivities = async (req: Request, res: Response) => {
     const skip = (page - 1) * limit;
 
     try {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (user) {
-            const [activities, totalCount] = await Promise.all([
-                prisma.activity.findMany({
-                    where: {
-                        userId: userId,
+        const [activities, totalCount] = await Promise.all([
+            prisma.activity.findMany({
+                where: {
+                    userId: userId,
+                },
+                include: {
+                    movie: {
+                        select: {
+                            title: true,
+                            releaseYear: true,
+                            poster: true,
+                        },
                     },
-                    include: {
-                        movie: {
-                            select: {
-                                title: true,
-                                releaseYear: true,
-                                poster: true,
-                            },
+                    user: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            photo: true,
                         },
-                        user: {
-                            select: {
-                                firstName: true,
-                                lastName: true,
-                                photo: true,
-                            },
-                        },
-                        movieReview: {
-                            include: {
-                                user: {
-                                    select: {
-                                        id: true,
-                                        firstName: true,
-                                        lastName: true,
-                                    },
+                    },
+                    movieReview: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
                                 },
-                                movie: {
-                                    select: {
-                                        id: true,
-                                        title: true,
-                                        releaseYear: true,
-                                    },
+                            },
+                            movie: {
+                                select: {
+                                    id: true,
+                                    title: true,
+                                    releaseYear: true,
                                 },
                             },
                         },
                     },
-                    orderBy: { date: "desc" },
-                    skip: skip,
-                    take: limit,
-                }),
-                prisma.activity.count({
-                    where: { userId: userId },
-                }),
-            ]);
+                },
+                orderBy: { date: "desc" },
+                skip: skip,
+                take: limit,
+            }),
+            prisma.activity.count({
+                where: { userId: userId },
+            }),
+        ]);
 
-            const totalPages = Math.ceil(totalCount / limit);
-            const hasMore = page < totalPages;
+        const totalPages = Math.ceil(totalCount / limit);
+        const hasMore = page < totalPages;
 
-            res.status(200).send({
-                activities,
-                totalCount,
-                currentPage: page,
-                totalPages,
-                hasMore,
-            });
-        } else {
-            res.status(500).send({
-                message: "Could not find user",
-            });
-        }
+        res.status(200).send({
+            activities,
+            totalCount,
+            currentPage: page,
+            totalPages,
+            hasMore,
+        });
     } catch (error) {
         res.status(500).send({
             message: "Could not fetch user activities",
+            error,
         });
     }
 };
@@ -194,7 +188,7 @@ export const getUserFriends = async (req: Request, res: Response) => {
     try {
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            include: {
+            select: {
                 friends: {
                     select: {
                         id: true,
@@ -205,13 +199,12 @@ export const getUserFriends = async (req: Request, res: Response) => {
                 },
             },
         });
-        if (user) {
-            res.status(200).send(user.friends);
-        } else {
-            res.status(500).send({ message: "Could not find user" });
-        }
+        res.status(200).send(user?.friends || []);
     } catch (error: any) {
-        res.status(500).send({ message: "Could not fetch user freinds" });
+        res.status(500).send({
+            message: "Could not fetch user friends",
+            error,
+        });
     }
 };
 
@@ -219,37 +212,32 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const { otherUserId }: { otherUserId: string } = req.body;
     try {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        const otherUser = await prisma.user.findUnique({
-            where: { id: otherUserId },
+        const friendRequest = await prisma.friendRequest.findUnique({
+            where: {
+                sentUserId_receivedUserId: {
+                    sentUserId: userId,
+                    receivedUserId: otherUserId,
+                },
+            },
         });
-        if (user && otherUser) {
-            const friendRequest = await prisma.friendRequest.findUnique({
-                where: {
-                    sentUserId_receivedUserId: {
-                        sentUserId: userId,
-                        receivedUserId: otherUserId,
-                    },
+        if (friendRequest) {
+            res.status(409).send({
+                message: "User has already received a friend request",
+            });
+        } else {
+            await prisma.friendRequest.create({
+                data: {
+                    sentUserId: userId,
+                    receivedUserId: otherUserId,
                 },
             });
-            if (friendRequest) {
-                res.status(409).send({
-                    message: "User has already received a friend request",
-                });
-            } else {
-                await prisma.friendRequest.create({
-                    data: {
-                        sentUserId: userId,
-                        receivedUserId: otherUserId,
-                    },
-                });
-                res.status(200).send();
-            }
-        } else {
-            res.status(500).send({ message: "Could not find user" });
+            res.status(200).send();
         }
     } catch (error: any) {
-        res.status(500).send({ message: "Could not send friend request" });
+        res.status(500).send({
+            message: "Could not send friend request",
+            error,
+        });
     }
 };
 
@@ -257,19 +245,28 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const { otherUserId } = req.body;
     try {
-        const userWithFriend = await prisma.user.findUnique({
-            where: { id: userId },
-            select: {
+        // Check if already friends
+        const existingFriendship = await prisma.user.findFirst({
+            where: {
+                id: userId,
                 friends: {
-                    where: {
+                    some: {
                         id: otherUserId,
                     },
-                    select: { id: true },
                 },
             },
         });
-        if (!userWithFriend?.friends.length) {
-            await prisma.user.update({
+
+        if (existingFriendship) {
+            res.status(409).send({
+                message: "The user is already on the friend list",
+            });
+            return;
+        }
+
+        // Execute all operations atomically
+        await prisma.$transaction(async (tx) => {
+            await tx.user.update({
                 where: { id: userId },
                 data: {
                     friends: {
@@ -279,7 +276,7 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
                     },
                 },
             });
-            await prisma.user.update({
+            await tx.user.update({
                 where: { id: otherUserId },
                 data: {
                     friends: {
@@ -289,7 +286,7 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
                     },
                 },
             });
-            await prisma.friendRequest.delete({
+            await tx.friendRequest.delete({
                 where: {
                     sentUserId_receivedUserId: {
                         sentUserId: otherUserId,
@@ -297,47 +294,41 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
                     },
                 },
             });
-            res.status(200).send();
-        } else
-            res.status(409).send({
-                message: "The user is already on the friend list",
-            });
+        });
+
+        res.status(200).send();
     } catch (error: any) {
-        res.status(500).send({ message: "Could not accept friend request" });
+        res.status(500).send({
+            message: "Could not accept friend request",
+            error,
+        });
     }
 };
 
 export const getUserWatchlist = async (req: Request, res: Response) => {
     const { userId } = req.params;
     try {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
+        const watchlist = await prisma.movieWatchList.findMany({
+            where: { userId },
             include: {
-                watchList: {
-                    include: {
-                        movie: {
-                            select: {
-                                title: true,
-                                releaseYear: true,
-                                genres: true,
-                                avgRating: true,
-                                numRatings: true,
-                                poster: true,
-                            },
-                        },
+                movie: {
+                    select: {
+                        title: true,
+                        releaseYear: true,
+                        genres: true,
+                        avgRating: true,
+                        numRatings: true,
+                        poster: true,
                     },
                 },
             },
         });
-        if (user) {
-            res.send(user.watchList);
-        } else {
-            res.status(500).send({
-                message: "Could not find user",
-            });
-        }
+        res.status(200).send(watchlist);
     } catch (error) {
-        res.status(500).send({ message: "Could not fetch user watchlist" });
+        res.status(500).send({
+            message: "Could not fetch user watchlist",
+            error,
+        });
     }
 };
 

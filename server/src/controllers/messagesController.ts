@@ -8,10 +8,19 @@ export const getUserMessages = async (req: Request, res: Response) => {
     try {
         const senderId = req.query.senderId as string;
         const recipientId = req.query.recipientId as string;
-        const sentMessages = await prisma.message.findMany({
+
+        const allMessages = await prisma.message.findMany({
             where: {
-                senderId: senderId,
-                recipientId: recipientId,
+                OR: [
+                    {
+                        senderId: senderId,
+                        recipientId: recipientId,
+                    },
+                    {
+                        senderId: recipientId,
+                        recipientId: senderId,
+                    },
+                ],
             },
             include: {
                 sender: {
@@ -21,37 +30,14 @@ export const getUserMessages = async (req: Request, res: Response) => {
                     },
                 },
             },
-        });
-        const receivedMessages = await prisma.message.findMany({
-            where: {
-                senderId: recipientId,
-                recipientId: senderId,
-            },
-            include: {
-                sender: {
-                    select: {
-                        firstName: true,
-                        lastName: true,
-                    },
-                },
+            orderBy: {
+                date: "asc",
             },
         });
-        if (sentMessages && receivedMessages) {
-            const allMessages = sentMessages
-                .concat(receivedMessages)
-                .sort((a, b) => {
-                    return (
-                        new Date(a.date).valueOf() - new Date(b.date).valueOf()
-                    );
-                });
-            res.status(200).send(allMessages);
-        } else {
-            res.status(500).send({
-                message: "Could not find messages",
-            });
-        }
-    } catch (error: any) {
-        res.status(500).send({ message: error.message });
+
+        res.status(200).send(allMessages);
+    } catch (error) {
+        res.status(500).send({ message: "Could not fetch messages", error });
     }
 };
 
@@ -73,7 +59,7 @@ export const postMessage = async (req: Request, res: Response) => {
         });
         res.status(200).send(message);
     } catch (error: any) {
-        res.status(500).send({ message: error.message });
+        res.status(500).send({ message: "Could not post message", error });
     }
 };
 
@@ -86,6 +72,9 @@ export const markMessageAsRead = async (req: Request, res: Response) => {
         });
         res.status(200).send();
     } catch (error: any) {
-        res.status(500).send({ message: error.message });
+        res.status(500).send({
+            message: "Could not mark message as read",
+            error,
+        });
     }
 };
