@@ -30,7 +30,19 @@ export const googleCallback = (req: Request, res: Response) => {
         try {
             const state = JSON.parse(req.query.state as string);
             if (state.from) {
-                redirectPath = state.from;
+                // Validate redirect path to prevent open redirect attacks
+                const requestedPath = state.from;
+
+                // Only allow relative paths that start with /
+                // Reject any path containing protocol schemes or domain names
+                if (
+                    typeof requestedPath === "string" &&
+                    requestedPath.startsWith("/") &&
+                    !requestedPath.startsWith("//") &&
+                    !/^(\/\\|https?:\/\/|javascript:)/i.test(requestedPath)
+                ) {
+                    redirectPath = requestedPath;
+                }
             }
         } catch (err) {
             // If state parsing fails, use default redirect
