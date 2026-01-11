@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { MovieCard } from "./MovieCard";
@@ -26,7 +26,10 @@ export const MoviesList = ({
     const [page, setPage] = useState(currentPage);
     const [hasMoreMovies, setHasMoreMovies] = useState(hasMore);
 
-    const allMovies = [...movies, ...additionalMovies];
+    const allMovies = useMemo(
+        () => [...movies, ...additionalMovies],
+        [movies, additionalMovies]
+    );
 
     const handleLoadMore = async () => {
         setLoading(true);
@@ -58,24 +61,27 @@ export const MoviesList = ({
         setHasMoreMovies(hasMore);
     }, [movies, currentPage, hasMore]);
 
-    const handleCloseFilterTag = (filter: string) => {
-        setSearchParams((searchParams) => {
-            if (filter.includes("Genre:")) {
-                searchParams.delete("genre");
-            }
-            if (filter.includes("Year:")) {
-                searchParams.delete("releaseYear");
-            }
-            if (filter.includes("Director:")) {
-                searchParams.delete("director");
-            }
-            if (filter.includes("Search:")) {
-                searchParams.delete("search");
-            }
-            searchParams.delete("page");
-            return searchParams;
-        });
-    };
+    const handleCloseFilterTag = useCallback(
+        (filter: string) => {
+            setSearchParams((searchParams) => {
+                if (filter.includes("Genre:")) {
+                    searchParams.delete("genre");
+                }
+                if (filter.includes("Year:")) {
+                    searchParams.delete("releaseYear");
+                }
+                if (filter.includes("Director:")) {
+                    searchParams.delete("director");
+                }
+                if (filter.includes("Search:")) {
+                    searchParams.delete("search");
+                }
+                searchParams.delete("page");
+                return searchParams;
+            });
+        },
+        [setSearchParams]
+    );
 
     return (
         <div className="flex flex-col w-full">

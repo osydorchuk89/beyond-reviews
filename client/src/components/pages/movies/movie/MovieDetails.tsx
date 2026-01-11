@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useNavigate } from "react-router";
 
 import { AuthData, Movie } from "../../../../lib/entities";
@@ -13,14 +12,12 @@ interface MovieDetailsProps {
 export const MovieDetails = ({ movie }: MovieDetailsProps) => {
     const navigate = useNavigate();
 
-    const handleFilterNavigation = useCallback(
-        (filterType: string, filterValue: string) => {
-            navigate(
-                `/movies?${filterType}=${encodeURIComponent(filterValue)}`
-            );
-        },
-        [navigate]
-    );
+    const handleFilterNavigation = (
+        filterType: string,
+        filterValue: string
+    ) => {
+        navigate(`/movies?${filterType}=${encodeURIComponent(filterValue)}`);
+    };
 
     return (
         <div className="flex flex-col gap-5 text-lg mb-5 relative">

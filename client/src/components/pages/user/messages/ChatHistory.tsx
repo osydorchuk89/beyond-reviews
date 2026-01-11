@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { UsersMessages } from "../../../../lib/entities";
 import { ChatHistoryMessage } from "./ChatHistoryMessage";
@@ -18,31 +18,36 @@ export const ChatHistory = ({
     onSendMessage,
     loading,
 }: ChatHistoryProps) => {
-    const processedMessages = chatHistory
-        ? chatHistory.messages.map((msg, index, arr) => {
-              const dateObj = new Date(msg.date as string);
-              const currentMessageDate = dateObj.toLocaleDateString("default", {
-                  month: "short",
-                  day: "numeric",
-              });
-              if (index === 0) {
-                  msg.dateSeparator = currentMessageDate;
-              } else {
-                  const prevDateObj = new Date(arr[index - 1].date as string);
-                  const previousMessageDate = prevDateObj.toLocaleDateString(
+    const processedMessages = useMemo(() => {
+        return chatHistory
+            ? chatHistory.messages.map((msg, index, arr) => {
+                  const dateObj = new Date(msg.date as string);
+                  const currentMessageDate = dateObj.toLocaleDateString(
                       "default",
                       {
                           month: "short",
                           day: "numeric",
                       }
                   );
-                  if (currentMessageDate !== previousMessageDate) {
+                  if (index === 0) {
                       msg.dateSeparator = currentMessageDate;
+                  } else {
+                      const prevDateObj = new Date(
+                          arr[index - 1].date as string
+                      );
+                      const previousMessageDate =
+                          prevDateObj.toLocaleDateString("default", {
+                              month: "short",
+                              day: "numeric",
+                          });
+                      if (currentMessageDate !== previousMessageDate) {
+                          msg.dateSeparator = currentMessageDate;
+                      }
                   }
-              }
-              return msg;
-          })
-        : [];
+                  return msg;
+              })
+            : [];
+    }, [chatHistory]);
 
     const [numberMessages, setNumberMessages] = useState(20);
     const [hasScrolled, setHasScrolled] = useState(false);

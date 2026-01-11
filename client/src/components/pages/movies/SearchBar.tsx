@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 
 import { BaseButton } from "../../ui/BaseButton";
 import { CloseIcon } from "../../icons/CloseIcon";
+import { useCallback } from "react";
 
 interface SearchInput {
     title: string;
@@ -22,12 +23,12 @@ export const SearchBar = () => {
         reset();
     };
 
-    const handleCloseSearchTag = () => {
+    const handleCloseSearchTag = useCallback(() => {
         setSearchParams((searchParams) => {
             searchParams.delete("search");
             return searchParams;
         });
-    };
+    }, [setSearchParams]);
 
     return (
         <div className="flex flex-col justify-between bg-sky-100 rounded-md shadow-md overflow-hidden">

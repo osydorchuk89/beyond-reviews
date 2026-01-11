@@ -1,4 +1,5 @@
 import {
+    Link,
     Outlet,
     useLoaderData,
     useNavigation,
@@ -26,9 +27,13 @@ export const UserLayout = () => {
 
     return (
         <div className="flex flex-col items-center gap-6 my-10 mx-48">
-            <h2 className="text-center text-2xl font-bold">
+            <Link
+                className="text-center text-2xl font-bold"
+                to={`/users/${profileUser.id}/profile`}
+                relative="route"
+            >
                 {profileUserFullName}
-            </h2>
+            </Link>
             {isLoading ? <LoadingSpinner /> : <Outlet key={profileUser.id} />}
             {visitingUser && !isSameUser && (
                 <div>
