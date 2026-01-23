@@ -67,13 +67,12 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
                                 : " hover:bg-orange-200"
                         }`}
                     >
-                        <div
+                        <button
                             className="w-full py-2"
-                            tabIndex={0}
                             onClick={() => handleItemClick(item)}
                         >
                             {item.text}
-                        </div>
+                        </button>
                         {isItemActive(item) && (
                             <CloseIcon
                                 handleClick={() =>

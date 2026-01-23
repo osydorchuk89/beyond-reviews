@@ -27,17 +27,17 @@ export const MovieReviewDisplay = ({
             </div>
             <div>
                 <p className="font-bold">Your review: </p>
-                <p ref={ref} className={!isShowingMore ? "line-clamp-5" : ""}>
+                <p ref={ref} className={isShowingMore ? "" : "line-clamp-5"}>
                     {userReview ?? "N/A"}
                 </p>
                 {isTruncated && (
                     <div>
-                        <a
+                        <button
                             className="mt-1 text-sky-700 hover:text-green-950 text-base font-medium uppercase cursor-pointer"
                             onClick={toggleIsShowingMore}
                         >
                             {isShowingMore ? "Show less" : "Show more"}
-                        </a>
+                        </button>
                     </div>
                 )}
             </div>

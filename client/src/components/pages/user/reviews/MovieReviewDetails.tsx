@@ -22,7 +22,8 @@ export const MovieReviewDetails = ({ review }: MovieReviewDetailsProps) => {
                     <img
                         width={150}
                         src={review.movie.poster}
-                        className="rounded-lg "
+                        className="rounded-lg"
+                        alt="movir poster"
                     />
                 </Link>
             </div>

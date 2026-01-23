@@ -24,6 +24,7 @@ export const FriendRequestItem = ({
                 <img
                     src={photo}
                     className="object-cover object-top w-8 h-8 rounded-full self-center mr-2"
+                    alt="user photo"
                 />
                 <BaseLink to={`/users/${userId}/profile`}>
                     {`${firstName} ${lastName}`}

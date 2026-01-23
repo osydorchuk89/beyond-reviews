@@ -54,7 +54,7 @@ export const MovieReviewForm = ({
             </label>
             <input id="rating" type="hidden" name="rating" value={userRating} />
             <div className="flex">
-                {[...Array(10).keys()].map((index) => {
+                {[...new Array(10).keys()].map((index) => {
                     index += 1;
                     return (
                         <div key={index}>

@@ -29,7 +29,7 @@ export const RegistrationForm = () => {
         formData.append("lastName", data.lastName);
         formData.append("email", data.email);
         formData.append("password", data.password);
-        if (data.photo && data.photo[0]) {
+        if (data.photo?.[0]) {
             formData.append("photo", data.photo[0]);
         }
         submit(formData, { method: "post" });
@@ -37,8 +37,7 @@ export const RegistrationForm = () => {
 
     // Show email error if returned from action
     if (
-        actionData?.error &&
-        actionData.error.includes("email already exists")
+        actionData?.error?.includes("email already exists")
     ) {
         if (!errors.email) {
             setError("email", {

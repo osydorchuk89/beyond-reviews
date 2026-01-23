@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router";
 
-import { AuthData, Movie } from "../../../../lib/entities";
+import { Movie } from "../../../../lib/entities";
 import { QueryLink } from "../../../ui/QueryLink";
 import { StarIcon } from "../../../icons/StarIcon";
 
 interface MovieDetailsProps {
     movie: Movie;
-    authData: AuthData;
 }
 
 export const MovieDetails = ({ movie }: MovieDetailsProps) => {

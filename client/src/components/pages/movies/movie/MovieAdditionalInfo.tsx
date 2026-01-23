@@ -31,7 +31,7 @@ export const MovieAdditionalInfo = ({
                     {authData.user && (
                         <MovieBookmark movie={movie} authData={authData} />
                     )}
-                    <MovieDetails movie={movie} authData={authData} />
+                    <MovieDetails movie={movie} />
                     <MovieReviewSection
                         movieReviews={movieReviews}
                         authData={authData}

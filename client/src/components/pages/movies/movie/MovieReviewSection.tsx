@@ -15,11 +15,11 @@ export const MovieReviewSection = ({
     authData,
 }: MovieReviewSectionProps) => {
     const userRating =
-        movieReviews?.filter((item) => item.userId === authData.user?.id)[0]
+        movieReviews?.find((item) => item.userId === authData.user?.id)
             ?.rating ?? 0;
     const userReview =
-        movieReviews?.filter((item) => item.userId === authData.user?.id)[0]
-            ?.text ?? "";
+        movieReviews?.find((item) => item.userId === authData.user?.id)?.text ??
+        "";
 
     const [isEditing, setIsEditing] = useState(false);
     const [hasRated, setHasRated] = useState(userRating > 0);

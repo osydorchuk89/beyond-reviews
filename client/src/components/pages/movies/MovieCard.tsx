@@ -70,7 +70,7 @@ export const MovieCard = ({
                 )}
             </p>
             <Link to={movieId}>
-                <img src={poster} className="rounded-lg" />
+                <img src={poster} className="rounded-lg" alt="movie poster" />
             </Link>
             <div className="flex mt-4">
                 <span>

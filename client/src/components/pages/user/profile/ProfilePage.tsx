@@ -55,6 +55,7 @@ export const ProfilePage = () => {
             <img
                 src="https://beyond-reviews-os.s3.eu-central-1.amazonaws.com/user-icon.png"
                 className="object-cover object-top w-32 h-32 rounded-full self-center"
+                alt="user avatar"
             />
             <ul className="flex flex-col items-center gap-5 text-lg">
                 {visibleNavLinks.map((link) => (

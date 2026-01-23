@@ -21,7 +21,7 @@ export const ChatSidePanel = ({
             </h3>
             <ul className="flex flex-col bg-sky-200 flex-1">
                 {user.friends.map((friend) => (
-                    <a
+                    <button
                         key={friend.id}
                         className={
                             selectedFriend?.id === friend.id
@@ -33,7 +33,7 @@ export const ChatSidePanel = ({
                         <p>
                             {friend.firstName} {friend.lastName}
                         </p>
-                    </a>
+                    </button>
                 ))}
             </ul>
         </div>

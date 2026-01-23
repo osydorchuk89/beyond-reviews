@@ -3,9 +3,9 @@ import { buttonStyles } from "../../styles/buttonStyles";
 interface BaseButtonProps {
     style: "orange" | "sky" | "disabled";
     children: React.ReactNode;
-    type?: "submit" | "reset" | "button" | undefined;
+    type?: "submit" | "reset" | "button";
     disabled?: boolean;
-    handleClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+    handleClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export const BaseButton = ({

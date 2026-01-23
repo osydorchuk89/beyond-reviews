@@ -31,6 +31,7 @@ export const ActivityDetails = ({
                     <img
                         src={activity.user.photo}
                         className="object-cover object-top w-8 h-8 rounded-full self-center mr-2"
+                        alt="user photo"
                     />
                     {activity.movieId && activity.action === "rated" && (
                         <span className="font-bold">

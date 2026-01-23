@@ -20,7 +20,7 @@ export const Header = () => {
     return (
         <header
             className={`w-full bg-sky-800 h-24 flex justify-between items-center text-white px-48 ${
-                pathname !== "/" ? "sticky top-0 z-10" : ""
+                pathname === "/" ? "" : "sticky top-0 z-10"
             }`}
         >
             <Link
