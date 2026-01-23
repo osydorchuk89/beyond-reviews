@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 import { BookMarkIcon } from "../../../icons/BookMarkIcon";
@@ -14,7 +14,7 @@ interface MovieBookmarkProps {
 export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
     const userId = authData.user?.id;
     const userHasSavedMovie = movie.onWatchList.some(
-        (like) => like.userId === userId
+        (like) => like.userId === userId,
     );
     const [iconFilled, setIconFilled] = useState(userHasSavedMovie);
     const [hasSaved, setHasSaved] = useState(userHasSavedMovie);
@@ -39,11 +39,11 @@ export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
             ),
             {
                 closeButton: false,
-            }
+            },
         );
     };
 
-    const saveMovie = useCallback(async () => {
+    const saveMovie = async () => {
         if (userId) {
             setHasSaved((prevState) => !prevState);
             setIconFilled((prevState) => !prevState);
@@ -56,7 +56,7 @@ export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
                 console.log(error);
             }
         }
-    }, [userId, movie.id, hasSaved, showNotificationToast]);
+    };
 
     return (
         <div className="absolute w-40 top-10 right-0 flex flex-col justify-center items-end transition-opacity">

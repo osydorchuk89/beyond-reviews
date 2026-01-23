@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import { Friend, User } from "../../../../lib/entities";
@@ -17,50 +17,43 @@ export const UserFriendsPage = () => {
     // Track accepted requests locally
     const [acceptedRequestIds, setAcceptedRequestIds] = useState<string[]>([]);
     const [userFriends, setUserFriends] = useState<Friend[]>(
-        profileUser.friends
+        profileUser.friends,
     );
 
     // Filter out accepted requests from received requests
-    const filteredReceivedRequests = useMemo(
-        () =>
-            profileUser.receivedFriendRequests.filter(
-                (request) => !acceptedRequestIds.includes(request.sentUserId)
-            ),
-        [profileUser.receivedFriendRequests, acceptFriendRequest]
+    const filteredReceivedRequests = profileUser.receivedFriendRequests.filter(
+        (request) => !acceptedRequestIds.includes(request.sentUserId),
     );
 
-    const handleFriendRequest = useCallback(
-        async (userId: string, otherUserId: string) => {
-            const acceptedRequest = profileUser.receivedFriendRequests.find(
-                (request) => request.sentUserId === otherUserId
+    const handleFriendRequest = async (userId: string, otherUserId: string) => {
+        const acceptedRequest = profileUser.receivedFriendRequests.find(
+            (request) => request.sentUserId === otherUserId,
+        );
+
+        if (!acceptedRequest) return;
+
+        setAcceptedRequestIds((prev) => [...prev, otherUserId]);
+
+        const newFriend: Friend = {
+            id: acceptedRequest.sentUserId,
+            firstName: acceptedRequest.sentUser.firstName,
+            lastName: acceptedRequest.sentUser.lastName,
+            photo: acceptedRequest.sentUser.photo,
+        };
+        setUserFriends((prev) => [...prev, newFriend]);
+
+        try {
+            await acceptFriendRequest(userId, otherUserId);
+        } catch (error) {
+            setAcceptedRequestIds((prev) =>
+                prev.filter((id) => id !== otherUserId),
             );
-
-            if (!acceptedRequest) return;
-
-            setAcceptedRequestIds((prev) => [...prev, otherUserId]);
-
-            const newFriend: Friend = {
-                id: acceptedRequest.sentUserId,
-                firstName: acceptedRequest.sentUser.firstName,
-                lastName: acceptedRequest.sentUser.lastName,
-                photo: acceptedRequest.sentUser.photo,
-            };
-            setUserFriends((prev) => [...prev, newFriend]);
-
-            try {
-                await acceptFriendRequest(userId, otherUserId);
-            } catch (error) {
-                setAcceptedRequestIds((prev) =>
-                    prev.filter((id) => id !== otherUserId)
-                );
-                setUserFriends((prev) =>
-                    prev.filter((friend) => friend.id !== otherUserId)
-                );
-                console.error("Failed to accept friend request:", error);
-            }
-        },
-        [profileUser.receivedFriendRequests]
-    );
+            setUserFriends((prev) =>
+                prev.filter((friend) => friend.id !== otherUserId),
+            );
+            console.error("Failed to accept friend request:", error);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">

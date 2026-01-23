@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import { Friend, Message, User, UsersMessages } from "../../../../lib/entities";
@@ -16,52 +16,38 @@ export const UserMessagesPage = () => {
     const [loading, setLoading] = useState(false);
 
     // Handler for selecting a friend
-    const handleSelectFriend = useCallback(
-        async (friend: Friend) => {
-            setLoading(true);
-            const userId = profileUser.id;
-            const history = await getChatHistory(userId, friend.id);
-            setChatHistory(history);
-            setSelectedFriend(friend);
-            setLoading(false);
-        },
-        [profileUser.id]
-    );
+    const handleSelectFriend = async (friend: Friend) => {
+        setLoading(true);
+        const userId = profileUser.id;
+        const history = await getChatHistory(userId, friend.id);
+        setChatHistory(history);
+        setSelectedFriend(friend);
+        setLoading(false);
+    };
 
     // Handler for sending a message
-    const handleSendMessage = useCallback(
-        async (text: string) => {
-            if (!selectedFriend || !chatHistory) return;
-            const userId = profileUser.id;
-            const friendId = selectedFriend.id;
+    const handleSendMessage = async (text: string) => {
+        if (!selectedFriend || !chatHistory) return;
+        const userId = profileUser.id;
+        const friendId = selectedFriend.id;
 
-            // Send the message to the server
-            const newMessage: Message = await sendMessage(
-                userId,
-                friendId,
-                text
-            );
+        // Send the message to the server
+        const newMessage: Message = await sendMessage(userId, friendId, text);
 
-            // Optimistically update chatHistory with the new message
-            setChatHistory((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          messages: [...prev.messages, newMessage],
-                      }
-                    : prev
-            );
-        },
-        [selectedFriend, chatHistory, profileUser.id]
-    );
+        // Optimistically update chatHistory with the new message
+        setChatHistory((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      messages: [...prev.messages, newMessage],
+                  }
+                : prev,
+        );
+    };
 
-    const selectedFriendName = useMemo(
-        () =>
-            selectedFriend
-                ? `${selectedFriend.firstName} ${selectedFriend.lastName}`
-                : "No user selected",
-        [selectedFriend]
-    );
+    const selectedFriendName = selectedFriend
+        ? `${selectedFriend.firstName} ${selectedFriend.lastName}`
+        : "No user selected";
 
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full">
