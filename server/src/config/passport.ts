@@ -26,21 +26,22 @@ passport.use(
                 if (user.password) {
                     const isValid = await bcrypt.compare(
                         password,
-                        user.password!
+                        user.password,
                     );
                     if (!isValid) {
                         return cb(null, false, { message: "Invalid password" });
                     }
                     return cb(null, user);
                 } else {
-                    // if a user was found but has no password, this user was registered wis google
-                    return cb(null, user);
+                    return cb(null, false, {
+                        message: "Please use Google to sign in",
+                    });
                 }
             } catch (err) {
                 return cb(err);
             }
-        }
-    )
+        },
+    ),
 );
 
 passport.use(
@@ -75,8 +76,8 @@ passport.use(
             } catch (err) {
                 return cb(err);
             }
-        }
-    )
+        },
+    ),
 );
 
 // Serialize user into the session
@@ -88,6 +89,9 @@ passport.serializeUser((user: any, cb) => {
 passport.deserializeUser(async (id: string, cb) => {
     try {
         const user = await prisma.user.findUnique({ where: { id } });
+        if (!user) {
+            return cb(null, false);
+        }
         cb(null, user);
     } catch (err) {
         cb(err);

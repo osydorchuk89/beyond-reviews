@@ -20,24 +20,20 @@ export const getAllMovies = async (req: Request, res: Response) => {
         const search = req.query.search as string;
 
         const whereClause: any = {};
-
         if (genre) {
             whereClause.genres = {
                 has: genre,
             };
         }
-
         if (releaseYear) {
             whereClause.releaseYear = parseInt(releaseYear);
         }
-
         if (director) {
             whereClause.director = {
                 contains: director,
                 mode: "insensitive",
             };
         }
-
         if (search) {
             whereClause.title = {
                 contains: search,
@@ -104,7 +100,7 @@ export const getMovieById = async (req: Request, res: Response) => {
                 onWatchList: true,
             },
         });
-        res.send(movie);
+        res.status(200).send(movie);
     } catch (error) {
         res.status(500).send({
             message: "Could not fetch movie details",
@@ -177,7 +173,7 @@ export const getMovieReviews = async (req: Request, res: Response) => {
                 },
             },
         });
-        res.send(movieReviews);
+        res.status(200).send(movieReviews);
     } catch (error) {
         res.status(500).send({ message: "Could not get movie reviews", error });
     }

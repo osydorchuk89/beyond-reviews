@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+
 import { BASE_CLIENT_URL } from "../config/constants";
 
 export const login = (req: Request, res: Response) => {
@@ -7,9 +8,9 @@ export const login = (req: Request, res: Response) => {
 
 export const getAuthStatus = (req: Request, res: Response) => {
     if (req.isAuthenticated()) {
-        res.send({ isAuthenticated: true, user: req.user });
+        res.status(200).send({ isAuthenticated: true, user: req.user });
     } else {
-        res.send({ isAuthenticated: false });
+        res.status(200).send({ isAuthenticated: false });
     }
 };
 
@@ -18,7 +19,13 @@ export const logout = (req: Request, res: Response, next: NextFunction) => {
         if (err) {
             return next(err);
         }
-        res.send("Logged out");
+        req.session.destroy((err) => {
+            if (err) {
+                return next(err);
+            }
+            res.clearCookie("connect.sid"); 
+            res.status(200).send("Logged out");
+        });
     });
 };
 

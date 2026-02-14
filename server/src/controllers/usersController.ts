@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-
 import { PrismaClient } from "@prisma/client";
+
 import { UserSchema } from "../lib/schemas";
 import { login } from "./authController";
 
@@ -112,7 +112,7 @@ export const getUserData = async (req: Request, res: Response) => {
 
 export const getUserActivities = async (req: Request, res: Response) => {
     const { userId } = req.params;
-    const page = parseInt(req.query.page as string) || 1;
+    const page = parseInt(req.query.page as string) ?? 1;
     const limit = 15;
     const skip = (page - 1) * limit;
 
@@ -199,7 +199,7 @@ export const getUserFriends = async (req: Request, res: Response) => {
                 },
             },
         });
-        res.status(200).send(user?.friends || []);
+        res.status(200).send(user?.friends ?? []);
     } catch (error: any) {
         res.status(500).send({
             message: "Could not fetch user friends",

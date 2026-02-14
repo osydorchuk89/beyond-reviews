@@ -4,7 +4,7 @@ import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
 import MongoStore from "connect-mongo";
-import "dotenv/config";
+import dotenv from "dotenv";
 
 import { moviesRouter } from "./routes/movies";
 import { usersRouter } from "./routes/users";
@@ -31,9 +31,16 @@ app.use(bodyParser.json());
 
 app.set("trust proxy", 1);
 
+dotenv.config();
+const sessionSecret = process.env.EXPRESS_SESSION_SECRET;
+
+if (!sessionSecret) {
+    throw new Error("EXPRESS_SESSION_SECRET environment variable is not set");
+}
+
 app.use(
     session({
-        secret: process.env.EXPRESS_SESSION_SECRET!,
+        secret: sessionSecret,
         resave: false,
         saveUninitialized: false,
         cookie: {
@@ -43,10 +50,10 @@ app.use(
             maxAge: 1000 * 60 * 24,
         },
         store: MongoStore.create({
-            mongoUrl: process.env.DATABASE_URL!,
+            mongoUrl: process.env.DATABASE_URL,
             collectionName: "sessions",
         }),
-    })
+    }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
@@ -56,7 +63,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/auth", authRouter);
 
-app.get("/", (_, res) => {
+app.get("/", (_req, res) => {
     res.send("Hello World!!!");
 });
 
