@@ -11,7 +11,7 @@ export const CloseIcon = ({ handleClick }: CloseIconProps) => {
                 viewBox="0 0 24 24"
                 strokeWidth="2"
                 stroke="currentColor"
-                className="w-6 h-6 cursor-pointer flex-none text-orange-600 hover:text-orange-900"
+                className="w-6 h-6 cursor-pointer text-orange-600 hover:text-orange-900"
             >
                 <path
                     strokeLinecap="round"

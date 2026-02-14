@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router";
 
-import { CloseIcon } from "../../icons/CloseIcon";
 import { SearchItem } from "../../../lib/entities";
+import { SortFilterItem } from "./SortFilterItem";
 
 interface SortFilterProps {
     itemsList: SearchItem[];
@@ -59,28 +59,13 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
             </p>
             <ul className="flex flex-col justify-between font-bold px-5 py-2 items-center md:items-stretch">
                 {itemsList.map((item) => (
-                    <li
+                    <SortFilterItem
                         key={`${item.value}-${item.sortOrder ?? ""}`}
-                        className={`flex items-center gap-2 text-orange-950 px-2 rounded-md cursor-pointer ${
-                            isItemActive(item)
-                                ? " bg-orange-300 hover:bg-orange-300"
-                                : " hover:bg-orange-200"
-                        }`}
-                    >
-                        <button
-                            className="w-full py-2"
-                            onClick={() => handleItemClick(item)}
-                        >
-                            {item.text}
-                        </button>
-                        {isItemActive(item) && (
-                            <CloseIcon
-                                handleClick={() =>
-                                    handleCancelSortFilter(item.type)
-                                }
-                            />
-                        )}
-                    </li>
+                        item={item}
+                        isItemActive={isItemActive}
+                        handleItemClick={handleItemClick}
+                        handleCancelSortFilter={handleCancelSortFilter}
+                    />
                 ))}
             </ul>
         </div>

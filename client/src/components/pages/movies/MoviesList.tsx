@@ -4,8 +4,8 @@ import { useSearchParams } from "react-router";
 import { MovieCard } from "./MovieCard";
 import { Movie } from "../../../lib/entities";
 import { BaseButton } from "../../ui/BaseButton";
-import { FilterTags } from "./FilterTags";
 import { getMovies } from "../../../lib/api";
+import { FilterTag } from "./FilterTag";
 
 interface MoviesListProps {
     movies: Movie[];
@@ -80,10 +80,15 @@ export const MoviesList = ({
     return (
         <div className="flex flex-col w-full">
             {filters && filters.length > 0 && (
-                <FilterTags
-                    filters={filters}
-                    onRemoveFilter={handleCloseFilterTag}
-                />
+                <ul className="flex flex-row justify-center gap-4">
+                    {filters.map((filter) => (
+                        <FilterTag
+                            key={filter}
+                            filter={filter}
+                            onRemoveFilter={handleCloseFilterTag}
+                        />
+                    ))}
+                </ul>
             )}
             <div className="flex flex-col gap-10 mb-10 items-center">
                 {allMovies.length > 0 ? (
