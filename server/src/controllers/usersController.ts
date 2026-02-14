@@ -7,7 +7,10 @@ import { login } from "./authController";
 
 const prisma = new PrismaClient();
 
-export const registerNewUser = async (req: Request, res: Response) => {
+export const registerNewUser = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const userData = req.body;
     if (req.file) {
         const userPhotoFile: { [key: string]: any } = req.file;
@@ -18,7 +21,7 @@ export const registerNewUser = async (req: Request, res: Response) => {
     }
     const validationResult = UserSchema.safeParse(userData);
     if (!validationResult.success) {
-        res.status(500).send({ message: "Validation failed" });
+        res.status(400).send({ message: "Validation failed" });
     } else {
         const validatedData = validationResult.data;
         const userExists = await prisma.user.findUnique({
@@ -33,7 +36,7 @@ export const registerNewUser = async (req: Request, res: Response) => {
         } else {
             const hashedPassword = await bcrypt.hash(
                 validatedData.password,
-                12
+                12,
             );
             validatedData.password = hashedPassword;
             try {
@@ -46,7 +49,7 @@ export const registerNewUser = async (req: Request, res: Response) => {
                     if (err) {
                         console.error(
                             "Auto-login error after registration:",
-                            err
+                            err,
                         );
                         return res.status(201).send({
                             message:
@@ -63,7 +66,10 @@ export const registerNewUser = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserData = async (req: Request, res: Response) => {
+export const getUserData = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { userId } = req.params;
     try {
         const user = await prisma.user.findUnique({
@@ -102,6 +108,11 @@ export const getUserData = async (req: Request, res: Response) => {
                 },
             },
         });
+
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send({
@@ -110,7 +121,10 @@ export const getUserData = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserActivities = async (req: Request, res: Response) => {
+export const getUserActivities = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { userId } = req.params;
     const page = parseInt(req.query.page as string) ?? 1;
     const limit = 15;
@@ -183,7 +197,10 @@ export const getUserActivities = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserFriends = async (req: Request, res: Response) => {
+export const getUserFriends = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { userId } = req.params;
     try {
         const user = await prisma.user.findUnique({
@@ -208,9 +225,29 @@ export const getUserFriends = async (req: Request, res: Response) => {
     }
 };
 
-export const sendFriendRequest = async (req: Request, res: Response) => {
+export const sendFriendRequest = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { userId } = req.params;
     const { otherUserId }: { otherUserId: string } = req.body;
+
+    const sender = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
+    if (!sender) {
+        return res.status(404).send({ message: "Sender user not found" });
+    }
+
+    const recipient = await prisma.user.findUnique({
+        where: { id: otherUserId },
+    });
+
+    if (!recipient) {
+        return res.status(404).send({ message: "Recipient user not found" });
+    }
+
     try {
         const friendRequest = await prisma.friendRequest.findUnique({
             where: {
@@ -241,10 +278,46 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
     }
 };
 
-export const acceptFriendRequest = async (req: Request, res: Response) => {
+export const acceptFriendRequest = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { userId } = req.params;
     const { otherUserId } = req.body;
+
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
+    if (!user) {
+        return res.status(404).send({ message: "User not found" });
+    }
+
+    const otherUser = await prisma.user.findUnique({
+        where: { id: otherUserId },
+    });
+
+    if (!otherUser) {
+        return res.status(404).send({ message: "Other user not found" });
+    }
+
     try {
+        // Check if friend request exists
+        const friendRequest = await prisma.friendRequest.findUnique({
+            where: {
+                sentUserId_receivedUserId: {
+                    sentUserId: otherUserId,
+                    receivedUserId: userId,
+                },
+            },
+        });
+
+        if (!friendRequest) {
+            return res
+                .status(404)
+                .send({ message: "Friend request not found" });
+        }
+
         // Check if already friends
         const existingFriendship = await prisma.user.findFirst({
             where: {
@@ -305,7 +378,10 @@ export const acceptFriendRequest = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserWatchlist = async (req: Request, res: Response) => {
+export const getUserWatchlist = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { userId } = req.params;
     try {
         const watchlist = await prisma.movieWatchList.findMany({
@@ -332,7 +408,10 @@ export const getUserWatchlist = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserMovieReviews = async (req: Request, res: Response) => {
+export const getUserMovieReviews = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { userId } = req.params;
     try {
         const reviews = await prisma.movieReview.findMany({
@@ -358,7 +437,10 @@ export const getUserMovieReviews = async (req: Request, res: Response) => {
     }
 };
 
-export const createUsers = async (req: Request, res: Response) => {
+export const createUsers = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
     try {
         const response = await prisma.user.createMany({
             data: req.body,

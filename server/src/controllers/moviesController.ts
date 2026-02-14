@@ -5,7 +5,10 @@ import { ReviewSchema } from "../lib/schemas";
 
 const prisma = new PrismaClient();
 
-export const getAllMovies = async (req: Request, res: Response) => {
+export const getAllMovies = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     try {
         const page = parseInt(req.query.page as string) ?? 1;
         const limit = parseInt(req.query.limit as string) ?? 15;
@@ -89,7 +92,10 @@ export const getAllMovies = async (req: Request, res: Response) => {
     }
 };
 
-export const getMovieById = async (req: Request, res: Response) => {
+export const getMovieById = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { movieId } = req.params;
     try {
         const movie = await prisma.movie.findUnique({
@@ -100,6 +106,11 @@ export const getMovieById = async (req: Request, res: Response) => {
                 onWatchList: true,
             },
         });
+
+        if (!movie) {
+            return res.status(404).send({ message: "Movie not found" });
+        }
+
         res.status(200).send(movie);
     } catch (error) {
         res.status(500).send({
@@ -111,10 +122,19 @@ export const getMovieById = async (req: Request, res: Response) => {
 
 export const addOrRemoveMovieFromWatchlist = async (
     req: Request,
-    res: Response
-) => {
+    res: Response,
+): Promise<any> => {
     const { movieId } = req.params;
     const { saved, userId } = req.body;
+
+    const movie = await prisma.movie.findUnique({
+        where: { id: movieId },
+    });
+
+    if (!movie) {
+        return res.status(404).send({ message: "Movie not found" });
+    }
+
     try {
         await prisma.$transaction(async (tx) => {
             if (saved) {
@@ -149,7 +169,10 @@ export const addOrRemoveMovieFromWatchlist = async (
     }
 };
 
-export const getMovieReviews = async (req: Request, res: Response) => {
+export const getMovieReviews = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const { movieId } = req.params;
     try {
         const movieReviews = await prisma.movieReview.findMany({
@@ -181,16 +204,24 @@ export const getMovieReviews = async (req: Request, res: Response) => {
 
 export const createOrUpdateMovieReview = async (
     req: Request,
-    res: Response
-) => {
+    res: Response,
+): Promise<any> => {
     const { rating, text } = req.body;
     const validationResult = ReviewSchema.safeParse({
         rating,
         text,
     });
     if (!validationResult.success) {
-        res.status(500).send({ message: "Validation failed" });
+        res.status(400).send({ message: "Validation failed" });
     } else {
+        const movie = await prisma.movie.findUnique({
+            where: { id: req.params.movieId },
+        });
+
+        if (!movie) {
+            return res.status(404).send({ message: "Movie not found" });
+        }
+
         try {
             const movieReview = await prisma.$transaction(async (tx) => {
                 const review = await tx.movieReview.upsert({
@@ -259,47 +290,51 @@ export const createOrUpdateMovieReview = async (
     }
 };
 
-export const likeOrUnlikeMovieReview = async (req: Request, res: Response) => {
+export const likeOrUnlikeMovieReview = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const reviewId = req.params.reviewId;
     const { like, userId } = req.body;
     try {
         const movieReview = await prisma.movieReview.findUnique({
             where: { id: reviewId },
         });
-        if (movieReview) {
-            await prisma.$transaction(async (tx) => {
-                if (like) {
-                    await tx.movieReviewLike.create({
-                        data: {
-                            reviewId: movieReview.id,
-                            userId: userId,
-                        },
-                    });
-                } else {
-                    await tx.movieReviewLike.delete({
-                        where: {
-                            reviewId_userId: {
-                                reviewId: movieReview.id,
-                                userId: userId,
-                            },
-                        },
-                    });
-                }
-                await tx.activity.create({
-                    data: {
-                        userId: userId,
-                        movieReviewId: movieReview.id,
-                        action: like ? "liked" : "unliked",
-                        date: new Date(),
-                    },
-                });
-            });
-            res.status(200).send();
-        } else {
-            res.status(500).send({
+
+        if (!movieReview) {
+            return res.status(404).send({
                 message: "Could not find review",
             });
         }
+
+        await prisma.$transaction(async (tx) => {
+            if (like) {
+                await tx.movieReviewLike.create({
+                    data: {
+                        reviewId: movieReview.id,
+                        userId: userId,
+                    },
+                });
+            } else {
+                await tx.movieReviewLike.delete({
+                    where: {
+                        reviewId_userId: {
+                            reviewId: movieReview.id,
+                            userId: userId,
+                        },
+                    },
+                });
+            }
+            await tx.activity.create({
+                data: {
+                    userId: userId,
+                    movieReviewId: movieReview.id,
+                    action: like ? "liked" : "unliked",
+                    date: new Date(),
+                },
+            });
+        });
+        res.status(200).send();
     } catch (error) {
         res.status(500).send({
             message: "Could not like or unlike review",
@@ -308,7 +343,10 @@ export const likeOrUnlikeMovieReview = async (req: Request, res: Response) => {
     }
 };
 
-export const createMovies = async (req: Request, res: Response) => {
+export const createMovies = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
     try {
         const response = await prisma.movie.createMany({
             data: req.body,

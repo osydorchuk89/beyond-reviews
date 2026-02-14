@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getUserMessages = async (req: Request, res: Response) => {
+export const getUserMessages = async (req: Request, res: Response): Promise<any> => {
     try {
         const senderId = req.query.senderId as string;
         const recipientId = req.query.recipientId as string;
@@ -41,11 +41,27 @@ export const getUserMessages = async (req: Request, res: Response) => {
     }
 };
 
-export const postMessage = async (req: Request, res: Response) => {
+export const postMessage = async (req: Request, res: Response): Promise<any> => {
     const text = req.body.text;
     const date = req.body.date.toString();
     const senderId = req.body.senderId;
     const recipientId = req.body.recipientId;
+
+    const sender = await prisma.user.findUnique({
+        where: { id: senderId },
+    });
+
+    if (!sender) {
+        return res.status(404).send({ message: "Sender not found" });
+    }
+
+    const recipient = await prisma.user.findUnique({
+        where: { id: recipientId },
+    });
+
+    if (!recipient) {
+        return res.status(404).send({ message: "Recipient not found" });
+    }
 
     try {
         const message = await prisma.message.create({
@@ -63,9 +79,18 @@ export const postMessage = async (req: Request, res: Response) => {
     }
 };
 
-export const markMessageAsRead = async (req: Request, res: Response) => {
+export const markMessageAsRead = async (req: Request, res: Response): Promise<any> => {
     try {
         const { messageId } = req.params;
+
+        const message = await prisma.message.findUnique({
+            where: { id: messageId },
+        });
+
+        if (!message) {
+            return res.status(404).send({ message: "Message not found" });
+        }
+
         await prisma.message.update({
             where: { id: messageId },
             data: { wasRead: true },
