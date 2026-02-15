@@ -1,12 +1,14 @@
 import { Link } from "react-router";
 
 import { MovieReview } from "../../../../lib/entities";
+import { getMoviePoster } from "../../../../lib/utils";
 
 interface MovieReviewDetailsProps {
     review: MovieReview;
 }
 
 export const MovieReviewDetails = ({ review }: MovieReviewDetailsProps) => {
+    const moviePoster = getMoviePoster(review.movie.poster);
     return (
         <div className="flex bg-sky-100 rounded-lg shadow-lg p-5 gap-8">
             <div className="w-1/4 flex flex-col items-center gap-4">
@@ -21,9 +23,9 @@ export const MovieReviewDetails = ({ review }: MovieReviewDetailsProps) => {
                 <Link to={`/movies/${review.movieId}`}>
                     <img
                         width={150}
-                        src={review.movie.poster}
+                        src={moviePoster}
                         className="rounded-lg"
-                        alt="movir poster"
+                        alt="movie poster"
                     />
                 </Link>
             </div>

@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router";
 import { StarIcon } from "../../icons/StarIcon";
 import { useQueryClick } from "../../../hooks/useQueryClick";
 import { QueryLink } from "../../ui/QueryLink";
+import { useGetMovieGenres } from "../../../hooks/useGetMovieGenres";
+import { getMoviePoster } from "../../../lib/utils";
 
 interface MovieCardProps {
     movieId: string;
@@ -28,31 +30,23 @@ export const MovieCard = ({
 
     const handleQueryClick = useQueryClick();
     const location = useLocation();
+
     const onUserPage = location.pathname.startsWith("/users");
+
+    const movieGenres = useGetMovieGenres(genres, onUserPage, handleQueryClick);
+    const moviePoster = getMoviePoster(poster);
 
     return (
         <div className="flex flex-col w-80 justify-start items-center bg-sky-100 rounded-lg shadow-lg p-5 relative">
             <p className="w-full text-center text-xl font-bold h-16 bg-sky-700 rounded-t-lg flex justify-center items-center absolute top-0 p-4">
-                <Link className="hover:underline text-sky-50" to={movieId}>
+                <Link
+                    className="hover:underline text-sky-50"
+                    to={`/movies/${movieId}`}
+                >
                     {displayedTitle}
                 </Link>
             </p>
-            <p className="mb-2 text-sky-950 mt-16">
-                {genres.slice(0, 3).map((item, index) => (
-                    <span key={item}>
-                        {onUserPage ? (
-                            <span>{item}</span>
-                        ) : (
-                            <QueryLink
-                                onClick={() => handleQueryClick("genre", item)}
-                            >
-                                {item}
-                            </QueryLink>
-                        )}
-                        {index !== genres.slice(0, 3).length - 1 && " | "}
-                    </span>
-                ))}
-            </p>
+            <p className="mb-2 text-sky-950 mt-16">{movieGenres}</p>
             <p className="mb-2 text-sky-950">
                 {onUserPage ? (
                     <span>{releaseYear.toString()}</span>
@@ -61,7 +55,7 @@ export const MovieCard = ({
                         onClick={() =>
                             handleQueryClick(
                                 "releaseYear",
-                                releaseYear.toString()
+                                releaseYear.toString(),
                             )
                         }
                     >
@@ -69,8 +63,12 @@ export const MovieCard = ({
                     </QueryLink>
                 )}
             </p>
-            <Link to={movieId}>
-                <img src={poster} className="rounded-lg" alt="movie poster" />
+            <Link to={`/movies/${movieId}`}>
+                <img
+                    src={moviePoster}
+                    className="rounded-lg"
+                    alt="movie poster"
+                />
             </Link>
             <div className="flex mt-4">
                 <span>

@@ -13,7 +13,7 @@ export const MovieDetails = ({ movie }: MovieDetailsProps) => {
 
     const handleFilterNavigation = (
         filterType: string,
-        filterValue: string
+        filterValue: string,
     ) => {
         navigate(`/movies?${filterType}=${encodeURIComponent(filterValue)}`);
     };
@@ -35,7 +35,7 @@ export const MovieDetails = ({ movie }: MovieDetailsProps) => {
                     onClick={() =>
                         handleFilterNavigation(
                             "releaseYear",
-                            movie.releaseYear.toString()
+                            movie.releaseYear.toString(),
                         )
                     }
                 >
@@ -67,7 +67,11 @@ export const MovieDetails = ({ movie }: MovieDetailsProps) => {
                     {movie.numRatings === 1 ? "vote" : "votes"}
                 </span>
             </div>
-            <p>{movie.overview}</p>
+            {movie.overview ? (
+                <p>{movie.overview}</p>
+            ) : (
+                <p className="italic">No overview available.</p>
+            )}
         </div>
     );
 };
