@@ -8,6 +8,7 @@ import {
     getMovieById,
     getMovieReviews,
     likeOrUnlikeMovieReview,
+    updateMovie,
 } from "../controllers/moviesController";
 
 export const moviesRouter = Router();
@@ -17,6 +18,9 @@ moviesRouter.get("/", getAllMovies);
 
 // get a specific movie
 moviesRouter.get("/:movieId", getMovieById);
+
+// update a movie (for dev purposes - e.g., backfilling data)
+moviesRouter.patch("/:movieId", updateMovie);
 
 // add/remove a movie on/from a watchlist
 moviesRouter.put("/:movieId", addOrRemoveMovieFromWatchlist);

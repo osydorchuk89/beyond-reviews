@@ -3,16 +3,21 @@ import { Router } from "express";
 import { fileUpload } from "../lib/upload";
 import {
     acceptFriendRequest,
+    getAllUsers,
     getUserActivities,
     getUserData,
     getUserFriends,
     getUserMovieReviews,
     getUserWatchlist,
     registerNewUser,
+    seedUsers,
     sendFriendRequest,
 } from "../controllers/usersController";
 
 export const usersRouter = Router();
+
+// get all users (for dev purposes)
+usersRouter.get("/", getAllUsers);
 
 // register new user
 usersRouter.post("/", fileUpload.single("photo"), registerNewUser);
@@ -38,5 +43,5 @@ usersRouter.get("/:userId/watch-list", getUserWatchlist);
 // get user movie reviews
 usersRouter.get("/:userId/movie-reviews", getUserMovieReviews);
 
-// create new users - for dev purposes
-usersRouter.post("/seed", registerNewUser);
+// create new users in bulk - for dev purposes
+usersRouter.post("/seed", seedUsers);

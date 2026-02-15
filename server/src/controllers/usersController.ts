@@ -437,16 +437,118 @@ export const getUserMovieReviews = async (
     }
 };
 
-export const createUsers = async (
-    req: Request,
+
+export const getAllUsers = async (
+    _req: Request,
     res: Response,
-): Promise<void> => {
+): Promise<any> => {
     try {
-        const response = await prisma.user.createMany({
-            data: req.body,
+        const users = await prisma.user.findMany({
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                photo: true,
+            },
         });
-        res.send(response);
-    } catch (error) {
-        console.log(error);
+        res.send(users);
+    } catch (error: any) {
+        console.error("Failed to fetch users:", error);
+        res.status(500).send({ message: error.message });
     }
+};
+
+// For dev purposes only
+export const seedUsers = async (req: Request, res: Response): Promise<any> => {
+    const usersData = req.body;
+
+    // Validate input is an array
+    if (!Array.isArray(usersData)) {
+        return res
+            .status(400)
+            .send({ message: "Request body must be an array of users" });
+    }
+
+    const results = {
+        created: 0,
+        failed: 0,
+        errors: [] as any[],
+    };
+
+    console.log(`🌱 Starting bulk user seeding: ${usersData.length} users`);
+
+    // Process users one by one to handle duplicates gracefully
+    for (let i = 0; i < usersData.length; i++) {
+        const userData = usersData[i];
+
+        // Validate user data
+        const validationResult = UserSchema.safeParse(userData);
+        if (!validationResult.success) {
+            results.failed++;
+            results.errors.push({
+                index: i,
+                email: userData.email,
+                error: "Validation failed",
+                details: validationResult.error.errors,
+            });
+            continue;
+        }
+
+        const validatedData = validationResult.data;
+
+        try {
+            // Check if user already exists
+            const userExists = await prisma.user.findUnique({
+                where: { email: validatedData.email },
+            });
+
+            if (userExists) {
+                results.failed++;
+                results.errors.push({
+                    index: i,
+                    email: validatedData.email,
+                    error: "User already exists",
+                });
+                continue;
+            }
+
+            // Hash password
+            const hashedPassword = await bcrypt.hash(
+                validatedData.password,
+                12,
+            );
+            validatedData.password = hashedPassword;
+
+            // Create user
+            await prisma.user.create({
+                data: validatedData,
+            });
+
+            results.created++;
+
+            // Log progress every 10 users
+            if ((i + 1) % 10 === 0) {
+                console.log(
+                    `   ✓ Progress: ${i + 1}/${usersData.length} processed`,
+                );
+            }
+        } catch (error: any) {
+            results.failed++;
+            results.errors.push({
+                index: i,
+                email: validatedData.email,
+                error: error.message,
+            });
+        }
+    }
+
+    console.log(
+        `✅ Seeding complete: ${results.created} created, ${results.failed} failed`,
+    );
+
+    res.status(201).send({
+        message: `Bulk seed completed: ${results.created} users created, ${results.failed} failed`,
+        results,
+    });
 };

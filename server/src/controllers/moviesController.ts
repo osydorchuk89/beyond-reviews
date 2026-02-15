@@ -343,16 +343,42 @@ export const likeOrUnlikeMovieReview = async (
     }
 };
 
+// For dev purposes only
 export const createMovies = async (
     req: Request,
     res: Response,
-): Promise<void> => {
+): Promise<any> => {
     try {
         const response = await prisma.movie.createMany({
             data: req.body,
         });
         res.send(response);
     } catch (error) {
-        console.log(error);
+        res.status(500).send({
+            message: "Could not create movie",
+            error,
+        });
+    }
+};
+
+// For dev purposes only
+export const updateMovie = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
+    const { movieId } = req.params;
+    const updateData = req.body;
+
+    try {
+        const updatedMovie = await prisma.movie.update({
+            where: { id: movieId },
+            data: updateData,
+        });
+        res.status(200).send(updatedMovie);
+    } catch (error: any) {
+        res.status(500).send({
+            message: "Could not update movie",
+            error,
+        });
     }
 };
