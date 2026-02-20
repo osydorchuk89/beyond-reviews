@@ -14,7 +14,7 @@ export const LoginErrorAlert = ({ message, onClose }: LoginErrorAlertProps) => {
                 onClick={onClose}
                 data-testid="close-button"
             >
-                <CloseIcon />
+                <CloseIcon style="dark" />
             </button>
         </div>
     );

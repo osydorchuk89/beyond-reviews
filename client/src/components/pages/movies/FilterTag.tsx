@@ -11,7 +11,7 @@ export const FilterTag = ({ filter, onRemoveFilter }: FilterTagProps) => {
             <span className="text-orange-950 text-xl text-center leading-0">
                 {filter}
             </span>
-            <CloseIcon handleClick={() => onRemoveFilter(filter)} />
+            <CloseIcon style="dark" handleClick={() => onRemoveFilter(filter)} />
         </li>
     );
 };

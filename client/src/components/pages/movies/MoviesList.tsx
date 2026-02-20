@@ -93,7 +93,7 @@ export const MoviesList = ({
             <div className="flex flex-col gap-10 mb-10 items-center">
                 {allMovies.length > 0 ? (
                     <>
-                        <ul className="grid grid-cols-1 lg:grid-cols-3 items-center gap-16 mx-5">
+                        <ul className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 items-center gap-16 mx-5">
                             {allMovies.map((movie: Movie) => (
                                 <MovieCard
                                     key={movie.id}

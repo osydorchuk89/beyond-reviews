@@ -2,7 +2,7 @@ import { ButtonLink } from "../../ui/ButtonLink";
 
 export const HeroSection = () => {
     return (
-        <div className="bg-sky-800 flex gap-8 py-20 px-48 text-white">
+        <div className="bg-sky-800 flex gap-8 py-20 px-48 text-white min-h-[85vh]">
             <div className="flex flex-col gap-20 w-1/2">
                 <p className="text-6xl font-bold">Discover, Review, Connect</p>
                 <p className="text-xl">

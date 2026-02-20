@@ -1,6 +1,10 @@
+import { horizontalPadding } from "../../../styles/responsive";
+
 export const Footer = () => {
     return (
-        <footer className="bg-sky-800 h-24 flex items-center justify-between px-48 text-white">
+        <footer
+            className={`bg-sky-800 h-24 flex items-center justify-between ${horizontalPadding.page} text-white`}
+        >
             <span>&copy; Beyond Reviews 2025</span>
             <ul className="flex flex-col items-center sm:flex-row sm:gap-8">
                 <li>

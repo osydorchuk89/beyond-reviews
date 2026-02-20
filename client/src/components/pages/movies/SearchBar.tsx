@@ -54,7 +54,10 @@ export const SearchBar = () => {
                     {searchTerm && searchTerm !== "" && (
                         <div className="flex items-center gap-2 bg-orange-300 rounded-md text-orange-950 p-2 overflow-hidden">
                             <span className="truncate">{searchTerm}</span>
-                            <CloseIcon handleClick={handleCloseSearchTag} />
+                            <CloseIcon
+                                style="dark"
+                                handleClick={handleCloseSearchTag}
+                            />
                         </div>
                     )}
                 </div>

@@ -31,6 +31,7 @@ export const SortFilterItem = ({
             {isItemActive(item) && (
                 <div className="absolute top-2 right-2">
                     <CloseIcon
+                        style="dark"
                         handleClick={() => handleCancelSortFilter(item.type)}
                     />
                 </div>
