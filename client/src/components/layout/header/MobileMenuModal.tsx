@@ -6,7 +6,7 @@ import { HeaderNavLink } from "./HeaderNavLink";
 import { LogoutButton } from "../../ui/LogoutButton";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { headerNavLinks } from "../../../lib/data";
-import type{ AuthData } from "../../../lib/entities";
+import type { AuthData } from "../../../lib/entities";
 
 export const MobileMenuModal = () => {
     const { authData } = useRouteLoaderData("root") as { authData: AuthData };
@@ -35,7 +35,9 @@ export const MobileMenuModal = () => {
 
                     {authData.user ? (
                         <div className="flex flex-col gap-4">
-                            <HeaderNavLink to={`/users/${authData.user?.id}/profile`}>
+                            <HeaderNavLink
+                                to={`/users/${authData.user?.id}/profile`}
+                            >
                                 Your profile
                             </HeaderNavLink>
                             <LogoutButton />

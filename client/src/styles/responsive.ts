@@ -18,7 +18,8 @@ export const verticalPadding = {
 
 // Responsive text sizes
 export const textSizes = {
-    hero: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl",
+    heroTitle: "text-2xl sm:text-3xl md:text-4xl lg:text-5xl",
+    heroBody: "text-lg sm:text-xl",
     pageTitle: "text-2xl sm:text-3xl md:text-4xl",
     sectionTitle: "text-xl sm:text-2xl md:text-3xl",
     heading: "text-lg sm:text-xl md:text-2xl",

@@ -3,8 +3,8 @@ import { useLocation } from "react-router";
 
 import { MenuIcon } from "../../icons/MenuIcon";
 import { MobileMenuModal } from "./MobileMenuModal";
-import type { User } from "../../../lib/entities";
 import { useMobileMenuStore } from "../../../store";
+import type { User } from "../../../lib/entities";
 
 interface MobileMenuProps {
     user: User | undefined;

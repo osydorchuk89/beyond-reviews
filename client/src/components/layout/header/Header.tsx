@@ -2,12 +2,12 @@ import { Link, useLocation, useRouteLoaderData } from "react-router";
 
 import { headerNavLinks } from "../../../lib/data";
 import { LogoutButton } from "../../ui/LogoutButton";
-import { AuthData } from "../../../lib/entities";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { horizontalPadding, textSizes } from "../../../styles/responsive";
 import { HeaderNavLink } from "./HeaderNavLink";
 import { UserButton } from "./UserButton";
 import { MobileMenu } from "./MobileMenu";
+import type { AuthData } from "../../../lib/entities";
 
 export const Header = () => {
     const { pathname } = useLocation();
