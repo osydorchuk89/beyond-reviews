@@ -4,14 +4,21 @@ import { ButtonLink } from "../../ui/ButtonLink";
 export const HeroSection = () => {
     return (
         <div
-            className={`bg-sky-800 flex gap-8 py-20 ${horizontalPadding.page} text-white min-h-[80vh]`}
+            className={`bg-sky-800 flex gap-8 py-8 sm:py-20 ${horizontalPadding.page} text-white min-h-[80vh]`}
         >
-            <div className="flex flex-col gap-20 w-full sm:w-1/2">
+            <div className="flex flex-col gap-12 sm:gap-20 w-full sm:w-1/2">
                 <p
                     className={`${textSizes.heroTitle} font-bold text-center sm:text-start`}
                 >
                     Discover, Review, Connect
                 </p>
+                <div className="flex justify-center sm:hidden">
+                    <img
+                        src="images/hero-image.png"
+                        alt="Two people discussing a book they read"
+                        className="rounded-xl w-5/6"
+                    />
+                </div>
                 <p className={`${textSizes.heroBody}`}>
                     Dive into books, movies, and music with personalized
                     ratings, real user insights, and a community that shares

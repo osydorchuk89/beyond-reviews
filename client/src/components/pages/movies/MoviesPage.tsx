@@ -37,8 +37,8 @@ export const MoviesPage = () => {
             <p className="text-4xl text-center font-bold py-10 mb-5">
                 Popular Movies
             </p>
-            <div className="flex flex-col md:flex-row items-center md:items-start">
-                <aside className="flex flex-col w-5/6 md:w-1/4 ml-5 gap-8 mb-5">
+            <div className="flex flex-col lg:flex-row items-center lg:items-start">
+                <aside className="flex flex-col w-5/6 lg:w-1/4 lg:ml-5 gap-8 mb-5">
                     <SearchBar />
                     <SortFilterBar
                         itemsList={sideBarSortList}
