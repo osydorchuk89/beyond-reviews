@@ -6,10 +6,7 @@ interface HeaderNavLinkProps {
     children: ReactNode;
 }
 
-export const HeaderNavLink = ({
-    to,
-    children,
-}: HeaderNavLinkProps) => {
+export const HeaderNavLink = ({ to, children }: HeaderNavLinkProps) => {
     return (
         <NavLink
             className={({ isActive }) =>

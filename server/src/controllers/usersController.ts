@@ -437,7 +437,6 @@ export const getUserMovieReviews = async (
     }
 };
 
-
 export const getAllUsers = async (
     _req: Request,
     res: Response,
@@ -475,8 +474,6 @@ export const seedUsers = async (req: Request, res: Response): Promise<any> => {
         failed: 0,
         errors: [] as any[],
     };
-
-    console.log(`🌱 Starting bulk user seeding: ${usersData.length} users`);
 
     // Process users one by one to handle duplicates gracefully
     for (let i = 0; i < usersData.length; i++) {
@@ -526,13 +523,6 @@ export const seedUsers = async (req: Request, res: Response): Promise<any> => {
             });
 
             results.created++;
-
-            // Log progress every 10 users
-            if ((i + 1) % 10 === 0) {
-                console.log(
-                    `   ✓ Progress: ${i + 1}/${usersData.length} processed`,
-                );
-            }
         } catch (error: any) {
             results.failed++;
             results.errors.push({

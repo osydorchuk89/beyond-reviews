@@ -24,11 +24,7 @@ export const MobileMenuModal = () => {
                 </div>
                 <nav className="flex flex-col px-4 gap-2">
                     {headerNavLinks.map((link) => (
-                        <div key={link.text} onClick={closeMenu}>
-                            <HeaderNavLink to={link.to}>
-                                {link.text}
-                            </HeaderNavLink>
-                        </div>
+                        <HeaderNavLink to={link.to}>{link.text}</HeaderNavLink>
                     ))}
 
                     <div className="border-t border-sky-600 my-4" />
