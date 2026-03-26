@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { fileUpload } from "../lib/upload";
+import { fileUpload, uploadPhotoToGcs } from "../lib/upload";
 import {
     acceptFriendRequest,
     getAllUsers,
@@ -20,7 +20,12 @@ export const usersRouter = Router();
 usersRouter.get("/", getAllUsers);
 
 // register new user
-usersRouter.post("/", fileUpload.single("photo"), registerNewUser);
+usersRouter.post(
+    "/",
+    fileUpload.single("photo"),
+    uploadPhotoToGcs,
+    registerNewUser,
+);
 
 // get user info
 usersRouter.get("/:userId", getUserData);

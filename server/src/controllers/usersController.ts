@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 
+import { DEFAULT_USER_PHOTO_URL } from "../config/constants";
 import { UserSchema } from "../lib/schemas";
 import { login } from "./authController";
 
@@ -16,8 +17,7 @@ export const registerNewUser = async (
         const userPhotoFile: { [key: string]: any } = req.file;
         userData.photo = userPhotoFile.location;
     } else {
-        userData.photo =
-            "https://beyond-reviews-os.s3.eu-central-1.amazonaws.com/user-icon.png";
+        userData.photo = DEFAULT_USER_PHOTO_URL;
     }
     const validationResult = UserSchema.safeParse(userData);
     if (!validationResult.success) {
