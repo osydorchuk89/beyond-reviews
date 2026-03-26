@@ -5,6 +5,7 @@ import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";
 
 import { PrismaClient } from "@prisma/client";
+import { DEFAULT_USER_PHOTO_URL } from "./constants";
 
 const BASE_URL =
     process.env.NODE_ENV === "production"
@@ -68,7 +69,7 @@ passport.use(
                             email: profile._json.email!,
                             photo: profile.photos
                                 ? profile.photos[0].value
-                                : "https://beyond-reviews-os.s3.eu-central-1.amazonaws.com/user-icon.png",
+                                : DEFAULT_USER_PHOTO_URL,
                         },
                     });
                     return cb(null, newUser);
