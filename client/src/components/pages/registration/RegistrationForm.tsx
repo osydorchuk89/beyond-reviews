@@ -32,13 +32,14 @@ export const RegistrationForm = () => {
         if (data.photo?.[0]) {
             formData.append("photo", data.photo[0]);
         }
-        submit(formData, { method: "post" });
+        submit(formData, {
+            method: "post",
+            encType: "multipart/form-data",
+        });
     };
 
     // Show email error if returned from action
-    if (
-        actionData?.error?.includes("email already exists")
-    ) {
+    if (actionData?.error?.includes("email already exists")) {
         if (!errors.email) {
             setError("email", {
                 type: "custom",
@@ -50,6 +51,7 @@ export const RegistrationForm = () => {
     return (
         <Form
             noValidate
+            encType="multipart/form-data"
             className="flex flex-col justify-start w-[36rem] px-5 pt-5 pb-10 gap-5"
             onSubmit={handleSubmit(onSubmit)}
         >

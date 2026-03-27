@@ -14,25 +14,23 @@ export const ProfilePage = () => {
     };
     const { visitingUser, isSameUser } = useIsSameUser(profileUser);
 
-    const areFriends =
-        (visitingUser &&
-            profileUser.friends.some(
-                (friend) => friend.id === visitingUser.id
-            )) ||
-        false;
+    const areFriends = Boolean(
+        visitingUser &&
+        profileUser.friends.some((friend) => friend.id === visitingUser.id),
+    );
 
     const visibleNavLinks = profileNavLinks.filter(
         (link) =>
             isSameUser ||
             (link.text !== "Messages" &&
                 link.text !== "Settings" &&
-                link.text !== "Friends")
+                link.text !== "Friends"),
     );
 
     const initialRequestSentState =
         (visitingUser &&
             profileUser.receivedFriendRequests.some(
-                (request) => request.sentUserId === visitingUser?.id
+                (request) => request.sentUserId === visitingUser?.id,
             )) ||
         false;
     const [requestSent, setRequestSent] = useState(initialRequestSentState);
@@ -51,9 +49,9 @@ export const ProfilePage = () => {
     };
 
     return (
-        <div className="flex flex-col justify-between p-5 rounded-lg shadow-lg bg-sky-100 gap-10 min-h-[70vh] md:w-2/3">
+        <div className="flex flex-col justify-between p-5 rounded-lg shadow-lg bg-sky-100 gap-8 min-h-[70vh] md:w-2/3">
             <img
-                src="https://beyond-reviews-os.s3.eu-central-1.amazonaws.com/user-icon.png"
+                src={profileUser.photo}
                 className="object-cover object-top w-32 h-32 rounded-full self-center"
                 alt="user avatar"
             />

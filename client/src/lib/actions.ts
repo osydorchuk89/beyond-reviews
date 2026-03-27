@@ -8,11 +8,7 @@ export const registrationAction = async ({ request }: { request: Request }) => {
     const formData = await request.formData();
 
     try {
-        const response = await axiosInstance.post("/api/users/", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+        const response = await axiosInstance.post("/api/users/", formData);
 
         if (response.status === 200 && response.data) {
             return redirect("/");

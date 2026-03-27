@@ -1,10 +1,10 @@
+import "dotenv/config";
 import express from "express";
 import session from "express-session";
 import passport from "passport";
 import cors from "cors";
 import bodyParser from "body-parser";
 import MongoStore from "connect-mongo";
-import dotenv from "dotenv";
 
 import { moviesRouter } from "./routes/movies";
 import { usersRouter } from "./routes/users";
@@ -30,8 +30,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.set("trust proxy", 1);
-
-dotenv.config();
 const sessionSecret = process.env.EXPRESS_SESSION_SECRET;
 
 if (!sessionSecret) {
@@ -65,6 +63,26 @@ app.use("/auth", authRouter);
 
 app.get("/", (_req, res) => {
     res.send("Hello World!!!");
+});
+
+app.use((err: any, _req: any, res: any, _next: any) => {
+    console.error(err);
+
+    if (err?.name === "MulterError" && err?.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).send({
+            message: "Photo size should not exceed 5MB",
+        });
+    }
+
+    if (err?.message === "Only jpg, jpeg, png, or webp formats are accepted") {
+        return res.status(400).send({
+            message: err.message,
+        });
+    }
+
+    return res.status(500).send({
+        message: err?.message ?? "Internal server error",
+    });
 });
 
 app.listen(process.env.PORT || 8080);
