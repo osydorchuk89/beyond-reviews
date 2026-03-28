@@ -7,6 +7,7 @@ import { MoviesData } from "../../../lib/entities";
 import { SortFilterBar } from "./SortFilterBar";
 import { sideBarFilterList, sideBarSortList } from "../../../lib/data";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
+import { horizontalPadding } from "../../../styles/responsive";
 
 export const MoviesPage = () => {
     const { moviesDataPromise } = useLoaderData() as {
@@ -37,8 +38,10 @@ export const MoviesPage = () => {
             <p className="text-4xl text-center font-bold py-10 mb-5">
                 Popular Movies
             </p>
-            <div className="flex flex-col lg:flex-row items-center lg:items-start">
-                <aside className="flex flex-col w-5/6 lg:w-1/4 lg:ml-5 gap-8 mb-5">
+            <div
+                className={`flex flex-col lg:flex-row items-center gap-2 lg:items-start ${horizontalPadding.page}`}
+            >
+                <aside className="flex flex-col w-5/6 lg:w-1/4 gap-8 mb-5">
                     <SearchBar />
                     <SortFilterBar
                         itemsList={sideBarSortList}
@@ -54,7 +57,7 @@ export const MoviesPage = () => {
                         <Await resolve={moviesDataPromise}>
                             {(moviesData) => {
                                 const filters = buildFilters(
-                                    moviesData.appliedFilters
+                                    moviesData.appliedFilters,
                                 );
                                 return (
                                     <MoviesList
