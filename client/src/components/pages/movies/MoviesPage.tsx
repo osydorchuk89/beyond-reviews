@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Await, useLoaderData } from "react-router";
 
-import { MoviesList } from "./MoviesList";
+import { MoviesListSection } from "./MoviesListSection";
 import { SearchBar } from "./SearchBar";
 import { MoviesData } from "../../../lib/entities";
 import { SortFilterBar } from "./SortFilterBar";
@@ -39,7 +39,7 @@ export const MoviesPage = () => {
                 Popular Movies
             </p>
             <div
-                className={`flex flex-col lg:flex-row items-center gap-2 lg:items-start ${horizontalPadding.page}`}
+                className={`flex flex-col lg:flex-row items-center gap-8 lg:items-start ${horizontalPadding.page}`}
             >
                 <aside className="flex flex-col w-5/6 lg:w-1/4 gap-8 mb-5">
                     <SearchBar />
@@ -60,7 +60,7 @@ export const MoviesPage = () => {
                                     moviesData.appliedFilters,
                                 );
                                 return (
-                                    <MoviesList
+                                    <MoviesListSection
                                         movies={moviesData.movies}
                                         filters={filters}
                                         hasMore={moviesData.hasMore}

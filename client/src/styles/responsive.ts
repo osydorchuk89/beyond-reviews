@@ -1,6 +1,6 @@
 export const horizontalPadding = {
     // Horizontal padding that scales with screen size
-    page: "px-4 sm:px-6 md:px-12 lg:px-24",
+    page: "px-4 sm:px-6 lg:px-12 xl:px-24",
 
     // Alternative smaller padding for sections
     section: "px-4 sm:px-6 md:px-8 lg:px-12",
