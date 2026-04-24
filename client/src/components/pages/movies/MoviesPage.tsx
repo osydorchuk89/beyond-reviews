@@ -39,7 +39,7 @@ export const MoviesPage = () => {
                 Popular Movies
             </p>
             <div
-                className={`flex flex-col lg:flex-row items-center gap-8 lg:items-start ${horizontalPadding.page}`}
+                className={`flex flex-col lg:flex-row items-center gap-4 lg:items-start ${horizontalPadding.page}`}
             >
                 <aside className="flex flex-col w-5/6 lg:w-1/4 gap-8 mb-5">
                     <SearchBar />

@@ -16,7 +16,7 @@ export const SortFilterItem = ({
 }: SortFilterItemProps) => {
     return (
         <li
-            className={`flex relative items-center gap-2 text-orange-950 px-2 rounded-md ${
+            className={`w-full flex relative items-center gap-2 text-orange-950 px-2 rounded-md ${
                 isItemActive(item)
                     ? " bg-orange-300 hover:bg-orange-300"
                     : " hover:bg-orange-200"

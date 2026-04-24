@@ -37,20 +37,29 @@ export const SearchBar = () => {
             <form
                 noValidate
                 onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col justify-center gap-3 py-3 px-5"
+                className="flex flex-col justify-center md:gap-3 px-5 py-3"
             >
-                <input
-                    {...register("title", {
-                        required: true,
-                    })}
-                    className="w-full border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
-                    placeholder="enter movie title"
-                    type="text"
-                />
-                <div className="flex justify-center md:justify-start gap-2 w-full">
-                    <BaseButton style="orange" type="submit">
-                        Search
-                    </BaseButton>
+                <div className="relative">
+                    <input
+                        {...register("title", {
+                            required: true,
+                        })}
+                        className="w-full rounded-md border border-gray-700 py-2 pr-20 pl-3 focus:border-orange-900 md:pr-3"
+                        placeholder="enter movie title"
+                        type="text"
+                    />
+                    <div className="absolute top-1/2 right-1 -translate-y-1/2 md:hidden">
+                        <BaseButton style="searchInline" type="submit">
+                            Search
+                        </BaseButton>
+                    </div>
+                </div>
+                <div className="flex justify-center gap-2 w-full md:justify-start">
+                    <div className="hidden md:block">
+                        <BaseButton style="orange" type="submit">
+                            Search
+                        </BaseButton>
+                    </div>
                     {searchTerm && searchTerm !== "" && (
                         <div className="flex items-center gap-2 bg-orange-300 rounded-md text-orange-950 p-2 overflow-hidden">
                             <span className="truncate">{searchTerm}</span>

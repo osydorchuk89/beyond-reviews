@@ -1,7 +1,7 @@
 import { buttonStyles } from "../../styles/buttonStyles";
 
 interface BaseButtonProps {
-    style: "orange" | "sky" | "disabled";
+    style: keyof typeof buttonStyles;
     children: React.ReactNode;
     type?: "submit" | "reset" | "button";
     disabled?: boolean;

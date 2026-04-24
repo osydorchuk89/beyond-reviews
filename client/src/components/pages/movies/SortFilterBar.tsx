@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { SearchItem } from "../../../lib/entities";
@@ -9,6 +10,7 @@ interface SortFilterProps {
 }
 
 export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const genre = searchParams.get("genre");
     const releaseYear = searchParams.get("releaseYear");
@@ -52,12 +54,29 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
         });
     };
 
+    const activeItemsCount = itemsList.filter(isItemActive).length;
+    const mobileTitle =
+        activeItemsCount > 0 ? `${title} ${activeItemsCount}` : title;
+
     return (
         <div className="flex flex-col rounded-md shadow-md bg-sky-100 overflow-hidden">
-            <p className="bg-sky-700 text-sky-50 text-center text-xl font-bold py-2 mb-2">
+            <button
+                type="button"
+                className="cursor-pointer flex items-center justify-between bg-sky-700 px-5 py-2 text-xl font-bold text-sky-50 lg:hidden"
+                aria-expanded={isOpen}
+                onClick={() => setIsOpen((prevIsOpen) => !prevIsOpen)}
+            >
+                <span>{mobileTitle}</span>
+                <span aria-hidden="true">{isOpen ? "-" : "+"}</span>
+            </button>
+            <p className="hidden bg-sky-700 text-sky-50 text-center text-xl font-bold py-2 mb-2 lg:block">
                 {title}
             </p>
-            <ul className="flex flex-col justify-between font-bold px-5 py-2 items-center md:items-stretch">
+            <ul
+                className={`${
+                    isOpen ? "flex" : "hidden"
+                } flex-col justify-between font-bold px-5 py-2 items-center md:items-stretch lg:flex`}
+            >
                 {itemsList.map((item) => (
                     <SortFilterItem
                         key={`${item.value}-${item.sortOrder ?? ""}`}
