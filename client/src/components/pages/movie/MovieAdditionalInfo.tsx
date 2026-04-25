@@ -23,14 +23,16 @@ export const MovieAdditionalInfo = ({
     const isUpdating = fetchers.some((f) => f.state !== "idle");
 
     return (
-        <div className="flex flex-col w-2/3 text-lg">
+        <div className="flex flex-col w-full lg:w-2/3 text-base md:text-lg relative">
             {isUpdating ? (
                 <LoadingSpinner />
             ) : (
                 <>
-                    {authData.user && (
-                        <MovieBookmark movie={movie} authData={authData} />
-                    )}
+                    <div className="hidden md:block">
+                        {authData.user && (
+                            <MovieBookmark movie={movie} authData={authData} />
+                        )}
+                    </div>
                     <MovieDetails movie={movie} />
                     <MovieReviewSection
                         movieReviews={movieReviews}
