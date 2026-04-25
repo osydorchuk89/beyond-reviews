@@ -15,10 +15,10 @@ export const UserWatchListPage = () => {
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     return (
-        <div className="flex flex-col gap-10 justify-center items-center min-h-[70vh]">
+        <div className="flex flex-col gap-10 justify-center items-center min-h-[70vh] w-full">
             <h2 className="text-xl text-center font-bold">Watchlist</h2>
             {userWatchList.length > 0 ? (
-                <div className="grid grid-cols-3 items-center gap-16 mx-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 items-center justify-items-center gap-8 sm:gap-12 lg:gap-16 w-full">
                     {userWatchList.map((item) => (
                         <MovieCard
                             movieId={item.movieId}
@@ -33,8 +33,8 @@ export const UserWatchListPage = () => {
                     ))}
                 </div>
             ) : (
-                <div className="flex flex-col justify-center items-center gap-10 my-32">
-                    <p className="text-lg">
+                <div className="flex flex-col justify-center items-center gap-10 my-20 sm:my-32 text-center">
+                    <p className="text-lg break-words">
                         There are no movies on{" "}
                         {isSameUser ? "your" : `${profileUserName}'s`} watchlist
                     </p>

@@ -15,11 +15,11 @@ export const FriendsList = ({
     return (
         <div className="flex flex-col gap-2">
             {friends.length > 0 ? (
-                <ul className="flex flex-col gap-5">
+                <ul className="flex flex-col gap-4 sm:gap-5">
                     {friends.map((friend) => (
                         <li
                             key={friend.id}
-                            className="flex flex-col text-lg p-5 rounded-lg shadow-lg bg-sky-100 gap-8"
+                            className="flex flex-col text-lg p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8 break-words"
                         >
                             <BaseLink to={`/users/${friend.id}/profile`}>
                                 {`${friend.firstName} ${friend.lastName}`}
@@ -28,7 +28,7 @@ export const FriendsList = ({
                     ))}
                 </ul>
             ) : (
-                <p className="text-center">
+                <p className="text-center break-words">
                     {isSameUser ? "You have" : `${profileUserName} has`} no
                     friends so far
                 </p>

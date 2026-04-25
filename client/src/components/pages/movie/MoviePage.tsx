@@ -4,14 +4,14 @@ import { ToastContainer } from "react-toastify";
 import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieReviews } from "./MovieReviews";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
-import { Movie, MovieReview } from "../../../lib/entities";
+import { Movie, MovieReviewsData } from "../../../lib/entities";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { horizontalPadding } from "../../../styles/responsive";
 
 export const MoviePage = () => {
-    const { movie, movieReviews } = useLoaderData() as {
+    const { movie, movieReviewsData } = useLoaderData() as {
         movie: Movie;
-        movieReviews: MovieReview[];
+        movieReviewsData: MovieReviewsData;
     };
 
     if (!movie) {
@@ -45,10 +45,13 @@ export const MoviePage = () => {
                 <MovieMainInfo movie={movie} />
                 <MovieAdditionalInfo
                     movie={movie}
-                    movieReviews={movieReviews}
+                    userReview={movieReviewsData.userReview}
                 />
             </div>
-            <MovieReviews movieReviews={movieReviews} />
+            <MovieReviews
+                movieId={movie.id}
+                initialMovieReviewsData={movieReviewsData}
+            />
         </div>
     );
 };

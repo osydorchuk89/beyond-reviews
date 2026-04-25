@@ -21,8 +21,10 @@ export const FriendRequestsSection = ({
 }: FriendRequestsSectionProps) => {
     return (
         <div className="flex flex-col gap-2">
-            <p className="text-xl font-medium text-center">{title}</p>
-            <div className="flex flex-col p-5 rounded-lg shadow-lg bg-sky-100 gap-8">
+            <p className="text-lg sm:text-xl font-medium text-center">
+                {title}
+            </p>
+            <div className="flex flex-col p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8">
                 <ul className="flex flex-col gap-4">
                     {requests.map((request) => {
                         const user =

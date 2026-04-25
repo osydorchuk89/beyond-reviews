@@ -52,7 +52,7 @@ export const UserMessagesPage = () => {
     return (
         <div className="flex flex-col gap-10 min-h-[70vh] w-full">
             <h2 className="text-xl text-center font-bold">Messages</h2>
-            <div className="flex rounded-md overflow-hidden h-[600px]">
+            <div className="flex flex-col md:flex-row rounded-md overflow-hidden min-h-[640px] md:h-[600px]">
                 <ChatSidePanel
                     user={profileUser}
                     selectedFriend={selectedFriend}

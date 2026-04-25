@@ -413,22 +413,43 @@ export const getUserMovieReviews = async (
     res: Response,
 ): Promise<any> => {
     const { userId } = req.params;
+    const page = parseInt(req.query.page as string) ?? 1;
+    const limit = 15;
+    const skip = (page - 1) * limit;
+
     try {
-        const reviews = await prisma.movieReview.findMany({
-            where: { userId },
-            include: {
-                movie: {
-                    select: {
-                        id: true,
-                        title: true,
-                        releaseYear: true,
-                        poster: true,
+        const [reviews, totalCount] = await Promise.all([
+            prisma.movieReview.findMany({
+                where: { userId },
+                include: {
+                    movie: {
+                        select: {
+                            id: true,
+                            title: true,
+                            releaseYear: true,
+                            poster: true,
+                        },
                     },
                 },
-            },
-            orderBy: { date: "desc" },
+                orderBy: { date: "desc" },
+                skip,
+                take: limit,
+            }),
+            prisma.movieReview.count({
+                where: { userId },
+            }),
+        ]);
+
+        const totalPages = Math.ceil(totalCount / limit);
+        const hasMore = page < totalPages;
+
+        res.status(200).send({
+            reviews,
+            totalCount,
+            currentPage: page,
+            totalPages,
+            hasMore,
         });
-        res.status(200).send(reviews);
     } catch (error) {
         res.status(500).send({
             message: "Could not fetch user reviews",

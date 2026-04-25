@@ -8,12 +8,12 @@ import { LoadingSpinner } from "../../ui/LoadingSpinner";
 
 interface MovieAdditionalInfoProps {
     movie: Movie;
-    movieReviews: MovieReview[];
+    userReview?: MovieReview | null;
 }
 
 export const MovieAdditionalInfo = ({
     movie,
-    movieReviews,
+    userReview,
 }: MovieAdditionalInfoProps) => {
     const { authData } = useRouteLoaderData("root") as {
         authData: AuthData;
@@ -35,7 +35,7 @@ export const MovieAdditionalInfo = ({
                     </div>
                     <MovieDetails movie={movie} />
                     <MovieReviewSection
-                        movieReviews={movieReviews}
+                        userReview={userReview}
                         authData={authData}
                     />
                 </>
