@@ -17,7 +17,7 @@ export const ChatMessageForm = ({ onSend }: ChatMessageFormProps) => {
         <form
             noValidate
             onSubmit={handleSend}
-            className="flex gap-5 mx-5 justify-between items-end"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-5 mx-3 sm:mx-5 justify-between sm:items-end"
         >
             <input
                 {...register("text", { required: true })}
@@ -25,9 +25,11 @@ export const ChatMessageForm = ({ onSend }: ChatMessageFormProps) => {
                 name="text"
                 placeholder="type your message here"
             />
-            <BaseButton style="orange" type="submit">
-                SEND
-            </BaseButton>
+            <div className="w-full sm:w-auto text-center">
+                <BaseButton style="orange" type="submit">
+                    SEND
+                </BaseButton>
+            </div>
         </form>
     );
 };

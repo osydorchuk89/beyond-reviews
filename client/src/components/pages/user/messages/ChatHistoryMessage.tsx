@@ -10,7 +10,7 @@ export const ChatHistoryMessage = ({ message }: MessageProps) => {
     const { userId } = useParams() as { userId: string };
 
     const messageStyle =
-        "flex gap-2 justify-between px-4 py-1 rounded-lg relative";
+        "flex gap-2 justify-between max-w-[85%] sm:max-w-[75%] px-3 sm:px-4 py-2 rounded-lg relative break-words";
 
     return (
         <>
@@ -28,7 +28,9 @@ export const ChatHistoryMessage = ({ message }: MessageProps) => {
                         : messageStyle + " bg-sky-200 self-start"
                 }
             >
-                <span className="mr-6">{message.text}</span>
+                <span className="mr-8 min-w-0 break-words">
+                    {message.text}
+                </span>
                 <span className="absolute right-1 bottom-1 text-[10px]">
                     {new Date(message.date).toLocaleTimeString("default", {
                         hour: "2-digit",

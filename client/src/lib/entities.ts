@@ -50,7 +50,16 @@ export interface Movie {
 
 export interface MovieData {
     movie: Movie;
-    movieReviews: MovieReview[];
+    movieReviewsData: MovieReviewsData;
+}
+
+export interface MovieReviewsData {
+    reviews: MovieReview[];
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasMore: boolean;
+    userReview?: MovieReview | null;
 }
 
 export interface MoviesData {
@@ -97,6 +106,14 @@ export interface UserActivity {
 
 export interface UserActivities {
     activities: UserActivity[];
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasMore: boolean;
+}
+
+export interface UserMovieReviews {
+    reviews: MovieReview[];
     currentPage: number;
     totalPages: number;
     totalCount: number;

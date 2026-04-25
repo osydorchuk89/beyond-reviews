@@ -12,11 +12,11 @@ export const ChatSidePanel = ({
     setSelectedFriend,
 }: ChatSidePanelProps) => {
     const baseFriendItemStyle =
-        "flex justify-start gap-2 cursor-pointer px-2 py-5 border-b-1 border-b-sky-500 hover:bg-sky-500";
+        "flex justify-start gap-2 cursor-pointer px-3 py-3 md:py-5 border-b-1 border-b-sky-500 hover:bg-sky-500 text-left break-words";
 
     return (
-        <div className="flex flex-col w-1/4 shadow-lg overflow-y-auto">
-            <h3 className="text-xl px-2 py-5 bg-sky-800 text-white text-center font-medium">
+        <div className="flex flex-col w-full md:w-1/4 md:min-w-48 shadow-lg max-h-56 md:max-h-none overflow-y-auto">
+            <h3 className="text-lg md:text-xl px-2 py-4 md:py-5 bg-sky-800 text-white text-center font-medium">
                 Friends
             </h3>
             <ul className="flex flex-col bg-sky-200 flex-1">

@@ -6,20 +6,16 @@ import { MovieReview, AuthData } from "../../../lib/entities";
 import { BaseLink } from "../../ui/BaseLink";
 
 interface MovieReviewSectionProps {
-    movieReviews: MovieReview[];
+    userReview?: MovieReview | null;
     authData: AuthData;
 }
 
 export const MovieReviewSection = ({
-    movieReviews,
+    userReview,
     authData,
 }: MovieReviewSectionProps) => {
-    const userRating =
-        movieReviews?.find((item) => item.userId === authData.user?.id)
-            ?.rating ?? 0;
-    const userReview =
-        movieReviews?.find((item) => item.userId === authData.user?.id)?.text ??
-        "";
+    const userRating = userReview?.rating ?? 0;
+    const userReviewText = userReview?.text ?? "";
 
     const [isEditing, setIsEditing] = useState(false);
     const [hasRated, setHasRated] = useState(userRating > 0);
@@ -30,7 +26,7 @@ export const MovieReviewSection = ({
                 {authData.isAuthenticated && (!hasRated || isEditing) && (
                     <MovieReviewForm
                         initialRating={userRating}
-                        initialText={userReview}
+                        initialText={userReviewText}
                         hasRated={hasRated}
                         onCancel={() => setIsEditing(false)}
                         onSuccess={() => {
@@ -42,7 +38,7 @@ export const MovieReviewSection = ({
                 {authData.isAuthenticated && hasRated && !isEditing && (
                     <MovieReviewDisplay
                         userRating={userRating}
-                        userReview={userReview}
+                        userReview={userReviewText}
                         onEdit={() => setIsEditing(true)}
                     />
                 )}
