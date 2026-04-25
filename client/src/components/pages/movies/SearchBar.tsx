@@ -37,25 +37,25 @@ export const SearchBar = () => {
             <form
                 noValidate
                 onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col justify-center md:gap-3 px-5 py-3"
+                className="flex flex-col justify-center lg:gap-3 px-5 py-3"
             >
                 <div className="relative">
                     <input
                         {...register("title", {
                             required: true,
                         })}
-                        className="w-full rounded-md border border-gray-700 py-2 pr-20 pl-3 focus:border-orange-900 md:pr-3"
+                        className="w-full rounded-md border border-gray-700 py-2 pr-20 pl-3 focus:border-orange-900 lg:pr-3"
                         placeholder="enter movie title"
                         type="text"
                     />
-                    <div className="absolute top-1/2 right-1 -translate-y-1/2 md:hidden">
+                    <div className="absolute top-1/2 right-1 -translate-y-1/2 lg:hidden">
                         <BaseButton style="searchInline" type="submit">
                             Search
                         </BaseButton>
                     </div>
                 </div>
-                <div className="flex justify-center gap-2 w-full md:justify-start">
-                    <div className="hidden md:block">
+                <div className="flex justify-center gap-2 w-full lg:justify-start">
+                    <div className="hidden lg:block">
                         <BaseButton style="orange" type="submit">
                             Search
                         </BaseButton>
