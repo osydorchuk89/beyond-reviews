@@ -49,7 +49,7 @@ export const SearchBar = () => {
                         type="text"
                     />
                     <div className="absolute top-1/2 right-1 -translate-y-1/2 lg:hidden">
-                        <BaseButton style="searchInline" type="submit">
+                        <BaseButton style="inline" type="submit">
                             Search
                         </BaseButton>
                     </div>

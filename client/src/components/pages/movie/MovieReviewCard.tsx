@@ -1,12 +1,13 @@
 import { RefObject, useRef, useState } from "react";
-
-import { AuthData, MovieReview } from "../../../../lib/entities";
-import { useTruncatedElement } from "../../../../hooks/useTruncatedElements";
-import { BaseLink } from "../../../ui/BaseLink";
-import { StarIcon } from "../../../icons/StarIcon";
-import { LikeIcon } from "../../../icons/LikeIcon";
 import { useRouteLoaderData } from "react-router";
-import { sendLikeOrUnlike } from "../../../../lib/api";
+
+import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
+import { sendLikeOrUnlike } from "../../../lib/api";
+import { MovieReview, AuthData } from "../../../lib/entities";
+import { LikeIcon } from "../../icons/LikeIcon";
+import { StarIcon } from "../../icons/StarIcon";
+import { BaseLink } from "../../ui/BaseLink";
+
 
 interface MovieReviewCardProps {
     movieReview: MovieReview;

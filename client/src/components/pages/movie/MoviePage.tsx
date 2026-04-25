@@ -2,9 +2,9 @@ import { useLoaderData } from "react-router";
 
 import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieReviews } from "./MovieReviews";
-import { ButtonLink } from "../../../ui/ButtonLink";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
-import { Movie, MovieReview } from "../../../../lib/entities";
+import { Movie, MovieReview } from "../../../lib/entities";
+import { ButtonLink } from "../../ui/ButtonLink";
 
 export const MoviePage = () => {
     const { movie, movieReviews } = useLoaderData() as {

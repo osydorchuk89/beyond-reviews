@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
-import { BookMarkIcon } from "../../../icons/BookMarkIcon";
-import { AuthData, Movie } from "../../../../lib/entities";
-import { ToastNotification } from "../../../ui/ToastNotification";
-import { addOrRemoveMovieFromWatchlist } from "../../../../lib/api";
+import { addOrRemoveMovieFromWatchlist } from "../../../lib/api";
+import { Movie, AuthData } from "../../../lib/entities";
+import { BookMarkIcon } from "../../icons/BookMarkIcon";
+import { ToastNotification } from "../../ui/ToastNotification";
 
 interface MovieBookmarkProps {
     movie: Movie;

@@ -1,10 +1,10 @@
 import { useFetchers, useRouteLoaderData } from "react-router";
 
-import { AuthData, Movie, MovieReview } from "../../../../lib/entities";
 import { MovieBookmark } from "./MovieBookmark";
 import { MovieDetails } from "./MovieDetails";
 import { MovieReviewSection } from "./MovieReviewSection";
-import { LoadingSpinner } from "../../../ui/LoadingSpinner";
+import { Movie, MovieReview, AuthData } from "../../../lib/entities";
+import { LoadingSpinner } from "../../ui/LoadingSpinner";
 
 interface MovieAdditionalInfoProps {
     movie: Movie;

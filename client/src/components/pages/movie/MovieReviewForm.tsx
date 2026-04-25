@@ -3,10 +3,11 @@ import { useFetcher } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { MovieReviewInputs } from "../../../../lib/entities";
-import { ReviewSchema } from "../../../../lib/schemas";
-import { StarIcon } from "../../../icons/StarIcon";
-import { BaseButton } from "../../../ui/BaseButton";
+import { MovieReviewInputs } from "../../../lib/entities";
+import { ReviewSchema } from "../../../lib/schemas";
+import { StarIcon } from "../../icons/StarIcon";
+import { BaseButton } from "../../ui/BaseButton";
+
 
 interface MovieReviewFormProps {
     initialRating?: number;

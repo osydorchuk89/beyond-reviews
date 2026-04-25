@@ -4,7 +4,6 @@ import { MainLayout } from "./components/MainLayout";
 import { UserLayout } from "./components/pages/user/UserLayout";
 import { HeroSection } from "./components/pages/main/HeroSection";
 import { MoviesPage } from "./components/pages/movies/MoviesPage";
-import { MoviePage } from "./components/pages/movies/movie/MoviePage";
 import { LoginPage } from "./components/pages/login/LoginPage";
 import { RegistrationPage } from "./components/pages/registration/RegistrationPage";
 import { BooksPage } from "./components/pages/books/BooksPage";
@@ -36,6 +35,7 @@ import {
     registrationAction,
 } from "./lib/actions";
 import { MoviesLayout } from "./components/pages/movies/MoviesLayout";
+import { MoviePage } from "./components/pages/movie/MoviePage";
 
 export const router = createBrowserRouter([
     {

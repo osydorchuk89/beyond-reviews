@@ -1,5 +1,5 @@
-import { Movie } from "../../../../lib/entities";
-import { getMoviePoster } from "../../../../lib/utils";
+import { Movie } from "../../../lib/entities";
+import { getMoviePoster } from "../../../lib/utils";
 
 interface MovieMainInfoProps {
     movie: Movie;

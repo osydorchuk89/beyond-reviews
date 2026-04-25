@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
 
-import { Movie } from "../../../../lib/entities";
-import { QueryLink } from "../../../ui/QueryLink";
-import { StarIcon } from "../../../icons/StarIcon";
+import { Movie } from "../../../lib/entities";
+import { StarIcon } from "../../icons/StarIcon";
+import { QueryLink } from "../../ui/QueryLink";
 
 interface MovieDetailsProps {
     movie: Movie;
