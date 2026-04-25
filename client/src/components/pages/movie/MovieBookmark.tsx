@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
-import { BookMarkIcon } from "../../../icons/BookMarkIcon";
-import { AuthData, Movie } from "../../../../lib/entities";
-import { ToastNotification } from "../../../ui/ToastNotification";
-import { addOrRemoveMovieFromWatchlist } from "../../../../lib/api";
+import { addOrRemoveMovieFromWatchlist } from "../../../lib/api";
+import { Movie, AuthData } from "../../../lib/entities";
+import { BookMarkIcon } from "../../icons/BookMarkIcon";
+import { ToastNotification } from "../../ui/ToastNotification";
 
 interface MovieBookmarkProps {
     movie: Movie;
@@ -32,7 +32,7 @@ export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
             ({ closeToast }) => (
                 <ToastNotification
                     text={`Movie was ${
-                        userHasSavedMovie ? "removed from" : "added to"
+                        hasSaved ? "removed from" : "added to"
                     } your watchlist`}
                     closeToast={closeToast}
                 />
@@ -59,16 +59,7 @@ export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
     };
 
     return (
-        <div className="absolute w-40 top-10 right-0 flex flex-col justify-center items-end transition-opacity">
-            <ToastContainer
-                autoClose={3000}
-                hideProgressBar
-                toastStyle={{
-                    backgroundColor: "#bae6fd",
-                    paddingBlock: 0,
-                    paddingInline: 20,
-                }}
-            />
+        <div className="absolute self-end top-0 right-0 flex flex-col justify-center items-end transition-opacity">
             <BookMarkIcon
                 color={getIconColor()}
                 handleMouseEnter={() => {

@@ -1,6 +1,7 @@
 import { useRef, RefObject } from "react";
-import { useTruncatedElement } from "../../../../hooks/useTruncatedElements";
-import { BaseButton } from "../../../ui/BaseButton";
+
+import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
+import { BaseButton } from "../../ui/BaseButton";
 
 interface MovieReviewDisplayProps {
     userRating: number;

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { AuthData, MovieReview } from "../../../../lib/entities";
-import { BaseLink } from "../../../ui/BaseLink";
 import { MovieReviewForm } from "./MovieReviewForm";
 import { MovieReviewDisplay } from "./MovieReviewDisplay";
+import { MovieReview, AuthData } from "../../../lib/entities";
+import { BaseLink } from "../../ui/BaseLink";
 
 interface MovieReviewSectionProps {
     movieReviews: MovieReview[];

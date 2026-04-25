@@ -1,15 +1,26 @@
 import { useSearchParams } from "react-router";
+
 import { BaseButton } from "./BaseButton";
 
 interface PaginationProps {
     currentPage: number;
     totalPages: number;
+    onPageChange?: (page: number) => void;
 }
 
-export const Pagination = ({ currentPage, totalPages }: PaginationProps) => {
+export const Pagination = ({
+    currentPage,
+    totalPages,
+    onPageChange,
+}: PaginationProps) => {
     const [_searchParams, setSearchParams] = useSearchParams();
 
     const handlePageChange = (page: number) => {
+        if (onPageChange) {
+            onPageChange(page);
+            return;
+        }
+
         setSearchParams({ page: page.toString() });
     };
 
@@ -45,7 +56,7 @@ export const Pagination = ({ currentPage, totalPages }: PaginationProps) => {
     };
 
     return (
-        <div className="flex justify-center items-center gap-2 mt-8">
+        <div className="flex justify-center items-center gap-2 my-8">
             <BaseButton
                 handleClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}

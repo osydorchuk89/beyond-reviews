@@ -1,10 +1,12 @@
 import { useLoaderData } from "react-router";
+import { ToastContainer } from "react-toastify";
 
 import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieReviews } from "./MovieReviews";
-import { ButtonLink } from "../../../ui/ButtonLink";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
-import { Movie, MovieReview } from "../../../../lib/entities";
+import { Movie, MovieReview } from "../../../lib/entities";
+import { ButtonLink } from "../../ui/ButtonLink";
+import { horizontalPadding } from "../../../styles/responsive";
 
 export const MoviePage = () => {
     const { movie, movieReviews } = useLoaderData() as {
@@ -27,8 +29,19 @@ export const MoviePage = () => {
     }
 
     return (
-        <div className="flex flex-col mx-48 text-sky-950 relative">
-            <div className="flex gap-10 py-10">
+        <div
+            className={`flex flex-col w-full mx-auto ${horizontalPadding.page} text-sky-950 relative`}
+        >
+            <ToastContainer
+                autoClose={3000}
+                hideProgressBar
+                toastStyle={{
+                    backgroundColor: "#bae6fd",
+                    paddingBlock: 0,
+                    paddingInline: 20,
+                }}
+            />
+            <div className="flex flex-col md:flex-row gap-8 md:gap-10 py-6 sm:py-10">
                 <MovieMainInfo movie={movie} />
                 <MovieAdditionalInfo
                     movie={movie}
