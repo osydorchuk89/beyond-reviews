@@ -174,29 +174,65 @@ export const getMovieReviews = async (
     res: Response,
 ): Promise<any> => {
     const { movieId } = req.params;
+    const page = parseInt(req.query.page as string) ?? 1;
+    const limit = parseInt(req.query.limit as string) ?? 10;
+    const skip = (page - 1) * limit;
+    const userId = req.query.userId as string | undefined;
+
     try {
-        const movieReviews = await prisma.movieReview.findMany({
-            where: { movieId },
-            include: {
-                user: {
-                    select: {
-                        firstName: true,
-                        lastName: true,
-                    },
-                },
-                likedBy: {
-                    select: {
-                        userId: true,
-                    },
+        const include = {
+            user: {
+                select: {
+                    firstName: true,
+                    lastName: true,
                 },
             },
-            orderBy: {
-                likedBy: {
-                    _count: "desc",
+            likedBy: {
+                select: {
+                    userId: true,
                 },
             },
+        };
+
+        const [reviews, totalCount, userReview] = await Promise.all([
+            prisma.movieReview.findMany({
+                where: { movieId },
+                include,
+                orderBy: {
+                    likedBy: {
+                        _count: "desc",
+                    },
+                },
+                skip,
+                take: limit,
+            }),
+            prisma.movieReview.count({
+                where: { movieId },
+            }),
+            userId
+                ? prisma.movieReview.findUnique({
+                      where: {
+                          movieId_userId: {
+                              movieId,
+                              userId,
+                          },
+                      },
+                      include,
+                  })
+                : null,
+        ]);
+
+        const totalPages = Math.ceil(totalCount / limit);
+        const hasMore = page < totalPages;
+
+        res.status(200).send({
+            reviews,
+            totalCount,
+            currentPage: page,
+            totalPages,
+            hasMore,
+            userReview,
         });
-        res.status(200).send(movieReviews);
     } catch (error) {
         res.status(500).send({ message: "Could not get movie reviews", error });
     }

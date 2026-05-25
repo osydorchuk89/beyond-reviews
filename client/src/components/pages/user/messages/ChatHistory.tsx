@@ -84,16 +84,16 @@ export const ChatHistory = ({
     };
 
     return (
-        <div className="flex flex-col justify-between w-3/4 shadow-lg bg-sky-100">
+        <div className="flex flex-col justify-between w-full md:w-3/4 shadow-lg bg-sky-100 min-h-[28rem]">
             {loading ? (
                 <LoadingSpinner />
             ) : (
                 <>
-                    <h3 className="text-lg px-2 py-5 text-center font-medium border-b-1 border-b-sky-500">
+                    <h3 className="text-lg px-2 py-4 md:py-5 text-center font-medium border-b-1 border-b-sky-500 break-words">
                         {friendName}
                     </h3>
                     <div
-                        className="h-[26rem] w-full flex flex-col justify-start gap-3 p-5 overflow-y-auto"
+                        className="h-[26rem] w-full flex flex-col justify-start gap-3 p-3 sm:p-5 overflow-y-auto"
                         ref={messagesRef}
                         onScroll={onScroll}
                     >
@@ -111,7 +111,7 @@ export const ChatHistory = ({
                             </p>
                         )}
                     </div>
-                    <div className="w-full flex flex-col gap-5 mb-5">
+                    <div className="w-full flex flex-col gap-5 mb-4 sm:mb-5">
                         <ChatMessageForm onSend={onSendMessage} />
                     </div>
                 </>

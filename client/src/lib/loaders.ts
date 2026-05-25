@@ -43,11 +43,12 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
 
 export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
     const { movieId } = params as { movieId: string };
-    const [movie, movieReviews] = await Promise.all([
+    const authData = await getAuthData();
+    const [movie, movieReviewsData] = await Promise.all([
         getMovie(movieId),
-        getMovieReviews(movieId),
+        getMovieReviews(movieId, 1, 10, authData.user?.id),
     ]);
-    return { movie, movieReviews };
+    return { movie, movieReviewsData };
 };
 
 export const userProfileLoader = async ({ params }: LoaderFunctionArgs) => {
@@ -82,9 +83,14 @@ export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {
     return { userWatchList };
 };
 
-export const userReviewsLoader = async ({ params }: LoaderFunctionArgs) => {
+export const userReviewsLoader = async ({
+    params,
+    request,
+}: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
-    const userMovieReviews = await getUserMovieReviews(userId);
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") ?? "1");
+    const userMovieReviews = await getUserMovieReviews(userId, page);
     return { userMovieReviews };
 };
 

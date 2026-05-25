@@ -24,14 +24,14 @@ export const ActivityItem = ({ activity }: ActivityDetailsProps) => {
 
     if (!activity.movie) {
         return (
-            <div className="p-5 rounded-lg shadow-lg bg-sky-100">
+            <div className="p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100">
                 <p className="text-center italic">Missing data</p>
             </div>
         );
     }
 
     return (
-        <div className="p-5 rounded-lg shadow-lg bg-sky-100">
+        <div className="p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100">
             <ActivityDetails
                 activity={activity}
                 ratingUserName={ratingUserName}

@@ -9,7 +9,7 @@ export const ActivityOtherReview = ({ activity }: ActivityOtherReviewProps) => {
     const movieReviewLinkText = `${activity.movieReview.movie.title} (${activity.movieReview.movie.releaseYear})`;
 
     return (
-        <div className="mt-2">
+        <div className="mt-2 space-y-1 break-words">
             <p>
                 <strong>Movie</strong>:{" "}
                 <BaseLink to={`/movies/${activity.movieReview.movieId}`}>
@@ -22,7 +22,7 @@ export const ActivityOtherReview = ({ activity }: ActivityOtherReviewProps) => {
             <p>
                 <strong>Review</strong>:{" "}
                 {activity.movieReview.text ? (
-                    <span className="w-full">{activity.movieReview.text}</span>
+                    <span>{activity.movieReview.text}</span>
                 ) : (
                     <span className="italic">no review</span>
                 )}

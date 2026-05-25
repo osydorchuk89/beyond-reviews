@@ -17,7 +17,7 @@ export const UserActivitiesPage = () => {
     const { activities, currentPage, totalPages } = userActivities;
 
     return (
-        <div className="flex flex-col gap-10 min-h-[70vh] w-full md:w-2/3">
+        <div className="flex flex-col gap-6 sm:gap-10 min-h-[70vh] w-full max-w-4xl">
             <h2 className="text-center text-xl font-bold">Activities</h2>
             {activities.length > 0 && (
                 <>

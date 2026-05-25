@@ -3,11 +3,12 @@ import {
     AuthData,
     Message,
     Movie,
-    MovieReview,
+    MovieReviewsData,
     MoviesData,
     MovieWatchList,
     User,
     UserActivities,
+    UserMovieReviews,
     UsersMessages,
 } from "./entities";
 
@@ -59,11 +60,18 @@ export const getMovie = async (movieId: string): Promise<Movie> => {
 };
 
 export const getMovieReviews = async (
-    movieId: string
-): Promise<MovieReview[]> => {
+    movieId: string,
+    page: number = 1,
+    limit: number = 10,
+    userId?: string
+): Promise<MovieReviewsData> => {
     try {
+        const params: Record<string, string | number> = { page, limit };
+        if (userId) params.userId = userId;
+
         const response = await axiosInstance.get(
-            `/api/movies/${movieId}/reviews`
+            `/api/movies/${movieId}/reviews`,
+            { params }
         );
         return response.data;
     } catch (error) {
@@ -73,11 +81,12 @@ export const getMovieReviews = async (
 };
 
 export const getUserMovieReviews = async (
-    userId: string
-): Promise<MovieReview[]> => {
+    userId: string,
+    page: number = 1
+): Promise<UserMovieReviews> => {
     try {
         const response = await axiosInstance.get(
-            `/api/users/${userId}/movie-reviews`
+            `/api/users/${userId}/movie-reviews?page=${page}`
         );
         return response.data;
     } catch (error) {

@@ -26,46 +26,56 @@ export const ActivityDetails = ({
 
     return (
         <>
-            <div className="flex justify-between">
-                <p className="flex items-center">
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start">
+                <p className="flex items-start min-w-0">
                     <img
                         src={activity.user.photo}
-                        className="object-cover object-top w-8 h-8 rounded-full self-center mr-2"
+                        className="object-cover object-top w-8 h-8 rounded-full shrink-0 mr-2"
                         alt="user photo"
                     />
-                    {activity.movieId && activity.action === "rated" && (
-                        <span className="font-bold">
-                            {isSameUser ? "You" : profileUserName} rated{" "}
-                            {activity.reviewRating}/10{" "}
-                            <BaseLink to={movieUrl}>{movieFullTitle}</BaseLink>
-                        </span>
-                    )}
-                    {activity.movieId && activity.action !== "rated" && (
-                        <span className="font-bold">
-                            {isSameUser ? "You" : profileUserName}{" "}
-                            {activity.action === "saved" ? "added" : "removed"}{" "}
-                            <BaseLink to={movieUrl}>{movieFullTitle}</BaseLink>{" "}
-                            {activity.action === "saved" ? "to" : "from"} watch
-                            list
-                        </span>
-                    )}
-                    {activity.movieReviewId && (
-                        <span className="font-bold">
-                            {isSameUser ? "You" : profileUserName}{" "}
-                            {activity.action === "liked" ? "liked" : "unliked"}{" "}
-                            a review by{" "}
-                            <BaseLink to={`/users/${ratingUserId}/profile`}>
-                                {ratingUserName}
-                            </BaseLink>
-                        </span>
-                    )}
+                    <span className="font-bold break-words">
+                        {activity.movieId && activity.action === "rated" && (
+                            <>
+                                {isSameUser ? "You" : profileUserName} rated{" "}
+                                {activity.reviewRating}/10{" "}
+                                <BaseLink to={movieUrl}>
+                                    {movieFullTitle}
+                                </BaseLink>
+                            </>
+                        )}
+                        {activity.movieId && activity.action !== "rated" && (
+                            <>
+                                {isSameUser ? "You" : profileUserName}{" "}
+                                {activity.action === "saved"
+                                    ? "added"
+                                    : "removed"}{" "}
+                                <BaseLink to={movieUrl}>
+                                    {movieFullTitle}
+                                </BaseLink>{" "}
+                                {activity.action === "saved" ? "to" : "from"}{" "}
+                                watch list
+                            </>
+                        )}
+                        {activity.movieReviewId && (
+                            <>
+                                {isSameUser ? "You" : profileUserName}{" "}
+                                {activity.action === "liked"
+                                    ? "liked"
+                                    : "unliked"}{" "}
+                                a review by{" "}
+                                <BaseLink to={`/users/${ratingUserId}/profile`}>
+                                    {ratingUserName}
+                                </BaseLink>
+                            </>
+                        )}
+                    </span>
                 </p>
-                <p>
+                <p className="text-sm sm:text-base sm:text-right shrink-0">
                     <span className="italic">{parsedDate}</span>
                 </p>
             </div>
             {activity.movieId && activity.reviewText && (
-                <p className="mt-2">
+                <p className="mt-2 break-words">
                     <strong>Review</strong>: {activity.reviewText}
                 </p>
             )}

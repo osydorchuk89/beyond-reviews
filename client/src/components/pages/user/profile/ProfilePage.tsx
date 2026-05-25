@@ -49,10 +49,10 @@ export const ProfilePage = () => {
     };
 
     return (
-        <div className="flex flex-col justify-between p-5 rounded-lg shadow-lg bg-sky-100 gap-8 min-h-[70vh] md:w-2/3">
+        <div className="flex flex-col justify-between p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8 min-h-[70vh] w-full max-w-2xl">
             <img
                 src={profileUser.photo}
-                className="object-cover object-top w-32 h-32 rounded-full self-center"
+                className="object-cover object-top w-28 h-28 sm:w-32 sm:h-32 rounded-full self-center"
                 alt="user avatar"
             />
             <ul className="flex flex-col items-center gap-5 text-lg">
@@ -64,16 +64,18 @@ export const ProfilePage = () => {
             </ul>
             <div className="flex justify-center">
                 {visitingUser && !isSameUser && !areFriends && (
-                    <BaseButton
-                        style={requestSent ? "disabled" : "orange"}
-                        handleClick={
-                            requestSent ? undefined : handleFriendRequest
-                        }
-                    >
-                        {requestSent
-                            ? "FRIEND REQUEST SENT"
-                            : "SEND FRIEND REQUEST"}
-                    </BaseButton>
+                    <div className="w-full sm:w-auto flex justify-center text-center">
+                        <BaseButton
+                            style={requestSent ? "disabled" : "orange"}
+                            handleClick={
+                                requestSent ? undefined : handleFriendRequest
+                            }
+                        >
+                            {requestSent
+                                ? "FRIEND REQUEST SENT"
+                                : "SEND FRIEND REQUEST"}
+                        </BaseButton>
+                    </div>
                 )}
             </div>
         </div>
