@@ -97,13 +97,25 @@ export const getMovieById = async (
     res: Response,
 ): Promise<any> => {
     const { movieId } = req.params;
+    const userId =
+        ((req.user as { id?: string } | undefined)?.id ??
+            req.query.userId) as string | undefined;
     try {
         const movie = await prisma.movie.findUnique({
             where: {
                 id: movieId,
             },
             include: {
-                onWatchList: true,
+                onWatchList: userId
+                    ? {
+                          where: {
+                              userId,
+                          },
+                          select: {
+                              userId: true,
+                          },
+                      }
+                    : false,
             },
         });
 
@@ -199,9 +211,7 @@ export const getMovieReviews = async (
                 where: { movieId },
                 include,
                 orderBy: {
-                    likedBy: {
-                        _count: "desc",
-                    },
+                    likeCount: "desc",
                 },
                 skip,
                 take: limit,
@@ -351,12 +361,28 @@ export const likeOrUnlikeMovieReview = async (
                         userId: userId,
                     },
                 });
+                await tx.movieReview.update({
+                    where: { id: movieReview.id },
+                    data: {
+                        likeCount: {
+                            increment: 1,
+                        },
+                    },
+                });
             } else {
                 await tx.movieReviewLike.delete({
                     where: {
                         reviewId_userId: {
                             reviewId: movieReview.id,
                             userId: userId,
+                        },
+                    },
+                });
+                await tx.movieReview.update({
+                    where: { id: movieReview.id },
+                    data: {
+                        likeCount: {
+                            decrement: 1,
                         },
                     },
                 });

@@ -25,7 +25,9 @@ export const MovieReviewCard = ({ movieReview }: MovieReviewCardProps) => {
 
     const [iconFilled, setIconFilled] = useState(hasUserLikedReview);
     const [hasLiked, setHasLiked] = useState(hasUserLikedReview);
-    const [likeCount, setLikeCount] = useState(movieReview.likedBy.length);
+    const [likeCount, setLikeCount] = useState(
+        movieReview.likeCount ?? movieReview.likedBy.length,
+    );
 
     const reviewDate = new Date(movieReview.date);
     const parsedDate = reviewDate.toLocaleString("default", {

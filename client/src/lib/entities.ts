@@ -87,6 +87,7 @@ export interface MovieReview {
     date: Date;
     rating: number;
     text?: string;
+    likeCount: number;
     likedBy: { userId: string }[];
 }
 

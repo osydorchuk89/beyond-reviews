@@ -72,6 +72,7 @@ type SyntheticReview = {
     date: Date;
     rating: number;
     text: string | null;
+    likeCount: number;
 };
 
 const parseArgs = (): CliOptions => {
@@ -1032,6 +1033,7 @@ async function main() {
                 date: reviewDate(movie.releaseYear, rng),
                 rating,
                 text: localReviewTextFor(movie, rating, rng),
+                likeCount: 0,
             });
 
             userReviewCounts.set(user.id, (userReviewCounts.get(user.id) ?? 0) + 1);
@@ -1056,6 +1058,7 @@ async function main() {
         },
     });
     const reviewLikes: { reviewId: string; userId: string }[] = [];
+    const reviewLikeCounts = new Map<string, number>();
 
     for (const review of createdReviews) {
         const movie = moviePlanById.get(review.movieId);
@@ -1064,6 +1067,7 @@ async function main() {
         }
 
         const likeCount = likedByCountFor(review.rating, movie.targetReviewCount, rng);
+        reviewLikeCounts.set(review.id, likeCount);
 
         for (const user of sampleUsersExcept(users, likeCount, review.userId, rng)) {
             reviewLikes.push({
@@ -1076,6 +1080,13 @@ async function main() {
     await chunkedCreateMany("Review likes", reviewLikes, (chunk) =>
         prisma.movieReviewLike.createMany({ data: chunk }),
     );
+
+    for (const [reviewId, likeCount] of reviewLikeCounts) {
+        await prisma.movieReview.update({
+            where: { id: reviewId },
+            data: { likeCount },
+        });
+    }
 
     if (options.withActivities) {
         const reviewActivities = createdReviews.map((review) => ({

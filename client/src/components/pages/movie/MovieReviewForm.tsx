@@ -8,7 +8,6 @@ import { ReviewSchema } from "../../../lib/schemas";
 import { StarIcon } from "../../icons/StarIcon";
 import { BaseButton } from "../../ui/BaseButton";
 
-
 interface MovieReviewFormProps {
     initialRating?: number;
     initialText?: string;
@@ -80,7 +79,7 @@ export const MovieReviewForm = ({
             </div>
             <p className="text-red-800">{errors.rating?.message}</p>
 
-            <div className="my-5">
+            <div className="flex flex-col my-5">
                 <label htmlFor="review" className="font-bold">
                     Post your review (optional):
                 </label>
@@ -103,8 +102,8 @@ export const MovieReviewForm = ({
                     {isUpdating
                         ? "Please wait..."
                         : hasRated
-                        ? "EDIT"
-                        : "SUBMIT"}
+                          ? "EDIT"
+                          : "SUBMIT"}
                 </BaseButton>
             </div>
         </fetcher.Form>

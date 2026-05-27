@@ -36,17 +36,28 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
         director,
         sortBy,
         sortOrder,
-        search
+        search,
     );
     return { moviesDataPromise };
 };
 
 export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
     const { movieId } = params as { movieId: string };
-    const authData = await getAuthData();
+
+    const authDataPromise = getAuthData();
+    const moviePromise = getMovie(movieId);
+
+    const authData = await authDataPromise;
+    const movieReviewsDataPromise = getMovieReviews(
+        movieId,
+        1,
+        10,
+        authData.user?.id,
+    );
+
     const [movie, movieReviewsData] = await Promise.all([
-        getMovie(movieId),
-        getMovieReviews(movieId, 1, 10, authData.user?.id),
+        moviePromise,
+        movieReviewsDataPromise,
     ]);
     return { movie, movieReviewsData };
 };

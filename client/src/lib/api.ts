@@ -49,9 +49,17 @@ export const getMovies = async (
     }
 };
 
-export const getMovie = async (movieId: string): Promise<Movie> => {
+export const getMovie = async (
+    movieId: string,
+    userId?: string,
+): Promise<Movie> => {
     try {
-        const response = await axiosInstance.get(`/api/movies/${movieId}`);
+        const params: Record<string, string> = {};
+        if (userId) params.userId = userId;
+
+        const response = await axiosInstance.get(`/api/movies/${movieId}`, {
+            params,
+        });
         return response.data;
     } catch (error) {
         console.log(error);
