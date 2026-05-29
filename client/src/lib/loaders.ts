@@ -2,6 +2,7 @@ import { LoaderFunctionArgs, redirect } from "react-router";
 
 import {
     getAuthData,
+    getFriendRecommendations,
     getMovie,
     getMovieReviews,
     getMovies,
@@ -86,6 +87,30 @@ export const protectedLoader = async ({ params }: LoaderFunctionArgs) => {
         return redirect("/");
     }
     return null;
+};
+
+export const userFriendsLoader = async (args: LoaderFunctionArgs) => {
+    const protectedResult = await protectedLoader(args);
+
+    if (protectedResult) {
+        return protectedResult;
+    }
+
+    const { userId } = args.params as { userId: string };
+
+    try {
+        const friendRecommendationsData =
+            await getFriendRecommendations(userId);
+        return {
+            friendRecommendationsData,
+            friendRecommendationsError: false,
+        };
+    } catch {
+        return {
+            friendRecommendationsData: null,
+            friendRecommendationsError: true,
+        };
+    }
 };
 
 export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {

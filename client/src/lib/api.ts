@@ -1,6 +1,7 @@
 import axiosInstance from "./axiosInstance";
 import {
     AuthData,
+    FriendRecommendationsData,
     Message,
     Movie,
     MovieReviewsData,
@@ -188,6 +189,20 @@ export const getUserFriends = async (userId: string): Promise<User[]> => {
     }
 };
 
+export const getFriendRecommendations = async (
+    userId: string,
+): Promise<FriendRecommendationsData> => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/recommendations/friends`,
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
 export const sendFriendRequest = async (
     userId: string,
     otherUserId: string
@@ -198,6 +213,7 @@ export const sendFriendRequest = async (
         });
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 
@@ -211,6 +227,7 @@ export const acceptFriendRequest = async (
         });
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 

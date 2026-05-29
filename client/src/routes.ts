@@ -24,6 +24,7 @@ import {
     protectedLoader,
     rootLoader,
     userActivitiesLoader,
+    userFriendsLoader,
     userProfileLoader,
     userReviewsLoader,
     userWatchListLoader,
@@ -108,7 +109,7 @@ export const router = createBrowserRouter([
                                     {
                                         path: "friends",
                                         Component: UserFriendsPage,
-                                        loader: protectedLoader,
+                                        loader: userFriendsLoader,
                                     },
                                     {
                                         path: "messages",

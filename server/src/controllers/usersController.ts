@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { DEFAULT_USER_PHOTO_URL } from "../config/constants";
 import { UserSchema } from "../lib/schemas";
 import { login } from "./authController";
+import { getFriendRecommendationsForUser } from "../services/friendRecommendations";
 
 const prisma = new PrismaClient();
 
@@ -220,6 +221,26 @@ export const getUserFriends = async (
     } catch (error: any) {
         res.status(500).send({
             message: "Could not fetch user friends",
+            error,
+        });
+    }
+};
+
+export const getUserFriendRecommendations = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
+    const { userId } = req.params;
+
+    try {
+        const recommendations = await getFriendRecommendationsForUser(
+            prisma,
+            userId,
+        );
+        res.status(200).send(recommendations);
+    } catch (error: any) {
+        res.status(500).send({
+            message: "Could not fetch friend recommendations",
             error,
         });
     }

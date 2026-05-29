@@ -174,6 +174,20 @@ export interface Friend {
     photo: string;
 }
 
+export interface FriendRecommendation {
+    user: Friend;
+    similarityScore: number;
+    sharedMovieCount: number;
+    sharedFavoriteTitles: string[];
+}
+
+export interface FriendRecommendationsData {
+    recommendations: FriendRecommendation[];
+    currentReviewCount: number;
+    minReviewsRequired: number;
+    recommendationsAvailable: boolean;
+}
+
 export interface RegistrationInputs {
     firstName: string;
     lastName: string;

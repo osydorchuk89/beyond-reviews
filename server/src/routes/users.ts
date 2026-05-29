@@ -6,6 +6,7 @@ import {
     getAllUsers,
     getUserActivities,
     getUserData,
+    getUserFriendRecommendations,
     getUserFriends,
     getUserMovieReviews,
     getUserWatchlist,
@@ -35,6 +36,12 @@ usersRouter.get("/:userId/activities", getUserActivities);
 
 // get user frineds
 usersRouter.get("/:userId/friends", getUserFriends);
+
+// get user friend recommendations
+usersRouter.get(
+    "/:userId/recommendations/friends",
+    getUserFriendRecommendations,
+);
 
 // send a friend request
 usersRouter.post("/:userId/friend-requests", sendFriendRequest);
