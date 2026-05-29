@@ -6,6 +6,11 @@ import { DEFAULT_USER_PHOTO_URL } from "../config/constants";
 import { UserSchema } from "../lib/schemas";
 import { login } from "./authController";
 import { getFriendRecommendationsForUser } from "../services/friendRecommendations";
+import {
+    acceptFriendRequestFromUser,
+    sendFriendRequestToUser,
+} from "../services/friendships";
+import { getErrorMessage, getErrorStatusCode } from "../services/errors";
 
 const prisma = new PrismaClient();
 
@@ -253,47 +258,15 @@ export const sendFriendRequest = async (
     const { userId } = req.params;
     const { otherUserId }: { otherUserId: string } = req.body;
 
-    const sender = await prisma.user.findUnique({
-        where: { id: userId },
-    });
-
-    if (!sender) {
-        return res.status(404).send({ message: "Sender user not found" });
-    }
-
-    const recipient = await prisma.user.findUnique({
-        where: { id: otherUserId },
-    });
-
-    if (!recipient) {
-        return res.status(404).send({ message: "Recipient user not found" });
-    }
-
     try {
-        const friendRequest = await prisma.friendRequest.findUnique({
-            where: {
-                sentUserId_receivedUserId: {
-                    sentUserId: userId,
-                    receivedUserId: otherUserId,
-                },
-            },
+        await sendFriendRequestToUser(prisma, {
+            userId,
+            otherUserId,
         });
-        if (friendRequest) {
-            res.status(409).send({
-                message: "User has already received a friend request",
-            });
-        } else {
-            await prisma.friendRequest.create({
-                data: {
-                    sentUserId: userId,
-                    receivedUserId: otherUserId,
-                },
-            });
-            res.status(200).send();
-        }
+        res.status(200).send();
     } catch (error: any) {
-        res.status(500).send({
-            message: "Could not send friend request",
+        res.status(getErrorStatusCode(error)).send({
+            message: getErrorMessage(error, "Could not send friend request"),
             error,
         });
     }
@@ -306,94 +279,16 @@ export const acceptFriendRequest = async (
     const { userId } = req.params;
     const { otherUserId } = req.body;
 
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-    });
-
-    if (!user) {
-        return res.status(404).send({ message: "User not found" });
-    }
-
-    const otherUser = await prisma.user.findUnique({
-        where: { id: otherUserId },
-    });
-
-    if (!otherUser) {
-        return res.status(404).send({ message: "Other user not found" });
-    }
-
     try {
-        // Check if friend request exists
-        const friendRequest = await prisma.friendRequest.findUnique({
-            where: {
-                sentUserId_receivedUserId: {
-                    sentUserId: otherUserId,
-                    receivedUserId: userId,
-                },
-            },
-        });
-
-        if (!friendRequest) {
-            return res
-                .status(404)
-                .send({ message: "Friend request not found" });
-        }
-
-        // Check if already friends
-        const existingFriendship = await prisma.user.findFirst({
-            where: {
-                id: userId,
-                friends: {
-                    some: {
-                        id: otherUserId,
-                    },
-                },
-            },
-        });
-
-        if (existingFriendship) {
-            res.status(409).send({
-                message: "The user is already on the friend list",
-            });
-            return;
-        }
-
-        // Execute all operations atomically
-        await prisma.$transaction(async (tx) => {
-            await tx.user.update({
-                where: { id: userId },
-                data: {
-                    friends: {
-                        connect: {
-                            id: otherUserId,
-                        },
-                    },
-                },
-            });
-            await tx.user.update({
-                where: { id: otherUserId },
-                data: {
-                    friends: {
-                        connect: {
-                            id: userId,
-                        },
-                    },
-                },
-            });
-            await tx.friendRequest.delete({
-                where: {
-                    sentUserId_receivedUserId: {
-                        sentUserId: otherUserId,
-                        receivedUserId: userId,
-                    },
-                },
-            });
+        await acceptFriendRequestFromUser(prisma, {
+            userId,
+            otherUserId,
         });
 
         res.status(200).send();
     } catch (error: any) {
-        res.status(500).send({
-            message: "Could not accept friend request",
+        res.status(getErrorStatusCode(error)).send({
+            message: getErrorMessage(error, "Could not accept friend request"),
             error,
         });
     }

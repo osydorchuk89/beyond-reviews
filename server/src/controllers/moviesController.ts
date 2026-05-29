@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
 
 import { PrismaClient } from "@prisma/client";
-import { ReviewSchema } from "../lib/schemas";
+import {
+    createOrUpdateMovieReviewForUser,
+    likeOrUnlikeMovieReviewForUser,
+} from "../services/movieReviews";
+import { updateMovieWatchlist } from "../services/movieWatchlist";
+import { getErrorMessage, getErrorStatusCode } from "../services/errors";
 
 const prisma = new PrismaClient();
 
@@ -139,45 +144,18 @@ export const addOrRemoveMovieFromWatchlist = async (
     const { movieId } = req.params;
     const { saved, userId } = req.body;
 
-    const movie = await prisma.movie.findUnique({
-        where: { id: movieId },
-    });
-
-    if (!movie) {
-        return res.status(404).send({ message: "Movie not found" });
-    }
-
     try {
-        await prisma.$transaction(async (tx) => {
-            if (saved) {
-                await tx.movieWatchList.create({
-                    data: {
-                        userId: userId,
-                        movieId: movieId,
-                    },
-                });
-            } else {
-                await tx.movieWatchList.delete({
-                    where: {
-                        movieId_userId: {
-                            movieId: movieId,
-                            userId: userId,
-                        },
-                    },
-                });
-            }
-            await tx.activity.create({
-                data: {
-                    userId: userId,
-                    action: saved ? "saved" : "unsaved",
-                    movieId: movieId,
-                    date: new Date(),
-                },
-            });
+        await updateMovieWatchlist(prisma, {
+            movieId,
+            userId,
+            saved,
         });
         res.status(200).send();
     } catch (error) {
-        res.status(500).send({ message: "Could not update watchlist", error });
+        res.status(getErrorStatusCode(error)).send({
+            message: getErrorMessage(error, "Could not update watchlist"),
+            error,
+        });
     }
 };
 
@@ -253,86 +231,22 @@ export const createOrUpdateMovieReview = async (
     res: Response,
 ): Promise<any> => {
     const { rating, text } = req.body;
-    const validationResult = ReviewSchema.safeParse({
-        rating,
-        text,
-    });
-    if (!validationResult.success) {
-        res.status(400).send({ message: "Validation failed" });
-    } else {
-        const movie = await prisma.movie.findUnique({
-            where: { id: req.params.movieId },
+
+    try {
+        const movieReview = await createOrUpdateMovieReviewForUser(prisma, {
+            movieId: req.params.movieId,
+            userId: req.body.userId,
+            rating,
+            text,
+            date: req.body.date,
         });
 
-        if (!movie) {
-            return res.status(404).send({ message: "Movie not found" });
-        }
-
-        try {
-            const movieReview = await prisma.$transaction(async (tx) => {
-                const review = await tx.movieReview.upsert({
-                    where: {
-                        movieId_userId: {
-                            userId: req.body.userId,
-                            movieId: req.params.movieId,
-                        },
-                    },
-                    update: {
-                        ...validationResult.data,
-                        date: req.body.date,
-                    },
-                    create: {
-                        ...validationResult.data,
-                        userId: req.body.userId,
-                        movieId: req.params.movieId,
-                        date: req.body.date,
-                    },
-                });
-
-                // Use aggregation to calculate average rating and count
-                const aggregations = await tx.movieReview.aggregate({
-                    where: {
-                        movieId: req.params.movieId,
-                    },
-                    _avg: {
-                        rating: true,
-                    },
-                    _count: {
-                        rating: true,
-                    },
-                });
-
-                // Update movie with new stats
-                await tx.movie.update({
-                    where: { id: req.params.movieId },
-                    data: {
-                        avgRating: aggregations._avg.rating ?? 0,
-                        numRatings: aggregations._count.rating,
-                    },
-                });
-
-                // Create user activity
-                await tx.activity.create({
-                    data: {
-                        userId: req.body.userId,
-                        movieId: req.params.movieId,
-                        action: "rated",
-                        reviewRating: review.rating,
-                        reviewText: review.text,
-                        date: new Date(),
-                    },
-                });
-
-                return review;
-            });
-
-            res.status(200).send(movieReview);
-        } catch (error) {
-            res.status(500).send({
-                message: "Could not create or update review",
-                error,
-            });
-        }
+        res.status(200).send(movieReview);
+    } catch (error) {
+        res.status(getErrorStatusCode(error)).send({
+            message: getErrorMessage(error, "Could not create or update review"),
+            error,
+        });
     }
 };
 
@@ -343,63 +257,15 @@ export const likeOrUnlikeMovieReview = async (
     const reviewId = req.params.reviewId;
     const { like, userId } = req.body;
     try {
-        const movieReview = await prisma.movieReview.findUnique({
-            where: { id: reviewId },
-        });
-
-        if (!movieReview) {
-            return res.status(404).send({
-                message: "Could not find review",
-            });
-        }
-
-        await prisma.$transaction(async (tx) => {
-            if (like) {
-                await tx.movieReviewLike.create({
-                    data: {
-                        reviewId: movieReview.id,
-                        userId: userId,
-                    },
-                });
-                await tx.movieReview.update({
-                    where: { id: movieReview.id },
-                    data: {
-                        likeCount: {
-                            increment: 1,
-                        },
-                    },
-                });
-            } else {
-                await tx.movieReviewLike.delete({
-                    where: {
-                        reviewId_userId: {
-                            reviewId: movieReview.id,
-                            userId: userId,
-                        },
-                    },
-                });
-                await tx.movieReview.update({
-                    where: { id: movieReview.id },
-                    data: {
-                        likeCount: {
-                            decrement: 1,
-                        },
-                    },
-                });
-            }
-            await tx.activity.create({
-                data: {
-                    userId: userId,
-                    movieReviewId: movieReview.id,
-                    action: like ? "liked" : "unliked",
-                    date: new Date(),
-                },
-            });
+        await likeOrUnlikeMovieReviewForUser(prisma, {
+            reviewId,
+            userId,
+            like,
         });
         res.status(200).send();
     } catch (error) {
-        res.status(500).send({
-            message: "Could not like or unlike review",
+        res.status(getErrorStatusCode(error)).send({
+            message: getErrorMessage(error, "Could not like or unlike review"),
             error,
         });
     }
