@@ -2,6 +2,7 @@ import {
     ReceivedFriendRequest,
     SentFriendRequest,
 } from "../../../../lib/entities";
+import { horizontalPadding } from "../../../../styles/responsive";
 import { FriendRequestItem } from "./FriendRequestItem";
 
 interface FriendRequestsSectionProps {
@@ -20,7 +21,7 @@ export const FriendRequestsSection = ({
     profileUserId,
 }: FriendRequestsSectionProps) => {
     return (
-        <div className="flex flex-col gap-3">
+        <div className={`flex flex-col gap-3 ${horizontalPadding.custom}`}>
             <h3 className="text-lg font-bold text-sky-950">{title}</h3>
             <div className="flex flex-col p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8">
                 <ul className="flex flex-col gap-4">

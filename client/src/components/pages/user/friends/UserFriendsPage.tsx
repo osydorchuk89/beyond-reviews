@@ -78,22 +78,8 @@ export const UserFriendsPage = () => {
         ) ?? [];
 
     return (
-        <div className="flex flex-col gap-6 sm:gap-10 min-h-[70vh] w-full max-w-4xl">
+        <div className="flex flex-col gap-6 sm:gap-10 min-h-[70vh] w-full">
             <h2 className="text-xl text-center font-bold">Friends</h2>
-            {isSameUser &&
-                friendRecommendationsData &&
-                !friendRecommendationsError && (
-                    <FriendRecommendationsSection
-                        {...friendRecommendationsData}
-                        recommendations={recommendedFriends}
-                        onSendFriendRequest={handleSendFriendRequest}
-                    />
-                )}
-            {isSameUser && friendRecommendationsError && (
-                <p className="text-center">
-                    Friend recommendations could not be loaded.
-                </p>
-            )}
             {filteredReceivedRequests.length > 0 && isSameUser && (
                 <FriendRequestsSection
                     title="Received friend requests"
@@ -115,6 +101,20 @@ export const UserFriendsPage = () => {
                 isSameUser={isSameUser}
                 profileUserName={profileUserName}
             />
+            {isSameUser &&
+                friendRecommendationsData &&
+                !friendRecommendationsError && (
+                    <FriendRecommendationsSection
+                        {...friendRecommendationsData}
+                        recommendations={recommendedFriends}
+                        onSendFriendRequest={handleSendFriendRequest}
+                    />
+                )}
+            {isSameUser && friendRecommendationsError && (
+                <p className="text-center">
+                    Friend recommendations could not be loaded.
+                </p>
+            )}
         </div>
     );
 };

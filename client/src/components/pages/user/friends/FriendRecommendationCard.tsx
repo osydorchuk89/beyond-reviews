@@ -14,11 +14,11 @@ export const FriendRecommendationCard = ({
     handleSendFriendRequest,
 }: FriendRecommendationCardProps) => {
     return (
-        <li className="flex flex-col gap-4 rounded-lg bg-sky-100 p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
+        <li className="flex w-76 shrink-0 flex-col justify-between gap-5 rounded-lg bg-white/70 p-4">
             <div className="flex min-w-0 gap-3">
                 <img
                     src={recommendation.user.photo}
-                    className="h-10 w-10 shrink-0 rounded-full object-cover object-top"
+                    className="h-12 w-12 shrink-0 rounded-full object-cover object-top"
                     alt="user photo"
                 />
                 <div className="min-w-0">
@@ -40,7 +40,7 @@ export const FriendRecommendationCard = ({
                     )}
                 </div>
             </div>
-            <div className="w-full text-center sm:w-auto">
+            <div className="w-full text-center">
                 <BaseButton
                     style={hasRequested ? "disabled" : "sky"}
                     disabled={hasRequested}

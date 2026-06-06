@@ -1,4 +1,5 @@
 import { Friend } from "../../../../lib/entities";
+import { horizontalPadding } from "../../../../styles/responsive";
 import { BaseLink } from "../../../ui/BaseLink";
 
 interface FriendsListProps {
@@ -13,7 +14,7 @@ export const FriendsList = ({
     profileUserName,
 }: FriendsListProps) => {
     return (
-        <div className="flex flex-col gap-3">
+        <div className={`flex flex-col gap-3 ${horizontalPadding.custom}`}>
             <h3 className="text-lg font-bold text-sky-950">Your friends</h3>
             <div className="flex flex-col gap-2">
                 {friends.length > 0 ? (

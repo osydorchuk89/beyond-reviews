@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-
 import { MovieRecommendationsData } from "../../../lib/entities";
 import { MovieCard } from "./MovieCard";
 import { ArrowIcon } from "../../icons/ArrowIcon";
+import { useHorizontalScroll } from "../../../hooks/useHorizontalScroll";
 
 interface MovieRecommendationsSectionProps {
     movieRecommendationsData: MovieRecommendationsData;
@@ -11,9 +10,6 @@ interface MovieRecommendationsSectionProps {
 export const MovieRecommendationsSection = ({
     movieRecommendationsData,
 }: MovieRecommendationsSectionProps) => {
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
     const {
         recommendations,
         recommendationsAvailable,
@@ -24,39 +20,8 @@ export const MovieRecommendationsSection = ({
         minReviewsRequired - currentReviewCount,
         0,
     );
-
-    const handleScroll = (direction: "left" | "right") => {
-        const scrollContainer = scrollContainerRef.current;
-        if (!scrollContainer) return;
-
-        const scrollAmount = scrollContainer.clientWidth * 0.8;
-        scrollContainer.scrollBy({
-            left: direction === "left" ? -scrollAmount : scrollAmount,
-            behavior: "smooth",
-        });
-    };
-
-    useEffect(() => {
-        const scrollContainer = scrollContainerRef.current;
-        if (!scrollContainer) return;
-
-        const updateScrollState = () => {
-            const maxScrollLeft =
-                scrollContainer.scrollWidth - scrollContainer.clientWidth;
-
-            setCanScrollLeft(scrollContainer.scrollLeft > 0);
-            setCanScrollRight(scrollContainer.scrollLeft < maxScrollLeft - 1);
-        };
-
-        updateScrollState();
-        scrollContainer.addEventListener("scroll", updateScrollState);
-        window.addEventListener("resize", updateScrollState);
-
-        return () => {
-            scrollContainer.removeEventListener("scroll", updateScrollState);
-            window.removeEventListener("resize", updateScrollState);
-        };
-    }, [recommendations.length]);
+    const { scrollContainerRef, canScrollLeft, canScrollRight, handleScroll } =
+        useHorizontalScroll(recommendations.length);
 
     return (
         <section className="flex flex-col gap-8 w-full rounded-xl bg-fuchsia-100 p-4 sm:p-6">

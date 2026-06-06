@@ -7,6 +7,8 @@ export const horizontalPadding = {
 
     // Minimal padding for tight spaces
     compact: "px-2 sm:px-4 md:px-6",
+
+    custom: "px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48",
 };
 
 // Vertical padding options
