@@ -4,6 +4,7 @@ import {
     getAuthData,
     getFriendRecommendations,
     getMovie,
+    getMovieRecommendations,
     getMovieReviews,
     getMovies,
     getUser,
@@ -39,7 +40,13 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
         sortOrder,
         search,
     );
-    return { moviesDataPromise };
+    const movieRecommendationsDataPromise = getAuthData()
+        .then((authData) =>
+            authData.user ? getMovieRecommendations(authData.user.id) : null,
+        )
+        .catch(() => null);
+
+    return { moviesDataPromise, movieRecommendationsDataPromise };
 };
 
 export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
@@ -115,8 +122,30 @@ export const userFriendsLoader = async (args: LoaderFunctionArgs) => {
 
 export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
-    const userWatchList = await getWatchList(userId);
-    return { userWatchList };
+    const [authData, userWatchList] = await Promise.all([
+        getAuthData(),
+        getWatchList(userId),
+    ]);
+
+    if (!authData.isAuthenticated || authData.user?.id !== userId) {
+        return {
+            userWatchList,
+            movieRecommendationsData: null,
+        };
+    }
+
+    try {
+        const movieRecommendationsData = await getMovieRecommendations(userId);
+        return {
+            userWatchList,
+            movieRecommendationsData,
+        };
+    } catch {
+        return {
+            userWatchList,
+            movieRecommendationsData: null,
+        };
+    }
 };
 
 export const userReviewsLoader = async ({

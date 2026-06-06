@@ -1,16 +1,22 @@
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
-import { MovieWatchList, User } from "../../../../lib/entities";
+import {
+    MovieRecommendationsData,
+    MovieWatchList,
+    User,
+} from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { MovieCard } from "../../movies/MovieCard";
 import { ButtonLink } from "../../../ui/ButtonLink";
+import { MovieRecommendationsSection } from "../../movies/MovieRecommendationsSection";
 
 export const UserWatchListPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { userWatchList } = useLoaderData() as {
+    const { userWatchList, movieRecommendationsData } = useLoaderData() as {
         userWatchList: MovieWatchList[];
+        movieRecommendationsData: MovieRecommendationsData | null;
     };
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
@@ -44,6 +50,11 @@ export const UserWatchListPage = () => {
                         </ButtonLink>
                     )}
                 </div>
+            )}
+            {movieRecommendationsData && (
+                <MovieRecommendationsSection
+                    movieRecommendationsData={movieRecommendationsData}
+                />
             )}
         </div>
     );

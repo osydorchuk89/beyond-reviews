@@ -14,6 +14,7 @@ interface MovieCardProps {
     avgRating: number;
     numRatings: number;
     poster: string;
+    hasShadow?: boolean;
 }
 
 export const MovieCard = ({
@@ -24,6 +25,7 @@ export const MovieCard = ({
     avgRating,
     numRatings,
     poster,
+    hasShadow = true,
 }: MovieCardProps) => {
     const displayedTitle =
         title?.length > 45 ? `${title.substring(0, 45)}...` : title;
@@ -37,7 +39,9 @@ export const MovieCard = ({
     const moviePoster = getMoviePoster(poster);
 
     return (
-        <div className="flex flex-col w-76 justify-start items-center bg-sky-100 rounded-lg shadow-lg p-5 relative">
+        <div
+            className={`flex flex-col w-76 justify-start items-center bg-sky-100 rounded-lg p-5 relative ${hasShadow && "shadow-lg"}`}
+        >
             <p className="w-full text-center text-xl font-bold h-16 bg-sky-700 rounded-t-lg flex justify-center items-center absolute top-0 p-4">
                 <Link
                     className="hover:underline text-sky-50"

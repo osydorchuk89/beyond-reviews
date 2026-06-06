@@ -1,73 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 import {
-    Rating,
     FriendRecommendationsResult,
-    CandidateRating,
     FriendRecommendation,
 } from "../lib/entities";
+import { getSimilarUsersForUser } from "./userSimilarity";
 
-const MIN_REVIEWS_FOR_FRIEND_RECOMMENDATIONS = 3;
 const MAX_FRIEND_RECOMMENDATIONS = 5;
-const MAX_RATING_DIFFERENCE = 9;
-const FAVORITE_RATING_THRESHOLD = 8;
-
-const calculateSimilarityScore = (
-    userReviews: Rating[],
-    candidateReviews: Rating[],
-) => {
-    const candidateRatingsByMovieId = new Map(
-        candidateReviews.map((review) => [review.movieId, review.rating]),
-    );
-    const sharedReviews = userReviews.filter((review) =>
-        candidateRatingsByMovieId.has(review.movieId),
-    );
-
-    if (sharedReviews.length === 0) return 0;
-
-    const averageRatingDifference =
-        sharedReviews.reduce((sum, review) => {
-            const candidateRating = candidateRatingsByMovieId.get(
-                review.movieId,
-            );
-            return sum + Math.abs(review.rating - (candidateRating ?? 0));
-        }, 0) / sharedReviews.length;
-
-    const agreementScore =
-        1 - averageRatingDifference / MAX_RATING_DIFFERENCE;
-    const overlapConfidence = Math.min(
-        sharedReviews.length / MIN_REVIEWS_FOR_FRIEND_RECOMMENDATIONS,
-        1,
-    );
-
-    return agreementScore * overlapConfidence;
-};
 
 export const getFriendRecommendationsForUser = async (
     prisma: PrismaClient,
     userId: string,
 ): Promise<FriendRecommendationsResult> => {
-    const userReviews = await prisma.movieReview.findMany({
-        where: { userId },
-        select: {
-            movieId: true,
-            rating: true,
-            movie: {
-                select: {
-                    title: true,
-                },
-            },
-        },
-    });
-
-    if (userReviews.length < MIN_REVIEWS_FOR_FRIEND_RECOMMENDATIONS) {
-        return {
-            recommendations: [],
-            currentReviewCount: userReviews.length,
-            minReviewsRequired: MIN_REVIEWS_FOR_FRIEND_RECOMMENDATIONS,
-            recommendationsAvailable: false,
-        };
-    }
-
     const user = await prisma.user.findUnique({
         where: { id: userId },
         select: {
@@ -88,9 +31,9 @@ export const getFriendRecommendationsForUser = async (
     if (!user) {
         return {
             recommendations: [],
-            currentReviewCount: userReviews.length,
-            minReviewsRequired: MIN_REVIEWS_FOR_FRIEND_RECOMMENDATIONS,
-            recommendationsAvailable: true,
+            currentReviewCount: 0,
+            minReviewsRequired: 3,
+            recommendationsAvailable: false,
         };
     }
 
@@ -101,65 +44,22 @@ export const getFriendRecommendationsForUser = async (
         ...user.receivedFriendRequests.map((request) => request.sentUserId),
     ]);
 
-    const userMovieIds = userReviews.map((review) => review.movieId);
-    const candidateReviews = await prisma.movieReview.findMany({
-        where: {
-            movieId: {
-                in: userMovieIds,
-            },
-            userId: {
-                notIn: [...excludedUserIds],
-            },
-        },
-        select: {
-            movieId: true,
-            rating: true,
-            userId: true,
-        },
-    });
-
-    const userReviewsByMovieId = new Map(
-        userReviews.map((review) => [review.movieId, review]),
+    const similarityResult = await getSimilarUsersForUser(
+        prisma,
+        userId,
+        [...excludedUserIds],
     );
-    const candidateReviewsByUserId = new Map<string, CandidateRating[]>();
 
-    for (const review of candidateReviews) {
-        const reviews = candidateReviewsByUserId.get(review.userId) ?? [];
-        reviews.push(review);
-        candidateReviewsByUserId.set(review.userId, reviews);
+    if (!similarityResult.recommendationsAvailable) {
+        return {
+            recommendations: [],
+            currentReviewCount: similarityResult.currentReviewCount,
+            minReviewsRequired: similarityResult.minReviewsRequired,
+            recommendationsAvailable: false,
+        };
     }
 
-    const scoredRecommendations = [...candidateReviewsByUserId.values()]
-        .map((reviews) => {
-            const similarityScore = calculateSimilarityScore(
-                userReviews,
-                reviews,
-            );
-            const sharedFavoriteTitles = reviews
-                .filter((review) => {
-                    const userReview = userReviewsByMovieId.get(review.movieId);
-                    return (
-                        review.rating >= FAVORITE_RATING_THRESHOLD &&
-                        (userReview?.rating ?? 0) >= FAVORITE_RATING_THRESHOLD
-                    );
-                })
-                .map((review) => review.movieId)
-                .slice(0, 3);
-
-            return {
-                userId: reviews[0].userId,
-                similarityScore,
-                sharedMovieCount: reviews.length,
-                sharedFavoriteMovieIds: sharedFavoriteTitles,
-            };
-        })
-        .filter((recommendation) => recommendation.similarityScore > 0)
-        .sort((a, b) => {
-            if (b.similarityScore !== a.similarityScore) {
-                return b.similarityScore - a.similarityScore;
-            }
-            return b.sharedMovieCount - a.sharedMovieCount;
-        })
+    const scoredRecommendations = similarityResult.similarUsers
         .slice(0, MAX_FRIEND_RECOMMENDATIONS);
 
     const recommendedUserIds = scoredRecommendations.map(
@@ -228,8 +128,8 @@ export const getFriendRecommendationsForUser = async (
 
     return {
         recommendations,
-        currentReviewCount: userReviews.length,
-        minReviewsRequired: MIN_REVIEWS_FOR_FRIEND_RECOMMENDATIONS,
+        currentReviewCount: similarityResult.currentReviewCount,
+        minReviewsRequired: similarityResult.minReviewsRequired,
         recommendationsAvailable: true,
     };
 };

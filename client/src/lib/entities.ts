@@ -188,6 +188,29 @@ export interface FriendRecommendationsData {
     recommendationsAvailable: boolean;
 }
 
+export interface RecommendedMovie {
+    id: string;
+    title: string;
+    releaseYear: number;
+    genres: string[];
+    avgRating: number;
+    numRatings: number;
+    poster: string;
+}
+
+export interface MovieRecommendation {
+    movie: RecommendedMovie;
+    score: number;
+    recommendedByCount: number;
+}
+
+export interface MovieRecommendationsData {
+    recommendations: MovieRecommendation[];
+    currentReviewCount: number;
+    minReviewsRequired: number;
+    recommendationsAvailable: boolean;
+}
+
 export interface RegistrationInputs {
     firstName: string;
     lastName: string;

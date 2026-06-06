@@ -2,17 +2,20 @@ import { Suspense } from "react";
 import { Await, useLoaderData } from "react-router";
 
 import { MoviesListSection } from "./MoviesListSection";
+import { MovieRecommendationsSection } from "./MovieRecommendationsSection";
 import { SearchBar } from "./SearchBar";
-import { MoviesData } from "../../../lib/entities";
+import { MovieRecommendationsData, MoviesData } from "../../../lib/entities";
 import { SortFilterBar } from "./SortFilterBar";
 import { sideBarFilterList, sideBarSortList } from "../../../lib/data";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { horizontalPadding } from "../../../styles/responsive";
 
 export const MoviesPage = () => {
-    const { moviesDataPromise } = useLoaderData() as {
-        moviesDataPromise: Promise<MoviesData>;
-    };
+    const { moviesDataPromise, movieRecommendationsDataPromise } =
+        useLoaderData() as {
+            moviesDataPromise: Promise<MoviesData>;
+            movieRecommendationsDataPromise: Promise<MovieRecommendationsData | null>;
+        };
 
     const buildFilters = (appliedFilters: MoviesData["appliedFilters"]) => {
         const filters = [];
@@ -34,7 +37,7 @@ export const MoviesPage = () => {
     };
 
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full mb-5">
             <p className="text-4xl text-center font-bold py-5 mb-5">
                 Popular Movies
             </p>
@@ -71,6 +74,21 @@ export const MoviesPage = () => {
                         </Await>
                     </Suspense>
                 </div>
+            </div>
+            <div className={`w-full ${horizontalPadding.page}`}>
+                <Suspense fallback={null}>
+                    <Await resolve={movieRecommendationsDataPromise}>
+                        {(movieRecommendationsData) =>
+                            movieRecommendationsData ? (
+                                <MovieRecommendationsSection
+                                    movieRecommendationsData={
+                                        movieRecommendationsData
+                                    }
+                                />
+                            ) : null
+                        }
+                    </Await>
+                </Suspense>
             </div>
         </div>
     );

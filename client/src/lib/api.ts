@@ -4,6 +4,7 @@ import {
     FriendRecommendationsData,
     Message,
     Movie,
+    MovieRecommendationsData,
     MovieReviewsData,
     MoviesData,
     MovieWatchList,
@@ -137,7 +138,9 @@ export const addOrRemoveMovieFromWatchlist = async (
     }
 };
 
-export const getWatchList = async (userId: string): Promise<MovieWatchList> => {
+export const getWatchList = async (
+    userId: string,
+): Promise<MovieWatchList[]> => {
     try {
         const response = await axiosInstance.get(
             `/api/users/${userId}/watch-list`
@@ -195,6 +198,20 @@ export const getFriendRecommendations = async (
     try {
         const response = await axiosInstance.get(
             `/api/users/${userId}/recommendations/friends`,
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+export const getMovieRecommendations = async (
+    userId: string,
+): Promise<MovieRecommendationsData> => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/recommendations/movies`,
         );
         return response.data;
     } catch (error) {

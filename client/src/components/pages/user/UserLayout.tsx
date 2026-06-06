@@ -28,7 +28,7 @@ export const UserLayout = () => {
 
     return (
         <div
-            className={`flex flex-col items-center gap-6 my-6 sm:my-10 w-full max-w-7xl mx-auto ${horizontalPadding.page}`}
+            className={`flex flex-col items-center gap-6 my-6 sm:my-10 w-full mx-auto ${horizontalPadding.page}`}
         >
             <Link
                 className="text-center text-xl sm:text-2xl font-bold break-words"

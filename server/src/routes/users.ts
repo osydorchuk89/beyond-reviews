@@ -8,6 +8,7 @@ import {
     getUserData,
     getUserFriendRecommendations,
     getUserFriends,
+    getUserMovieRecommendations,
     getUserMovieReviews,
     getUserWatchlist,
     registerNewUser,
@@ -41,6 +42,12 @@ usersRouter.get("/:userId/friends", getUserFriends);
 usersRouter.get(
     "/:userId/recommendations/friends",
     getUserFriendRecommendations,
+);
+
+// get user movie recommendations
+usersRouter.get(
+    "/:userId/recommendations/movies",
+    getUserMovieRecommendations,
 );
 
 // send a friend request

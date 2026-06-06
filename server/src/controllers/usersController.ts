@@ -6,6 +6,7 @@ import { DEFAULT_USER_PHOTO_URL } from "../config/constants";
 import { UserSchema } from "../lib/schemas";
 import { login } from "./authController";
 import { getFriendRecommendationsForUser } from "../services/friendRecommendations";
+import { getMovieRecommendationsForUser } from "../services/movieRecommendations";
 import {
     acceptFriendRequestFromUser,
     sendFriendRequestToUser,
@@ -246,6 +247,26 @@ export const getUserFriendRecommendations = async (
     } catch (error: any) {
         res.status(500).send({
             message: "Could not fetch friend recommendations",
+            error,
+        });
+    }
+};
+
+export const getUserMovieRecommendations = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
+    const { userId } = req.params;
+
+    try {
+        const recommendations = await getMovieRecommendationsForUser(
+            prisma,
+            userId,
+        );
+        res.status(200).send(recommendations);
+    } catch (error: any) {
+        res.status(500).send({
+            message: "Could not fetch movie recommendations",
             error,
         });
     }
