@@ -13,26 +13,29 @@ export const FriendsList = ({
     profileUserName,
 }: FriendsListProps) => {
     return (
-        <div className="flex flex-col gap-2">
-            {friends.length > 0 ? (
-                <ul className="flex flex-col gap-4 sm:gap-5">
-                    {friends.map((friend) => (
-                        <li
-                            key={friend.id}
-                            className="flex flex-col text-lg p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8 break-words"
-                        >
-                            <BaseLink to={`/users/${friend.id}/profile`}>
-                                {`${friend.firstName} ${friend.lastName}`}
-                            </BaseLink>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p className="text-center break-words">
-                    {isSameUser ? "You have" : `${profileUserName} has`} no
-                    friends so far
-                </p>
-            )}
+        <div className="flex flex-col gap-3">
+            <h3 className="text-lg font-bold text-sky-950">Your friends</h3>
+            <div className="flex flex-col gap-2">
+                {friends.length > 0 ? (
+                    <ul className="flex flex-col gap-4 sm:gap-5">
+                        {friends.map((friend) => (
+                            <li
+                                key={friend.id}
+                                className="flex flex-col text-lg p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8 break-words"
+                            >
+                                <BaseLink to={`/users/${friend.id}/profile`}>
+                                    {`${friend.firstName} ${friend.lastName}`}
+                                </BaseLink>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className="text-center break-words">
+                        {isSameUser ? "You have" : `${profileUserName} has`} no
+                        friends so far
+                    </p>
+                )}
+            </div>
         </div>
     );
 };

@@ -20,10 +20,8 @@ export const FriendRequestsSection = ({
     profileUserId,
 }: FriendRequestsSectionProps) => {
     return (
-        <div className="flex flex-col gap-2">
-            <p className="text-lg sm:text-xl font-medium text-center">
-                {title}
-            </p>
+        <div className="flex flex-col gap-3">
+            <h3 className="text-lg font-bold text-sky-950">{title}</h3>
             <div className="flex flex-col p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8">
                 <ul className="flex flex-col gap-4">
                     {requests.map((request) => {
@@ -51,7 +49,7 @@ export const FriendRequestsSection = ({
                                         ? () =>
                                               onAcceptRequest(
                                                   profileUserId,
-                                                  userId
+                                                  userId,
                                               )
                                         : undefined
                                 }

@@ -41,7 +41,7 @@ export const UserLayout = () => {
             {visitingUser && !isSameUser && (
                 <div>
                     <ButtonLink
-                        style="orange"
+                        style="sky"
                         to={`/users/${visitingUser.id}/profile`}
                     >
                         BACK TO YOUR PROFILE
