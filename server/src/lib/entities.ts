@@ -3,7 +3,6 @@ export interface Rating {
     rating: number;
 }
 
-
 export interface CandidateRating extends Rating {
     userId: string;
 }
@@ -46,4 +45,37 @@ export interface MovieRecommendationsResult {
     currentReviewCount: number;
     minReviewsRequired: number;
     recommendationsAvailable: boolean;
+}
+
+export interface ReviewedMovieForProfile {
+    movieId: string;
+    rating: number;
+    movie: {
+        genres: string[];
+        director: string;
+        releaseYear: number;
+    };
+}
+
+export interface CandidateMovie {
+    id: string;
+    title: string;
+    releaseYear: number;
+    director: string;
+    genres: string[];
+    avgRating: number;
+    numRatings: number;
+    poster: string;
+}
+
+export interface PreferenceStats {
+    total: number;
+    count: number;
+}
+
+export interface UserTasteProfile {
+    genres: Map<string, PreferenceStats>;
+    directors: Map<string, PreferenceStats>;
+    decades: Map<number, PreferenceStats>;
+    averageRating: number;
 }

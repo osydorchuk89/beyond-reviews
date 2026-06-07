@@ -1,16 +1,187 @@
 import { PrismaClient } from "@prisma/client";
 
 import {
+    CandidateMovie,
     MovieRecommendation,
     MovieRecommendationsResult,
+    PreferenceStats,
+    ReviewedMovieForProfile,
+    UserTasteProfile,
 } from "../lib/entities";
 import {
     FAVORITE_RATING_THRESHOLD,
     getSimilarUsersForUser,
 } from "./userSimilarity";
 
-const MAX_SIMILAR_USERS_FOR_MOVIE_RECOMMENDATIONS = 30;
-const MAX_MOVIE_RECOMMENDATIONS = 12;
+const RECOMMENDATION_LIMITS = {
+    maxSimilarUsers: 30,
+    maxMovieRecommendations: 12,
+};
+
+const SCORE_WEIGHTS = {
+    content: 0.65,
+    collaborative: 0.15,
+    publicQuality: 0.1,
+    publicConfidence: 0.1,
+};
+
+const CONTENT_WEIGHTS = {
+    genre: 0.5,
+    director: 0.4,
+    decade: 0.1,
+};
+
+const CONFIDENCE_COUNTS = {
+    genre: 12,
+    director: 2,
+    decade: 25,
+    publicQualityRatings: 50,
+    publicRankingRatings: 50,
+};
+
+const NEUTRAL_SCORE = 5;
+const MAX_RATING_RESIDUAL_FOR_FULL_SIGNAL = 4;
+const MIN_SPECIFIC_AFFINITY = 0.08;
+
+const clamp = (value: number, min: number, max: number) =>
+    Math.min(Math.max(value, min), max);
+
+const getDecade = (releaseYear: number) => Math.floor(releaseYear / 10) * 10;
+
+const normalizeDirector = (director: string) => director.trim().toLowerCase();
+
+const addPreference = <T>(
+    preferences: Map<T, PreferenceStats>,
+    key: T,
+    preference: number,
+) => {
+    const stats = preferences.get(key) ?? { total: 0, count: 0 };
+    stats.total += preference;
+    stats.count += 1;
+    preferences.set(key, stats);
+};
+
+const buildUserTasteProfile = (
+    reviewedMovies: ReviewedMovieForProfile[],
+): UserTasteProfile => {
+    const averageRating =
+        reviewedMovies.length > 0
+            ? reviewedMovies.reduce((sum, review) => sum + review.rating, 0) /
+              reviewedMovies.length
+            : NEUTRAL_SCORE;
+    const profile: UserTasteProfile = {
+        genres: new Map(),
+        directors: new Map(),
+        decades: new Map(),
+        averageRating,
+    };
+
+    for (const review of reviewedMovies) {
+        const preference = clamp(
+            (review.rating - averageRating) /
+                MAX_RATING_RESIDUAL_FOR_FULL_SIGNAL,
+            -1,
+            1,
+        );
+        if (preference === 0) continue;
+
+        for (const genre of review.movie.genres) {
+            addPreference(profile.genres, genre, preference);
+        }
+
+        addPreference(
+            profile.directors,
+            normalizeDirector(review.movie.director),
+            preference,
+        );
+        addPreference(
+            profile.decades,
+            getDecade(review.movie.releaseYear),
+            preference,
+        );
+    }
+
+    return profile;
+};
+
+const getAveragePreference = <T>(
+    preferences: Map<T, PreferenceStats>,
+    key: T,
+    confidenceCount: number,
+) => {
+    const stats = preferences.get(key);
+    if (!stats) return 0;
+
+    const confidence = clamp(stats.count / confidenceCount, 0, 1);
+    return clamp((stats.total / stats.count) * confidence, -1, 1);
+};
+
+const preferenceToScore = (preference: number) =>
+    clamp((preference + 1) * 5, 0, 10);
+
+const getContentSignals = (
+    movie: CandidateMovie,
+    profile: UserTasteProfile,
+) => {
+    const genrePreference =
+        movie.genres.length === 0
+            ? 0
+            : movie.genres.reduce(
+                  (sum, genre) =>
+                      sum +
+                      getAveragePreference(
+                          profile.genres,
+                          genre,
+                          CONFIDENCE_COUNTS.genre,
+                      ),
+                  0,
+              ) / movie.genres.length;
+    const directorPreference = getAveragePreference(
+        profile.directors,
+        normalizeDirector(movie.director),
+        CONFIDENCE_COUNTS.director,
+    );
+    const decadePreference = getAveragePreference(
+        profile.decades,
+        getDecade(movie.releaseYear),
+        CONFIDENCE_COUNTS.decade,
+    );
+    const hasSpecificAffinity =
+        genrePreference >= MIN_SPECIFIC_AFFINITY ||
+        directorPreference >= MIN_SPECIFIC_AFFINITY;
+    const effectiveDecadePreference = hasSpecificAffinity
+        ? decadePreference
+        : Math.min(decadePreference, 0);
+
+    return {
+        score:
+            preferenceToScore(genrePreference) * CONTENT_WEIGHTS.genre +
+            preferenceToScore(directorPreference) * CONTENT_WEIGHTS.director +
+            preferenceToScore(effectiveDecadePreference) *
+                CONTENT_WEIGHTS.decade,
+        hasSpecificAffinity,
+    };
+};
+
+const getPublicQualityScore = (movie: CandidateMovie) => {
+    const confidence = clamp(
+        movie.numRatings / CONFIDENCE_COUNTS.publicQualityRatings,
+        0,
+        1,
+    );
+
+    return movie.avgRating * confidence + NEUTRAL_SCORE * (1 - confidence);
+};
+
+const getPublicConfidenceScore = (movie: CandidateMovie) => {
+    const confidence = clamp(
+        Math.sqrt(movie.numRatings / CONFIDENCE_COUNTS.publicRankingRatings),
+        0,
+        1,
+    );
+
+    return NEUTRAL_SCORE + confidence * NEUTRAL_SCORE;
+};
 
 export const getMovieRecommendationsForUser = async (
     prisma: PrismaClient,
@@ -29,29 +200,37 @@ export const getMovieRecommendationsForUser = async (
 
     const similarUsers = similarityResult.similarUsers.slice(
         0,
-        MAX_SIMILAR_USERS_FOR_MOVIE_RECOMMENDATIONS,
+        RECOMMENDATION_LIMITS.maxSimilarUsers,
     );
 
-    if (similarUsers.length === 0) {
-        return {
-            recommendations: [],
-            currentReviewCount: similarityResult.currentReviewCount,
-            minReviewsRequired: similarityResult.minReviewsRequired,
-            recommendationsAvailable: true,
-        };
-    }
-
-    const userWatchlist = await prisma.movieWatchList.findMany({
-        where: { userId },
-        select: {
-            movieId: true,
-        },
-    });
+    const [userWatchlist, reviewedMovies] = await Promise.all([
+        prisma.movieWatchList.findMany({
+            where: { userId },
+            select: {
+                movieId: true,
+            },
+        }),
+        prisma.movieReview.findMany({
+            where: { userId },
+            select: {
+                movieId: true,
+                rating: true,
+                movie: {
+                    select: {
+                        genres: true,
+                        director: true,
+                        releaseYear: true,
+                    },
+                },
+            },
+        }),
+    ]);
 
     const excludedMovieIds = new Set([
         ...similarityResult.userReviews.map((review) => review.movieId),
         ...userWatchlist.map((item) => item.movieId),
     ]);
+    const userTasteProfile = buildUserTasteProfile(reviewedMovies);
     const similarUsersById = new Map(
         similarUsers.map((user) => [user.userId, user]),
     );
@@ -101,30 +280,31 @@ export const getMovieRecommendationsForUser = async (
         movieScoresByMovieId.set(review.movieId, scoreData);
     }
 
-    const scoredMovies = [...movieScoresByMovieId.entries()]
-        .map(([movieId, scoreData]) => ({
+    const collaborativeScoresByMovieId = new Map(
+        [...movieScoresByMovieId.entries()].map(([movieId, scoreData]) => [
             movieId,
-            score: scoreData.weightedRatingTotal / scoreData.similarityTotal,
-            recommendedByCount: scoreData.recommendedByUserIds.size,
-        }))
-        .sort((a, b) => {
-            if (b.score !== a.score) {
-                return b.score - a.score;
-            }
-            return b.recommendedByCount - a.recommendedByCount;
-        })
-        .slice(0, MAX_MOVIE_RECOMMENDATIONS);
+            {
+                score:
+                    scoreData.similarityTotal > 0
+                        ? scoreData.weightedRatingTotal /
+                          scoreData.similarityTotal
+                        : NEUTRAL_SCORE,
+                recommendedByCount: scoreData.recommendedByUserIds.size,
+            },
+        ]),
+    );
 
-    const movies = await prisma.movie.findMany({
+    const candidateMovies = await prisma.movie.findMany({
         where: {
             id: {
-                in: scoredMovies.map((movie) => movie.movieId),
+                notIn: [...excludedMovieIds],
             },
         },
         select: {
             id: true,
             title: true,
             releaseYear: true,
+            director: true,
             genres: true,
             avgRating: true,
             numRatings: true,
@@ -132,22 +312,48 @@ export const getMovieRecommendationsForUser = async (
         },
     });
 
-    const moviesById = new Map(movies.map((movie) => [movie.id, movie]));
-    const recommendations = scoredMovies
-        .map((scoredMovie) => {
-            const movie = moviesById.get(scoredMovie.movieId);
-            if (!movie) return null;
+    const scoredMovies = candidateMovies
+        .map((movie) => {
+            const collaborativeScoreData = collaborativeScoresByMovieId.get(
+                movie.id,
+            );
+            const contentSignals = getContentSignals(movie, userTasteProfile);
+            const collaborativeScore = contentSignals.hasSpecificAffinity
+                ? (collaborativeScoreData?.score ?? NEUTRAL_SCORE)
+                : NEUTRAL_SCORE;
+            const score =
+                contentSignals.score * SCORE_WEIGHTS.content +
+                collaborativeScore * SCORE_WEIGHTS.collaborative +
+                getPublicQualityScore(movie) * SCORE_WEIGHTS.publicQuality +
+                getPublicConfidenceScore(movie) *
+                    SCORE_WEIGHTS.publicConfidence;
+
+            return {
+                movieId: movie.id,
+                movie,
+                score,
+                recommendedByCount:
+                    collaborativeScoreData?.recommendedByCount ?? 0,
+            };
+        })
+        .sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+            return b.recommendedByCount - a.recommendedByCount;
+        })
+        .slice(0, RECOMMENDATION_LIMITS.maxMovieRecommendations);
+    const recommendations: MovieRecommendation[] = scoredMovies.map(
+        (scoredMovie) => {
+            const { director: _director, ...movie } = scoredMovie.movie;
 
             return {
                 movie,
                 score: scoredMovie.score,
                 recommendedByCount: scoredMovie.recommendedByCount,
             };
-        })
-        .filter(
-            (recommendation): recommendation is MovieRecommendation =>
-                recommendation !== null,
-        );
+        },
+    );
 
     return {
         recommendations,
