@@ -3,6 +3,8 @@ import { useRouteLoaderData } from "react-router";
 import { AuthData, Movie } from "../../../lib/entities";
 import { getMoviePoster } from "../../../lib/utils";
 import { MovieBookmark } from "./MovieBookmark";
+import { QueryLink } from "../../ui/QueryLink";
+import { useFilterNavigation } from "../../../hooks/useFilterNavigation";
 
 interface MovieMainInfoProps {
     movie: Movie;
@@ -13,6 +15,7 @@ export const MovieMainInfo = ({ movie }: MovieMainInfoProps) => {
         authData: AuthData;
     };
     const moviePoster = getMoviePoster(movie.poster);
+    const handleFilterNavigation = useFilterNavigation();
 
     return (
         <div className="flex flex-col flex-wrap justify-start items-center gap-0 md:gap-6 w-full lg:w-1/3 relative">
@@ -24,6 +27,16 @@ export const MovieMainInfo = ({ movie }: MovieMainInfoProps) => {
             <p className="mb-6 md:mb-0 text-2xl sm:text-3xl md:text-4xl text-center font-semibold">
                 {movie.title}
             </p>
+            <QueryLink
+                onClick={() =>
+                    handleFilterNavigation(
+                        "releaseYear",
+                        movie.releaseYear.toString(),
+                    )
+                }
+            >
+                {movie.releaseYear.toString()}
+            </QueryLink>
             <img
                 className="w-full max-w-80 rounded-lg"
                 src={moviePoster}

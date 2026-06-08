@@ -38,6 +38,7 @@ export const MoviesListSection = ({
                 searchParams.get("genre") ?? undefined,
                 searchParams.get("releaseYear") ?? undefined,
                 searchParams.get("director") ?? undefined,
+                searchParams.get("actor") ?? undefined,
                 searchParams.get("sortBy") ?? undefined,
                 searchParams.get("sortOrder") ?? undefined,
                 searchParams.get("search") ?? undefined,
@@ -68,6 +69,9 @@ export const MoviesListSection = ({
             }
             if (filter.includes("Director:")) {
                 searchParams.delete("director");
+            }
+            if (filter.includes("Actor:")) {
+                searchParams.delete("actor");
             }
             if (filter.includes("Search:")) {
                 searchParams.delete("search");

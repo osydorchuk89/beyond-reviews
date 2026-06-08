@@ -32,6 +32,8 @@ export interface MovieRecommendation {
         title: string;
         releaseYear: number;
         genres: string[];
+        cast: string[];
+        keywords: string[];
         avgRating: number;
         numRatings: number;
         poster: string;
@@ -63,6 +65,8 @@ export interface CandidateMovie {
     releaseYear: number;
     director: string;
     genres: string[];
+    cast: string[];
+    keywords: string[];
     avgRating: number;
     numRatings: number;
     poster: string;

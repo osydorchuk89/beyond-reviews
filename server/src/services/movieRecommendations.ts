@@ -218,6 +218,8 @@ export const getMovieRecommendationsForUser = async (
                 movie: {
                     select: {
                         genres: true,
+                        cast: true,
+                        keywords: true,
                         director: true,
                         releaseYear: true,
                     },
@@ -306,6 +308,8 @@ export const getMovieRecommendationsForUser = async (
             releaseYear: true,
             director: true,
             genres: true,
+            cast: true,
+            keywords: true,
             avgRating: true,
             numRatings: true,
             poster: true,

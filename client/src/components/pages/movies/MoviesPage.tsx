@@ -29,6 +29,9 @@ export const MoviesPage = () => {
         if (appliedFilters.director) {
             filters.push(`Director: ${appliedFilters.director}`);
         }
+        if (appliedFilters.actor) {
+            filters.push(`Actor: ${appliedFilters.actor}`);
+        }
         if (appliedFilters.search) {
             filters.push(`Search: "${appliedFilters.search}"`);
         }

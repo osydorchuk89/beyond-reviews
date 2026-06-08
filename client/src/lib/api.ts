@@ -30,6 +30,7 @@ export const getMovies = async (
     genre?: string,
     releaseYear?: string,
     director?: string,
+    actor?: string,
     sortBy?: string,
     sortOrder?: string,
     search?: string
@@ -39,6 +40,7 @@ export const getMovies = async (
         if (genre) params.genre = genre;
         if (releaseYear) params.releaseYear = releaseYear;
         if (director) params.director = director;
+        if (actor) params.actor = actor;
         if (sortBy) params.sortBy = sortBy;
         if (sortOrder) params.sortOrder = sortOrder;
         if (search) params.search = search;

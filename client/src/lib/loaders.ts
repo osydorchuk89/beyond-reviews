@@ -26,6 +26,7 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
     const genre = searchParams.get("genre") ?? undefined;
     const releaseYear = searchParams.get("releaseYear") ?? undefined;
     const director = searchParams.get("director") ?? undefined;
+    const actor = searchParams.get("actor") ?? undefined;
     const sortBy = searchParams.get("sortBy") ?? undefined;
     const sortOrder = searchParams.get("sortOrder") ?? undefined;
     const search = searchParams.get("search") ?? undefined;
@@ -36,6 +37,7 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
         genre,
         releaseYear,
         director,
+        actor,
         sortBy,
         sortOrder,
         search,

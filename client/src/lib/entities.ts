@@ -40,6 +40,8 @@ export interface Movie {
     overview: string;
     language: string;
     genres: string[];
+    cast: string[];
+    keywords: string[];
     runtime: number;
     avgRating: number;
     numRatings: number;
@@ -72,6 +74,7 @@ export interface MoviesData {
         genre?: string;
         releaseYear?: string;
         director?: string;
+        actor?: string;
         sortBy?: string;
         sortOrder?: string;
         search?: string;
@@ -193,6 +196,8 @@ export interface RecommendedMovie {
     title: string;
     releaseYear: number;
     genres: string[];
+    cast: string[];
+    keywords: string[];
     avgRating: number;
     numRatings: number;
     poster: string;

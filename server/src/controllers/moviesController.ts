@@ -23,6 +23,7 @@ export const getAllMovies = async (
         const genre = req.query.genre as string;
         const releaseYear = req.query.releaseYear as string;
         const director = req.query.director as string;
+        const actor = req.query.actor as string;
         const sortBy = (req.query.sortBy as string) ?? "id";
         const sortOrder = (req.query.sortOrder as string) ?? "asc";
         const search = req.query.search as string;
@@ -40,6 +41,11 @@ export const getAllMovies = async (
             whereClause.director = {
                 contains: director,
                 mode: "insensitive",
+            };
+        }
+        if (actor) {
+            whereClause.cast = {
+                has: actor,
             };
         }
         if (search) {
@@ -87,6 +93,7 @@ export const getAllMovies = async (
                 genre,
                 releaseYear,
                 director,
+                actor,
                 sortBy,
                 sortOrder,
                 search,

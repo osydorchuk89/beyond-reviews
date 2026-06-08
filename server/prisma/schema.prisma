@@ -43,6 +43,8 @@ model Movie {
     overview       String
     language       String
     genres         String[]
+    cast           String[]         @default([])
+    keywords       String[]         @default([])
     runtime        Int
     popularity     Float            @default(0)
     reviews        MovieReview[]
