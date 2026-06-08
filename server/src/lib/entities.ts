@@ -54,6 +54,8 @@ export interface ReviewedMovieForProfile {
     rating: number;
     movie: {
         genres: string[];
+        cast: string[];
+        keywords: string[];
         director: string;
         releaseYear: number;
     };
@@ -80,6 +82,8 @@ export interface PreferenceStats {
 export interface UserTasteProfile {
     genres: Map<string, PreferenceStats>;
     directors: Map<string, PreferenceStats>;
+    actors: Map<string, PreferenceStats>;
+    keywords: Map<string, PreferenceStats>;
     decades: Map<number, PreferenceStats>;
     averageRating: number;
 }

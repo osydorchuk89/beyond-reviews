@@ -15,7 +15,9 @@ export const FriendsList = ({
 }: FriendsListProps) => {
     return (
         <div className={`flex flex-col gap-3 ${horizontalPadding.custom}`}>
-            <h3 className="text-lg font-bold text-sky-950">Your friends</h3>
+            <h3 className="text-lg font-bold text-sky-950 text-center">
+                Your friends
+            </h3>
             <div className="flex flex-col gap-2">
                 {friends.length > 0 ? (
                     <ul className="flex flex-col gap-4 sm:gap-5">

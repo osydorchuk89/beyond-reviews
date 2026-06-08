@@ -22,7 +22,17 @@ export const ActivityDetails = ({
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     const movieUrl = `/movies/${activity.movieId}`;
-    const movieFullTitle = `${activity.movie.title} (${activity.movie.releaseYear})`;
+    const movieFullTitle = activity.movie
+        ? `${activity.movie.title} (${activity.movie.releaseYear})`
+        : "";
+    const isMovieRatingActivity =
+        activity.movieId && activity.action === "rated";
+    const isWatchlistActivity =
+        activity.movieId &&
+        (activity.action === "saved" || activity.action === "unsaved");
+    const isReviewLikeActivity =
+        activity.movieReviewId &&
+        (activity.action === "liked" || activity.action === "unliked");
 
     return (
         <>
@@ -34,7 +44,7 @@ export const ActivityDetails = ({
                         alt="user photo"
                     />
                     <span className="font-bold break-words">
-                        {activity.movieId && activity.action === "rated" && (
+                        {isMovieRatingActivity && (
                             <>
                                 {isSameUser ? "You" : profileUserName} rated{" "}
                                 {activity.reviewRating}/10{" "}
@@ -43,7 +53,7 @@ export const ActivityDetails = ({
                                 </BaseLink>
                             </>
                         )}
-                        {activity.movieId && activity.action !== "rated" && (
+                        {isWatchlistActivity && (
                             <>
                                 {isSameUser ? "You" : profileUserName}{" "}
                                 {activity.action === "saved"
@@ -56,7 +66,7 @@ export const ActivityDetails = ({
                                 watch list
                             </>
                         )}
-                        {activity.movieReviewId && (
+                        {isReviewLikeActivity && (
                             <>
                                 {isSameUser ? "You" : profileUserName}{" "}
                                 {activity.action === "liked"

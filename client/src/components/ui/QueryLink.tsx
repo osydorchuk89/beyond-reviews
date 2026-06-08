@@ -11,7 +11,7 @@ export const QueryLink = ({
 }: QueryLinkProps) => {
     return (
         <a
-            className={`text-lg text-sky-800 hover:text-sky-500 ${isBold && "font-medium"} hover:underline cursor-pointer`}
+            className={`${isBold && "text-lg"} text-sky-800 hover:text-sky-500 ${isBold && "font-medium"} hover:underline cursor-pointer`}
             onClick={onClick}
         >
             {children}

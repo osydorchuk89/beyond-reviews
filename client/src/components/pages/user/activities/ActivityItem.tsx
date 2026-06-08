@@ -7,6 +7,9 @@ interface ActivityDetailsProps {
 }
 
 export const ActivityItem = ({ activity }: ActivityDetailsProps) => {
+    const isReviewLikeActivity =
+        activity.movieReviewId &&
+        (activity.action === "liked" || activity.action === "unliked");
     const ratingUser = activity.movieReview?.user;
     const ratingUserId = ratingUser?.id ?? "";
     const ratingUserName = ratingUser
@@ -22,7 +25,7 @@ export const ActivityItem = ({ activity }: ActivityDetailsProps) => {
         minute: "numeric",
     });
 
-    if (!activity.movie) {
+    if (!activity.movie && !activity.movieReview) {
         return (
             <div className="p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100">
                 <p className="text-center italic">Missing data</p>
@@ -38,7 +41,7 @@ export const ActivityItem = ({ activity }: ActivityDetailsProps) => {
                 ratingUserId={ratingUserId}
                 parsedDate={parsedDate}
             />
-            {activity.movieReviewId && (
+            {isReviewLikeActivity && (
                 <ActivityOtherReview activity={activity} />
             )}
         </div>

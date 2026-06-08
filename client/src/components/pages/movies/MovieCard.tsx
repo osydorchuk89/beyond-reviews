@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 
 import { StarIcon } from "../../icons/StarIcon";
 import { useQueryClick } from "../../../hooks/useQueryClick";
@@ -31,11 +31,8 @@ export const MovieCard = ({
         title?.length > 45 ? `${title.substring(0, 45)}...` : title;
 
     const handleQueryClick = useQueryClick();
-    const location = useLocation();
 
-    const onUserPage = location.pathname.startsWith("/users");
-
-    const movieGenres = useGetMovieGenres(genres, onUserPage, handleQueryClick);
+    const movieGenres = useGetMovieGenres(genres, handleQueryClick);
     const moviePoster = getMoviePoster(poster);
 
     return (
@@ -52,20 +49,13 @@ export const MovieCard = ({
             </p>
             <p className="mb-2 text-sky-950 mt-16">{movieGenres}</p>
             <p className="mb-2 text-sky-950">
-                {onUserPage ? (
-                    <span>{releaseYear.toString()}</span>
-                ) : (
-                    <QueryLink
-                        onClick={() =>
-                            handleQueryClick(
-                                "releaseYear",
-                                releaseYear.toString(),
-                            )
-                        }
-                    >
-                        {releaseYear.toString()}
-                    </QueryLink>
-                )}
+                <QueryLink
+                    onClick={() =>
+                        handleQueryClick("releaseYear", releaseYear.toString())
+                    }
+                >
+                    {releaseYear}
+                </QueryLink>
             </p>
             <Link to={`/movies/${movieId}`}>
                 <img

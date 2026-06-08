@@ -26,14 +26,18 @@ const SCORE_WEIGHTS = {
 };
 
 const CONTENT_WEIGHTS = {
-    genre: 0.5,
-    director: 0.4,
-    decade: 0.1,
+    genre: 0.4,
+    director: 0.25,
+    actor: 0.15,
+    keyword: 0.15,
+    decade: 0.05,
 };
 
 const CONFIDENCE_COUNTS = {
     genre: 12,
     director: 2,
+    actor: 3,
+    keyword: 4,
     decade: 25,
     publicQualityRatings: 50,
     publicRankingRatings: 50,
@@ -49,6 +53,8 @@ const clamp = (value: number, min: number, max: number) =>
 const getDecade = (releaseYear: number) => Math.floor(releaseYear / 10) * 10;
 
 const normalizeDirector = (director: string) => director.trim().toLowerCase();
+
+const normalizeProfileTerm = (term: string) => term.trim().toLowerCase();
 
 const addPreference = <T>(
     preferences: Map<T, PreferenceStats>,
@@ -72,6 +78,8 @@ const buildUserTasteProfile = (
     const profile: UserTasteProfile = {
         genres: new Map(),
         directors: new Map(),
+        actors: new Map(),
+        keywords: new Map(),
         decades: new Map(),
         averageRating,
     };
@@ -87,6 +95,20 @@ const buildUserTasteProfile = (
 
         for (const genre of review.movie.genres) {
             addPreference(profile.genres, genre, preference);
+        }
+        for (const actor of review.movie.cast) {
+            addPreference(
+                profile.actors,
+                normalizeProfileTerm(actor),
+                preference,
+            );
+        }
+        for (const keyword of review.movie.keywords) {
+            addPreference(
+                profile.keywords,
+                normalizeProfileTerm(keyword),
+                preference,
+            );
         }
 
         addPreference(
@@ -119,6 +141,31 @@ const getAveragePreference = <T>(
 const preferenceToScore = (preference: number) =>
     clamp((preference + 1) * 5, 0, 10);
 
+const getAverageArrayPreference = (
+    preferences: Map<string, PreferenceStats>,
+    values: string[],
+    confidenceCount: number,
+) => {
+    if (values.length === 0) return 0;
+
+    const matchedPreferences = values
+        .map((value) =>
+            getAveragePreference(
+                preferences,
+                normalizeProfileTerm(value),
+                confidenceCount,
+            ),
+        )
+        .filter((preference) => preference !== 0);
+
+    if (matchedPreferences.length === 0) return 0;
+
+    return (
+        matchedPreferences.reduce((sum, preference) => sum + preference, 0) /
+        matchedPreferences.length
+    );
+};
+
 const getContentSignals = (
     movie: CandidateMovie,
     profile: UserTasteProfile,
@@ -141,6 +188,16 @@ const getContentSignals = (
         normalizeDirector(movie.director),
         CONFIDENCE_COUNTS.director,
     );
+    const actorPreference = getAverageArrayPreference(
+        profile.actors,
+        movie.cast,
+        CONFIDENCE_COUNTS.actor,
+    );
+    const keywordPreference = getAverageArrayPreference(
+        profile.keywords,
+        movie.keywords,
+        CONFIDENCE_COUNTS.keyword,
+    );
     const decadePreference = getAveragePreference(
         profile.decades,
         getDecade(movie.releaseYear),
@@ -148,7 +205,9 @@ const getContentSignals = (
     );
     const hasSpecificAffinity =
         genrePreference >= MIN_SPECIFIC_AFFINITY ||
-        directorPreference >= MIN_SPECIFIC_AFFINITY;
+        directorPreference >= MIN_SPECIFIC_AFFINITY ||
+        actorPreference >= MIN_SPECIFIC_AFFINITY ||
+        keywordPreference >= MIN_SPECIFIC_AFFINITY;
     const effectiveDecadePreference = hasSpecificAffinity
         ? decadePreference
         : Math.min(decadePreference, 0);
@@ -157,6 +216,8 @@ const getContentSignals = (
         score:
             preferenceToScore(genrePreference) * CONTENT_WEIGHTS.genre +
             preferenceToScore(directorPreference) * CONTENT_WEIGHTS.director +
+            preferenceToScore(actorPreference) * CONTENT_WEIGHTS.actor +
+            preferenceToScore(keywordPreference) * CONTENT_WEIGHTS.keyword +
             preferenceToScore(effectiveDecadePreference) *
                 CONTENT_WEIGHTS.decade,
         hasSpecificAffinity,
