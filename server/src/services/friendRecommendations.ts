@@ -3,11 +3,97 @@ import {
     FriendRecommendationsResult,
     FriendRecommendation,
 } from "../lib/entities";
-import { getSimilarUsersForUser } from "./userSimilarity";
+import {
+    MIN_REVIEWS_FOR_RECOMMENDATIONS,
+    getSimilarUsersForUser,
+} from "./userSimilarity";
 
 const MAX_FRIEND_RECOMMENDATIONS = 5;
+const RECOMMENDATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-export const getFriendRecommendationsForUser = async (
+const isFresh = (generatedAt: Date) =>
+    Date.now() - generatedAt.getTime() < RECOMMENDATION_CACHE_TTL_MS;
+
+export const replaceFriendRecommendationsForUser = async (
+    prisma: PrismaClient,
+    userId: string,
+    recommendations: FriendRecommendation[],
+) => {
+    const generatedAt = new Date();
+
+    await prisma.friendRecommendationCache.deleteMany({
+        where: { userId },
+    });
+
+    if (recommendations.length === 0) return;
+
+    await prisma.friendRecommendationCache.createMany({
+        data: recommendations.map((recommendation) => ({
+            userId,
+            recommendedUserId: recommendation.user.id,
+            similarityScore: recommendation.similarityScore,
+            sharedMovieCount: recommendation.sharedMovieCount,
+            sharedFavoriteTitles: recommendation.sharedFavoriteTitles,
+            generatedAt,
+        })),
+    });
+};
+
+const getCachedFriendRecommendationsForUser = async (
+    prisma: PrismaClient,
+    userId: string,
+): Promise<FriendRecommendationsResult | null> => {
+    const [cachedRecommendations, currentReviewCount] = await Promise.all([
+        prisma.friendRecommendationCache.findMany({
+            where: { userId },
+            orderBy: [
+                { similarityScore: "desc" },
+                { sharedMovieCount: "desc" },
+            ],
+            select: {
+                similarityScore: true,
+                sharedMovieCount: true,
+                sharedFavoriteTitles: true,
+                generatedAt: true,
+                recommendedUser: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        photo: true,
+                    },
+                },
+            },
+        }),
+        prisma.movieReview.count({
+            where: { userId },
+        }),
+    ]);
+
+    if (
+        cachedRecommendations.length === 0 ||
+        cachedRecommendations.some(
+            (recommendation) => !isFresh(recommendation.generatedAt),
+        )
+    ) {
+        return null;
+    }
+
+    return {
+        recommendations: cachedRecommendations.map((recommendation) => ({
+            user: recommendation.recommendedUser,
+            similarityScore: recommendation.similarityScore,
+            sharedMovieCount: recommendation.sharedMovieCount,
+            sharedFavoriteTitles: recommendation.sharedFavoriteTitles,
+        })),
+        currentReviewCount,
+        minReviewsRequired: MIN_REVIEWS_FOR_RECOMMENDATIONS,
+        recommendationsAvailable:
+            currentReviewCount >= MIN_REVIEWS_FOR_RECOMMENDATIONS,
+    };
+};
+
+const computeFriendRecommendationsForUser = async (
     prisma: PrismaClient,
     userId: string,
 ): Promise<FriendRecommendationsResult> => {
@@ -132,4 +218,29 @@ export const getFriendRecommendationsForUser = async (
         minReviewsRequired: similarityResult.minReviewsRequired,
         recommendationsAvailable: true,
     };
+};
+
+export const getFriendRecommendationsForUser = async (
+    prisma: PrismaClient,
+    userId: string,
+): Promise<FriendRecommendationsResult> => {
+    const cachedRecommendations = await getCachedFriendRecommendationsForUser(
+        prisma,
+        userId,
+    );
+
+    if (cachedRecommendations) return cachedRecommendations;
+
+    const recommendations = await computeFriendRecommendationsForUser(
+        prisma,
+        userId,
+    );
+
+    await replaceFriendRecommendationsForUser(
+        prisma,
+        userId,
+        recommendations.recommendations,
+    );
+
+    return recommendations;
 };

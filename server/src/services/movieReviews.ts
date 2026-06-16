@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 import { ReviewSchema } from "../lib/schemas";
 import { ServiceError } from "./errors";
+import { invalidateMovieRecommendationsForUser } from "./movieRecommendations";
 
 interface CreateOrUpdateMovieReviewArgs {
     movieId: string;
@@ -88,6 +89,8 @@ export const createOrUpdateMovieReviewForUser = async (
                 date: new Date(),
             },
         });
+
+        await invalidateMovieRecommendationsForUser(tx, userId);
 
         return review;
     });

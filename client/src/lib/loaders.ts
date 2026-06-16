@@ -107,19 +107,17 @@ export const userFriendsLoader = async (args: LoaderFunctionArgs) => {
 
     const { userId } = args.params as { userId: string };
 
-    try {
-        const friendRecommendationsData =
-            await getFriendRecommendations(userId);
-        return {
+    const friendRecommendationsResultPromise = getFriendRecommendations(userId)
+        .then((friendRecommendationsData) => ({
             friendRecommendationsData,
             friendRecommendationsError: false,
-        };
-    } catch {
-        return {
+        }))
+        .catch(() => ({
             friendRecommendationsData: null,
             friendRecommendationsError: true,
-        };
-    }
+        }));
+
+    return { friendRecommendationsResultPromise };
 };
 
 export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {
@@ -136,18 +134,13 @@ export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {
         };
     }
 
-    try {
-        const movieRecommendationsData = await getMovieRecommendations(userId);
-        return {
-            userWatchList,
-            movieRecommendationsData,
-        };
-    } catch {
-        return {
-            userWatchList,
-            movieRecommendationsData: null,
-        };
-    }
+    const movieRecommendationsDataPromise = getMovieRecommendations(userId)
+        .catch(() => null);
+
+    return {
+        userWatchList,
+        movieRecommendationsDataPromise,
+    };
 };
 
 export const userReviewsLoader = async ({

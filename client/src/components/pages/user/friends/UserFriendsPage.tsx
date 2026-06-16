@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLoaderData, useRouteLoaderData } from "react-router";
+import { Suspense, useState } from "react";
+import { Await, useLoaderData, useRouteLoaderData } from "react-router";
 
 import {
     Friend,
@@ -11,15 +11,20 @@ import { FriendRequestsSection } from "./FriendRequestsSection";
 import { FriendsList } from "./FriendsList";
 import { acceptFriendRequest, sendFriendRequest } from "../../../../lib/api";
 import { FriendRecommendationsSection } from "./FriendRecommendationsSection";
+import { FriendRecommendationsLoadingSection } from "./FriendRecommendationsLoadingSection";
+
+interface FriendRecommendationsLoaderResult {
+    friendRecommendationsData: FriendRecommendationsData | null;
+    friendRecommendationsError: boolean;
+}
 
 export const UserFriendsPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { friendRecommendationsData, friendRecommendationsError } =
+    const { friendRecommendationsResultPromise } =
         useLoaderData() as {
-            friendRecommendationsData: FriendRecommendationsData | null;
-            friendRecommendationsError: boolean;
+            friendRecommendationsResultPromise: Promise<FriendRecommendationsLoaderResult>;
         };
 
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
@@ -69,14 +74,6 @@ export const UserFriendsPage = () => {
         await sendFriendRequest(profileUser.id, otherUserId);
     };
 
-    const recommendedFriends =
-        friendRecommendationsData?.recommendations.filter(
-            (recommendation) =>
-                !userFriends.some(
-                    (friend) => friend.id === recommendation.user.id,
-                ),
-        ) ?? [];
-
     return (
         <div className="flex flex-col gap-6 sm:gap-10 min-h-[70vh] w-full">
             <h2 className="text-xl text-center font-bold">Friends</h2>
@@ -101,19 +98,46 @@ export const UserFriendsPage = () => {
                 isSameUser={isSameUser}
                 profileUserName={profileUserName}
             />
-            {isSameUser &&
-                friendRecommendationsData &&
-                !friendRecommendationsError && (
-                    <FriendRecommendationsSection
-                        {...friendRecommendationsData}
-                        recommendations={recommendedFriends}
-                        onSendFriendRequest={handleSendFriendRequest}
-                    />
-                )}
-            {isSameUser && friendRecommendationsError && (
-                <p className="text-center">
-                    Friend recommendations could not be loaded.
-                </p>
+            {isSameUser && (
+                <Suspense fallback={<FriendRecommendationsLoadingSection />}>
+                    <Await resolve={friendRecommendationsResultPromise}>
+                        {({
+                            friendRecommendationsData,
+                            friendRecommendationsError,
+                        }) => {
+                            if (friendRecommendationsError) {
+                                return (
+                                    <p className="text-center">
+                                        Friend recommendations could not be
+                                        loaded.
+                                    </p>
+                                );
+                            }
+
+                            if (!friendRecommendationsData) return null;
+
+                            const recommendedFriends =
+                                friendRecommendationsData.recommendations.filter(
+                                    (recommendation) =>
+                                        !userFriends.some(
+                                            (friend) =>
+                                                friend.id ===
+                                                recommendation.user.id,
+                                        ),
+                                );
+
+                            return (
+                                <FriendRecommendationsSection
+                                    {...friendRecommendationsData}
+                                    recommendations={recommendedFriends}
+                                    onSendFriendRequest={
+                                        handleSendFriendRequest
+                                    }
+                                />
+                            );
+                        }}
+                    </Await>
+                </Suspense>
             )}
         </div>
     );

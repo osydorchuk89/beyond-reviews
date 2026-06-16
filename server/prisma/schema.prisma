@@ -33,26 +33,59 @@ model User {
     receivedFriendRequests FriendRequest[]   @relation("receivedUser")
     sentMessages           Message[]         @relation("sender")
     receivedMessages       Message[]         @relation("recipient")
+    movieRecommendations   MovieRecommendationCache[] @relation("movieRecommendationUser")
+    friendRecommendations  FriendRecommendationCache[] @relation("friendRecommendationUser")
+    recommendedToUsers     FriendRecommendationCache[] @relation("recommendedUser")
 }
 
 model Movie {
-    id             String           @id @default(auto()) @map("_id") @db.ObjectId
-    title          String
-    releaseYear    Int
-    director       String
-    overview       String
-    language       String
-    genres         String[]
-    cast           String[]         @default([])
-    keywords       String[]         @default([])
-    runtime        Int
-    popularity     Float            @default(0)
-    reviews        MovieReview[]
-    avgRating      Float
-    numRatings     Int
-    poster         String
-    onWatchList    MovieWatchList[]
-    userActivities Activity[]
+    id              String           @id @default(auto()) @map("_id") @db.ObjectId
+    title           String
+    releaseYear     Int
+    director        String
+    overview        String
+    language        String
+    genres          String[]
+    cast            String[]         @default([])
+    keywords        String[]         @default([])
+    runtime         Int
+    popularity      Float            @default(0)
+    reviews         MovieReview[]
+    avgRating       Float
+    numRatings      Int
+    poster          String
+    onWatchList     MovieWatchList[]
+    userActivities  Activity[]
+    recommendations MovieRecommendationCache[]
+}
+
+model MovieRecommendationCache {
+    id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+    user               User     @relation(fields: [userId], references: [id], name: "movieRecommendationUser")
+    userId             String   @db.ObjectId
+    movie              Movie    @relation(fields: [movieId], references: [id])
+    movieId            String   @db.ObjectId
+    score              Float
+    recommendedByCount Int
+    generatedAt        DateTime
+
+    @@unique([userId, movieId])
+    @@index([userId, score])
+}
+
+model FriendRecommendationCache {
+    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    user                 User     @relation(fields: [userId], references: [id], name: "friendRecommendationUser")
+    userId               String   @db.ObjectId
+    recommendedUser      User     @relation(fields: [recommendedUserId], references: [id], name: "recommendedUser")
+    recommendedUserId    String   @db.ObjectId
+    similarityScore      Float
+    sharedMovieCount     Int
+    sharedFavoriteTitles String[]
+    generatedAt          DateTime
+
+    @@unique([userId, recommendedUserId])
+    @@index([userId, similarityScore])
 }
 
 model MovieReview {

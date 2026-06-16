@@ -9,6 +9,7 @@ import { SortFilterBar } from "./SortFilterBar";
 import { sideBarFilterList, sideBarSortList } from "../../../lib/data";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { horizontalPadding } from "../../../styles/responsive";
+import { MovieRecommendationsLoadingSection } from "./MovieRecommendationsLoadingSection";
 
 export const MoviesPage = () => {
     const { moviesDataPromise, movieRecommendationsDataPromise } =
@@ -79,7 +80,7 @@ export const MoviesPage = () => {
                 </div>
             </div>
             <div className={`w-full ${horizontalPadding.page}`}>
-                <Suspense fallback={null}>
+                <Suspense fallback={<MovieRecommendationsLoadingSection />}>
                     <Await resolve={movieRecommendationsDataPromise}>
                         {(movieRecommendationsData) =>
                             movieRecommendationsData ? (

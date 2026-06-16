@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 import {
     CandidateMovie,
@@ -10,8 +10,11 @@ import {
 } from "../lib/entities";
 import {
     FAVORITE_RATING_THRESHOLD,
+    MIN_REVIEWS_FOR_RECOMMENDATIONS,
     getSimilarUsersForUser,
 } from "./userSimilarity";
+
+const RECOMMENDATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 const RECOMMENDATION_LIMITS = {
     maxSimilarUsers: 30,
@@ -244,7 +247,99 @@ const getPublicConfidenceScore = (movie: CandidateMovie) => {
     return NEUTRAL_SCORE + confidence * NEUTRAL_SCORE;
 };
 
-export const getMovieRecommendationsForUser = async (
+type RecommendationPrismaClient = PrismaClient | Prisma.TransactionClient;
+
+const isFresh = (generatedAt: Date) =>
+    Date.now() - generatedAt.getTime() < RECOMMENDATION_CACHE_TTL_MS;
+
+export const replaceMovieRecommendationsForUser = async (
+    prisma: RecommendationPrismaClient,
+    userId: string,
+    recommendations: MovieRecommendation[],
+) => {
+    const generatedAt = new Date();
+
+    await prisma.movieRecommendationCache.deleteMany({
+        where: { userId },
+    });
+
+    if (recommendations.length === 0) return;
+
+    await prisma.movieRecommendationCache.createMany({
+        data: recommendations.map((recommendation) => ({
+            userId,
+            movieId: recommendation.movie.id,
+            score: recommendation.score,
+            recommendedByCount: recommendation.recommendedByCount,
+            generatedAt,
+        })),
+    });
+};
+
+export const invalidateMovieRecommendationsForUser = async (
+    prisma: RecommendationPrismaClient,
+    userId: string,
+) => {
+    await prisma.movieRecommendationCache.deleteMany({
+        where: { userId },
+    });
+};
+
+const getCachedMovieRecommendationsForUser = async (
+    prisma: PrismaClient,
+    userId: string,
+): Promise<MovieRecommendationsResult | null> => {
+    const [cachedRecommendations, currentReviewCount] = await Promise.all([
+        prisma.movieRecommendationCache.findMany({
+            where: { userId },
+            orderBy: [{ score: "desc" }, { recommendedByCount: "desc" }],
+            select: {
+                score: true,
+                recommendedByCount: true,
+                generatedAt: true,
+                movie: {
+                    select: {
+                        id: true,
+                        title: true,
+                        releaseYear: true,
+                        genres: true,
+                        cast: true,
+                        keywords: true,
+                        avgRating: true,
+                        numRatings: true,
+                        poster: true,
+                    },
+                },
+            },
+        }),
+        prisma.movieReview.count({
+            where: { userId },
+        }),
+    ]);
+
+    if (
+        cachedRecommendations.length === 0 ||
+        cachedRecommendations.some(
+            (recommendation) => !isFresh(recommendation.generatedAt),
+        )
+    ) {
+        return null;
+    }
+
+    return {
+        recommendations: cachedRecommendations.map((recommendation) => ({
+            movie: recommendation.movie,
+            score: recommendation.score,
+            recommendedByCount: recommendation.recommendedByCount,
+        })),
+        currentReviewCount,
+        minReviewsRequired: MIN_REVIEWS_FOR_RECOMMENDATIONS,
+        recommendationsAvailable:
+            currentReviewCount >= MIN_REVIEWS_FOR_RECOMMENDATIONS,
+    };
+};
+
+const computeMovieRecommendationsForUser = async (
     prisma: PrismaClient,
     userId: string,
 ): Promise<MovieRecommendationsResult> => {
@@ -426,4 +521,29 @@ export const getMovieRecommendationsForUser = async (
         minReviewsRequired: similarityResult.minReviewsRequired,
         recommendationsAvailable: true,
     };
+};
+
+export const getMovieRecommendationsForUser = async (
+    prisma: PrismaClient,
+    userId: string,
+): Promise<MovieRecommendationsResult> => {
+    const cachedRecommendations = await getCachedMovieRecommendationsForUser(
+        prisma,
+        userId,
+    );
+
+    if (cachedRecommendations) return cachedRecommendations;
+
+    const recommendations = await computeMovieRecommendationsForUser(
+        prisma,
+        userId,
+    );
+
+    await replaceMovieRecommendationsForUser(
+        prisma,
+        userId,
+        recommendations.recommendations,
+    );
+
+    return recommendations;
 };

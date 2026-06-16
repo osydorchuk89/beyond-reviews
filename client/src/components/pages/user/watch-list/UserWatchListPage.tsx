@@ -1,4 +1,5 @@
-import { useLoaderData, useRouteLoaderData } from "react-router";
+import { Suspense } from "react";
+import { Await, useLoaderData, useRouteLoaderData } from "react-router";
 
 import {
     MovieRecommendationsData,
@@ -9,15 +10,17 @@ import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { MovieCard } from "../../movies/MovieCard";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { MovieRecommendationsSection } from "../../movies/MovieRecommendationsSection";
+import { MovieRecommendationsLoadingSection } from "../../movies/MovieRecommendationsLoadingSection";
 
 export const UserWatchListPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { userWatchList, movieRecommendationsData } = useLoaderData() as {
-        userWatchList: MovieWatchList[];
-        movieRecommendationsData: MovieRecommendationsData | null;
-    };
+    const { userWatchList, movieRecommendationsDataPromise } =
+        useLoaderData() as {
+            userWatchList: MovieWatchList[];
+            movieRecommendationsDataPromise: Promise<MovieRecommendationsData | null>;
+        };
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
     return (
@@ -51,11 +54,19 @@ export const UserWatchListPage = () => {
                     )}
                 </div>
             )}
-            {movieRecommendationsData && (
-                <MovieRecommendationsSection
-                    movieRecommendationsData={movieRecommendationsData}
-                />
-            )}
+            <Suspense fallback={<MovieRecommendationsLoadingSection />}>
+                <Await resolve={movieRecommendationsDataPromise}>
+                    {(movieRecommendationsData) =>
+                        movieRecommendationsData ? (
+                            <MovieRecommendationsSection
+                                movieRecommendationsData={
+                                    movieRecommendationsData
+                                }
+                            />
+                        ) : null
+                    }
+                </Await>
+            </Suspense>
         </div>
     );
 };
