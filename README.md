@@ -2,6 +2,10 @@
 
 A full-stack web application for reviewing movies built with React, express, and MongoDB. The live app is available [here](https://beyond-reviews-smoc.onrender.com/).
 
+## AI / Contributor Context
+
+Before starting code changes, read [AGENTS.md](AGENTS.md) for the product direction, architecture notes, local workflows, and guidance for future AI agent sessions.
+
 ## Features
 
 - User authentication with Google OAuth
