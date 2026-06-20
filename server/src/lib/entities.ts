@@ -56,7 +56,7 @@ export interface ReviewedMovieForProfile {
         genres: string[];
         cast: string[];
         keywords: string[];
-        director: string;
+        director: string | null;
         releaseYear: number;
     };
 }
@@ -65,13 +65,13 @@ export interface CandidateMovie {
     id: string;
     title: string;
     releaseYear: number;
-    director: string;
+    director: string | null;
     genres: string[];
     cast: string[];
     keywords: string[];
     avgRating: number;
     numRatings: number;
-    poster: string;
+    image: string;
 }
 
 export interface PreferenceStats {

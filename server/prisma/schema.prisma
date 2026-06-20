@@ -5,158 +5,210 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-    provider      = "prisma-client-js"
-    binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-    provider = "mongodb"
-    url      = env("DATABASE_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum MediaType {
+  MOVIE
+  BOOK
+  ALBUM
 }
 
 model User {
-    id                     String            @id @default(auto()) @map("_id") @db.ObjectId
-    firstName              String
-    lastName               String
-    email                  String            @unique
-    password               String?
-    photo                  String?
-    reviews                MovieReview[]
-    likes                  MovieReviewLike[]
-    watchList              MovieWatchList[]
-    activities             Activity[]
-    friends                User[]            @relation(fields: [friendsIds], references: [id], name: "friends")
-    friendsIds             String[]          @db.ObjectId
-    friendOf               User[]            @relation(fields: [friendOfIds], references: [id], name: "friends")
-    friendOfIds            String[]          @db.ObjectId
-    sentFriendRequests     FriendRequest[]   @relation("sentUser")
-    receivedFriendRequests FriendRequest[]   @relation("receivedUser")
-    sentMessages           Message[]         @relation("sender")
-    receivedMessages       Message[]         @relation("recipient")
-    movieRecommendations   MovieRecommendationCache[] @relation("movieRecommendationUser")
-    friendRecommendations  FriendRecommendationCache[] @relation("friendRecommendationUser")
-    recommendedToUsers     FriendRecommendationCache[] @relation("recommendedUser")
+  id                     String                      @id @default(auto()) @map("_id") @db.ObjectId
+  firstName              String
+  lastName               String
+  email                  String                      @unique
+  password               String?
+  photo                  String?
+  reviews                Review[]
+  likes                  ReviewLike[]
+  savedItems             SavedItem[]
+  activities             Activity[]
+  friends                User[]                      @relation(fields: [friendsIds], references: [id], name: "friends")
+  friendsIds             String[]                    @db.ObjectId
+  friendOf               User[]                      @relation(fields: [friendOfIds], references: [id], name: "friends")
+  friendOfIds            String[]                    @db.ObjectId
+  sentFriendRequests     FriendRequest[]             @relation("sentUser")
+  receivedFriendRequests FriendRequest[]             @relation("receivedUser")
+  sentMessages           Message[]                   @relation("sender")
+  receivedMessages       Message[]                   @relation("recipient")
+  recommendations        RecommendationCache[]       @relation("recommendationUser")
+  friendRecommendations  FriendRecommendationCache[] @relation("friendRecommendationUser")
+  recommendedToUsers     FriendRecommendationCache[] @relation("recommendedUser")
+}
+
+model MediaItem {
+  id              String                @id @default(auto()) @map("_id") @db.ObjectId
+  type            MediaType             @default(MOVIE)
+  title           String
+  releaseYear     Int
+  overview        String
+  language        String
+  genres          String[]
+  keywords        String[]              @default([])
+  popularity      Float                 @default(0)
+  avgRating       Float                 @default(0)
+  numRatings      Int                   @default(0)
+  image           String                @map("poster")
+  movie           Movie?
+  book            Book?
+  reviews         Review[]
+  savedByUsers    SavedItem[]
+  userActivities  Activity[]
+  recommendations RecommendationCache[]
+
+  @@index([type])
+  @@index([type, title])
+  @@map("Movie")
 }
 
 model Movie {
-    id              String           @id @default(auto()) @map("_id") @db.ObjectId
-    title           String
-    releaseYear     Int
-    director        String
-    overview        String
-    language        String
-    genres          String[]
-    cast            String[]         @default([])
-    keywords        String[]         @default([])
-    runtime         Int
-    popularity      Float            @default(0)
-    reviews         MovieReview[]
-    avgRating       Float
-    numRatings      Int
-    poster          String
-    onWatchList     MovieWatchList[]
-    userActivities  Activity[]
-    recommendations MovieRecommendationCache[]
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id])
+  mediaItemId String    @unique @db.ObjectId
+  tmdbId      Int?
+  director    String
+  cast        String[]  @default([])
+  runtime     Int
+
+  @@index([tmdbId])
+  @@map("MovieDetails")
 }
 
-model MovieRecommendationCache {
-    id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-    user               User     @relation(fields: [userId], references: [id], name: "movieRecommendationUser")
-    userId             String   @db.ObjectId
-    movie              Movie    @relation(fields: [movieId], references: [id])
-    movieId            String   @db.ObjectId
-    score              Float
-    recommendedByCount Int
-    generatedAt        DateTime
+model Book {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  mediaItem    MediaItem @relation(fields: [mediaItemId], references: [id])
+  mediaItemId  String    @unique @db.ObjectId
+  authors      String[]
+  pageCount    Int?
+  isbn10       String?
+  isbn13       String?
+  googleBookId String?
 
-    @@unique([userId, movieId])
-    @@index([userId, score])
+  @@index([googleBookId])
+  @@index([isbn13])
+  @@map("BookDetails")
+}
+
+model RecommendationCache {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  user               User      @relation(fields: [userId], references: [id], name: "recommendationUser")
+  userId             String    @db.ObjectId
+  mediaType          MediaType @default(MOVIE)
+  mediaItem          MediaItem @relation(fields: [mediaItemId], references: [id])
+  mediaItemId        String    @map("movieId") @db.ObjectId
+  score              Float
+  recommendedByCount Int
+  generatedAt        DateTime
+
+  @@unique([userId, mediaItemId])
+  @@index([userId, score])
+  @@index([userId, mediaType, score])
+  @@map("MovieRecommendationCache")
 }
 
 model FriendRecommendationCache {
-    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
-    user                 User     @relation(fields: [userId], references: [id], name: "friendRecommendationUser")
-    userId               String   @db.ObjectId
-    recommendedUser      User     @relation(fields: [recommendedUserId], references: [id], name: "recommendedUser")
-    recommendedUserId    String   @db.ObjectId
-    similarityScore      Float
-    sharedMovieCount     Int
-    sharedFavoriteTitles String[]
-    generatedAt          DateTime
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  user                 User     @relation(fields: [userId], references: [id], name: "friendRecommendationUser")
+  userId               String   @db.ObjectId
+  recommendedUser      User     @relation(fields: [recommendedUserId], references: [id], name: "recommendedUser")
+  recommendedUserId    String   @db.ObjectId
+  similarityScore      Float
+  sharedMovieCount     Int
+  sharedFavoriteTitles String[]
+  generatedAt          DateTime
 
-    @@unique([userId, recommendedUserId])
-    @@index([userId, similarityScore])
+  @@unique([userId, recommendedUserId])
+  @@index([userId, similarityScore])
 }
 
-model MovieReview {
-    id             String            @id @default(auto()) @map("_id") @db.ObjectId
-    movie          Movie             @relation(fields: [movieId], references: [id])
-    movieId        String            @db.ObjectId
-    user           User              @relation(fields: [userId], references: [id])
-    userId         String            @db.ObjectId
-    date           DateTime
-    rating         Int
-    text           String?
-    likeCount      Int               @default(0)
-    likedBy        MovieReviewLike[]
-    userActivities Activity[]
+model Review {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  mediaItem      MediaItem    @relation(fields: [mediaItemId], references: [id])
+  mediaItemId    String       @map("movieId") @db.ObjectId
+  mediaType      MediaType    @default(MOVIE)
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String       @db.ObjectId
+  date           DateTime
+  rating         Int
+  text           String?
+  likeCount      Int          @default(0)
+  likedBy        ReviewLike[]
+  userActivities Activity[]
 
-    @@unique([movieId, userId])
-    @@index([userId])
-    @@index([movieId, likeCount])
+  @@unique([mediaItemId, userId])
+  @@index([userId])
+  @@index([userId, mediaType])
+  @@index([mediaItemId, likeCount])
+  @@index([mediaType, mediaItemId])
+  @@map("MovieReview")
 }
 
-model MovieReviewLike {
-    id       String      @id @default(auto()) @map("_id") @db.ObjectId
-    review   MovieReview @relation(fields: [reviewId], references: [id])
-    reviewId String      @db.ObjectId
-    user     User        @relation(fields: [userId], references: [id])
-    userId   String      @db.ObjectId
+model ReviewLike {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  review   Review @relation(fields: [reviewId], references: [id])
+  reviewId String @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String @db.ObjectId
 
-    @@unique([reviewId, userId])
+  @@unique([reviewId, userId])
+  @@map("MovieReviewLike")
 }
 
-model MovieWatchList {
-    id      String @id @default(auto()) @map("_id") @db.ObjectId
-    user    User   @relation(fields: [userId], references: [id])
-    userId  String @db.ObjectId
-    movie   Movie  @relation(fields: [movieId], references: [id])
-    movieId String @db.ObjectId
+model SavedItem {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String    @db.ObjectId
+  mediaType   MediaType @default(MOVIE)
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id])
+  mediaItemId String    @map("movieId") @db.ObjectId
 
-    @@unique([movieId, userId])
+  @@unique([mediaItemId, userId])
+  @@index([userId, mediaType])
+  @@map("MovieWatchList")
 }
 
 model Activity {
-    id            String       @id @default(auto()) @map("_id") @db.ObjectId
-    user          User         @relation(fields: [userId], references: [id])
-    userId        String       @db.ObjectId
-    action        String
-    reviewRating  Int?
-    reviewText    String?
-    movie         Movie?       @relation(fields: [movieId], references: [id])
-    movieId       String?      @db.ObjectId
-    movieReview   MovieReview? @relation(fields: [movieReviewId], references: [id])
-    movieReviewId String?      @db.ObjectId
-    date          DateTime
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String     @db.ObjectId
+  action       String
+  reviewRating Int?
+  reviewText   String?
+  mediaItem    MediaItem? @relation(fields: [mediaItemId], references: [id])
+  mediaItemId  String?    @map("movieId") @db.ObjectId
+  review       Review?    @relation(fields: [reviewId], references: [id])
+  reviewId     String?    @map("movieReviewId") @db.ObjectId
+  date         DateTime
+
+  @@index([mediaItemId])
+  @@index([reviewId])
 }
 
 model FriendRequest {
-    id             String @id @default(auto()) @map("_id") @db.ObjectId
-    sentUser       User   @relation(fields: [sentUserId], references: [id], name: "sentUser")
-    sentUserId     String @db.ObjectId
-    receivedUser   User   @relation(fields: [receivedUserId], references: [id], name: "receivedUser")
-    receivedUserId String @db.ObjectId
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  sentUser       User   @relation(fields: [sentUserId], references: [id], name: "sentUser")
+  sentUserId     String @db.ObjectId
+  receivedUser   User   @relation(fields: [receivedUserId], references: [id], name: "receivedUser")
+  receivedUserId String @db.ObjectId
 
-    @@unique([sentUserId, receivedUserId])
+  @@unique([sentUserId, receivedUserId])
 }
 
 model Message {
-    id          String   @id @default(auto()) @map("_id") @db.ObjectId
-    sender      User     @relation(fields: [senderId], references: [id], name: "sender")
-    senderId    String   @db.ObjectId
-    recipient   User     @relation(fields: [recipientId], references: [id], name: "recipient")
-    recipientId String   @db.ObjectId
-    text        String
-    date        DateTime
-    wasRead     Boolean
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  sender      User     @relation(fields: [senderId], references: [id], name: "sender")
+  senderId    String   @db.ObjectId
+  recipient   User     @relation(fields: [recipientId], references: [id], name: "recipient")
+  recipientId String   @db.ObjectId
+  text        String
+  date        DateTime
+  wasRead     Boolean
 }

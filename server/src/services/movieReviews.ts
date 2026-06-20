@@ -31,8 +31,8 @@ export const createOrUpdateMovieReviewForUser = async (
         throw new ServiceError(400, "Validation failed");
     }
 
-    const movie = await prisma.movie.findUnique({
-        where: { id: movieId },
+    const movie = await prisma.mediaItem.findFirst({
+        where: { id: movieId, type: "MOVIE" },
     });
 
     if (!movie) {
@@ -40,11 +40,11 @@ export const createOrUpdateMovieReviewForUser = async (
     }
 
     return prisma.$transaction(async (tx) => {
-        const review = await tx.movieReview.upsert({
+        const review = await tx.review.upsert({
             where: {
-                movieId_userId: {
+                mediaItemId_userId: {
                     userId,
-                    movieId,
+                    mediaItemId: movieId,
                 },
             },
             update: {
@@ -54,14 +54,15 @@ export const createOrUpdateMovieReviewForUser = async (
             create: {
                 ...validationResult.data,
                 userId,
-                movieId,
+                mediaItemId: movieId,
+                mediaType: "MOVIE",
                 date,
             },
         });
 
-        const aggregations = await tx.movieReview.aggregate({
+        const aggregations = await tx.review.aggregate({
             where: {
-                movieId,
+                mediaItemId: movieId,
             },
             _avg: {
                 rating: true,
@@ -71,7 +72,7 @@ export const createOrUpdateMovieReviewForUser = async (
             },
         });
 
-        await tx.movie.update({
+        await tx.mediaItem.update({
             where: { id: movieId },
             data: {
                 avgRating: aggregations._avg.rating ?? 0,
@@ -82,7 +83,7 @@ export const createOrUpdateMovieReviewForUser = async (
         await tx.activity.create({
             data: {
                 userId,
-                movieId,
+                mediaItemId: movieId,
                 action: "rated",
                 reviewRating: review.rating,
                 reviewText: review.text,
@@ -100,7 +101,7 @@ export const likeOrUnlikeMovieReviewForUser = async (
     prisma: PrismaClient,
     { reviewId, userId, like }: LikeOrUnlikeMovieReviewArgs,
 ) => {
-    const movieReview = await prisma.movieReview.findUnique({
+    const movieReview = await prisma.review.findUnique({
         where: { id: reviewId },
     });
 
@@ -110,13 +111,13 @@ export const likeOrUnlikeMovieReviewForUser = async (
 
     await prisma.$transaction(async (tx) => {
         if (like) {
-            await tx.movieReviewLike.create({
+            await tx.reviewLike.create({
                 data: {
                     reviewId: movieReview.id,
                     userId,
                 },
             });
-            await tx.movieReview.update({
+            await tx.review.update({
                 where: { id: movieReview.id },
                 data: {
                     likeCount: {
@@ -125,7 +126,7 @@ export const likeOrUnlikeMovieReviewForUser = async (
                 },
             });
         } else {
-            await tx.movieReviewLike.delete({
+            await tx.reviewLike.delete({
                 where: {
                     reviewId_userId: {
                         reviewId: movieReview.id,
@@ -133,7 +134,7 @@ export const likeOrUnlikeMovieReviewForUser = async (
                     },
                 },
             });
-            await tx.movieReview.update({
+            await tx.review.update({
                 where: { id: movieReview.id },
                 data: {
                     likeCount: {
@@ -146,7 +147,7 @@ export const likeOrUnlikeMovieReviewForUser = async (
         await tx.activity.create({
             data: {
                 userId,
-                movieReviewId: movieReview.id,
+                reviewId: movieReview.id,
                 action: like ? "liked" : "unliked",
                 date: new Date(),
             },

@@ -12,6 +12,11 @@ import {
     sendFriendRequestToUser,
 } from "../services/friendships";
 import { getErrorMessage, getErrorStatusCode } from "../services/errors";
+import {
+    toMovieResponse,
+    toMovieReviewResponse,
+    toMovieWatchlistResponse,
+} from "../lib/media";
 
 const prisma = new PrismaClient();
 
@@ -144,11 +149,12 @@ export const getUserActivities = async (
                     userId: userId,
                 },
                 include: {
-                    movie: {
+                    mediaItem: {
                         select: {
                             title: true,
                             releaseYear: true,
-                            poster: true,
+                            image: true,
+                            movie: true,
                         },
                     },
                     user: {
@@ -158,7 +164,7 @@ export const getUserActivities = async (
                             photo: true,
                         },
                     },
-                    movieReview: {
+                    review: {
                         include: {
                             user: {
                                 select: {
@@ -167,11 +173,13 @@ export const getUserActivities = async (
                                     lastName: true,
                                 },
                             },
-                            movie: {
+                            mediaItem: {
                                 select: {
                                     id: true,
                                     title: true,
                                     releaseYear: true,
+                                    image: true,
+                                    movie: true,
                                 },
                             },
                         },
@@ -189,8 +197,25 @@ export const getUserActivities = async (
         const totalPages = Math.ceil(totalCount / limit);
         const hasMore = page < totalPages;
 
+        const movieActivities = activities.map((activity) => {
+            const { mediaItem, mediaItemId, review, reviewId, ...rest } =
+                activity;
+            return {
+                ...rest,
+                movieId: mediaItemId,
+                movie: mediaItem ? toMovieResponse(mediaItem) : mediaItem,
+                movieReviewId: reviewId,
+                movieReview: review
+                    ? {
+                          ...toMovieReviewResponse(review),
+                          movie: toMovieResponse(review.mediaItem),
+                      }
+                    : review,
+            };
+        });
+
         res.status(200).send({
-            activities,
+            activities: movieActivities,
             totalCount,
             currentPage: page,
             totalPages,
@@ -321,22 +346,26 @@ export const getUserWatchlist = async (
 ): Promise<any> => {
     const { userId } = req.params;
     try {
-        const watchlist = await prisma.movieWatchList.findMany({
-            where: { userId },
+        const watchlist = await prisma.savedItem.findMany({
+            where: {
+                userId,
+                mediaType: "MOVIE",
+            },
             include: {
-                movie: {
+                mediaItem: {
                     select: {
                         title: true,
                         releaseYear: true,
                         genres: true,
                         avgRating: true,
                         numRatings: true,
-                        poster: true,
+                        image: true,
+                        movie: true,
                     },
                 },
             },
         });
-        res.status(200).send(watchlist);
+        res.status(200).send(watchlist.map(toMovieWatchlistResponse));
     } catch (error) {
         res.status(500).send({
             message: "Could not fetch user watchlist",
@@ -356,15 +385,19 @@ export const getUserMovieReviews = async (
 
     try {
         const [reviews, totalCount] = await Promise.all([
-            prisma.movieReview.findMany({
-                where: { userId },
+            prisma.review.findMany({
+                where: {
+                    userId,
+                    mediaType: "MOVIE",
+                },
                 include: {
-                    movie: {
+                    mediaItem: {
                         select: {
                             id: true,
                             title: true,
                             releaseYear: true,
-                            poster: true,
+                            image: true,
+                            movie: true,
                         },
                     },
                 },
@@ -372,8 +405,11 @@ export const getUserMovieReviews = async (
                 skip,
                 take: limit,
             }),
-            prisma.movieReview.count({
-                where: { userId },
+            prisma.review.count({
+                where: {
+                    userId,
+                    mediaType: "MOVIE",
+                },
             }),
         ]);
 
@@ -381,7 +417,13 @@ export const getUserMovieReviews = async (
         const hasMore = page < totalPages;
 
         res.status(200).send({
-            reviews,
+            reviews: reviews.map((review) => {
+                const { mediaItem, ...reviewData } = review;
+                return {
+                    ...toMovieReviewResponse(reviewData),
+                    movie: toMovieResponse(mediaItem),
+                };
+            }),
             totalCount,
             currentPage: page,
             totalPages,

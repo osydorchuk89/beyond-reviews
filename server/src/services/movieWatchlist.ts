@@ -12,8 +12,8 @@ export const updateMovieWatchlist = async (
     prisma: PrismaClient,
     { movieId, userId, saved }: UpdateMovieWatchlistArgs,
 ) => {
-    const movie = await prisma.movie.findUnique({
-        where: { id: movieId },
+    const movie = await prisma.mediaItem.findFirst({
+        where: { id: movieId, type: "MOVIE" },
     });
 
     if (!movie) {
@@ -22,17 +22,18 @@ export const updateMovieWatchlist = async (
 
     await prisma.$transaction(async (tx) => {
         if (saved) {
-            await tx.movieWatchList.create({
+            await tx.savedItem.create({
                 data: {
                     userId,
-                    movieId,
+                    mediaItemId: movieId,
+                    mediaType: "MOVIE",
                 },
             });
         } else {
-            await tx.movieWatchList.delete({
+            await tx.savedItem.delete({
                 where: {
-                    movieId_userId: {
-                        movieId,
+                    mediaItemId_userId: {
+                        mediaItemId: movieId,
                         userId,
                     },
                 },
@@ -43,7 +44,7 @@ export const updateMovieWatchlist = async (
             data: {
                 userId,
                 action: saved ? "saved" : "unsaved",
-                movieId,
+                mediaItemId: movieId,
                 date: new Date(),
             },
         });

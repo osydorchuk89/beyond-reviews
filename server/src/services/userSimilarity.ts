@@ -57,13 +57,21 @@ export const getSimilarUsersForUser = async (
     userId: string,
     excludedUserIds: string[] = [],
 ): Promise<UserSimilarityResult> => {
-    const userReviews = await prisma.movieReview.findMany({
-        where: { userId },
-        select: {
-            movieId: true,
-            rating: true,
-        },
-    });
+    const userReviews = (
+        await prisma.review.findMany({
+            where: {
+                userId,
+                mediaType: "MOVIE",
+            },
+            select: {
+                mediaItemId: true,
+                rating: true,
+            },
+        })
+    ).map((review) => ({
+        movieId: review.mediaItemId,
+        rating: review.rating,
+    }));
 
     if (userReviews.length < MIN_REVIEWS_FOR_RECOMMENDATIONS) {
         return {
@@ -76,21 +84,28 @@ export const getSimilarUsersForUser = async (
     }
 
     const userMovieIds = userReviews.map((review) => review.movieId);
-    const candidateReviews = await prisma.movieReview.findMany({
-        where: {
-            movieId: {
-                in: userMovieIds,
+    const candidateReviews = (
+        await prisma.review.findMany({
+            where: {
+                mediaItemId: {
+                    in: userMovieIds,
+                },
+                userId: {
+                    notIn: [userId, ...excludedUserIds],
+                },
+                mediaType: "MOVIE",
             },
-            userId: {
-                notIn: [userId, ...excludedUserIds],
+            select: {
+                mediaItemId: true,
+                rating: true,
+                userId: true,
             },
-        },
-        select: {
-            movieId: true,
-            rating: true,
-            userId: true,
-        },
-    });
+        })
+    ).map((review) => ({
+        movieId: review.mediaItemId,
+        rating: review.rating,
+        userId: review.userId,
+    }));
 
     const userReviewsByMovieId = new Map(
         userReviews.map((review) => [review.movieId, review]),

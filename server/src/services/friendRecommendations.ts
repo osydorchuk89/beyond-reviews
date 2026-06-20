@@ -65,8 +65,11 @@ const getCachedFriendRecommendationsForUser = async (
                 },
             },
         }),
-        prisma.movieReview.count({
-            where: { userId },
+        prisma.review.count({
+            where: {
+                userId,
+                mediaType: "MOVIE",
+            },
         }),
     ]);
 
@@ -173,8 +176,9 @@ const computeFriendRecommendationsForUser = async (
                 photo: true,
             },
         }),
-        prisma.movie.findMany({
+        prisma.mediaItem.findMany({
             where: {
+                type: "MOVIE",
                 id: {
                     in: sharedFavoriteMovieIds,
                 },
