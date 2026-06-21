@@ -1,6 +1,9 @@
 import axiosInstance from "./axiosInstance";
 import {
     AuthData,
+    Book,
+    BookReviewsData,
+    BooksData,
     FriendRecommendationsData,
     Message,
     Movie,
@@ -53,6 +56,33 @@ export const getMovies = async (
     }
 };
 
+export const getBooks = async (
+    page: number = 1,
+    limit: number = 15,
+    genre?: string,
+    releaseYear?: string,
+    author?: string,
+    sortBy?: string,
+    sortOrder?: string,
+    search?: string
+): Promise<BooksData> => {
+    try {
+        const params: any = { page, limit };
+        if (genre) params.genre = genre;
+        if (releaseYear) params.releaseYear = releaseYear;
+        if (author) params.author = author;
+        if (sortBy) params.sortBy = sortBy;
+        if (sortOrder) params.sortOrder = sortOrder;
+        if (search) params.search = search;
+
+        const response = await axiosInstance.get("/api/books", { params });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
 export const getMovie = async (
     movieId: string,
     userId?: string,
@@ -62,6 +92,24 @@ export const getMovie = async (
         if (userId) params.userId = userId;
 
         const response = await axiosInstance.get(`/api/movies/${movieId}`, {
+            params,
+        });
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+export const getBook = async (
+    bookId: string,
+    userId?: string,
+): Promise<Book> => {
+    try {
+        const params: Record<string, string> = {};
+        if (userId) params.userId = userId;
+
+        const response = await axiosInstance.get(`/api/books/${bookId}`, {
             params,
         });
         return response.data;
@@ -83,6 +131,27 @@ export const getMovieReviews = async (
 
         const response = await axiosInstance.get(
             `/api/movies/${movieId}/reviews`,
+            { params }
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+export const getBookReviews = async (
+    bookId: string,
+    page: number = 1,
+    limit: number = 10,
+    userId?: string
+): Promise<BookReviewsData> => {
+    try {
+        const params: Record<string, string | number> = { page, limit };
+        if (userId) params.userId = userId;
+
+        const response = await axiosInstance.get(
+            `/api/books/${bookId}/reviews`,
             { params }
         );
         return response.data;
@@ -124,6 +193,22 @@ export const sendLikeOrUnlike = async (
     }
 };
 
+export const sendBookLikeOrUnlike = async (
+    bookId: string,
+    reviewId: string,
+    userId: string,
+    hasLiked: boolean
+) => {
+    try {
+        await axiosInstance.put(`/api/books/${bookId}/reviews/${reviewId}`, {
+            like: !hasLiked,
+            userId,
+        });
+    } catch (error: any) {
+        console.log(error);
+    }
+};
+
 // Watch lists
 export const addOrRemoveMovieFromWatchlist = async (
     movieId: string,
@@ -132,6 +217,21 @@ export const addOrRemoveMovieFromWatchlist = async (
 ) => {
     try {
         await axiosInstance.put(`/api/movies/${movieId}`, {
+            saved: !hasSaved,
+            userId,
+        });
+    } catch (error: any) {
+        console.log(error);
+    }
+};
+
+export const addOrRemoveBookFromWishlist = async (
+    bookId: string,
+    userId: string,
+    hasSaved: boolean
+) => {
+    try {
+        await axiosInstance.put(`/api/books/${bookId}`, {
             saved: !hasSaved,
             userId,
         });

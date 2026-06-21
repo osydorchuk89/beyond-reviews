@@ -2,6 +2,9 @@ import { LoaderFunctionArgs, redirect } from "react-router";
 
 import {
     getAuthData,
+    getBook,
+    getBookReviews,
+    getBooks,
     getFriendRecommendations,
     getMovie,
     getMovieRecommendations,
@@ -118,6 +121,52 @@ export const userFriendsLoader = async (args: LoaderFunctionArgs) => {
         }));
 
     return { friendRecommendationsResultPromise };
+};
+
+export const bookLoader = async ({ params }: LoaderFunctionArgs) => {
+    const { bookId } = params as { bookId: string };
+
+    const authDataPromise = getAuthData();
+    const authData = await authDataPromise;
+    const bookPromise = getBook(bookId, authData.user?.id);
+    const bookReviewsDataPromise = getBookReviews(
+        bookId,
+        1,
+        10,
+        authData.user?.id,
+    );
+
+    const [book, bookReviewsData] = await Promise.all([
+        bookPromise,
+        bookReviewsDataPromise,
+    ]);
+    return { book, bookReviewsData };
+};
+
+export const booksLoader = ({ request }: LoaderFunctionArgs) => {
+    const url = new URL(request.url);
+    const searchParams = url.searchParams;
+
+    const page = parseInt(searchParams.get("page") ?? "1");
+    const genre = searchParams.get("genre") ?? undefined;
+    const releaseYear = searchParams.get("releaseYear") ?? undefined;
+    const author = searchParams.get("author") ?? undefined;
+    const sortBy = searchParams.get("sortBy") ?? undefined;
+    const sortOrder = searchParams.get("sortOrder") ?? undefined;
+    const search = searchParams.get("search") ?? undefined;
+
+    const booksDataPromise = getBooks(
+        page,
+        15,
+        genre,
+        releaseYear,
+        author,
+        sortBy,
+        sortOrder,
+        search,
+    );
+
+    return { booksDataPromise };
 };
 
 export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {

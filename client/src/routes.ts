@@ -19,6 +19,8 @@ import { NotFoundPage } from "./components/pages/NotFoundPage";
 import { ErrorPage } from "./components/pages/ErrorPage";
 import {
     loginLoader,
+    booksLoader,
+    bookLoader,
     movieLoader,
     moviesLoader,
     protectedLoader,
@@ -33,10 +35,12 @@ import {
     loginAction,
     logoutAction,
     movieReviewAction,
+    bookReviewAction,
     registrationAction,
 } from "./lib/actions";
 import { MoviesLayout } from "./components/pages/movies/MoviesLayout";
 import { MoviePage } from "./components/pages/movie/MoviePage";
+import { BookPage } from "./components/pages/book/BookPage";
 
 export const router = createBrowserRouter([
     {
@@ -64,7 +68,19 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: "books",
-                        Component: BooksPage,
+                        children: [
+                            {
+                                index: true,
+                                Component: BooksPage,
+                                loader: booksLoader,
+                            },
+                            {
+                                path: ":bookId",
+                                Component: BookPage,
+                                loader: bookLoader,
+                                action: bookReviewAction,
+                            },
+                        ],
                     },
                     {
                         path: "music",

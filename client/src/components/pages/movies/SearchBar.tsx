@@ -8,7 +8,13 @@ interface SearchInput {
     title: string;
 }
 
-export const SearchBar = () => {
+interface SearchBarProps {
+    placeholder?: string;
+}
+
+export const SearchBar = ({
+    placeholder = "enter movie title",
+}: SearchBarProps) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const searchTerm = searchParams.get("search");
 
@@ -45,7 +51,7 @@ export const SearchBar = () => {
                             required: true,
                         })}
                         className="w-full rounded-md border border-gray-700 py-2 pr-20 pl-3 focus:border-orange-900 lg:pr-3"
-                        placeholder="enter movie title"
+                        placeholder={placeholder}
                         type="text"
                     />
                     <div className="absolute top-1/2 right-1 -translate-y-1/2 lg:hidden">

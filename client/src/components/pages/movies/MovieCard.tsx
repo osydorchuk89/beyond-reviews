@@ -1,9 +1,4 @@
-import { Link } from "react-router";
-
-import { StarIcon } from "../../icons/StarIcon";
-import { useQueryClick } from "../../../hooks/useQueryClick";
-import { QueryLink } from "../../ui/QueryLink";
-import { useGetMovieGenres } from "../../../hooks/useGetMovieGenres";
+import { MediaCard } from "../media/MediaCard";
 import { getMoviePoster } from "../../../lib/utils";
 
 interface MovieCardProps {
@@ -27,52 +22,19 @@ export const MovieCard = ({
     poster,
     hasShadow = true,
 }: MovieCardProps) => {
-    const displayedTitle =
-        title?.length > 45 ? `${title.substring(0, 45)}...` : title;
-
-    const handleQueryClick = useQueryClick();
-
-    const movieGenres = useGetMovieGenres(genres, handleQueryClick);
-    const moviePoster = getMoviePoster(poster);
-
     return (
-        <div
-            className={`flex flex-col w-76 justify-start items-center bg-sky-100 rounded-lg p-5 relative ${hasShadow && "shadow-lg"}`}
-        >
-            <p className="w-full text-center text-xl font-bold h-16 bg-sky-700 rounded-t-lg flex justify-center items-center absolute top-0 p-4">
-                <Link
-                    className="hover:underline text-sky-50"
-                    to={`/movies/${movieId}`}
-                >
-                    {displayedTitle}
-                </Link>
-            </p>
-            <p className="mb-2 text-sky-950 mt-16">{movieGenres}</p>
-            <p className="mb-2 text-sky-950">
-                <QueryLink
-                    onClick={() =>
-                        handleQueryClick("releaseYear", releaseYear.toString())
-                    }
-                >
-                    {releaseYear}
-                </QueryLink>
-            </p>
-            <Link to={`/movies/${movieId}`}>
-                <img
-                    src={moviePoster}
-                    className="rounded-lg"
-                    alt="movie poster"
-                />
-            </Link>
-            <div className="flex mt-4">
-                <span>
-                    <StarIcon className="w-6 h-6 fill-sky-500 border-none" />
-                </span>
-                <span className="text-sky-950">{avgRating.toPrecision(2)}</span>
-                <span className="text-gray-600 ml-5">
-                    {numRatings} {numRatings === 1 ? "vote" : "votes"}
-                </span>
-            </div>
-        </div>
+        <MediaCard
+            to={`/movies/${movieId}`}
+            title={title}
+            releaseYear={releaseYear}
+            genres={genres}
+            avgRating={avgRating}
+            numRatings={numRatings}
+            poster={getMoviePoster(poster)}
+            posterAlt="movie poster"
+            ratingCountSingular="vote"
+            ratingCountPlural="votes"
+            hasShadow={hasShadow}
+        />
     );
 };

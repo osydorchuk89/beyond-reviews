@@ -1,54 +1,52 @@
-import { Movie } from "../../../lib/entities";
-import { getMovies } from "../../../lib/api";
+import { Book } from "../../../lib/entities";
+import { getBooks } from "../../../lib/api";
 import { MediaListSection } from "../media/MediaListSection";
-import { MoviesList } from "./MoviesList";
+import { BooksList } from "./BooksList";
 
-interface MoviesListSectionProps {
-    movies: Movie[];
+interface BooksListSectionProps {
+    books: Book[];
     filters: string[];
     hasMore: boolean;
     currentPage: number;
 }
 
-export const MoviesListSection = ({
-    movies,
+export const BooksListSection = ({
+    books,
     filters,
     hasMore,
     currentPage,
-}: MoviesListSectionProps) => {
+}: BooksListSectionProps) => {
     return (
         <MediaListSection
-            items={movies}
+            items={books}
             filters={filters}
             hasMore={hasMore}
             currentPage={currentPage}
-            emptyMessage="No movies found"
+            emptyMessage="No books found"
             filterParamByLabel={{
                 "Genre:": "genre",
                 "Year:": "releaseYear",
-                "Director:": "director",
-                "Actor:": "actor",
+                "Author:": "author",
                 "Search:": "search",
             }}
             loadMoreItems={async (nextPage, searchParams) => {
-                const moviesData = await getMovies(
+                const booksData = await getBooks(
                     nextPage,
                     15,
                     searchParams.get("genre") ?? undefined,
                     searchParams.get("releaseYear") ?? undefined,
-                    searchParams.get("director") ?? undefined,
-                    searchParams.get("actor") ?? undefined,
+                    searchParams.get("author") ?? undefined,
                     searchParams.get("sortBy") ?? undefined,
                     searchParams.get("sortOrder") ?? undefined,
                     searchParams.get("search") ?? undefined,
                 );
                 return {
-                    items: moviesData.movies,
-                    hasMore: moviesData.hasMore,
+                    items: booksData.books,
+                    hasMore: booksData.hasMore,
                 };
             }}
-            renderItems={(allMovies) => <MoviesList allMovies={allMovies} />}
-            fetchErrorMessage="Failed to load more movies:"
+            renderItems={(allBooks) => <BooksList allBooks={allBooks} />}
+            fetchErrorMessage="Failed to load more books:"
         />
     );
 };

@@ -9,6 +9,8 @@ import { StarIcon } from "../../icons/StarIcon";
 import { BaseButton } from "../../ui/BaseButton";
 
 interface MovieReviewFormProps {
+    mediaLabel?: string;
+    fetcherKey?: string;
     initialRating?: number;
     initialText?: string;
     hasRated: boolean;
@@ -17,6 +19,8 @@ interface MovieReviewFormProps {
 }
 
 export const MovieReviewForm = ({
+    mediaLabel = "movie",
+    fetcherKey = "media-review",
     initialRating = 0,
     initialText = "",
     hasRated,
@@ -26,7 +30,7 @@ export const MovieReviewForm = ({
     const [userRating, setUserRating] = useState(initialRating);
     const [hover, setHover] = useState(initialRating);
 
-    const fetcher = useFetcher({ key: "movie-review" });
+    const fetcher = useFetcher({ key: fetcherKey });
     const isUpdating = fetcher.state !== "idle";
 
     const {
@@ -50,7 +54,7 @@ export const MovieReviewForm = ({
     return (
         <fetcher.Form method="post" noValidate>
             <label htmlFor="ratng" className="font-bold">
-                Rate the movie:
+                Rate the {mediaLabel}:
             </label>
             <input id="rating" type="hidden" name="rating" value={userRating} />
             <div className="flex">

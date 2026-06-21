@@ -47,7 +47,7 @@ export interface Movie {
     numRatings: number;
     reviews: MovieReview[];
     poster: string;
-    onWatchList: { userId: string }[];
+    onWishlist: { userId: string }[];
 }
 
 export interface MovieData {
@@ -81,6 +81,46 @@ export interface MoviesData {
     };
 }
 
+export interface Book {
+    id: string;
+    title: string;
+    releaseYear: number;
+    overview: string;
+    language: string;
+    genres: string[];
+    keywords: string[];
+    authors: string[];
+    pageCount?: number | null;
+    isbn10?: string | null;
+    isbn13?: string | null;
+    googleBookId?: string | null;
+    avgRating: number;
+    numRatings: number;
+    poster: string;
+    onWishlist?: { userId: string }[];
+}
+
+export interface BookData {
+    book: Book;
+    bookReviewsData: BookReviewsData;
+}
+
+export interface BooksData {
+    books: Book[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+    hasMore: boolean;
+    appliedFilters: {
+        genre?: string;
+        releaseYear?: string;
+        author?: string;
+        sortBy?: string;
+        sortOrder?: string;
+        search?: string;
+    };
+}
+
 export interface MovieReview {
     id: string;
     movieId: string;
@@ -92,6 +132,28 @@ export interface MovieReview {
     text?: string;
     likeCount: number;
     likedBy: { userId: string }[];
+}
+
+export interface BookReview {
+    id: string;
+    bookId: string;
+    book: Book;
+    userId: string;
+    user: { id: string; firstName: string; lastName: string };
+    date: Date;
+    rating: number;
+    text?: string;
+    likeCount: number;
+    likedBy: { userId: string }[];
+}
+
+export interface BookReviewsData {
+    reviews: BookReview[];
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasMore: boolean;
+    userReview?: BookReview | null;
 }
 
 export interface UserActivity {

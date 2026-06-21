@@ -85,3 +85,33 @@ export const movieReviewAction = async ({
         };
     }
 };
+
+export const bookReviewAction = async ({
+    params,
+    request,
+}: ActionFunctionArgs) => {
+    const { bookId } = params;
+
+    const authData = await getAuthData();
+    const userId = authData?.user?.id;
+
+    const formData = await request.formData();
+    const rating = Number(formData.get("rating"));
+    const text = formData.get("text");
+    const date = new Date();
+
+    try {
+        await axiosInstance.post(`/api/books/${bookId}/reviews`, {
+            bookId,
+            userId,
+            rating,
+            text,
+            date,
+        });
+        return { success: true };
+    } catch (error: any) {
+        return {
+            error: error.response?.data?.message ?? "Failed to submit review",
+        };
+    }
+};

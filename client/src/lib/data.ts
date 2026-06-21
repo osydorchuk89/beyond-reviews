@@ -61,4 +61,52 @@ export const sideBarSortList = [
     },
 ];
 
+export const booksSideBarFilterList = [
+    { type: "genre", value: "Fiction", text: "Fiction" },
+    { type: "genre", value: "Fantasy", text: "Fantasy" },
+    { type: "genre", value: "Science fiction", text: "Science Fiction" },
+    { type: "genre", value: "Biography", text: "Biography" },
+    { type: "genre", value: "History", text: "History" },
+    { type: "genre", value: "Business", text: "Business" },
+];
+
+export const booksSideBarSortList = [
+    {
+        type: "sortBy",
+        value: "releaseYear",
+        text: "Year (Newest)",
+        sortOrder: "desc",
+    },
+    {
+        type: "sortBy",
+        value: "releaseYear",
+        text: "Year (Oldest)",
+        sortOrder: "asc",
+    },
+    {
+        type: "sortBy",
+        value: "numRatings",
+        text: "Most Reviews",
+        sortOrder: "desc",
+    },
+    {
+        type: "sortBy",
+        value: "numRatings",
+        text: "Least Reviews",
+        sortOrder: "asc",
+    },
+    {
+        type: "sortBy",
+        value: "avgRating",
+        text: "Highest Rated",
+        sortOrder: "desc",
+    },
+    {
+        type: "sortBy",
+        value: "avgRating",
+        text: "Lowest Rated",
+        sortOrder: "asc",
+    },
+];
+
 export const movieInfoFilterList = [{ value: "" }];

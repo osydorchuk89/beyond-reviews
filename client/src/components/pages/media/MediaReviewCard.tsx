@@ -2,51 +2,66 @@ import { RefObject, useRef, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
-import { sendLikeOrUnlike } from "../../../lib/api";
-import { MovieReview, AuthData } from "../../../lib/entities";
+import { AuthData } from "../../../lib/entities";
 import { LikeIcon } from "../../icons/LikeIcon";
 import { StarIcon } from "../../icons/StarIcon";
 import { BaseLink } from "../../ui/BaseLink";
 
-
-interface MovieReviewCardProps {
-    movieReview: MovieReview;
+export interface MediaReviewCardData {
+    id: string;
+    userId: string;
+    user: { id: string; firstName: string; lastName: string };
+    date: Date | string;
+    rating: number;
+    text?: string | null;
+    likeCount: number;
+    likedBy: { userId: string }[];
 }
 
-export const MovieReviewCard = ({ movieReview }: MovieReviewCardProps) => {
+interface MediaReviewCardProps<TReview extends MediaReviewCardData> {
+    review: TReview;
+    mediaId: string;
+    likeOrUnlikeReview: (
+        mediaId: string,
+        reviewId: string,
+        userId: string,
+        hasLiked: boolean,
+    ) => Promise<void>;
+}
+
+export const MediaReviewCard = <TReview extends MediaReviewCardData>({
+    review,
+    mediaId,
+    likeOrUnlikeReview,
+}: MediaReviewCardProps<TReview>) => {
     const { authData } = useRouteLoaderData("root") as {
         authData: AuthData;
     };
     const userId = authData.user?.id;
 
-    const hasUserLikedReview = movieReview.likedBy.some(
-        (like) => like.userId === userId
+    const hasUserLikedReview = review.likedBy.some(
+        (like) => like.userId === userId,
     );
 
     const [iconFilled, setIconFilled] = useState(hasUserLikedReview);
     const [hasLiked, setHasLiked] = useState(hasUserLikedReview);
     const [likeCount, setLikeCount] = useState(
-        movieReview.likeCount ?? movieReview.likedBy.length,
+        review.likeCount ?? review.likedBy.length,
     );
 
-    const reviewDate = new Date(movieReview.date);
+    const reviewDate = new Date(review.date);
     const parsedDate = reviewDate.toLocaleString("default", {
         day: "2-digit",
         month: "long",
         year: "numeric",
     });
 
-    const likeOrUnlikeMovieReview = async () => {
+    const handleLikeOrUnlikeReview = async () => {
         setHasLiked((prevState) => !prevState);
         setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
         try {
             if (userId) {
-                await sendLikeOrUnlike(
-                    movieReview.movieId,
-                    movieReview.id,
-                    userId,
-                    hasLiked
-                );
+                await likeOrUnlikeReview(mediaId, review.id, userId, hasLiked);
             }
         } catch (error) {
             setHasLiked((prevState) => !prevState);
@@ -66,22 +81,21 @@ export const MovieReviewCard = ({ movieReview }: MovieReviewCardProps) => {
             <div className="flex flex-col w-full mb-5">
                 <div className="flex justify-between">
                     <p className="font-semibold">
-                        <BaseLink to={`/users/${movieReview.userId}/profile`}>
-                            {movieReview.user.firstName}{" "}
-                            {movieReview.user.lastName}
+                        <BaseLink to={`/users/${review.userId}/profile`}>
+                            {review.user.firstName} {review.user.lastName}
                         </BaseLink>
                     </p>
                     <div className="flex">
                         <span>
                             <StarIcon className="w-6 h-6 fill-sky-500 border-none" />
                         </span>
-                        <span className="font-bold">{movieReview.rating}</span>
+                        <span className="font-bold">{review.rating}</span>
                         <span className="text-gray-500 font-bold">/10</span>
                     </div>
                 </div>
                 <p className="text-sm text-gray-500">{parsedDate}</p>
             </div>
-            {movieReview.text ? (
+            {review.text ? (
                 <div>
                     <p
                         ref={ref}
@@ -89,7 +103,7 @@ export const MovieReviewCard = ({ movieReview }: MovieReviewCardProps) => {
                             isShowingMore ? "w-full" : "line-clamp-5 w-full"
                         }
                     >
-                        {movieReview.text}
+                        {review.text}
                     </p>
                     {isTruncated && (
                         <div>
@@ -108,12 +122,12 @@ export const MovieReviewCard = ({ movieReview }: MovieReviewCardProps) => {
             <p className="text-gray-500 text-sm mt-5 mb-1">
                 {likeCount} {likeCount === 1 ? "like" : "likes"}
             </p>
-            {userId && movieReview.userId !== userId && (
+            {userId && review.userId !== userId && (
                 <LikeIcon
                     className={`w-6 h-6 hover:cursor-pointer ${
                         iconFilled ? " fill-sky-600" : " fill-sky-50"
                     }`}
-                    handleClick={likeOrUnlikeMovieReview}
+                    handleClick={handleLikeOrUnlikeReview}
                     handleMouseEnter={() => {
                         hasLiked ? setIconFilled(false) : setIconFilled(true);
                     }}

@@ -3,13 +3,11 @@ import { Await, useLoaderData } from "react-router";
 
 import { MoviesListSection } from "./MoviesListSection";
 import { MovieRecommendationsSection } from "./MovieRecommendationsSection";
-import { SearchBar } from "./SearchBar";
 import { MovieRecommendationsData, MoviesData } from "../../../lib/entities";
-import { SortFilterBar } from "./SortFilterBar";
 import { sideBarFilterList, sideBarSortList } from "../../../lib/data";
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { horizontalPadding } from "../../../styles/responsive";
 import { MovieRecommendationsLoadingSection } from "./MovieRecommendationsLoadingSection";
+import { MediaCatalogPage } from "../media/MediaCatalogPage";
 
 export const MoviesPage = () => {
     const { moviesDataPromise, movieRecommendationsDataPromise } =
@@ -41,44 +39,23 @@ export const MoviesPage = () => {
     };
 
     return (
-        <div className="flex flex-col w-full mb-5">
-            <p className="text-4xl text-center font-bold py-5 mb-5">
-                Popular Movies
-            </p>
-            <div
-                className={`flex flex-col lg:flex-row items-center gap-4 lg:items-start ${horizontalPadding.page}`}
-            >
-                <aside className="flex flex-col w-5/6 lg:w-1/4 gap-8 mb-5">
-                    <SearchBar />
-                    <SortFilterBar
-                        itemsList={sideBarSortList}
-                        title="Sort by:"
+        <MediaCatalogPage
+            title="Popular Movies"
+            dataPromise={moviesDataPromise}
+            sortItems={sideBarSortList}
+            filterItems={sideBarFilterList}
+            renderContent={(moviesData) => {
+                const filters = buildFilters(moviesData.appliedFilters);
+                return (
+                    <MoviesListSection
+                        movies={moviesData.movies}
+                        filters={filters}
+                        hasMore={moviesData.hasMore}
+                        currentPage={moviesData.currentPage}
                     />
-                    <SortFilterBar
-                        itemsList={sideBarFilterList}
-                        title="Filter:"
-                    />
-                </aside>
-                <div className="flex flex-col w-full md:w-3/4">
-                    <Suspense fallback={<LoadingSpinner />}>
-                        <Await resolve={moviesDataPromise}>
-                            {(moviesData) => {
-                                const filters = buildFilters(
-                                    moviesData.appliedFilters,
-                                );
-                                return (
-                                    <MoviesListSection
-                                        movies={moviesData.movies}
-                                        filters={filters}
-                                        hasMore={moviesData.hasMore}
-                                        currentPage={moviesData.currentPage}
-                                    />
-                                );
-                            }}
-                        </Await>
-                    </Suspense>
-                </div>
-            </div>
+                );
+            }}
+        >
             <div className={`w-full ${horizontalPadding.page}`}>
                 <Suspense fallback={<MovieRecommendationsLoadingSection />}>
                     <Await resolve={movieRecommendationsDataPromise}>
@@ -94,6 +71,6 @@ export const MoviesPage = () => {
                     </Await>
                 </Suspense>
             </div>
-        </div>
+        </MediaCatalogPage>
     );
 };

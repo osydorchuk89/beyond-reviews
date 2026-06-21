@@ -1,4 +1,4 @@
-import { FilterTag } from "./FilterTag";
+import { MediaFilters } from "../media/MediaFilters";
 
 interface MoviesFiltersProps {
     filters: string[];
@@ -10,14 +10,9 @@ export const MoviesFilters = ({
     handleCloseFilterTag,
 }: MoviesFiltersProps) => {
     return (
-        <ul className="flex flex-row justify-center gap-4">
-            {filters.map((filter) => (
-                <FilterTag
-                    key={filter}
-                    filter={filter}
-                    onRemoveFilter={handleCloseFilterTag}
-                />
-            ))}
-        </ul>
+        <MediaFilters
+            filters={filters}
+            handleCloseFilterTag={handleCloseFilterTag}
+        />
     );
 };

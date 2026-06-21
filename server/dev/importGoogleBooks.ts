@@ -207,17 +207,31 @@ const getIdentifiers = (volume: GoogleBookVolume) => {
   };
 };
 
+const normalizeGoogleCoverUrl = (image?: string) => {
+  if (!image) return null;
+
+  try {
+    const url = new URL(image.replace(/^http:\/\//, "https://"));
+    if (url.searchParams.has("zoom")) {
+      url.searchParams.set("zoom", "0");
+    }
+    return url.toString();
+  } catch {
+    return image.replace(/^http:\/\//, "https://");
+  }
+};
+
 const getImage = (volume: GoogleBookVolume) => {
   const imageLinks = volume.volumeInfo?.imageLinks;
   const image =
     imageLinks?.extraLarge ??
     imageLinks?.large ??
     imageLinks?.medium ??
-    imageLinks?.thumbnail ??
     imageLinks?.small ??
+    imageLinks?.thumbnail ??
     imageLinks?.smallThumbnail;
 
-  return image?.replace(/^http:\/\//, "https://") ?? null;
+  return normalizeGoogleCoverUrl(image);
 };
 
 const candidateKey = (candidate: Pick<ImportCandidate, "title" | "authors" | "releaseYear">) =>

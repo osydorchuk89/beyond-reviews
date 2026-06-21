@@ -140,6 +140,22 @@ const pickIdentifiers = (isbns?: string[]) => {
   };
 };
 
+const openLibraryCoverUrl = ({
+  coverId,
+  isbn13,
+  isbn10,
+}: {
+  coverId: number;
+  isbn13: string | null;
+  isbn10: string | null;
+}) => {
+  const isbn = isbn13 ?? isbn10;
+
+  return isbn
+    ? `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`
+    : `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false`;
+};
+
 const cleanSubjects = (subjects?: string[]) =>
   [
     ...new Set(
@@ -224,7 +240,11 @@ const candidateFromDoc = (
       .map((keyword) => keyword.trim())
       .filter(Boolean)
       .slice(0, 12),
-    image: `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`,
+    image: openLibraryCoverUrl({
+      coverId: doc.cover_i,
+      isbn13,
+      isbn10,
+    }),
     avgRating,
     numRatings,
     popularity: numRatings,

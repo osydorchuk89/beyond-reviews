@@ -1,10 +1,6 @@
-import { useState } from "react";
-import { toast } from "react-toastify";
-
 import { addOrRemoveMovieFromWatchlist } from "../../../lib/api";
 import { Movie, AuthData } from "../../../lib/entities";
-import { BookMarkIcon } from "../../icons/BookMarkIcon";
-import { ToastNotification } from "../../ui/ToastNotification";
+import { MediaBookmark } from "../media/MediaBookmark";
 
 interface MovieBookmarkProps {
     movie: Movie;
@@ -12,64 +8,12 @@ interface MovieBookmarkProps {
 }
 
 export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
-    const userId = authData.user?.id;
-    const userHasSavedMovie = movie.onWatchList.some(
-        (like) => like.userId === userId,
-    );
-    const [iconFilled, setIconFilled] = useState(userHasSavedMovie);
-    const [hasSaved, setHasSaved] = useState(userHasSavedMovie);
-
-    const getIconColor = () => {
-        if (hasSaved && iconFilled) return "#0ea5e9"; // saved, not hovering
-        if (hasSaved && !iconFilled) return "#38bdf8"; // saved, hovering
-        if (!hasSaved && iconFilled) return "#e0f2fe"; // not saved, hovering
-        return "#ffffff"; // not saved, not hovering
-    };
-
-    const showNotificationToast = () => {
-        toast.dismiss();
-        return toast(
-            ({ closeToast }) => (
-                <ToastNotification
-                    text={`Movie was ${
-                        hasSaved ? "removed from" : "added to"
-                    } your watchlist`}
-                    closeToast={closeToast}
-                />
-            ),
-            {
-                closeButton: false,
-            },
-        );
-    };
-
-    const saveMovie = async () => {
-        if (userId) {
-            setHasSaved((prevState) => !prevState);
-            setIconFilled((prevState) => !prevState);
-            try {
-                showNotificationToast();
-                await addOrRemoveMovieFromWatchlist(movie.id, userId, hasSaved);
-            } catch (error) {
-                setHasSaved((prevState) => !prevState);
-                setIconFilled((prevState) => !prevState);
-                console.log(error);
-            }
-        }
-    };
-
     return (
-        <div className="absolute self-end top-0 right-0 flex flex-col justify-center items-end transition-opacity">
-            <BookMarkIcon
-                color={getIconColor()}
-                handleMouseEnter={() => {
-                    hasSaved ? setIconFilled(false) : setIconFilled(true);
-                }}
-                handleMouseLeave={() => {
-                    hasSaved ? setIconFilled(true) : setIconFilled(false);
-                }}
-                handleClick={saveMovie}
-            />
-        </div>
+        <MediaBookmark
+            item={movie}
+            authData={authData}
+            mediaLabel="Movie"
+            addOrRemoveFromWishlist={addOrRemoveMovieFromWatchlist}
+        />
     );
 };
