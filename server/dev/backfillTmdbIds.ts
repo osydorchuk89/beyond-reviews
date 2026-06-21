@@ -10,7 +10,6 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 type LocalMovie = {
   id: string;
-  detailId: string;
   title: string;
   releaseYear: number;
   director: string | null;
@@ -150,15 +149,10 @@ const main = async () => {
       },
       select: {
         id: true,
+        title: true,
+        releaseYear: true,
         director: true,
         tmdbId: true,
-        mediaItem: {
-          select: {
-            id: true,
-            title: true,
-            releaseYear: true,
-          },
-        },
       },
       orderBy: {
         title: "asc",
@@ -179,10 +173,10 @@ const main = async () => {
         language: "en-US",
       });
       const titleMatches = Boolean(
-        details.title && normalize(details.title) === normalize(movie.mediaItem.title),
+        details.title && normalize(details.title) === normalize(movie.title),
       );
       const yearMatches =
-        releaseYearFromDate(details.release_date) === movie.mediaItem.releaseYear;
+        releaseYearFromDate(details.release_date) === movie.releaseYear;
 
       if (titleMatches && yearMatches) {
         valid += 1;
@@ -190,7 +184,7 @@ const main = async () => {
         invalid += 1;
         if (!quiet) {
           console.log(
-            `INVALID ${movie.mediaItem.title} (${movie.mediaItem.releaseYear}) -> ${details.title ?? "Untitled"} (${releaseYearFromDate(details.release_date)}) [${movie.tmdbId}]`,
+            `INVALID ${movie.title} (${movie.releaseYear}) -> ${details.title ?? "Untitled"} (${releaseYearFromDate(details.release_date)}) [${movie.tmdbId}]`,
           );
         }
 
@@ -220,26 +214,20 @@ const main = async () => {
     where: needsBackfillWhere,
     select: {
       id: true,
+      title: true,
+      releaseYear: true,
       director: true,
       tmdbId: true,
-      mediaItem: {
-        select: {
-          id: true,
-          title: true,
-          releaseYear: true,
-        },
-      },
     },
     orderBy: {
-      mediaItemId: "asc",
+      id: "asc",
     },
     take: Number.isFinite(limit) ? limit : undefined,
   })
   ).map((movie) => ({
-    id: movie.mediaItem.id,
-    detailId: movie.id,
-    title: movie.mediaItem.title,
-    releaseYear: movie.mediaItem.releaseYear,
+    id: movie.id,
+    title: movie.title,
+    releaseYear: movie.releaseYear,
     director: movie.director,
     tmdbId: movie.tmdbId,
   }));
@@ -276,7 +264,7 @@ const main = async () => {
 
     if (shouldWrite) {
       await prisma.movie.update({
-        where: { id: movie.detailId },
+        where: { id: movie.id },
         data: { tmdbId: match.result.id },
       });
       updated += 1;

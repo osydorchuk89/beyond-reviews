@@ -149,12 +149,11 @@ export const getUserActivities = async (
                     userId: userId,
                 },
                 include: {
-                    mediaItem: {
+                    movie: {
                         select: {
                             title: true,
                             releaseYear: true,
                             image: true,
-                            movie: true,
                         },
                     },
                     user: {
@@ -173,13 +172,12 @@ export const getUserActivities = async (
                                     lastName: true,
                                 },
                             },
-                            mediaItem: {
+                            movie: {
                                 select: {
                                     id: true,
                                     title: true,
                                     releaseYear: true,
                                     image: true,
-                                    movie: true,
                                 },
                             },
                         },
@@ -198,17 +196,17 @@ export const getUserActivities = async (
         const hasMore = page < totalPages;
 
         const movieActivities = activities.map((activity) => {
-            const { mediaItem, mediaItemId, review, reviewId, ...rest } =
+            const { movie, movieId, review, reviewId, ...rest } =
                 activity;
             return {
                 ...rest,
-                movieId: mediaItemId,
-                movie: mediaItem ? toMovieResponse(mediaItem) : mediaItem,
+                movieId,
+                movie: movie ? toMovieResponse(movie) : movie,
                 movieReviewId: reviewId,
                 movieReview: review
                     ? {
                           ...toMovieReviewResponse(review),
-                          movie: toMovieResponse(review.mediaItem),
+                          movie: review.movie ? toMovieResponse(review.movie) : review.movie,
                       }
                     : review,
             };
@@ -352,7 +350,7 @@ export const getUserWatchlist = async (
                 mediaType: "MOVIE",
             },
             include: {
-                mediaItem: {
+                movie: {
                     select: {
                         title: true,
                         releaseYear: true,
@@ -360,7 +358,6 @@ export const getUserWatchlist = async (
                         avgRating: true,
                         numRatings: true,
                         image: true,
-                        movie: true,
                     },
                 },
             },
@@ -391,15 +388,14 @@ export const getUserMovieReviews = async (
                     mediaType: "MOVIE",
                 },
                 include: {
-                    mediaItem: {
-                        select: {
-                            id: true,
-                            title: true,
-                            releaseYear: true,
-                            image: true,
-                            movie: true,
-                        },
+                movie: {
+                    select: {
+                        id: true,
+                        title: true,
+                        releaseYear: true,
+                        image: true,
                     },
+                },
                 },
                 orderBy: { date: "desc" },
                 skip,
@@ -418,10 +414,10 @@ export const getUserMovieReviews = async (
 
         res.status(200).send({
             reviews: reviews.map((review) => {
-                const { mediaItem, ...reviewData } = review;
+                const { movie, ...reviewData } = review;
                 return {
                     ...toMovieReviewResponse(reviewData),
-                    movie: toMovieResponse(mediaItem),
+                    movie: movie ? toMovieResponse(movie) : movie,
                 };
             }),
             totalCount,

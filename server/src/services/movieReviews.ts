@@ -31,8 +31,8 @@ export const createOrUpdateMovieReviewForUser = async (
         throw new ServiceError(400, "Validation failed");
     }
 
-    const movie = await prisma.mediaItem.findFirst({
-        where: { id: movieId, type: "MOVIE" },
+    const movie = await prisma.movie.findUnique({
+        where: { id: movieId },
     });
 
     if (!movie) {
@@ -42,9 +42,9 @@ export const createOrUpdateMovieReviewForUser = async (
     return prisma.$transaction(async (tx) => {
         const review = await tx.review.upsert({
             where: {
-                mediaItemId_userId: {
+                movieId_userId: {
                     userId,
-                    mediaItemId: movieId,
+                    movieId,
                 },
             },
             update: {
@@ -54,7 +54,7 @@ export const createOrUpdateMovieReviewForUser = async (
             create: {
                 ...validationResult.data,
                 userId,
-                mediaItemId: movieId,
+                movieId,
                 mediaType: "MOVIE",
                 date,
             },
@@ -62,7 +62,7 @@ export const createOrUpdateMovieReviewForUser = async (
 
         const aggregations = await tx.review.aggregate({
             where: {
-                mediaItemId: movieId,
+                movieId,
             },
             _avg: {
                 rating: true,
@@ -72,7 +72,7 @@ export const createOrUpdateMovieReviewForUser = async (
             },
         });
 
-        await tx.mediaItem.update({
+        await tx.movie.update({
             where: { id: movieId },
             data: {
                 avgRating: aggregations._avg.rating ?? 0,
@@ -83,7 +83,7 @@ export const createOrUpdateMovieReviewForUser = async (
         await tx.activity.create({
             data: {
                 userId,
-                mediaItemId: movieId,
+                movieId,
                 action: "rated",
                 reviewRating: review.rating,
                 reviewText: review.text,

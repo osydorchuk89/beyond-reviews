@@ -176,9 +176,8 @@ const computeFriendRecommendationsForUser = async (
                 photo: true,
             },
         }),
-        prisma.mediaItem.findMany({
+        prisma.movie.findMany({
             where: {
-                type: "MOVIE",
                 id: {
                     in: sharedFavoriteMovieIds,
                 },

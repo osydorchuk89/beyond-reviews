@@ -33,9 +33,7 @@ export const getAllMovies = async (
         const sortOrder = (req.query.sortOrder as string) ?? "asc";
         const search = req.query.search as string;
 
-        const whereClause: any = {
-            type: "MOVIE",
-        };
+        const whereClause: any = {};
         if (genre) {
             whereClause.genres = {
                 has: genre,
@@ -45,24 +43,14 @@ export const getAllMovies = async (
             whereClause.releaseYear = parseInt(releaseYear);
         }
         if (director) {
-            whereClause.movie = {
-                is: {
-                    director: {
-                        contains: director,
-                        mode: "insensitive",
-                    },
-                },
+            whereClause.director = {
+                contains: director,
+                mode: "insensitive",
             };
         }
         if (actor) {
-            whereClause.movie = {
-                ...(whereClause.movie ?? {}),
-                is: {
-                    ...((whereClause.movie as any)?.is ?? {}),
-                    cast: {
-                        has: actor,
-                    },
-                },
+            whereClause.cast = {
+                has: actor,
             };
         }
         if (search) {
@@ -91,16 +79,13 @@ export const getAllMovies = async (
         }
 
         const [movies, totalCount] = await Promise.all([
-            prisma.mediaItem.findMany({
+            prisma.movie.findMany({
                 where: whereClause,
                 orderBy: orderByClause,
                 skip,
                 take: limit,
-                include: {
-                    movie: true,
-                },
             }),
-            prisma.mediaItem.count({ where: whereClause }),
+            prisma.movie.count({ where: whereClause }),
         ]);
 
         res.status(200).send({
@@ -133,13 +118,11 @@ export const getMovieById = async (
         ((req.user as { id?: string } | undefined)?.id ??
             req.query.userId) as string | undefined;
     try {
-        const movie = await prisma.mediaItem.findFirst({
+        const movie = await prisma.movie.findUnique({
             where: {
                 id: movieId,
-                type: "MOVIE",
             },
             include: {
-                movie: true,
                 savedByUsers: userId
                     ? {
                           where: {
@@ -219,7 +202,7 @@ export const getMovieReviews = async (
 
         const [reviews, totalCount, userReview] = await Promise.all([
             prisma.review.findMany({
-                where: { mediaItemId: movieId },
+                where: { movieId },
                 include,
                 orderBy: {
                     likeCount: "desc",
@@ -228,13 +211,13 @@ export const getMovieReviews = async (
                 take: limit,
             }),
             prisma.review.count({
-                where: { mediaItemId: movieId },
+                where: { movieId },
             }),
             userId
                 ? prisma.review.findUnique({
                       where: {
-                          mediaItemId_userId: {
-                              mediaItemId: movieId,
+                          movieId_userId: {
+                              movieId,
                               userId,
                           },
                       },
@@ -316,28 +299,23 @@ export const createMovies = async (
         const response = await Promise.all(
             movies.map((movie) => {
                 const data = fromMovieWriteData(movie);
-                return prisma.mediaItem.create({
+                return prisma.movie.create({
                     data: {
-                        ...(data.mediaItem as any),
-                        type: "MOVIE",
-                        movie: {
-                            create: {
-                                director:
-                                    typeof movie.director === "string"
-                                        ? movie.director
-                                        : "",
-                                runtime:
-                                    typeof movie.runtime === "number"
-                                        ? movie.runtime
-                                        : 0,
-                                ...(Array.isArray(movie.cast)
-                                    ? { cast: movie.cast }
-                                    : {}),
-                                ...(typeof movie.tmdbId === "number"
-                                    ? { tmdbId: movie.tmdbId }
-                                    : {}),
-                            },
-                        },
+                        ...(data as any),
+                        director:
+                            typeof movie.director === "string"
+                                ? movie.director
+                                : "",
+                        runtime:
+                            typeof movie.runtime === "number"
+                                ? movie.runtime
+                                : 0,
+                        ...(Array.isArray(movie.cast)
+                            ? { cast: movie.cast }
+                            : {}),
+                        ...(typeof movie.tmdbId === "number"
+                            ? { tmdbId: movie.tmdbId }
+                            : {}),
                     },
                 });
             }),
@@ -360,36 +338,10 @@ export const updateMovie = async (
     const updateData = fromMovieWriteData(req.body);
 
     try {
-        const updatedMovie = await prisma.mediaItem.update({
+        const updatedMovie = await prisma.movie.update({
             where: { id: movieId },
-            data: updateData.mediaItem as any,
-            include: {
-                movie: true,
-            },
+            data: updateData as any,
         });
-        if (Object.keys(updateData.movie).length > 0) {
-            await prisma.movie.upsert({
-                where: { mediaItemId: movieId },
-                update: updateData.movie,
-                create: {
-                    mediaItemId: movieId,
-                    director:
-                        typeof req.body.director === "string"
-                            ? req.body.director
-                            : "",
-                    runtime:
-                        typeof req.body.runtime === "number"
-                            ? req.body.runtime
-                            : 0,
-                    ...(Array.isArray(req.body.cast)
-                        ? { cast: req.body.cast }
-                        : {}),
-                    ...(typeof req.body.tmdbId === "number"
-                        ? { tmdbId: req.body.tmdbId }
-                        : {}),
-                },
-            });
-        }
         res.status(200).send(toMovieResponse(updatedMovie));
     } catch (error: any) {
         res.status(500).send({

@@ -64,14 +64,14 @@ export const getSimilarUsersForUser = async (
                 mediaType: "MOVIE",
             },
             select: {
-                mediaItemId: true,
+                movieId: true,
                 rating: true,
             },
         })
     ).map((review) => ({
-        movieId: review.mediaItemId,
+        movieId: review.movieId ?? "",
         rating: review.rating,
-    }));
+    })).filter((review) => review.movieId);
 
     if (userReviews.length < MIN_REVIEWS_FOR_RECOMMENDATIONS) {
         return {
@@ -87,7 +87,7 @@ export const getSimilarUsersForUser = async (
     const candidateReviews = (
         await prisma.review.findMany({
             where: {
-                mediaItemId: {
+                movieId: {
                     in: userMovieIds,
                 },
                 userId: {
@@ -96,16 +96,16 @@ export const getSimilarUsersForUser = async (
                 mediaType: "MOVIE",
             },
             select: {
-                mediaItemId: true,
+                movieId: true,
                 rating: true,
                 userId: true,
             },
         })
     ).map((review) => ({
-        movieId: review.mediaItemId,
+        movieId: review.movieId ?? "",
         rating: review.rating,
         userId: review.userId,
-    }));
+    })).filter((review) => review.movieId);
 
     const userReviewsByMovieId = new Map(
         userReviews.map((review) => [review.movieId, review]),

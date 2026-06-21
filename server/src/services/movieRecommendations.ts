@@ -262,10 +262,7 @@ export const replaceMovieRecommendationsForUser = async (
     const generatedAt = new Date();
 
     await prisma.recommendationCache.deleteMany({
-        where: {
-            userId,
-            mediaType: "MOVIE",
-        },
+        where: { userId },
     });
 
     if (recommendations.length === 0) return;
@@ -274,7 +271,7 @@ export const replaceMovieRecommendationsForUser = async (
         data: recommendations.map((recommendation) => ({
             userId,
             mediaType: "MOVIE",
-            mediaItemId: recommendation.movie.id,
+            movieId: recommendation.movie.id,
             score: recommendation.score,
             recommendedByCount: recommendation.recommendedByCount,
             generatedAt,
@@ -287,10 +284,7 @@ export const invalidateMovieRecommendationsForUser = async (
     userId: string,
 ) => {
     await prisma.recommendationCache.deleteMany({
-        where: {
-            userId,
-            mediaType: "MOVIE",
-        },
+        where: { userId },
     });
 };
 
@@ -309,7 +303,7 @@ const getCachedMovieRecommendationsForUser = async (
                 score: true,
                 recommendedByCount: true,
                 generatedAt: true,
-                mediaItem: {
+                movie: {
                     select: {
                         id: true,
                         title: true,
@@ -319,7 +313,10 @@ const getCachedMovieRecommendationsForUser = async (
                         avgRating: true,
                         numRatings: true,
                         image: true,
-                        movie: true,
+                        tmdbId: true,
+                        director: true,
+                        cast: true,
+                        runtime: true,
                     },
                 },
             },
@@ -342,11 +339,13 @@ const getCachedMovieRecommendationsForUser = async (
     }
 
     return {
-        recommendations: cachedRecommendations.map((recommendation) => ({
-            movie: toMovieResponse(recommendation.mediaItem),
-            score: recommendation.score,
-            recommendedByCount: recommendation.recommendedByCount,
-        })),
+        recommendations: cachedRecommendations
+            .filter((recommendation) => recommendation.movie !== null)
+            .map((recommendation) => ({
+                movie: toMovieResponse(recommendation.movie!),
+                score: recommendation.score,
+                recommendedByCount: recommendation.recommendedByCount,
+            })),
         currentReviewCount,
         minReviewsRequired: MIN_REVIEWS_FOR_RECOMMENDATIONS,
         recommendationsAvailable:
@@ -381,7 +380,7 @@ const computeMovieRecommendationsForUser = async (
                 mediaType: "MOVIE",
             },
             select: {
-                mediaItemId: true,
+                movieId: true,
             },
         }),
         prisma.review.findMany({
@@ -390,34 +389,37 @@ const computeMovieRecommendationsForUser = async (
                 mediaType: "MOVIE",
             },
             select: {
-                mediaItemId: true,
+                movieId: true,
                 rating: true,
-                mediaItem: {
+                movie: {
                     select: {
                         genres: true,
                         keywords: true,
                         releaseYear: true,
-                        movie: true,
+                        director: true,
+                        cast: true,
                     },
                 },
             },
         }),
     ]);
 
-    const excludedMovieIds = new Set([
+    const excludedMovieIds = new Set<string>([
         ...similarityResult.userReviews.map((review) => review.movieId),
-        ...userWatchlist.map((item) => item.mediaItemId),
+        ...userWatchlist.flatMap((item) => (item.movieId ? [item.movieId] : [])),
     ]);
     const userTasteProfile = buildUserTasteProfile(
-        reviewedMovies.map((review) => ({
-            movieId: review.mediaItemId,
-            rating: review.rating,
-            movie: {
-                ...review.mediaItem,
-                director: review.mediaItem.movie?.director ?? null,
-                cast: review.mediaItem.movie?.cast ?? [],
-            },
-        })),
+        reviewedMovies.flatMap((review) =>
+            review.movieId && review.movie
+                ? [
+                      {
+                          movieId: review.movieId,
+                          rating: review.rating,
+                          movie: review.movie,
+                      },
+                  ]
+                : [],
+        ),
     );
     const similarUsersById = new Map(
         similarUsers.map((user) => [user.userId, user]),
@@ -431,13 +433,13 @@ const computeMovieRecommendationsForUser = async (
             rating: {
                 gte: FAVORITE_RATING_THRESHOLD,
             },
-            mediaItemId: {
+            movieId: {
                 notIn: [...excludedMovieIds],
             },
             mediaType: "MOVIE",
         },
         select: {
-            mediaItemId: true,
+            movieId: true,
             rating: true,
             userId: true,
         },
@@ -456,7 +458,9 @@ const computeMovieRecommendationsForUser = async (
         const similarUser = similarUsersById.get(review.userId);
         if (!similarUser) continue;
 
-        const scoreData = movieScoresByMovieId.get(review.mediaItemId) ?? {
+        if (!review.movieId) continue;
+
+        const scoreData = movieScoresByMovieId.get(review.movieId) ?? {
             weightedRatingTotal: 0,
             similarityTotal: 0,
             recommendedByUserIds: new Set<string>(),
@@ -466,7 +470,7 @@ const computeMovieRecommendationsForUser = async (
             similarUser.similarityScore * review.rating;
         scoreData.similarityTotal += similarUser.similarityScore;
         scoreData.recommendedByUserIds.add(review.userId);
-        movieScoresByMovieId.set(review.mediaItemId, scoreData);
+        movieScoresByMovieId.set(review.movieId, scoreData);
     }
 
     const collaborativeScoresByMovieId = new Map(
@@ -483,9 +487,8 @@ const computeMovieRecommendationsForUser = async (
         ]),
     );
 
-    const candidateMediaItems = await prisma.mediaItem.findMany({
+    const candidateMovies = await prisma.movie.findMany({
         where: {
-            type: "MOVIE",
             id: {
                 notIn: [...excludedMovieIds],
             },
@@ -499,29 +502,13 @@ const computeMovieRecommendationsForUser = async (
             avgRating: true,
             numRatings: true,
             image: true,
-        },
-    });
-    const candidateMovieDetails = await prisma.movie.findMany({
-        select: {
-            mediaItemId: true,
             director: true,
             cast: true,
         },
     });
-    const candidateMovieDetailsByMediaItemId = new Map(
-        candidateMovieDetails.map((movie) => [movie.mediaItemId, movie]),
-    );
 
-    const scoredMovies = candidateMediaItems
-        .map((mediaItem) => {
-            const movieDetails = candidateMovieDetailsByMediaItemId.get(
-                mediaItem.id,
-            );
-            const movie = {
-                ...mediaItem,
-                director: movieDetails?.director ?? null,
-                cast: movieDetails?.cast ?? [],
-            };
+    const scoredMovies = candidateMovies
+        .map((movie) => {
             const collaborativeScoreData = collaborativeScoresByMovieId.get(
                 movie.id,
             );
@@ -538,7 +525,7 @@ const computeMovieRecommendationsForUser = async (
 
             return {
                 movieId: movie.id,
-                movie: mediaItem,
+                movie,
                 score,
                 recommendedByCount:
                     collaborativeScoreData?.recommendedByCount ?? 0,

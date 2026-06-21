@@ -44,9 +44,8 @@ model User {
   recommendedToUsers     FriendRecommendationCache[] @relation("recommendedUser")
 }
 
-model MediaItem {
+model Movie {
   id              String                @id @default(auto()) @map("_id") @db.ObjectId
-  type            MediaType             @default(MOVIE)
   title           String
   releaseYear     Int
   overview        String
@@ -57,44 +56,46 @@ model MediaItem {
   avgRating       Float                 @default(0)
   numRatings      Int                   @default(0)
   image           String                @map("poster")
-  movie           Movie?
-  book            Book?
+  tmdbId          Int?
+  director        String
+  cast            String[]              @default([])
+  runtime         Int
   reviews         Review[]
   savedByUsers    SavedItem[]
   userActivities  Activity[]
   recommendations RecommendationCache[]
 
-  @@index([type])
-  @@index([type, title])
+  @@index([tmdbId])
+  @@index([title])
   @@map("Movie")
 }
 
-model Movie {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id])
-  mediaItemId String    @unique @db.ObjectId
-  tmdbId      Int?
-  director    String
-  cast        String[]  @default([])
-  runtime     Int
-
-  @@index([tmdbId])
-  @@map("MovieDetails")
-}
-
 model Book {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  mediaItem    MediaItem @relation(fields: [mediaItemId], references: [id])
-  mediaItemId  String    @unique @db.ObjectId
-  authors      String[]
-  pageCount    Int?
-  isbn10       String?
-  isbn13       String?
-  googleBookId String?
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  releaseYear     Int
+  overview        String
+  language        String
+  genres          String[]
+  keywords        String[]    @default([])
+  popularity      Float       @default(0)
+  avgRating       Float       @default(0)
+  numRatings      Int         @default(0)
+  image           String      @map("poster")
+  authors         String[]
+  pageCount       Int?
+  isbn10          String?
+  isbn13          String?
+  googleBookId    String?
+  reviews         Review[]
+  savedByUsers    SavedItem[]
+  userActivities  Activity[]
+  recommendations RecommendationCache[]
 
   @@index([googleBookId])
   @@index([isbn13])
-  @@map("BookDetails")
+  @@index([title])
+  @@map("Book")
 }
 
 model RecommendationCache {
@@ -102,13 +103,15 @@ model RecommendationCache {
   user               User      @relation(fields: [userId], references: [id], name: "recommendationUser")
   userId             String    @db.ObjectId
   mediaType          MediaType @default(MOVIE)
-  mediaItem          MediaItem @relation(fields: [mediaItemId], references: [id])
-  mediaItemId        String    @map("movieId") @db.ObjectId
+  movie              Movie?    @relation(fields: [movieId], references: [id])
+  movieId            String?   @map("movieId") @db.ObjectId
+  book               Book?     @relation(fields: [bookId], references: [id])
+  bookId             String?   @db.ObjectId
   score              Float
   recommendedByCount Int
   generatedAt        DateTime
 
-  @@unique([userId, mediaItemId])
+  @@unique([userId, movieId])
   @@index([userId, score])
   @@index([userId, mediaType, score])
   @@map("MovieRecommendationCache")
@@ -131,8 +134,10 @@ model FriendRecommendationCache {
 
 model Review {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
-  mediaItem      MediaItem    @relation(fields: [mediaItemId], references: [id])
-  mediaItemId    String       @map("movieId") @db.ObjectId
+  movie          Movie?       @relation(fields: [movieId], references: [id])
+  movieId        String?      @map("movieId") @db.ObjectId
+  book           Book?        @relation(fields: [bookId], references: [id])
+  bookId         String?      @db.ObjectId
   mediaType      MediaType    @default(MOVIE)
   user           User         @relation(fields: [userId], references: [id])
   userId         String       @db.ObjectId
@@ -143,11 +148,11 @@ model Review {
   likedBy        ReviewLike[]
   userActivities Activity[]
 
-  @@unique([mediaItemId, userId])
+  @@unique([movieId, userId])
   @@index([userId])
   @@index([userId, mediaType])
-  @@index([mediaItemId, likeCount])
-  @@index([mediaType, mediaItemId])
+  @@index([movieId, likeCount])
+  @@index([mediaType, movieId])
   @@map("MovieReview")
 }
 
@@ -167,10 +172,12 @@ model SavedItem {
   user        User      @relation(fields: [userId], references: [id])
   userId      String    @db.ObjectId
   mediaType   MediaType @default(MOVIE)
-  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id])
-  mediaItemId String    @map("movieId") @db.ObjectId
+  movie       Movie?    @relation(fields: [movieId], references: [id])
+  movieId     String?   @map("movieId") @db.ObjectId
+  book        Book?     @relation(fields: [bookId], references: [id])
+  bookId      String?   @db.ObjectId
 
-  @@unique([mediaItemId, userId])
+  @@unique([movieId, userId])
   @@index([userId, mediaType])
   @@map("MovieWatchList")
 }
@@ -182,13 +189,15 @@ model Activity {
   action       String
   reviewRating Int?
   reviewText   String?
-  mediaItem    MediaItem? @relation(fields: [mediaItemId], references: [id])
-  mediaItemId  String?    @map("movieId") @db.ObjectId
+  movie        Movie?     @relation(fields: [movieId], references: [id])
+  movieId      String?    @map("movieId") @db.ObjectId
+  book         Book?      @relation(fields: [bookId], references: [id])
+  bookId       String?    @db.ObjectId
   review       Review?    @relation(fields: [reviewId], references: [id])
   reviewId     String?    @map("movieReviewId") @db.ObjectId
   date         DateTime
 
-  @@index([mediaItemId])
+  @@index([movieId])
   @@index([reviewId])
 }
 

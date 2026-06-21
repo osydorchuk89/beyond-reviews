@@ -10,72 +10,61 @@ export const movieSelect = {
   avgRating: true,
   numRatings: true,
   image: true,
-  movie: true,
+  tmdbId: true,
+  director: true,
+  cast: true,
+  runtime: true,
 } as const;
 
 export const toMovieResponse = <
   T extends {
     image: string;
-    movie?: {
-      tmdbId?: number | null;
-      director?: string;
-      cast?: string[];
-      runtime?: number;
-    } | null;
+    tmdbId?: number | null;
+    director?: string | null;
+    cast?: string[] | null;
+    runtime?: number | null;
   },
 >(
-  mediaItem: T,
+  movie: T,
 ) => {
-  const { image, movie, ...rest } = mediaItem;
+  const { image, ...rest } = movie;
 
   return {
     ...rest,
-    tmdbId: movie?.tmdbId ?? null,
-    director: movie?.director ?? "",
-    cast: movie?.cast ?? [],
-    runtime: movie?.runtime ?? 0,
     poster: image,
   };
 };
 
-export const toMovieReviewResponse = <T extends { mediaItemId: string }>(
+export const toMovieReviewResponse = <T extends { movieId: string | null }>(
   review: T,
 ) => {
-  const { mediaItemId, ...rest } = review;
+  const { movieId, ...rest } = review;
 
   return {
     ...rest,
-    movieId: mediaItemId,
+    movieId,
   };
 };
 
 export const toMovieWatchlistResponse = <
-  T extends { mediaItemId: string; mediaItem: { image: string; movie?: {} | null } },
+  T extends { movieId: string | null; movie: { image: string } | null },
 >(
   item: T,
 ) => {
-  const { mediaItemId, mediaItem, ...rest } = item;
+  const { movieId, movie, ...rest } = item;
 
   return {
     ...rest,
-    movieId: mediaItemId,
-    movie: toMovieResponse(mediaItem),
+    movieId,
+    movie: movie ? toMovieResponse(movie) : movie,
   };
 };
 
 export const fromMovieWriteData = (data: Record<string, unknown>) => {
-  const { poster, tmdbId, director, cast, runtime, ...rest } = data;
+  const { poster, ...rest } = data;
 
   return {
-    mediaItem: {
-      ...rest,
-      ...(typeof poster === "string" ? { image: poster } : {}),
-    },
-    movie: {
-      ...(typeof tmdbId === "number" ? { tmdbId } : {}),
-      ...(typeof director === "string" ? { director } : {}),
-      ...(Array.isArray(cast) ? { cast } : {}),
-      ...(typeof runtime === "number" ? { runtime } : {}),
-    },
+    ...rest,
+    ...(typeof poster === "string" ? { image: poster } : {}),
   };
 };
