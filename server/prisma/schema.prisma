@@ -29,7 +29,7 @@ model User {
   photo                  String?
   reviews                Review[]
   likes                  ReviewLike[]
-  savedItems             SavedItem[]
+  wishlistItems          WishlistItem[]
   activities             Activity[]
   friends                User[]                      @relation(fields: [friendsIds], references: [id], name: "friends")
   friendsIds             String[]                    @db.ObjectId
@@ -61,7 +61,7 @@ model Movie {
   cast            String[]              @default([])
   runtime         Int
   reviews         Review[]
-  savedByUsers    SavedItem[]
+  wishlistedByUsers WishlistItem[]
   userActivities  Activity[]
   recommendations RecommendationCache[]
 
@@ -88,7 +88,7 @@ model Book {
   isbn13          String?
   googleBookId    String?
   reviews         Review[]
-  savedByUsers    SavedItem[]
+  wishlistedByUsers WishlistItem[]
   userActivities  Activity[]
   recommendations RecommendationCache[]
 
@@ -167,7 +167,7 @@ model ReviewLike {
   @@map("MovieReviewLike")
 }
 
-model SavedItem {
+model WishlistItem {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   user        User      @relation(fields: [userId], references: [id])
   userId      String    @db.ObjectId
@@ -179,7 +179,7 @@ model SavedItem {
 
   @@unique([movieId, userId])
   @@index([userId, mediaType])
-  @@map("MovieWatchList")
+  @@map("WishlistItem")
 }
 
 model Activity {

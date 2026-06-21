@@ -46,7 +46,7 @@ export const toMovieReviewResponse = <T extends { movieId: string | null }>(
   };
 };
 
-export const toMovieWatchlistResponse = <
+export const toMovieWishlistResponse = <
   T extends { movieId: string | null; movie: { image: string } | null },
 >(
   item: T,
@@ -61,6 +61,41 @@ export const toMovieWatchlistResponse = <
 };
 
 export const fromMovieWriteData = (data: Record<string, unknown>) => {
+  const { poster, ...rest } = data;
+
+  return {
+    ...rest,
+    ...(typeof poster === "string" ? { image: poster } : {}),
+  };
+};
+
+export const toBookResponse = <T extends { image: string }>(book: T) => {
+  const { image, ...rest } = book;
+
+  return {
+    ...rest,
+    poster: image,
+  };
+};
+
+export const toBookReviewResponse = <T extends { bookId: string | null }>(
+  review: T,
+) => review;
+
+export const toBookWishlistResponse = <
+  T extends { bookId: string | null; book: { image: string } | null },
+>(
+  item: T,
+) => {
+  const { book, ...rest } = item;
+
+  return {
+    ...rest,
+    book: book ? toBookResponse(book) : book,
+  };
+};
+
+export const fromBookWriteData = (data: Record<string, unknown>) => {
   const { poster, ...rest } = data;
 
   return {

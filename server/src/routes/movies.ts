@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import {
-    addOrRemoveMovieFromWatchlist,
+    addOrRemoveMovieFromWishlist,
     createMovies,
     createOrUpdateMovieReview,
     getAllMovies,
@@ -22,8 +22,8 @@ moviesRouter.get("/:movieId", getMovieById);
 // update a movie (for dev purposes - e.g., backfilling data)
 moviesRouter.patch("/:movieId", updateMovie);
 
-// add/remove a movie on/from a watchlist
-moviesRouter.put("/:movieId", addOrRemoveMovieFromWatchlist);
+// add/remove a movie on/from a wishlist
+moviesRouter.put("/:movieId", addOrRemoveMovieFromWishlist);
 
 // get reviews of a specific movie
 moviesRouter.get("/:movieId/reviews", getMovieReviews);

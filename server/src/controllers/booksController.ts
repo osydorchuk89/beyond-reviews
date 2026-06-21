@@ -2,20 +2,20 @@ import { Request, Response } from "express";
 
 import { PrismaClient } from "@prisma/client";
 import {
-    createOrUpdateMovieReviewForUser,
-    likeOrUnlikeMovieReviewForUser,
-} from "../services/movieReviews";
-import { updateMovieWishlist } from "../services/movieWishlist";
+    createOrUpdateBookReviewForUser,
+    likeOrUnlikeBookReviewForUser,
+} from "../services/bookReviews";
+import { updateBookWishlist } from "../services/bookWishlist";
 import { getErrorMessage, getErrorStatusCode } from "../services/errors";
 import {
-    fromMovieWriteData,
-    toMovieResponse,
-    toMovieReviewResponse,
+    fromBookWriteData,
+    toBookResponse,
+    toBookReviewResponse,
 } from "../lib/media";
 
 const prisma = new PrismaClient();
 
-export const getAllMovies = async (
+export const getAllBooks = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
@@ -24,11 +24,9 @@ export const getAllMovies = async (
         const limit = parseInt(req.query.limit as string) ?? 15;
         const skip = (page - 1) * limit;
 
-        // get filter, sort, and search parameters
         const genre = req.query.genre as string;
         const releaseYear = req.query.releaseYear as string;
-        const director = req.query.director as string;
-        const actor = req.query.actor as string;
+        const author = req.query.author as string;
         const sortBy = (req.query.sortBy as string) ?? "id";
         const sortOrder = (req.query.sortOrder as string) ?? "asc";
         const search = req.query.search as string;
@@ -42,15 +40,9 @@ export const getAllMovies = async (
         if (releaseYear) {
             whereClause.releaseYear = parseInt(releaseYear);
         }
-        if (director) {
-            whereClause.director = {
-                contains: director,
-                mode: "insensitive",
-            };
-        }
-        if (actor) {
-            whereClause.cast = {
-                has: actor,
+        if (author) {
+            whereClause.authors = {
+                has: author,
             };
         }
         if (search) {
@@ -78,18 +70,18 @@ export const getAllMovies = async (
                 orderByClause.id = "asc";
         }
 
-        const [movies, totalCount] = await Promise.all([
-            prisma.movie.findMany({
+        const [books, totalCount] = await Promise.all([
+            prisma.book.findMany({
                 where: whereClause,
                 orderBy: orderByClause,
                 skip,
                 take: limit,
             }),
-            prisma.movie.count({ where: whereClause }),
+            prisma.book.count({ where: whereClause }),
         ]);
 
         res.status(200).send({
-            movies: movies.map(toMovieResponse),
+            books: books.map(toBookResponse),
             totalCount,
             currentPage: page,
             totalPages: Math.ceil(totalCount / limit),
@@ -97,36 +89,37 @@ export const getAllMovies = async (
             appliedFilters: {
                 genre,
                 releaseYear,
-                director,
-                actor,
+                author,
                 sortBy,
                 sortOrder,
                 search,
             },
         });
     } catch (error) {
-        res.status(500).send({ message: "Could not fetch movies", error });
+        res.status(500).send({ message: "Could not fetch books", error });
     }
 };
 
-export const getMovieById = async (
+export const getBookById = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
-    const { movieId } = req.params;
+    const { bookId } = req.params;
     const userId =
         ((req.user as { id?: string } | undefined)?.id ??
             req.query.userId) as string | undefined;
+
     try {
-        const movie = await prisma.movie.findUnique({
+        const book = await prisma.book.findUnique({
             where: {
-                id: movieId,
+                id: bookId,
             },
             include: {
                 wishlistedByUsers: userId
                     ? {
                           where: {
                               userId,
+                              mediaType: "BOOK",
                           },
                           select: {
                               userId: true,
@@ -136,33 +129,33 @@ export const getMovieById = async (
             },
         });
 
-        if (!movie) {
-            return res.status(404).send({ message: "Movie not found" });
+        if (!book) {
+            return res.status(404).send({ message: "Book not found" });
         }
 
-        const { wishlistedByUsers, ...movieData } = movie;
+        const { wishlistedByUsers, ...bookData } = book;
         res.status(200).send({
-            ...toMovieResponse(movieData),
+            ...toBookResponse(bookData),
             onWishlist: wishlistedByUsers,
         });
     } catch (error) {
         res.status(500).send({
-            message: "Could not fetch movie details",
+            message: "Could not fetch book details",
             error,
         });
     }
 };
 
-export const addOrRemoveMovieFromWishlist = async (
+export const addOrRemoveBookFromWishlist = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
-    const { movieId } = req.params;
+    const { bookId } = req.params;
     const { saved, userId } = req.body;
 
     try {
-        await updateMovieWishlist(prisma, {
-            movieId,
+        await updateBookWishlist(prisma, {
+            bookId,
             userId,
             saved,
         });
@@ -175,11 +168,11 @@ export const addOrRemoveMovieFromWishlist = async (
     }
 };
 
-export const getMovieReviews = async (
+export const getBookReviews = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
-    const { movieId } = req.params;
+    const { bookId } = req.params;
     const page = parseInt(req.query.page as string) ?? 1;
     const limit = parseInt(req.query.limit as string) ?? 10;
     const skip = (page - 1) * limit;
@@ -202,7 +195,7 @@ export const getMovieReviews = async (
 
         const [reviews, totalCount, userReview] = await Promise.all([
             prisma.review.findMany({
-                where: { movieId },
+                where: { bookId, mediaType: "BOOK" },
                 include,
                 orderBy: {
                     likeCount: "desc",
@@ -211,15 +204,14 @@ export const getMovieReviews = async (
                 take: limit,
             }),
             prisma.review.count({
-                where: { movieId },
+                where: { bookId, mediaType: "BOOK" },
             }),
             userId
-                ? prisma.review.findUnique({
+                ? prisma.review.findFirst({
                       where: {
-                          movieId_userId: {
-                              movieId,
-                              userId,
-                          },
+                          bookId,
+                          userId,
+                          mediaType: "BOOK",
                       },
                       include,
                   })
@@ -230,36 +222,34 @@ export const getMovieReviews = async (
         const hasMore = page < totalPages;
 
         res.status(200).send({
-            reviews: reviews.map(toMovieReviewResponse),
+            reviews: reviews.map(toBookReviewResponse),
             totalCount,
             currentPage: page,
             totalPages,
             hasMore,
-            userReview: userReview
-                ? toMovieReviewResponse(userReview)
-                : userReview,
+            userReview: userReview ? toBookReviewResponse(userReview) : userReview,
         });
     } catch (error) {
-        res.status(500).send({ message: "Could not get movie reviews", error });
+        res.status(500).send({ message: "Could not get book reviews", error });
     }
 };
 
-export const createOrUpdateMovieReview = async (
+export const createOrUpdateBookReview = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
     const { rating, text } = req.body;
 
     try {
-        const movieReview = await createOrUpdateMovieReviewForUser(prisma, {
-            movieId: req.params.movieId,
+        const bookReview = await createOrUpdateBookReviewForUser(prisma, {
+            bookId: req.params.bookId,
             userId: req.body.userId,
             rating,
             text,
             date: req.body.date,
         });
 
-        res.status(200).send(toMovieReviewResponse(movieReview));
+        res.status(200).send(toBookReviewResponse(bookReview));
     } catch (error) {
         res.status(getErrorStatusCode(error)).send({
             message: getErrorMessage(error, "Could not create or update review"),
@@ -268,14 +258,14 @@ export const createOrUpdateMovieReview = async (
     }
 };
 
-export const likeOrUnlikeMovieReview = async (
+export const likeOrUnlikeBookReview = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
     const reviewId = req.params.reviewId;
     const { like, userId } = req.body;
     try {
-        await likeOrUnlikeMovieReviewForUser(prisma, {
+        await likeOrUnlikeBookReviewForUser(prisma, {
             reviewId,
             userId,
             like,
@@ -290,62 +280,49 @@ export const likeOrUnlikeMovieReview = async (
 };
 
 // For dev purposes only
-export const createMovies = async (
+export const createBooks = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
     try {
-        const movies = Array.isArray(req.body) ? req.body : [req.body];
+        const books = Array.isArray(req.body) ? req.body : [req.body];
         const response = await Promise.all(
-            movies.map((movie) => {
-                const data = fromMovieWriteData(movie);
-                return prisma.movie.create({
+            books.map((book) => {
+                const data = fromBookWriteData(book);
+                return prisma.book.create({
                     data: {
                         ...(data as any),
-                        director:
-                            typeof movie.director === "string"
-                                ? movie.director
-                                : "",
-                        runtime:
-                            typeof movie.runtime === "number"
-                                ? movie.runtime
-                                : 0,
-                        ...(Array.isArray(movie.cast)
-                            ? { cast: movie.cast }
-                            : {}),
-                        ...(typeof movie.tmdbId === "number"
-                            ? { tmdbId: movie.tmdbId }
-                            : {}),
+                        authors: Array.isArray(book.authors) ? book.authors : [],
                     },
                 });
             }),
         );
-        res.send(response);
+        res.send(response.map(toBookResponse));
     } catch (error) {
         res.status(500).send({
-            message: "Could not create movie",
+            message: "Could not create book",
             error,
         });
     }
 };
 
 // For dev purposes only
-export const updateMovie = async (
+export const updateBook = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
-    const { movieId } = req.params;
-    const updateData = fromMovieWriteData(req.body);
+    const { bookId } = req.params;
+    const updateData = fromBookWriteData(req.body);
 
     try {
-        const updatedMovie = await prisma.movie.update({
-            where: { id: movieId },
+        const updatedBook = await prisma.book.update({
+            where: { id: bookId },
             data: updateData as any,
         });
-        res.status(200).send(toMovieResponse(updatedMovie));
+        res.status(200).send(toBookResponse(updatedBook));
     } catch (error: any) {
         res.status(500).send({
-            message: "Could not update movie",
+            message: "Could not update book",
             error,
         });
     }

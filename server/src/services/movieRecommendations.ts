@@ -373,8 +373,8 @@ const computeMovieRecommendationsForUser = async (
         RECOMMENDATION_LIMITS.maxSimilarUsers,
     );
 
-    const [userWatchlist, reviewedMovies] = await Promise.all([
-        prisma.savedItem.findMany({
+    const [userWishlist, reviewedMovies] = await Promise.all([
+        prisma.wishlistItem.findMany({
             where: {
                 userId,
                 mediaType: "MOVIE",
@@ -406,7 +406,7 @@ const computeMovieRecommendationsForUser = async (
 
     const excludedMovieIds = new Set<string>([
         ...similarityResult.userReviews.map((review) => review.movieId),
-        ...userWatchlist.flatMap((item) => (item.movieId ? [item.movieId] : [])),
+        ...userWishlist.flatMap((item) => (item.movieId ? [item.movieId] : [])),
     ]);
     const userTasteProfile = buildUserTasteProfile(
         reviewedMovies.flatMap((review) =>

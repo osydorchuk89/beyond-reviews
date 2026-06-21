@@ -2,15 +2,15 @@ import { PrismaClient } from "@prisma/client";
 
 import { ServiceError } from "./errors";
 
-interface UpdateMovieWatchlistArgs {
+interface UpdateMovieWishlistArgs {
     movieId: string;
     userId: string;
     saved: boolean;
 }
 
-export const updateMovieWatchlist = async (
+export const updateMovieWishlist = async (
     prisma: PrismaClient,
-    { movieId, userId, saved }: UpdateMovieWatchlistArgs,
+    { movieId, userId, saved }: UpdateMovieWishlistArgs,
 ) => {
     const movie = await prisma.movie.findUnique({
         where: { id: movieId },
@@ -22,7 +22,7 @@ export const updateMovieWatchlist = async (
 
     await prisma.$transaction(async (tx) => {
         if (saved) {
-            await tx.savedItem.create({
+            await tx.wishlistItem.create({
                 data: {
                     userId,
                     movieId,
@@ -30,7 +30,7 @@ export const updateMovieWatchlist = async (
                 },
             });
         } else {
-            await tx.savedItem.delete({
+            await tx.wishlistItem.delete({
                 where: {
                     movieId_userId: {
                         movieId,
@@ -43,7 +43,7 @@ export const updateMovieWatchlist = async (
         await tx.activity.create({
             data: {
                 userId,
-                action: saved ? "saved" : "unsaved",
+                action: saved ? "wishlisted" : "unwishlisted",
                 movieId,
                 date: new Date(),
             },

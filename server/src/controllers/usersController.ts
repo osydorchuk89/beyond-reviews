@@ -15,7 +15,10 @@ import { getErrorMessage, getErrorStatusCode } from "../services/errors";
 import {
     toMovieResponse,
     toMovieReviewResponse,
-    toMovieWatchlistResponse,
+    toMovieWishlistResponse,
+    toBookResponse,
+    toBookReviewResponse,
+    toBookWishlistResponse,
 } from "../lib/media";
 
 const prisma = new PrismaClient();
@@ -151,9 +154,19 @@ export const getUserActivities = async (
                 include: {
                     movie: {
                         select: {
+                            id: true,
                             title: true,
                             releaseYear: true,
                             image: true,
+                        },
+                    },
+                    book: {
+                        select: {
+                            id: true,
+                            title: true,
+                            releaseYear: true,
+                            image: true,
+                            authors: true,
                         },
                     },
                     user: {
@@ -180,6 +193,15 @@ export const getUserActivities = async (
                                     image: true,
                                 },
                             },
+                            book: {
+                                select: {
+                                    id: true,
+                                    title: true,
+                                    releaseYear: true,
+                                    image: true,
+                                    authors: true,
+                                },
+                            },
                         },
                     },
                 },
@@ -196,17 +218,26 @@ export const getUserActivities = async (
         const hasMore = page < totalPages;
 
         const movieActivities = activities.map((activity) => {
-            const { movie, movieId, review, reviewId, ...rest } =
+            const { movie, movieId, book, bookId, review, reviewId, ...rest } =
                 activity;
             return {
                 ...rest,
                 movieId,
                 movie: movie ? toMovieResponse(movie) : movie,
+                bookId,
+                book: book ? toBookResponse(book) : book,
                 movieReviewId: reviewId,
                 movieReview: review
                     ? {
                           ...toMovieReviewResponse(review),
                           movie: review.movie ? toMovieResponse(review.movie) : review.movie,
+                      }
+                    : review,
+                bookReviewId: reviewId,
+                bookReview: review
+                    ? {
+                          ...toBookReviewResponse(review),
+                          book: review.book ? toBookResponse(review.book) : review.book,
                       }
                     : review,
             };
@@ -338,13 +369,13 @@ export const acceptFriendRequest = async (
     }
 };
 
-export const getUserWatchlist = async (
+export const getUserWishlist = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
     const { userId } = req.params;
     try {
-        const watchlist = await prisma.savedItem.findMany({
+        const wishlist = await prisma.wishlistItem.findMany({
             where: {
                 userId,
                 mediaType: "MOVIE",
@@ -362,10 +393,48 @@ export const getUserWatchlist = async (
                 },
             },
         });
-        res.status(200).send(watchlist.map(toMovieWatchlistResponse));
+        res.status(200).send(wishlist.map(toMovieWishlistResponse));
     } catch (error) {
         res.status(500).send({
-            message: "Could not fetch user watchlist",
+            message: "Could not fetch user wishlist",
+            error,
+        });
+    }
+};
+
+export const getUserBookWishlist = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
+    const { userId } = req.params;
+    try {
+        const wishlist = await prisma.wishlistItem.findMany({
+            where: {
+                userId,
+                mediaType: "BOOK",
+            },
+            include: {
+                book: {
+                    select: {
+                        title: true,
+                        releaseYear: true,
+                        genres: true,
+                        avgRating: true,
+                        numRatings: true,
+                        image: true,
+                        authors: true,
+                        pageCount: true,
+                        isbn10: true,
+                        isbn13: true,
+                        googleBookId: true,
+                    },
+                },
+            },
+        });
+        res.status(200).send(wishlist.map(toBookWishlistResponse));
+    } catch (error) {
+        res.status(500).send({
+            message: "Could not fetch user book wishlist",
             error,
         });
     }
@@ -428,6 +497,69 @@ export const getUserMovieReviews = async (
     } catch (error) {
         res.status(500).send({
             message: "Could not fetch user reviews",
+            error,
+        });
+    }
+};
+
+export const getUserBookReviews = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
+    const { userId } = req.params;
+    const page = parseInt(req.query.page as string) ?? 1;
+    const limit = 15;
+    const skip = (page - 1) * limit;
+
+    try {
+        const [reviews, totalCount] = await Promise.all([
+            prisma.review.findMany({
+                where: {
+                    userId,
+                    mediaType: "BOOK",
+                },
+                include: {
+                    book: {
+                        select: {
+                            id: true,
+                            title: true,
+                            releaseYear: true,
+                            image: true,
+                            authors: true,
+                        },
+                    },
+                },
+                orderBy: { date: "desc" },
+                skip,
+                take: limit,
+            }),
+            prisma.review.count({
+                where: {
+                    userId,
+                    mediaType: "BOOK",
+                },
+            }),
+        ]);
+
+        const totalPages = Math.ceil(totalCount / limit);
+        const hasMore = page < totalPages;
+
+        res.status(200).send({
+            reviews: reviews.map((review) => {
+                const { book, ...reviewData } = review;
+                return {
+                    ...toBookReviewResponse(reviewData),
+                    book: book ? toBookResponse(book) : book,
+                };
+            }),
+            totalCount,
+            currentPage: page,
+            totalPages,
+            hasMore,
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: "Could not fetch user book reviews",
             error,
         });
     }

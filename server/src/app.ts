@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import MongoStore from "connect-mongo";
 
 import { moviesRouter } from "./routes/movies";
+import { booksRouter } from "./routes/books";
 import { usersRouter } from "./routes/users";
 import { messagesRouter } from "./routes/messages";
 import { authRouter } from "./routes/auth";
@@ -57,6 +58,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api/movies", moviesRouter);
+app.use("/api/books", booksRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/auth", authRouter);
