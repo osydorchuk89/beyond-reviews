@@ -40,25 +40,32 @@ export const createOrUpdateMovieReviewForUser = async (
     }
 
     return prisma.$transaction(async (tx) => {
-        const review = await tx.review.upsert({
+        const existingReview = await tx.review.findFirst({
             where: {
-                movieId_userId: {
-                    userId,
-                    movieId,
-                },
-            },
-            update: {
-                ...validationResult.data,
-                date,
-            },
-            create: {
-                ...validationResult.data,
-                userId,
                 movieId,
+                userId,
                 mediaType: "MOVIE",
-                date,
             },
         });
+        const review = existingReview
+            ? await tx.review.update({
+                  where: {
+                      id: existingReview.id,
+                  },
+                  data: {
+                      ...validationResult.data,
+                      date,
+                  },
+              })
+            : await tx.review.create({
+                  data: {
+                      ...validationResult.data,
+                      userId,
+                      movieId,
+                      mediaType: "MOVIE",
+                      date,
+                  },
+              });
 
         const aggregations = await tx.review.aggregate({
             where: {

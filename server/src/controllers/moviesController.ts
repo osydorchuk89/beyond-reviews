@@ -214,12 +214,11 @@ export const getMovieReviews = async (
                 where: { movieId },
             }),
             userId
-                ? prisma.review.findUnique({
+                ? prisma.review.findFirst({
                       where: {
-                          movieId_userId: {
-                              movieId,
-                              userId,
-                          },
+                          movieId,
+                          userId,
+                          mediaType: "MOVIE",
                       },
                       include,
                   })

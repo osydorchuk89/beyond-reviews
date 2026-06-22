@@ -15,13 +15,24 @@ import {
 
 const prisma = new PrismaClient();
 
+const parsePositiveInteger = (
+    value: string | undefined,
+    fallback: number,
+) => {
+    const parsedValue = Number.parseInt(value ?? "", 10);
+
+    return Number.isInteger(parsedValue) && parsedValue > 0
+        ? parsedValue
+        : fallback;
+};
+
 export const getAllBooks = async (
     req: Request,
     res: Response,
 ): Promise<any> => {
     try {
-        const page = parseInt(req.query.page as string) ?? 1;
-        const limit = parseInt(req.query.limit as string) ?? 15;
+        const page = parsePositiveInteger(req.query.page as string, 1);
+        const limit = parsePositiveInteger(req.query.limit as string, 15);
         const skip = (page - 1) * limit;
 
         const genre = req.query.genre as string;
@@ -114,28 +125,27 @@ export const getBookById = async (
             where: {
                 id: bookId,
             },
-            include: {
-                wishlistedByUsers: userId
-                    ? {
-                          where: {
-                              userId,
-                              mediaType: "BOOK",
-                          },
-                          select: {
-                              userId: true,
-                          },
-                      }
-                    : false,
-            },
         });
 
         if (!book) {
             return res.status(404).send({ message: "Book not found" });
         }
 
-        const { wishlistedByUsers, ...bookData } = book;
+        const wishlistedByUsers = userId
+            ? await prisma.wishlistItem.findMany({
+                  where: {
+                      bookId,
+                      userId,
+                      mediaType: "BOOK",
+                  },
+                  select: {
+                      userId: true,
+                  },
+              })
+            : [];
+
         res.status(200).send({
-            ...toBookResponse(bookData),
+            ...toBookResponse(book),
             onWishlist: wishlistedByUsers,
         });
     } catch (error) {
@@ -173,8 +183,8 @@ export const getBookReviews = async (
     res: Response,
 ): Promise<any> => {
     const { bookId } = req.params;
-    const page = parseInt(req.query.page as string) ?? 1;
-    const limit = parseInt(req.query.limit as string) ?? 10;
+    const page = parsePositiveInteger(req.query.page as string, 1);
+    const limit = parsePositiveInteger(req.query.limit as string, 10);
     const skip = (page - 1) * limit;
     const userId = req.query.userId as string | undefined;
 

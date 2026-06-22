@@ -87,12 +87,14 @@ model Book {
   isbn10          String?
   isbn13          String?
   googleBookId    String?
+  hardcoverBookId Int?
   reviews         Review[]
   wishlistedByUsers WishlistItem[]
   userActivities  Activity[]
   recommendations RecommendationCache[]
 
   @@index([googleBookId])
+  @@index([hardcoverBookId])
   @@index([isbn13])
   @@index([title])
   @@map("Book")
@@ -148,11 +150,11 @@ model Review {
   likedBy        ReviewLike[]
   userActivities Activity[]
 
-  @@unique([movieId, userId])
   @@index([userId])
   @@index([userId, mediaType])
   @@index([movieId, likeCount])
   @@index([mediaType, movieId])
+  @@index([mediaType, bookId])
   @@map("MovieReview")
 }
 
