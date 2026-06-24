@@ -9,6 +9,8 @@ export const useQueryClick = () => {
                 searchParams.set("genre", value);
             } else if (paramType === "releaseYear") {
                 searchParams.set("releaseYear", value);
+            } else if (paramType === "author") {
+                searchParams.set("author", value);
             }
 
             searchParams.delete("page");

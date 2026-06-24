@@ -188,6 +188,64 @@ const stringArrayValue = (value: unknown) =>
         .filter((item): item is string => Boolean(item))
     : [];
 
+const uniqueStrings = (values: string[]) => [...new Set(values)];
+
+const contributionRole = (contribution: unknown) => {
+  if (typeof contribution === "string") return contribution.trim();
+  if (contribution === null || contribution === undefined) return null;
+  return null;
+};
+
+const authorNameFromContribution = (contribution: unknown) => {
+  if (!contribution || typeof contribution !== "object") return null;
+
+  const contributionObject = contribution as Record<string, unknown>;
+  const author = contributionObject.author;
+  if (!author || typeof author !== "object") return null;
+
+  return stringValue((author as Record<string, unknown>).name);
+};
+
+const authorNamesByRole = (
+  result: HardcoverBookResult,
+  isMatchingRole: (role: string | null) => boolean,
+) => {
+  if (!Array.isArray(result.contributions)) return [];
+
+  return uniqueStrings(
+    result.contributions
+      .map((contribution) => {
+        const contributionObject =
+          contribution && typeof contribution === "object"
+            ? (contribution as Record<string, unknown>)
+            : null;
+        if (!contributionObject) return null;
+
+        const role = contributionRole(contributionObject.contribution);
+        if (!isMatchingRole(role)) return null;
+
+        return authorNameFromContribution(contribution);
+      })
+      .filter((name): name is string => Boolean(name)),
+  );
+};
+
+const primaryAuthorsFromResult = (result: HardcoverBookResult) => {
+  const directAuthors = authorNamesByRole(
+    result,
+    (role) => role === null || /^author$/i.test(role) || /^writer$/i.test(role),
+  );
+  if (directAuthors.length > 0) return directAuthors;
+
+  const sourceAuthors = authorNamesByRole(result, (role) =>
+    /^source material$/i.test(role ?? ""),
+  );
+  if (sourceAuthors.length > 0) return sourceAuthors;
+
+  const authorNames = stringArrayValue(result.author_names);
+  return authorNames.slice(0, 1);
+};
+
 const cleanIdentifier = (identifier?: string) =>
   identifier?.replace(/[^0-9Xx]/g, "").toUpperCase() ?? null;
 
@@ -252,7 +310,7 @@ const candidateFromResult = (
   const id = numberValue(result.id);
   const title = stringValue(result.title);
   const releaseYear = parseReleaseYear(result);
-  const authors = stringArrayValue(result.author_names);
+  const authors = primaryAuthorsFromResult(result);
   const overview = stringValue(result.description);
   const image = normalizeImageUrl(result.image);
   const genres = stringArrayValue(result.genres).slice(0, 8);

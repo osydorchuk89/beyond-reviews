@@ -1,4 +1,6 @@
 import { MediaCard } from "../media/MediaCard";
+import { useQueryClick } from "../../../hooks/useQueryClick";
+import { QueryLink } from "../../ui/QueryLink";
 
 interface BookCardProps {
     bookId: string;
@@ -21,17 +23,30 @@ export const BookCard = ({
     numRatings,
     poster,
 }: BookCardProps) => {
-    const displayedAuthors =
-        authors.length === 0 ? "Unknown author" : authors.slice(0, 2).join(", ");
+    const handleQueryClick = useQueryClick();
+    const displayedAuthor = authors[0];
 
     return (
         <MediaCard
             to={`/books/${bookId}`}
             title={title}
-            subtitle={displayedAuthors}
+            subtitle={
+                displayedAuthor ? (
+                    <QueryLink
+                        onClick={() =>
+                            handleQueryClick("author", displayedAuthor)
+                        }
+                    >
+                        {displayedAuthor}
+                    </QueryLink>
+                ) : (
+                    "Unknown author"
+                )
+            }
             releaseYear={releaseYear}
             genres={genres}
             genreLimit={2}
+            showGenres={false}
             avgRating={avgRating}
             numRatings={numRatings}
             poster={poster || "/images/fallback-movie-poster.jpg"}

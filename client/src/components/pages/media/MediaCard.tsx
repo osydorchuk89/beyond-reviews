@@ -18,6 +18,7 @@ interface MediaCardProps {
     ratingCountPlural: string;
     subtitle?: ReactNode;
     genreLimit?: number;
+    showGenres?: boolean;
     hasShadow?: boolean;
     imageClassName?: string;
 }
@@ -35,6 +36,7 @@ export const MediaCard = ({
     ratingCountPlural,
     subtitle,
     genreLimit = 3,
+    showGenres = true,
     hasShadow = true,
     imageClassName = "rounded-lg",
 }: MediaCardProps) => {
@@ -57,24 +59,28 @@ export const MediaCard = ({
                     {subtitle}
                 </p>
             )}
-            <p
-                className={`mb-2 text-sky-950 text-center min-h-6 ${!subtitle ? "mt-16" : ""}`}
-            >
-                {displayedGenres.length > 0 ? (
-                    displayedGenres.map((genre, index) => (
-                        <span key={genre}>
-                            <QueryLink
-                                onClick={() => handleQueryClick("genre", genre)}
-                            >
-                                {genre}
-                            </QueryLink>
-                            {index !== displayedGenres.length - 1 && " | "}
-                        </span>
-                    ))
-                ) : (
-                    <span>&nbsp;</span>
-                )}
-            </p>
+            {showGenres && (
+                <p
+                    className={`mb-2 text-sky-950 text-center min-h-6 ${!subtitle ? "mt-16" : ""}`}
+                >
+                    {displayedGenres.length > 0 ? (
+                        displayedGenres.map((genre, index) => (
+                            <span key={genre}>
+                                <QueryLink
+                                    onClick={() =>
+                                        handleQueryClick("genre", genre)
+                                    }
+                                >
+                                    {genre}
+                                </QueryLink>
+                                {index !== displayedGenres.length - 1 && " | "}
+                            </span>
+                        ))
+                    ) : (
+                        <span>&nbsp;</span>
+                    )}
+                </p>
+            )}
             <p className="mb-2 text-sky-950">
                 <QueryLink
                     onClick={() =>
