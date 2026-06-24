@@ -22,20 +22,29 @@ export const updateMovieWishlist = async (
 
     await prisma.$transaction(async (tx) => {
         if (saved) {
-            await tx.wishlistItem.create({
-                data: {
+            const existingWishlistItem = await tx.wishlistItem.findFirst({
+                where: {
                     userId,
                     movieId,
                     mediaType: "MOVIE",
                 },
             });
-        } else {
-            await tx.wishlistItem.delete({
-                where: {
-                    movieId_userId: {
-                        movieId,
+
+            if (!existingWishlistItem) {
+                await tx.wishlistItem.create({
+                    data: {
                         userId,
+                        movieId,
+                        mediaType: "MOVIE",
                     },
+                });
+            }
+        } else {
+            await tx.wishlistItem.deleteMany({
+                where: {
+                    movieId,
+                    userId,
+                    mediaType: "MOVIE",
                 },
             });
         }

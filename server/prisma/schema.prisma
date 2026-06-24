@@ -179,8 +179,9 @@ model WishlistItem {
   book        Book?     @relation(fields: [bookId], references: [id])
   bookId      String?   @db.ObjectId
 
-  @@unique([movieId, userId])
   @@index([userId, mediaType])
+  @@index([movieId, userId])
+  @@index([bookId, userId])
   @@map("WishlistItem")
 }
 

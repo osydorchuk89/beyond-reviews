@@ -7,7 +7,7 @@ export const headerNavLinks = [
 export const profileNavLinks = [
     { text: "Activities", to: "../activities" },
     { text: "Reviews", to: "../reviews" },
-    { text: "Watchlist", to: "../watch-list" },
+    { text: "Wishlist", to: "../wishlist" },
     { text: "Friends", to: "../friends" },
     { text: "Messages", to: "../messages" },
     { text: "Settings", to: "../settings" },

@@ -207,11 +207,24 @@ export interface SentFriendRequest extends FriendRequest {
     };
 }
 
-export interface MovieWatchList {
+export interface MovieWishlistItem {
     id: string;
     movie: Movie;
     movieId: string;
     userId: string;
+}
+
+export interface BookWishlistItem {
+    id: string;
+    book: Book;
+    bookId: string;
+    userId: string;
+}
+
+export interface WishlistData {
+    movies: MovieWishlistItem[];
+    books: BookWishlistItem[];
+    albums: [];
 }
 
 export interface Message {

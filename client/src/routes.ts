@@ -12,7 +12,7 @@ import { ProfilePage } from "./components/pages/user/profile/ProfilePage";
 import { UserActivitiesPage } from "./components/pages/user/activities/UserActivitiesPage";
 import { UserFriendsPage } from "./components/pages/user/friends/UserFriendsPage";
 import { UserMessagesPage } from "./components/pages/user/messages/UserMessagesPage";
-import { UserWatchListPage } from "./components/pages/user/watch-list/UserWatchListPage";
+import { UserWishlistPage } from "./components/pages/user/wishlist/UserWishlistPage";
 import { UserReviewsPage } from "./components/pages/user/reviews/UserReviewsPage";
 import { UserSettingsPage } from "./components/pages/user/settings/UserSettingsPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
@@ -29,7 +29,7 @@ import {
     userFriendsLoader,
     userProfileLoader,
     userReviewsLoader,
-    userWatchListLoader,
+    userWishlistLoader,
 } from "./lib/loaders";
 import {
     loginAction,
@@ -133,9 +133,14 @@ export const router = createBrowserRouter([
                                         loader: protectedLoader,
                                     },
                                     {
+                                        path: "wishlist",
+                                        Component: UserWishlistPage,
+                                        loader: userWishlistLoader,
+                                    },
+                                    {
                                         path: "watch-list",
-                                        Component: UserWatchListPage,
-                                        loader: userWatchListLoader,
+                                        Component: UserWishlistPage,
+                                        loader: userWishlistLoader,
                                     },
                                     {
                                         path: "reviews",

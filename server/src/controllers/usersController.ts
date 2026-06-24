@@ -378,11 +378,11 @@ export const getUserWishlist = async (
         const wishlist = await prisma.wishlistItem.findMany({
             where: {
                 userId,
-                mediaType: "MOVIE",
             },
             include: {
                 movie: {
                     select: {
+                        id: true,
                         title: true,
                         releaseYear: true,
                         genres: true,
@@ -391,9 +391,34 @@ export const getUserWishlist = async (
                         image: true,
                     },
                 },
+                book: {
+                    select: {
+                        id: true,
+                        title: true,
+                        releaseYear: true,
+                        genres: true,
+                        avgRating: true,
+                        numRatings: true,
+                        image: true,
+                        authors: true,
+                        pageCount: true,
+                        isbn10: true,
+                        isbn13: true,
+                        googleBookId: true,
+                    },
+                },
             },
         });
-        res.status(200).send(wishlist.map(toMovieWishlistResponse));
+
+        res.status(200).send({
+            movies: wishlist
+                .filter((item) => item.mediaType === "MOVIE" && item.movie)
+                .map(toMovieWishlistResponse),
+            books: wishlist
+                .filter((item) => item.mediaType === "BOOK" && item.book)
+                .map(toBookWishlistResponse),
+            albums: [],
+        });
     } catch (error) {
         res.status(500).send({
             message: "Could not fetch user wishlist",

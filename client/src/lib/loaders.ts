@@ -13,7 +13,7 @@ import {
     getUser,
     getUserActivities,
     getUserMovieReviews,
-    getWatchList,
+    getWishlist,
 } from "./api";
 
 export const rootLoader = async () => {
@@ -169,17 +169,17 @@ export const booksLoader = ({ request }: LoaderFunctionArgs) => {
     return { booksDataPromise };
 };
 
-export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {
+export const userWishlistLoader = async ({ params }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
-    const [authData, userWatchList] = await Promise.all([
+    const [authData, wishlistData] = await Promise.all([
         getAuthData(),
-        getWatchList(userId),
+        getWishlist(userId),
     ]);
 
     if (!authData.isAuthenticated || authData.user?.id !== userId) {
         return {
-            userWatchList,
-            movieRecommendationsData: null,
+            wishlistData,
+            movieRecommendationsDataPromise: null,
         };
     }
 
@@ -187,7 +187,7 @@ export const userWatchListLoader = async ({ params }: LoaderFunctionArgs) => {
         .catch(() => null);
 
     return {
-        userWatchList,
+        wishlistData,
         movieRecommendationsDataPromise,
     };
 };

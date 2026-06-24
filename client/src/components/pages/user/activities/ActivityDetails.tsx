@@ -27,9 +27,10 @@ export const ActivityDetails = ({
         : "";
     const isMovieRatingActivity =
         activity.movieId && activity.action === "rated";
-    const isWatchlistActivity =
+    const isWishlistActivity =
         activity.movieId &&
-        (activity.action === "saved" || activity.action === "unsaved");
+        (activity.action === "wishlisted" ||
+            activity.action === "unwishlisted");
     const isReviewLikeActivity =
         activity.movieReviewId &&
         (activity.action === "liked" || activity.action === "unliked");
@@ -53,17 +54,19 @@ export const ActivityDetails = ({
                                 </BaseLink>
                             </>
                         )}
-                        {isWatchlistActivity && (
+                        {isWishlistActivity && (
                             <>
                                 {isSameUser ? "You" : profileUserName}{" "}
-                                {activity.action === "saved"
+                                {activity.action === "wishlisted"
                                     ? "added"
                                     : "removed"}{" "}
                                 <BaseLink to={movieUrl}>
                                     {movieFullTitle}
                                 </BaseLink>{" "}
-                                {activity.action === "saved" ? "to" : "from"}{" "}
-                                watch list
+                                {activity.action === "wishlisted"
+                                    ? "to"
+                                    : "from"}{" "}
+                                wishlist
                             </>
                         )}
                         {isReviewLikeActivity && (

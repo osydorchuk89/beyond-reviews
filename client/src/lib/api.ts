@@ -10,10 +10,10 @@ import {
     MovieRecommendationsData,
     MovieReviewsData,
     MoviesData,
-    MovieWatchList,
     User,
     UserActivities,
     UserMovieReviews,
+    WishlistData,
     UsersMessages,
 } from "./entities";
 
@@ -209,8 +209,8 @@ export const sendBookLikeOrUnlike = async (
     }
 };
 
-// Watch lists
-export const addOrRemoveMovieFromWatchlist = async (
+// Wishlists
+export const addOrRemoveMovieFromWishlist = async (
     movieId: string,
     userId: string,
     hasSaved: boolean
@@ -222,6 +222,7 @@ export const addOrRemoveMovieFromWatchlist = async (
         });
     } catch (error: any) {
         console.log(error);
+        throw error;
     }
 };
 
@@ -237,15 +238,14 @@ export const addOrRemoveBookFromWishlist = async (
         });
     } catch (error: any) {
         console.log(error);
+        throw error;
     }
 };
 
-export const getWatchList = async (
-    userId: string,
-): Promise<MovieWatchList[]> => {
+export const getWishlist = async (userId: string): Promise<WishlistData> => {
     try {
         const response = await axiosInstance.get(
-            `/api/users/${userId}/watch-list`
+            `/api/users/${userId}/wishlist`
         );
         return response.data;
     } catch (error) {

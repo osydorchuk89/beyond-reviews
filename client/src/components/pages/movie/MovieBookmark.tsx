@@ -1,4 +1,4 @@
-import { addOrRemoveMovieFromWatchlist } from "../../../lib/api";
+import { addOrRemoveMovieFromWishlist } from "../../../lib/api";
 import { Movie, AuthData } from "../../../lib/entities";
 import { MediaBookmark } from "../media/MediaBookmark";
 
@@ -13,7 +13,7 @@ export const MovieBookmark = ({ movie, authData }: MovieBookmarkProps) => {
             item={movie}
             authData={authData}
             mediaLabel="Movie"
-            addOrRemoveFromWishlist={addOrRemoveMovieFromWatchlist}
+            addOrRemoveFromWishlist={addOrRemoveMovieFromWishlist}
         />
     );
 };
