@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import {
+    BookRecommendationsData,
     MovieRecommendationsData,
     User,
     WishlistData,
@@ -24,11 +25,15 @@ export const UserWishlistPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { wishlistData, movieRecommendationsDataPromise } =
-        useLoaderData() as {
-            wishlistData: WishlistData;
-            movieRecommendationsDataPromise: Promise<MovieRecommendationsData | null> | null;
-        };
+    const {
+        wishlistData,
+        movieRecommendationsDataPromise,
+        bookRecommendationsDataPromise,
+    } = useLoaderData() as {
+        wishlistData: WishlistData;
+        movieRecommendationsDataPromise: Promise<MovieRecommendationsData | null> | null;
+        bookRecommendationsDataPromise: Promise<BookRecommendationsData | null> | null;
+    };
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
     const [selectedTab, setSelectedTab] = useState<WishlistTab>("books");
 
@@ -53,6 +58,9 @@ export const UserWishlistPage = () => {
                 {selectedTab === "books" && (
                     <BooksWishlistContent
                         wishlistData={wishlistData}
+                        bookRecommendationsDataPromise={
+                            bookRecommendationsDataPromise
+                        }
                         isSameUser={Boolean(isSameUser)}
                         profileUserName={profileUserName}
                     />

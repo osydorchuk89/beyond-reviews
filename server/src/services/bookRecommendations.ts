@@ -1,25 +1,22 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 
 import {
-    CandidateMovie,
-    MovieRecommendation,
-    MovieRecommendationsResult,
+    BookRecommendation,
+    BookRecommendationsResult,
     PreferenceStats,
-    ReviewedMovieForProfile,
-    UserTasteProfile,
 } from "../lib/entities";
-import { toMovieResponse } from "../lib/media";
+import { toBookResponse } from "../lib/media";
 import {
     FAVORITE_RATING_THRESHOLD,
     MIN_REVIEWS_FOR_RECOMMENDATIONS,
-    getSimilarUsersForUser,
+    getSimilarBookUsersForUser,
 } from "./userSimilarity";
 
 const RECOMMENDATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 const RECOMMENDATION_LIMITS = {
     maxSimilarUsers: 30,
-    maxMovieRecommendations: 12,
+    maxBookRecommendations: 12,
 };
 
 const SCORE_WEIGHTS = {
@@ -31,16 +28,14 @@ const SCORE_WEIGHTS = {
 
 const CONTENT_WEIGHTS = {
     genre: 0.4,
-    director: 0.25,
-    actor: 0.15,
-    keyword: 0.15,
-    decade: 0.05,
+    author: 0.3,
+    keyword: 0.2,
+    decade: 0.1,
 };
 
 const CONFIDENCE_COUNTS = {
     genre: 12,
-    director: 2,
-    actor: 3,
+    author: 3,
     keyword: 4,
     decade: 25,
     publicQualityRatings: 50,
@@ -51,13 +46,43 @@ const NEUTRAL_SCORE = 5;
 const MAX_RATING_RESIDUAL_FOR_FULL_SIGNAL = 4;
 const MIN_SPECIFIC_AFFINITY = 0.08;
 
+interface CandidateBook {
+    id: string;
+    title: string;
+    releaseYear: number;
+    genres: string[];
+    keywords: string[];
+    authors: string[];
+    avgRating: number;
+    numRatings: number;
+    image: string;
+}
+
+interface BookTasteProfile {
+    genres: Map<string, PreferenceStats>;
+    authors: Map<string, PreferenceStats>;
+    keywords: Map<string, PreferenceStats>;
+    decades: Map<number, PreferenceStats>;
+    averageRating: number;
+}
+
+interface ReviewedBookForProfile {
+    bookId: string;
+    rating: number;
+    book: {
+        genres: string[];
+        authors: string[];
+        keywords: string[];
+        releaseYear: number;
+    };
+}
+
+type RecommendationPrismaClient = PrismaClient | Prisma.TransactionClient;
+
 const clamp = (value: number, min: number, max: number) =>
     Math.min(Math.max(value, min), max);
 
 const getDecade = (releaseYear: number) => Math.floor(releaseYear / 10) * 10;
-
-const normalizeDirector = (director?: string | null) =>
-    (director ?? "").trim().toLowerCase();
 
 const normalizeProfileTerm = (term: string) => term.trim().toLowerCase();
 
@@ -72,24 +97,23 @@ const addPreference = <T>(
     preferences.set(key, stats);
 };
 
-const buildUserTasteProfile = (
-    reviewedMovies: ReviewedMovieForProfile[],
-): UserTasteProfile => {
+const buildBookTasteProfile = (
+    reviewedBooks: ReviewedBookForProfile[],
+): BookTasteProfile => {
     const averageRating =
-        reviewedMovies.length > 0
-            ? reviewedMovies.reduce((sum, review) => sum + review.rating, 0) /
-              reviewedMovies.length
+        reviewedBooks.length > 0
+            ? reviewedBooks.reduce((sum, review) => sum + review.rating, 0) /
+              reviewedBooks.length
             : NEUTRAL_SCORE;
-    const profile: UserTasteProfile = {
+    const profile: BookTasteProfile = {
         genres: new Map(),
-        directors: new Map(),
-        actors: new Map(),
+        authors: new Map(),
         keywords: new Map(),
         decades: new Map(),
         averageRating,
     };
 
-    for (const review of reviewedMovies) {
+    for (const review of reviewedBooks) {
         const preference = clamp(
             (review.rating - averageRating) /
                 MAX_RATING_RESIDUAL_FOR_FULL_SIGNAL,
@@ -98,17 +122,17 @@ const buildUserTasteProfile = (
         );
         if (preference === 0) continue;
 
-        for (const genre of review.movie.genres) {
+        for (const genre of review.book.genres) {
             addPreference(profile.genres, genre, preference);
         }
-        for (const actor of review.movie.cast) {
+        for (const author of review.book.authors) {
             addPreference(
-                profile.actors,
-                normalizeProfileTerm(actor),
+                profile.authors,
+                normalizeProfileTerm(author),
                 preference,
             );
         }
-        for (const keyword of review.movie.keywords) {
+        for (const keyword of review.book.keywords) {
             addPreference(
                 profile.keywords,
                 normalizeProfileTerm(keyword),
@@ -117,13 +141,8 @@ const buildUserTasteProfile = (
         }
 
         addPreference(
-            profile.directors,
-            normalizeDirector(review.movie.director),
-            preference,
-        );
-        addPreference(
             profile.decades,
-            getDecade(review.movie.releaseYear),
+            getDecade(review.book.releaseYear),
             preference,
         );
     }
@@ -171,14 +190,11 @@ const getAverageArrayPreference = (
     );
 };
 
-const getContentSignals = (
-    movie: CandidateMovie,
-    profile: UserTasteProfile,
-) => {
+const getContentSignals = (book: CandidateBook, profile: BookTasteProfile) => {
     const genrePreference =
-        movie.genres.length === 0
+        book.genres.length === 0
             ? 0
-            : movie.genres.reduce(
+            : book.genres.reduce(
                   (sum, genre) =>
                       sum +
                       getAveragePreference(
@@ -187,31 +203,25 @@ const getContentSignals = (
                           CONFIDENCE_COUNTS.genre,
                       ),
                   0,
-              ) / movie.genres.length;
-    const directorPreference = getAveragePreference(
-        profile.directors,
-        normalizeDirector(movie.director),
-        CONFIDENCE_COUNTS.director,
-    );
-    const actorPreference = getAverageArrayPreference(
-        profile.actors,
-        movie.cast,
-        CONFIDENCE_COUNTS.actor,
+              ) / book.genres.length;
+    const authorPreference = getAverageArrayPreference(
+        profile.authors,
+        book.authors,
+        CONFIDENCE_COUNTS.author,
     );
     const keywordPreference = getAverageArrayPreference(
         profile.keywords,
-        movie.keywords,
+        book.keywords,
         CONFIDENCE_COUNTS.keyword,
     );
     const decadePreference = getAveragePreference(
         profile.decades,
-        getDecade(movie.releaseYear),
+        getDecade(book.releaseYear),
         CONFIDENCE_COUNTS.decade,
     );
     const hasSpecificAffinity =
         genrePreference >= MIN_SPECIFIC_AFFINITY ||
-        directorPreference >= MIN_SPECIFIC_AFFINITY ||
-        actorPreference >= MIN_SPECIFIC_AFFINITY ||
+        authorPreference >= MIN_SPECIFIC_AFFINITY ||
         keywordPreference >= MIN_SPECIFIC_AFFINITY;
     const effectiveDecadePreference = hasSpecificAffinity
         ? decadePreference
@@ -220,8 +230,7 @@ const getContentSignals = (
     return {
         score:
             preferenceToScore(genrePreference) * CONTENT_WEIGHTS.genre +
-            preferenceToScore(directorPreference) * CONTENT_WEIGHTS.director +
-            preferenceToScore(actorPreference) * CONTENT_WEIGHTS.actor +
+            preferenceToScore(authorPreference) * CONTENT_WEIGHTS.author +
             preferenceToScore(keywordPreference) * CONTENT_WEIGHTS.keyword +
             preferenceToScore(effectiveDecadePreference) *
                 CONTENT_WEIGHTS.decade,
@@ -229,19 +238,19 @@ const getContentSignals = (
     };
 };
 
-const getPublicQualityScore = (movie: CandidateMovie) => {
+const getPublicQualityScore = (book: CandidateBook) => {
     const confidence = clamp(
-        movie.numRatings / CONFIDENCE_COUNTS.publicQualityRatings,
+        book.numRatings / CONFIDENCE_COUNTS.publicQualityRatings,
         0,
         1,
     );
 
-    return movie.avgRating * confidence + NEUTRAL_SCORE * (1 - confidence);
+    return book.avgRating * confidence + NEUTRAL_SCORE * (1 - confidence);
 };
 
-const getPublicConfidenceScore = (movie: CandidateMovie) => {
+const getPublicConfidenceScore = (book: CandidateBook) => {
     const confidence = clamp(
-        Math.sqrt(movie.numRatings / CONFIDENCE_COUNTS.publicRankingRatings),
+        Math.sqrt(book.numRatings / CONFIDENCE_COUNTS.publicRankingRatings),
         0,
         1,
     );
@@ -249,20 +258,18 @@ const getPublicConfidenceScore = (movie: CandidateMovie) => {
     return NEUTRAL_SCORE + confidence * NEUTRAL_SCORE;
 };
 
-type RecommendationPrismaClient = PrismaClient | Prisma.TransactionClient;
-
 const isFresh = (generatedAt: Date) =>
     Date.now() - generatedAt.getTime() < RECOMMENDATION_CACHE_TTL_MS;
 
-export const replaceMovieRecommendationsForUser = async (
+export const replaceBookRecommendationsForUser = async (
     prisma: RecommendationPrismaClient,
     userId: string,
-    recommendations: MovieRecommendation[],
+    recommendations: BookRecommendation[],
 ) => {
     const generatedAt = new Date();
 
     await prisma.recommendationCache.deleteMany({
-        where: { userId, mediaType: "MOVIE" },
+        where: { userId, mediaType: "BOOK" },
     });
 
     if (recommendations.length === 0) return;
@@ -270,8 +277,8 @@ export const replaceMovieRecommendationsForUser = async (
     await prisma.recommendationCache.createMany({
         data: recommendations.map((recommendation) => ({
             userId,
-            mediaType: "MOVIE",
-            movieId: recommendation.movie.id,
+            mediaType: "BOOK",
+            bookId: recommendation.book.id,
             score: recommendation.score,
             recommendedByCount: recommendation.recommendedByCount,
             generatedAt,
@@ -279,31 +286,31 @@ export const replaceMovieRecommendationsForUser = async (
     });
 };
 
-export const invalidateMovieRecommendationsForUser = async (
+export const invalidateBookRecommendationsForUser = async (
     prisma: RecommendationPrismaClient,
     userId: string,
 ) => {
     await prisma.recommendationCache.deleteMany({
-        where: { userId, mediaType: "MOVIE" },
+        where: { userId, mediaType: "BOOK" },
     });
 };
 
-const getCachedMovieRecommendationsForUser = async (
+const getCachedBookRecommendationsForUser = async (
     prisma: PrismaClient,
     userId: string,
-): Promise<MovieRecommendationsResult | null> => {
+): Promise<BookRecommendationsResult | null> => {
     const [cachedRecommendations, currentReviewCount] = await Promise.all([
         prisma.recommendationCache.findMany({
             where: {
                 userId,
-                mediaType: "MOVIE",
+                mediaType: "BOOK",
             },
             orderBy: [{ score: "desc" }, { recommendedByCount: "desc" }],
             select: {
                 score: true,
                 recommendedByCount: true,
                 generatedAt: true,
-                movie: {
+                book: {
                     select: {
                         id: true,
                         title: true,
@@ -313,10 +320,7 @@ const getCachedMovieRecommendationsForUser = async (
                         avgRating: true,
                         numRatings: true,
                         image: true,
-                        tmdbId: true,
-                        director: true,
-                        cast: true,
-                        runtime: true,
+                        authors: true,
                     },
                 },
             },
@@ -324,7 +328,7 @@ const getCachedMovieRecommendationsForUser = async (
         prisma.review.count({
             where: {
                 userId,
-                mediaType: "MOVIE",
+                mediaType: "BOOK",
             },
         }),
     ]);
@@ -340,9 +344,9 @@ const getCachedMovieRecommendationsForUser = async (
 
     return {
         recommendations: cachedRecommendations
-            .filter((recommendation) => recommendation.movie !== null)
+            .filter((recommendation) => recommendation.book !== null)
             .map((recommendation) => ({
-                movie: toMovieResponse(recommendation.movie!),
+                book: toBookResponse(recommendation.book!),
                 score: recommendation.score,
                 recommendedByCount: recommendation.recommendedByCount,
             })),
@@ -353,11 +357,11 @@ const getCachedMovieRecommendationsForUser = async (
     };
 };
 
-const computeMovieRecommendationsForUser = async (
+const computeBookRecommendationsForUser = async (
     prisma: PrismaClient,
     userId: string,
-): Promise<MovieRecommendationsResult> => {
-    const similarityResult = await getSimilarUsersForUser(prisma, userId);
+): Promise<BookRecommendationsResult> => {
+    const similarityResult = await getSimilarBookUsersForUser(prisma, userId);
 
     if (!similarityResult.recommendationsAvailable) {
         return {
@@ -373,49 +377,48 @@ const computeMovieRecommendationsForUser = async (
         RECOMMENDATION_LIMITS.maxSimilarUsers,
     );
 
-    const [userWishlist, reviewedMovies] = await Promise.all([
+    const [userWishlist, reviewedBooks] = await Promise.all([
         prisma.wishlistItem.findMany({
             where: {
                 userId,
-                mediaType: "MOVIE",
+                mediaType: "BOOK",
             },
             select: {
-                movieId: true,
+                bookId: true,
             },
         }),
         prisma.review.findMany({
             where: {
                 userId,
-                mediaType: "MOVIE",
+                mediaType: "BOOK",
             },
             select: {
-                movieId: true,
+                bookId: true,
                 rating: true,
-                movie: {
+                book: {
                     select: {
                         genres: true,
                         keywords: true,
                         releaseYear: true,
-                        director: true,
-                        cast: true,
+                        authors: true,
                     },
                 },
             },
         }),
     ]);
 
-    const excludedMovieIds = new Set<string>([
-        ...similarityResult.userReviews.map((review) => review.movieId),
-        ...userWishlist.flatMap((item) => (item.movieId ? [item.movieId] : [])),
+    const excludedBookIds = new Set<string>([
+        ...similarityResult.userReviews.map((review) => review.mediaId),
+        ...userWishlist.flatMap((item) => (item.bookId ? [item.bookId] : [])),
     ]);
-    const userTasteProfile = buildUserTasteProfile(
-        reviewedMovies.flatMap((review) =>
-            review.movieId && review.movie
+    const userTasteProfile = buildBookTasteProfile(
+        reviewedBooks.flatMap((review) =>
+            review.bookId && review.book
                 ? [
                       {
-                          movieId: review.movieId,
+                          bookId: review.bookId,
                           rating: review.rating,
-                          movie: review.movie,
+                          book: review.book,
                       },
                   ]
                 : [],
@@ -433,19 +436,19 @@ const computeMovieRecommendationsForUser = async (
             rating: {
                 gte: FAVORITE_RATING_THRESHOLD,
             },
-            movieId: {
-                notIn: [...excludedMovieIds],
+            bookId: {
+                notIn: [...excludedBookIds],
             },
-            mediaType: "MOVIE",
+            mediaType: "BOOK",
         },
         select: {
-            movieId: true,
+            bookId: true,
             rating: true,
             userId: true,
         },
     });
 
-    const movieScoresByMovieId = new Map<
+    const bookScoresByBookId = new Map<
         string,
         {
             weightedRatingTotal: number;
@@ -456,11 +459,9 @@ const computeMovieRecommendationsForUser = async (
 
     for (const review of candidateReviews) {
         const similarUser = similarUsersById.get(review.userId);
-        if (!similarUser) continue;
+        if (!similarUser || !review.bookId) continue;
 
-        if (!review.movieId) continue;
-
-        const scoreData = movieScoresByMovieId.get(review.movieId) ?? {
+        const scoreData = bookScoresByBookId.get(review.bookId) ?? {
             weightedRatingTotal: 0,
             similarityTotal: 0,
             recommendedByUserIds: new Set<string>(),
@@ -470,12 +471,12 @@ const computeMovieRecommendationsForUser = async (
             similarUser.similarityScore * review.rating;
         scoreData.similarityTotal += similarUser.similarityScore;
         scoreData.recommendedByUserIds.add(review.userId);
-        movieScoresByMovieId.set(review.movieId, scoreData);
+        bookScoresByBookId.set(review.bookId, scoreData);
     }
 
-    const collaborativeScoresByMovieId = new Map(
-        [...movieScoresByMovieId.entries()].map(([movieId, scoreData]) => [
-            movieId,
+    const collaborativeScoresByBookId = new Map(
+        [...bookScoresByBookId.entries()].map(([bookId, scoreData]) => [
+            bookId,
             {
                 score:
                     scoreData.similarityTotal > 0
@@ -487,10 +488,10 @@ const computeMovieRecommendationsForUser = async (
         ]),
     );
 
-    const candidateMovies = await prisma.movie.findMany({
+    const candidateBooks = await prisma.book.findMany({
         where: {
             id: {
-                notIn: [...excludedMovieIds],
+                notIn: [...excludedBookIds],
             },
         },
         select: {
@@ -502,30 +503,29 @@ const computeMovieRecommendationsForUser = async (
             avgRating: true,
             numRatings: true,
             image: true,
-            director: true,
-            cast: true,
+            authors: true,
         },
     });
 
-    const scoredMovies = candidateMovies
-        .map((movie) => {
-            const collaborativeScoreData = collaborativeScoresByMovieId.get(
-                movie.id,
+    const scoredBooks = candidateBooks
+        .map((book) => {
+            const collaborativeScoreData = collaborativeScoresByBookId.get(
+                book.id,
             );
-            const contentSignals = getContentSignals(movie, userTasteProfile);
+            const contentSignals = getContentSignals(book, userTasteProfile);
             const collaborativeScore = contentSignals.hasSpecificAffinity
                 ? (collaborativeScoreData?.score ?? NEUTRAL_SCORE)
                 : NEUTRAL_SCORE;
             const score =
                 contentSignals.score * SCORE_WEIGHTS.content +
                 collaborativeScore * SCORE_WEIGHTS.collaborative +
-                getPublicQualityScore(movie) * SCORE_WEIGHTS.publicQuality +
-                getPublicConfidenceScore(movie) *
+                getPublicQualityScore(book) * SCORE_WEIGHTS.publicQuality +
+                getPublicConfidenceScore(book) *
                     SCORE_WEIGHTS.publicConfidence;
 
             return {
-                movieId: movie.id,
-                movie,
+                bookId: book.id,
+                book,
                 score,
                 recommendedByCount:
                     collaborativeScoreData?.recommendedByCount ?? 0,
@@ -537,15 +537,13 @@ const computeMovieRecommendationsForUser = async (
             }
             return b.recommendedByCount - a.recommendedByCount;
         })
-        .slice(0, RECOMMENDATION_LIMITS.maxMovieRecommendations);
-    const recommendations: MovieRecommendation[] = scoredMovies.map(
-        (scoredMovie) => {
-            return {
-                movie: toMovieResponse(scoredMovie.movie),
-                score: scoredMovie.score,
-                recommendedByCount: scoredMovie.recommendedByCount,
-            };
-        },
+        .slice(0, RECOMMENDATION_LIMITS.maxBookRecommendations);
+    const recommendations: BookRecommendation[] = scoredBooks.map(
+        (scoredBook) => ({
+            book: toBookResponse(scoredBook.book),
+            score: scoredBook.score,
+            recommendedByCount: scoredBook.recommendedByCount,
+        }),
     );
 
     return {
@@ -556,27 +554,31 @@ const computeMovieRecommendationsForUser = async (
     };
 };
 
-export const getMovieRecommendationsForUser = async (
+export const getBookRecommendationsForUser = async (
     prisma: PrismaClient,
     userId: string,
-): Promise<MovieRecommendationsResult> => {
-    const cachedRecommendations = await getCachedMovieRecommendationsForUser(
+): Promise<BookRecommendationsResult> => {
+    const cachedRecommendations = await getCachedBookRecommendationsForUser(
         prisma,
         userId,
     );
 
     if (cachedRecommendations) return cachedRecommendations;
 
-    const recommendations = await computeMovieRecommendationsForUser(
+    const recommendations = await computeBookRecommendationsForUser(
         prisma,
         userId,
     );
 
-    await replaceMovieRecommendationsForUser(
-        prisma,
-        userId,
-        recommendations.recommendations,
-    );
+    try {
+        await replaceBookRecommendationsForUser(
+            prisma,
+            userId,
+            recommendations.recommendations,
+        );
+    } catch (error) {
+        console.warn("Could not cache book recommendations", error);
+    }
 
     return recommendations;
 };

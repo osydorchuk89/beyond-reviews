@@ -1,17 +1,23 @@
-import { useLoaderData } from "react-router";
+import { Suspense } from "react";
+import { Await, useLoaderData } from "react-router";
 
-import { BooksData } from "../../../lib/entities";
+import { BookRecommendationsData, BooksData } from "../../../lib/entities";
 import {
     booksSideBarFilterList,
     booksSideBarSortList,
 } from "../../../lib/data";
+import { horizontalPadding } from "../../../styles/responsive";
 import { MediaCatalogPage } from "../media/MediaCatalogPage";
+import { BookRecommendationsLoadingSection } from "./BookRecommendationsLoadingSection";
+import { BookRecommendationsSection } from "./BookRecommendationsSection";
 import { BooksListSection } from "./BooksListSection";
 
 export const BooksPage = () => {
-    const { booksDataPromise } = useLoaderData() as {
-        booksDataPromise: Promise<BooksData>;
-    };
+    const { booksDataPromise, bookRecommendationsDataPromise } =
+        useLoaderData() as {
+            booksDataPromise: Promise<BooksData>;
+            bookRecommendationsDataPromise: Promise<BookRecommendationsData | null>;
+        };
 
     const buildFilters = (appliedFilters: BooksData["appliedFilters"]) => {
         const filters = [];
@@ -50,6 +56,22 @@ export const BooksPage = () => {
                     />
                 );
             }}
-        />
+        >
+            <div className={`w-full ${horizontalPadding.page}`}>
+                <Suspense fallback={<BookRecommendationsLoadingSection />}>
+                    <Await resolve={bookRecommendationsDataPromise}>
+                        {(bookRecommendationsData) =>
+                            bookRecommendationsData ? (
+                                <BookRecommendationsSection
+                                    bookRecommendationsData={
+                                        bookRecommendationsData
+                                    }
+                                />
+                            ) : null
+                        }
+                    </Await>
+                </Suspense>
+            </div>
+        </MediaCatalogPage>
     );
 };

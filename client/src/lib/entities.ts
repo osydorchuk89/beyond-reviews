@@ -291,6 +291,31 @@ export interface MovieRecommendationsData {
     recommendationsAvailable: boolean;
 }
 
+export interface RecommendedBook {
+    id: string;
+    title: string;
+    releaseYear: number;
+    authors: string[];
+    genres: string[];
+    keywords: string[];
+    avgRating: number;
+    numRatings: number;
+    poster: string;
+}
+
+export interface BookRecommendation {
+    book: RecommendedBook;
+    score: number;
+    recommendedByCount: number;
+}
+
+export interface BookRecommendationsData {
+    recommendations: BookRecommendation[];
+    currentReviewCount: number;
+    minReviewsRequired: number;
+    recommendationsAvailable: boolean;
+}
+
 export interface RegistrationInputs {
     firstName: string;
     lastName: string;

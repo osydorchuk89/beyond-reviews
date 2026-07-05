@@ -1,15 +1,25 @@
-import { WishlistData } from "../../../../lib/entities";
+import { Suspense } from "react";
+import { Await } from "react-router";
+
+import {
+    BookRecommendationsData,
+    WishlistData,
+} from "../../../../lib/entities";
+import { BookRecommendationsLoadingSection } from "../../books/BookRecommendationsLoadingSection";
+import { BookRecommendationsSection } from "../../books/BookRecommendationsSection";
 import { BookCard } from "../../books/BookCard";
 import { WishlistEmptyState } from "./WishlistEmptyState";
 
 interface BooksWishlistContentProps {
     wishlistData: WishlistData;
+    bookRecommendationsDataPromise: Promise<BookRecommendationsData | null> | null;
     isSameUser: boolean;
     profileUserName: string;
 }
 
 export const BooksWishlistContent = ({
     wishlistData,
+    bookRecommendationsDataPromise,
     isSameUser,
     profileUserName,
 }: BooksWishlistContentProps) => (
@@ -38,6 +48,22 @@ export const BooksWishlistContent = ({
                 exploreTo="/books"
                 exploreLabel="EXPLORE BOOKS"
             />
+        )}
+
+        {bookRecommendationsDataPromise && (
+            <Suspense fallback={<BookRecommendationsLoadingSection />}>
+                <Await resolve={bookRecommendationsDataPromise}>
+                    {(bookRecommendationsData) =>
+                        bookRecommendationsData ? (
+                            <BookRecommendationsSection
+                                bookRecommendationsData={
+                                    bookRecommendationsData
+                                }
+                            />
+                        ) : null
+                    }
+                </Await>
+            </Suspense>
         )}
     </>
 );

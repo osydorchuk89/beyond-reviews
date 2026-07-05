@@ -5,6 +5,7 @@ import {
     acceptFriendRequest,
     getAllUsers,
     getUserActivities,
+    getUserBookRecommendations,
     getUserData,
     getUserFriendRecommendations,
     getUserFriends,
@@ -50,6 +51,12 @@ usersRouter.get(
 usersRouter.get(
     "/:userId/recommendations/movies",
     getUserMovieRecommendations,
+);
+
+// get user book recommendations
+usersRouter.get(
+    "/:userId/recommendations/books",
+    getUserBookRecommendations,
 );
 
 // send a friend request

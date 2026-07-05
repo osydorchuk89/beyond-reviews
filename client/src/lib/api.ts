@@ -2,6 +2,7 @@ import axiosInstance from "./axiosInstance";
 import {
     AuthData,
     Book,
+    BookRecommendationsData,
     BookReviewsData,
     BooksData,
     FriendRecommendationsData,
@@ -314,6 +315,20 @@ export const getMovieRecommendations = async (
     try {
         const response = await axiosInstance.get(
             `/api/users/${userId}/recommendations/movies`,
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+export const getBookRecommendations = async (
+    userId: string,
+): Promise<BookRecommendationsData> => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/recommendations/books`,
         );
         return response.data;
     } catch (error) {

@@ -49,6 +49,29 @@ export interface MovieRecommendationsResult {
     recommendationsAvailable: boolean;
 }
 
+export interface BookRecommendation {
+    book: {
+        id: string;
+        title: string;
+        releaseYear: number;
+        authors: string[];
+        genres: string[];
+        keywords: string[];
+        avgRating: number;
+        numRatings: number;
+        poster: string;
+    };
+    score: number;
+    recommendedByCount: number;
+}
+
+export interface BookRecommendationsResult {
+    recommendations: BookRecommendation[];
+    currentReviewCount: number;
+    minReviewsRequired: number;
+    recommendationsAvailable: boolean;
+}
+
 export interface ReviewedMovieForProfile {
     movieId: string;
     rating: number;
@@ -86,4 +109,13 @@ export interface UserTasteProfile {
     keywords: Map<string, PreferenceStats>;
     decades: Map<number, PreferenceStats>;
     averageRating: number;
+}
+
+export interface RatingByMediaId {
+    mediaId: string;
+    rating: number;
+}
+
+export interface CandidateRatingByMediaId extends RatingByMediaId {
+    userId: string;
 }

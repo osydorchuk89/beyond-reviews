@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 import { ReviewSchema } from "../lib/schemas";
+import { invalidateBookRecommendationsForUser } from "./bookRecommendations";
 import { ServiceError } from "./errors";
 
 interface CreateOrUpdateBookReviewArgs {
@@ -95,6 +96,8 @@ export const createOrUpdateBookReviewForUser = async (
                 date: new Date(),
             },
         });
+
+        await invalidateBookRecommendationsForUser(tx, userId);
 
         return review;
     });

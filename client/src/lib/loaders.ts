@@ -3,6 +3,7 @@ import { LoaderFunctionArgs, redirect } from "react-router";
 import {
     getAuthData,
     getBook,
+    getBookRecommendations,
     getBookReviews,
     getBooks,
     getFriendRecommendations,
@@ -15,6 +16,14 @@ import {
     getUserMovieReviews,
     getWishlist,
 } from "./api";
+import { BookRecommendationsData } from "./entities";
+
+const unavailableBookRecommendationsData: BookRecommendationsData = {
+    recommendations: [],
+    currentReviewCount: 0,
+    minReviewsRequired: 3,
+    recommendationsAvailable: false,
+};
 
 export const rootLoader = async () => {
     const authData = await getAuthData();
@@ -165,8 +174,17 @@ export const booksLoader = ({ request }: LoaderFunctionArgs) => {
         sortOrder,
         search,
     );
+    const bookRecommendationsDataPromise = getAuthData()
+        .then((authData) =>
+            authData.user
+                ? getBookRecommendations(authData.user.id).catch(
+                      () => unavailableBookRecommendationsData,
+                  )
+                : null,
+        )
+        .catch(() => null);
 
-    return { booksDataPromise };
+    return { booksDataPromise, bookRecommendationsDataPromise };
 };
 
 export const userWishlistLoader = async ({ params }: LoaderFunctionArgs) => {
@@ -180,15 +198,21 @@ export const userWishlistLoader = async ({ params }: LoaderFunctionArgs) => {
         return {
             wishlistData,
             movieRecommendationsDataPromise: null,
+            bookRecommendationsDataPromise: null,
         };
     }
 
-    const movieRecommendationsDataPromise = getMovieRecommendations(userId)
-        .catch(() => null);
+    const movieRecommendationsDataPromise = getMovieRecommendations(
+        userId,
+    ).catch(() => null);
+    const bookRecommendationsDataPromise = getBookRecommendations(userId).catch(
+        () => unavailableBookRecommendationsData,
+    );
 
     return {
         wishlistData,
         movieRecommendationsDataPromise,
+        bookRecommendationsDataPromise,
     };
 };
 
