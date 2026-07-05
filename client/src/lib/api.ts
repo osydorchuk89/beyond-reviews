@@ -14,6 +14,7 @@ import {
     User,
     UserActivities,
     UserActivityTab,
+    UserBookReviews,
     UserMovieReviews,
     WishlistData,
     UsersMessages,
@@ -170,6 +171,21 @@ export const getUserMovieReviews = async (
     try {
         const response = await axiosInstance.get(
             `/api/users/${userId}/movie-reviews?page=${page}`
+        );
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+export const getUserBookReviews = async (
+    userId: string,
+    page: number = 1,
+): Promise<UserBookReviews> => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/users/${userId}/book-reviews?page=${page}`,
         );
         return response.data;
     } catch (error) {

@@ -13,10 +13,15 @@ import {
     getMovies,
     getUser,
     getUserActivities,
+    getUserBookReviews,
     getUserMovieReviews,
     getWishlist,
 } from "./api";
-import { BookRecommendationsData, UserActivityTab } from "./entities";
+import {
+    BookRecommendationsData,
+    UserActivityTab,
+    UserReviewTab,
+} from "./entities";
 
 const unavailableBookRecommendationsData: BookRecommendationsData = {
     recommendations: [],
@@ -226,8 +231,29 @@ export const userReviewsLoader = async ({
     const { userId } = params as { userId: string };
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get("page") ?? "1");
-    const userMovieReviews = await getUserMovieReviews(userId, page);
-    return { userMovieReviews };
+    const tabParam = url.searchParams.get("tab");
+    const selectedTab: UserReviewTab =
+        tabParam === "movies" || tabParam === "albums" ? tabParam : "books";
+
+    if (selectedTab === "albums") {
+        return {
+            selectedTab,
+            userReviews: {
+                reviews: [],
+                currentPage: page,
+                totalPages: 0,
+                totalCount: 0,
+                hasMore: false,
+            },
+        };
+    }
+
+    const userReviews =
+        selectedTab === "movies"
+            ? await getUserMovieReviews(userId, page)
+            : await getUserBookReviews(userId, page);
+
+    return { selectedTab, userReviews };
 };
 
 export const loginLoader = async () => {

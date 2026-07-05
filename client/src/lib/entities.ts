@@ -192,6 +192,16 @@ export interface UserMovieReviews {
     hasMore: boolean;
 }
 
+export interface UserBookReviews {
+    reviews: BookReview[];
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasMore: boolean;
+}
+
+export type UserReviewTab = "books" | "movies" | "albums";
+
 export interface FriendRequest {
     sentUserId: string;
     receivedUserId: string;
