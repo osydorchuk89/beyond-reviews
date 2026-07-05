@@ -6,23 +6,37 @@ interface ActivityOtherReviewProps {
 }
 
 export const ActivityOtherReview = ({ activity }: ActivityOtherReviewProps) => {
-    const movieReviewLinkText = `${activity.movieReview.movie.title} (${activity.movieReview.movie.releaseYear})`;
+    const movieReview = activity.movieReview?.movie
+        ? activity.movieReview
+        : null;
+    const bookReview = activity.bookReview?.book ? activity.bookReview : null;
+    const review = movieReview ?? bookReview;
+    const media = movieReview?.movie ?? bookReview?.book;
+    const mediaId = movieReview?.movieId ?? bookReview?.bookId;
+    const mediaUrl = movieReview
+        ? `/movies/${mediaId}`
+        : `/books/${mediaId}`;
+    const mediaLabel = movieReview ? "Movie" : "Book";
+
+    if (!review || !media || !mediaId) return null;
+
+    const reviewLinkText = `${media.title} (${media.releaseYear})`;
 
     return (
         <div className="mt-2 space-y-1 break-words">
             <p>
-                <strong>Movie</strong>:{" "}
-                <BaseLink to={`/movies/${activity.movieReview.movieId}`}>
-                    {movieReviewLinkText}
+                <strong>{mediaLabel}</strong>:{" "}
+                <BaseLink to={mediaUrl}>
+                    {reviewLinkText}
                 </BaseLink>
             </p>
             <p>
-                <strong>Rating</strong>: {`${activity.movieReview.rating}/10`}
+                <strong>Rating</strong>: {`${review.rating}/10`}
             </p>
             <p>
                 <strong>Review</strong>:{" "}
-                {activity.movieReview.text ? (
-                    <span>{activity.movieReview.text}</span>
+                {review.text ? (
+                    <span>{review.text}</span>
                 ) : (
                     <span className="italic">no review</span>
                 )}

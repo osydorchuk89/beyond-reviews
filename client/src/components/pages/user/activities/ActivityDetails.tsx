@@ -21,18 +21,21 @@ export const ActivityDetails = ({
     };
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 
-    const movieUrl = `/movies/${activity.movieId}`;
-    const movieFullTitle = activity.movie
-        ? `${activity.movie.title} (${activity.movie.releaseYear})`
+    const media = activity.movie ?? activity.book;
+    const mediaId = activity.movieId ?? activity.bookId;
+    const mediaUrl = activity.movieId
+        ? `/movies/${activity.movieId}`
+        : `/books/${activity.bookId}`;
+    const mediaFullTitle = media
+        ? `${media.title} (${media.releaseYear})`
         : "";
-    const isMovieRatingActivity =
-        activity.movieId && activity.action === "rated";
+    const isRatingActivity = mediaId && activity.action === "rated";
     const isWishlistActivity =
-        activity.movieId &&
+        mediaId &&
         (activity.action === "wishlisted" ||
             activity.action === "unwishlisted");
     const isReviewLikeActivity =
-        activity.movieReviewId &&
+        (activity.movieReviewId || activity.bookReviewId) &&
         (activity.action === "liked" || activity.action === "unliked");
 
     return (
@@ -45,12 +48,12 @@ export const ActivityDetails = ({
                         alt="user photo"
                     />
                     <span className="font-bold break-words">
-                        {isMovieRatingActivity && (
+                        {isRatingActivity && (
                             <>
                                 {isSameUser ? "You" : profileUserName} rated{" "}
                                 {activity.reviewRating}/10{" "}
-                                <BaseLink to={movieUrl}>
-                                    {movieFullTitle}
+                                <BaseLink to={mediaUrl}>
+                                    {mediaFullTitle}
                                 </BaseLink>
                             </>
                         )}
@@ -60,8 +63,8 @@ export const ActivityDetails = ({
                                 {activity.action === "wishlisted"
                                     ? "added"
                                     : "removed"}{" "}
-                                <BaseLink to={movieUrl}>
-                                    {movieFullTitle}
+                                <BaseLink to={mediaUrl}>
+                                    {mediaFullTitle}
                                 </BaseLink>{" "}
                                 {activity.action === "wishlisted"
                                     ? "to"
@@ -87,12 +90,12 @@ export const ActivityDetails = ({
                     <span className="italic">{parsedDate}</span>
                 </p>
             </div>
-            {activity.movieId && activity.reviewText && (
+            {mediaId && activity.reviewText && (
                 <p className="mt-2 break-words">
                     <strong>Review</strong>: {activity.reviewText}
                 </p>
             )}
-            {activity.movieId &&
+            {mediaId &&
                 activity.action === "rated" &&
                 !activity.reviewText && (
                     <p className="italic mt-2">No review</p>

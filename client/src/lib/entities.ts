@@ -160,13 +160,17 @@ export interface UserActivity {
     id: string;
     userId: string;
     user: User;
-    movieId: string;
-    movie: Movie;
-    movieReviewId: string;
-    movieReview: MovieReview;
+    movieId?: string | null;
+    movie?: Movie | null;
+    bookId?: string | null;
+    book?: Book | null;
+    movieReviewId?: string | null;
+    movieReview?: MovieReview | null;
+    bookReviewId?: string | null;
+    bookReview?: BookReview | null;
     action: string;
-    reviewRating: string;
-    reviewText: string;
+    reviewRating?: string | number | null;
+    reviewText?: string | null;
     date: Date;
 }
 

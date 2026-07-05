@@ -8,9 +8,9 @@ interface ActivityDetailsProps {
 
 export const ActivityItem = ({ activity }: ActivityDetailsProps) => {
     const isReviewLikeActivity =
-        activity.movieReviewId &&
+        (activity.movieReviewId || activity.bookReviewId) &&
         (activity.action === "liked" || activity.action === "unliked");
-    const ratingUser = activity.movieReview?.user;
+    const ratingUser = activity.movieReview?.user ?? activity.bookReview?.user;
     const ratingUserId = ratingUser?.id ?? "";
     const ratingUserName = ratingUser
         ? `${ratingUser.firstName} ${ratingUser.lastName}`
@@ -25,7 +25,12 @@ export const ActivityItem = ({ activity }: ActivityDetailsProps) => {
         minute: "numeric",
     });
 
-    if (!activity.movie && !activity.movieReview) {
+    if (
+        !activity.movie &&
+        !activity.book &&
+        !activity.movieReview &&
+        !activity.bookReview
+    ) {
         return (
             <div className="p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100">
                 <p className="text-center italic">Missing data</p>
