@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
 import {
-    CandidateRating,
     CandidateRatingByMediaId,
     Rating,
     RatingByMediaId,
@@ -42,37 +41,6 @@ export interface BookUserSimilarityResult {
 }
 
 export const calculateSimilarityScore = (
-    userReviews: Rating[],
-    candidateReviews: Rating[],
-) => {
-    const candidateRatingsByMovieId = new Map(
-        candidateReviews.map((review) => [review.movieId, review.rating]),
-    );
-    const sharedReviews = userReviews.filter((review) =>
-        candidateRatingsByMovieId.has(review.movieId),
-    );
-
-    if (sharedReviews.length === 0) return 0;
-
-    const averageRatingDifference =
-        sharedReviews.reduce((sum, review) => {
-            const candidateRating = candidateRatingsByMovieId.get(
-                review.movieId,
-            );
-            return sum + Math.abs(review.rating - (candidateRating ?? 0));
-        }, 0) / sharedReviews.length;
-
-    const agreementScore =
-        1 - averageRatingDifference / MAX_RATING_DIFFERENCE;
-    const overlapConfidence = Math.min(
-        sharedReviews.length / MIN_REVIEWS_FOR_RECOMMENDATIONS,
-        1,
-    );
-
-    return agreementScore * overlapConfidence;
-};
-
-export const calculateMediaSimilarityScore = (
     userReviews: RatingByMediaId[],
     candidateReviews: RatingByMediaId[],
 ) => {
@@ -103,12 +71,72 @@ export const calculateMediaSimilarityScore = (
     return agreementScore * overlapConfidence;
 };
 
+interface SimilarMediaUser {
+    userId: string;
+    similarityScore: number;
+    sharedMediaCount: number;
+    sharedFavoriteMediaIds: string[];
+}
+
+const getSimilarMediaUsersFromReviews = (
+    userReviews: RatingByMediaId[],
+    candidateReviews: CandidateRatingByMediaId[],
+): SimilarMediaUser[] => {
+    const userReviewsByMediaId = new Map(
+        userReviews.map((review) => [review.mediaId, review]),
+    );
+    const candidateReviewsByUserId = new Map<
+        string,
+        CandidateRatingByMediaId[]
+    >();
+
+    for (const review of candidateReviews) {
+        const reviews = candidateReviewsByUserId.get(review.userId) ?? [];
+        reviews.push(review);
+        candidateReviewsByUserId.set(review.userId, reviews);
+    }
+
+    return [...candidateReviewsByUserId.values()]
+        .map((reviews) => {
+            const similarityScore = calculateSimilarityScore(
+                userReviews,
+                reviews,
+            );
+            const sharedFavoriteMediaIds = reviews
+                .filter((review) => {
+                    const userReview = userReviewsByMediaId.get(
+                        review.mediaId,
+                    );
+                    return (
+                        review.rating >= FAVORITE_RATING_THRESHOLD &&
+                        (userReview?.rating ?? 0) >= FAVORITE_RATING_THRESHOLD
+                    );
+                })
+                .map((review) => review.mediaId)
+                .slice(0, 3);
+
+            return {
+                userId: reviews[0].userId,
+                similarityScore,
+                sharedMediaCount: reviews.length,
+                sharedFavoriteMediaIds,
+            };
+        })
+        .filter((similarUser) => similarUser.similarityScore > 0)
+        .sort((a, b) => {
+            if (b.similarityScore !== a.similarityScore) {
+                return b.similarityScore - a.similarityScore;
+            }
+            return b.sharedMediaCount - a.sharedMediaCount;
+        });
+};
+
 export const getSimilarUsersForUser = async (
     prisma: PrismaClient,
     userId: string,
     excludedUserIds: string[] = [],
 ): Promise<UserSimilarityResult> => {
-    const userReviews = (
+    const userReviewsByMediaId = (
         await prisma.review.findMany({
             where: {
                 userId,
@@ -120,21 +148,24 @@ export const getSimilarUsersForUser = async (
             },
         })
     ).map((review) => ({
-        movieId: review.movieId ?? "",
+        mediaId: review.movieId ?? "",
         rating: review.rating,
-    })).filter((review) => review.movieId);
+    })).filter((review) => review.mediaId);
 
-    if (userReviews.length < MIN_REVIEWS_FOR_RECOMMENDATIONS) {
+    if (userReviewsByMediaId.length < MIN_REVIEWS_FOR_RECOMMENDATIONS) {
         return {
-            userReviews,
+            userReviews: userReviewsByMediaId.map((review) => ({
+                movieId: review.mediaId,
+                rating: review.rating,
+            })),
             similarUsers: [],
-            currentReviewCount: userReviews.length,
+            currentReviewCount: userReviewsByMediaId.length,
             minReviewsRequired: MIN_REVIEWS_FOR_RECOMMENDATIONS,
             recommendationsAvailable: false,
         };
     }
 
-    const userMovieIds = userReviews.map((review) => review.movieId);
+    const userMovieIds = userReviewsByMediaId.map((review) => review.mediaId);
     const candidateReviews = (
         await prisma.review.findMany({
             where: {
@@ -153,58 +184,28 @@ export const getSimilarUsersForUser = async (
             },
         })
     ).map((review) => ({
-        movieId: review.movieId ?? "",
+        mediaId: review.movieId ?? "",
         rating: review.rating,
         userId: review.userId,
-    })).filter((review) => review.movieId);
+    })).filter((review) => review.mediaId);
 
-    const userReviewsByMovieId = new Map(
-        userReviews.map((review) => [review.movieId, review]),
-    );
-    const candidateReviewsByUserId = new Map<string, CandidateRating[]>();
-
-    for (const review of candidateReviews) {
-        const reviews = candidateReviewsByUserId.get(review.userId) ?? [];
-        reviews.push(review);
-        candidateReviewsByUserId.set(review.userId, reviews);
-    }
-
-    const similarUsers = [...candidateReviewsByUserId.values()]
-        .map((reviews) => {
-            const similarityScore = calculateSimilarityScore(
-                userReviews,
-                reviews,
-            );
-            const sharedFavoriteMovieIds = reviews
-                .filter((review) => {
-                    const userReview = userReviewsByMovieId.get(review.movieId);
-                    return (
-                        review.rating >= FAVORITE_RATING_THRESHOLD &&
-                        (userReview?.rating ?? 0) >= FAVORITE_RATING_THRESHOLD
-                    );
-                })
-                .map((review) => review.movieId)
-                .slice(0, 3);
-
-            return {
-                userId: reviews[0].userId,
-                similarityScore,
-                sharedMovieCount: reviews.length,
-                sharedFavoriteMovieIds,
-            };
-        })
-        .filter((similarUser) => similarUser.similarityScore > 0)
-        .sort((a, b) => {
-            if (b.similarityScore !== a.similarityScore) {
-                return b.similarityScore - a.similarityScore;
-            }
-            return b.sharedMovieCount - a.sharedMovieCount;
-        });
+    const similarUsers = getSimilarMediaUsersFromReviews(
+        userReviewsByMediaId,
+        candidateReviews,
+    ).map((similarUser) => ({
+        userId: similarUser.userId,
+        similarityScore: similarUser.similarityScore,
+        sharedMovieCount: similarUser.sharedMediaCount,
+        sharedFavoriteMovieIds: similarUser.sharedFavoriteMediaIds,
+    }));
 
     return {
-        userReviews,
+        userReviews: userReviewsByMediaId.map((review) => ({
+            movieId: review.mediaId,
+            rating: review.rating,
+        })),
         similarUsers,
-        currentReviewCount: userReviews.length,
+        currentReviewCount: userReviewsByMediaId.length,
         minReviewsRequired: MIN_REVIEWS_FOR_RECOMMENDATIONS,
         recommendationsAvailable: true,
     };
@@ -268,51 +269,15 @@ export const getSimilarBookUsersForUser = async (
         }))
         .filter((review) => review.mediaId);
 
-    const userReviewsByBookId = new Map(
-        userReviews.map((review) => [review.mediaId, review]),
-    );
-    const candidateReviewsByUserId = new Map<
-        string,
-        CandidateRatingByMediaId[]
-    >();
-
-    for (const review of candidateReviews) {
-        const reviews = candidateReviewsByUserId.get(review.userId) ?? [];
-        reviews.push(review);
-        candidateReviewsByUserId.set(review.userId, reviews);
-    }
-
-    const similarUsers = [...candidateReviewsByUserId.values()]
-        .map((reviews) => {
-            const similarityScore = calculateMediaSimilarityScore(
-                userReviews,
-                reviews,
-            );
-            const sharedFavoriteBookIds = reviews
-                .filter((review) => {
-                    const userReview = userReviewsByBookId.get(review.mediaId);
-                    return (
-                        review.rating >= FAVORITE_RATING_THRESHOLD &&
-                        (userReview?.rating ?? 0) >= FAVORITE_RATING_THRESHOLD
-                    );
-                })
-                .map((review) => review.mediaId)
-                .slice(0, 3);
-
-            return {
-                userId: reviews[0].userId,
-                similarityScore,
-                sharedBookCount: reviews.length,
-                sharedFavoriteBookIds,
-            };
-        })
-        .filter((similarUser) => similarUser.similarityScore > 0)
-        .sort((a, b) => {
-            if (b.similarityScore !== a.similarityScore) {
-                return b.similarityScore - a.similarityScore;
-            }
-            return b.sharedBookCount - a.sharedBookCount;
-        });
+    const similarUsers = getSimilarMediaUsersFromReviews(
+        userReviews,
+        candidateReviews,
+    ).map((similarUser) => ({
+        userId: similarUser.userId,
+        similarityScore: similarUser.similarityScore,
+        sharedBookCount: similarUser.sharedMediaCount,
+        sharedFavoriteBookIds: similarUser.sharedFavoriteMediaIds,
+    }));
 
     return {
         userReviews,

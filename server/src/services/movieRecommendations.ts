@@ -1,10 +1,9 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 import {
     CandidateMovie,
     MovieRecommendation,
     MovieRecommendationsResult,
-    PreferenceStats,
     ReviewedMovieForProfile,
     UserTasteProfile,
 } from "../lib/entities";
@@ -14,19 +13,32 @@ import {
     MIN_REVIEWS_FOR_RECOMMENDATIONS,
     getSimilarUsersForUser,
 } from "./userSimilarity";
-
-const RECOMMENDATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+import {
+    MAX_RATING_RESIDUAL_FOR_FULL_SIGNAL,
+    MIN_SPECIFIC_AFFINITY,
+    NEUTRAL_SCORE,
+    SCORE_WEIGHTS,
+    addPreference,
+    buildCollaborativeScores,
+    clamp,
+    getAverageArrayPreference,
+    getAveragePreference,
+    getDecade,
+    getPublicConfidenceScore,
+    getPublicQualityScore,
+    normalizeProfileTerm,
+    preferenceToScore,
+} from "./recommendationScoring";
+import {
+    invalidateRecommendationsForUser,
+    isRecommendationCacheFresh,
+    RecommendationPrismaClient,
+    replaceRecommendationsForUser,
+} from "./recommendationCache";
 
 const RECOMMENDATION_LIMITS = {
     maxSimilarUsers: 30,
     maxMovieRecommendations: 12,
-};
-
-const SCORE_WEIGHTS = {
-    content: 0.65,
-    collaborative: 0.15,
-    publicQuality: 0.1,
-    publicConfidence: 0.1,
 };
 
 const CONTENT_WEIGHTS = {
@@ -47,30 +59,8 @@ const CONFIDENCE_COUNTS = {
     publicRankingRatings: 50,
 };
 
-const NEUTRAL_SCORE = 5;
-const MAX_RATING_RESIDUAL_FOR_FULL_SIGNAL = 4;
-const MIN_SPECIFIC_AFFINITY = 0.08;
-
-const clamp = (value: number, min: number, max: number) =>
-    Math.min(Math.max(value, min), max);
-
-const getDecade = (releaseYear: number) => Math.floor(releaseYear / 10) * 10;
-
 const normalizeDirector = (director?: string | null) =>
     (director ?? "").trim().toLowerCase();
-
-const normalizeProfileTerm = (term: string) => term.trim().toLowerCase();
-
-const addPreference = <T>(
-    preferences: Map<T, PreferenceStats>,
-    key: T,
-    preference: number,
-) => {
-    const stats = preferences.get(key) ?? { total: 0, count: 0 };
-    stats.total += preference;
-    stats.count += 1;
-    preferences.set(key, stats);
-};
 
 const buildUserTasteProfile = (
     reviewedMovies: ReviewedMovieForProfile[],
@@ -131,46 +121,6 @@ const buildUserTasteProfile = (
     return profile;
 };
 
-const getAveragePreference = <T>(
-    preferences: Map<T, PreferenceStats>,
-    key: T,
-    confidenceCount: number,
-) => {
-    const stats = preferences.get(key);
-    if (!stats) return 0;
-
-    const confidence = clamp(stats.count / confidenceCount, 0, 1);
-    return clamp((stats.total / stats.count) * confidence, -1, 1);
-};
-
-const preferenceToScore = (preference: number) =>
-    clamp((preference + 1) * 5, 0, 10);
-
-const getAverageArrayPreference = (
-    preferences: Map<string, PreferenceStats>,
-    values: string[],
-    confidenceCount: number,
-) => {
-    if (values.length === 0) return 0;
-
-    const matchedPreferences = values
-        .map((value) =>
-            getAveragePreference(
-                preferences,
-                normalizeProfileTerm(value),
-                confidenceCount,
-            ),
-        )
-        .filter((preference) => preference !== 0);
-
-    if (matchedPreferences.length === 0) return 0;
-
-    return (
-        matchedPreferences.reduce((sum, preference) => sum + preference, 0) /
-        matchedPreferences.length
-    );
-};
-
 const getContentSignals = (
     movie: CandidateMovie,
     profile: UserTasteProfile,
@@ -229,63 +179,28 @@ const getContentSignals = (
     };
 };
 
-const getPublicQualityScore = (movie: CandidateMovie) => {
-    const confidence = clamp(
-        movie.numRatings / CONFIDENCE_COUNTS.publicQualityRatings,
-        0,
-        1,
-    );
-
-    return movie.avgRating * confidence + NEUTRAL_SCORE * (1 - confidence);
-};
-
-const getPublicConfidenceScore = (movie: CandidateMovie) => {
-    const confidence = clamp(
-        Math.sqrt(movie.numRatings / CONFIDENCE_COUNTS.publicRankingRatings),
-        0,
-        1,
-    );
-
-    return NEUTRAL_SCORE + confidence * NEUTRAL_SCORE;
-};
-
-type RecommendationPrismaClient = PrismaClient | Prisma.TransactionClient;
-
-const isFresh = (generatedAt: Date) =>
-    Date.now() - generatedAt.getTime() < RECOMMENDATION_CACHE_TTL_MS;
-
 export const replaceMovieRecommendationsForUser = async (
     prisma: RecommendationPrismaClient,
     userId: string,
     recommendations: MovieRecommendation[],
 ) => {
-    const generatedAt = new Date();
-
-    await prisma.recommendationCache.deleteMany({
-        where: { userId, mediaType: "MOVIE" },
-    });
-
-    if (recommendations.length === 0) return;
-
-    await prisma.recommendationCache.createMany({
-        data: recommendations.map((recommendation) => ({
-            userId,
-            mediaType: "MOVIE",
+    await replaceRecommendationsForUser(
+        prisma,
+        userId,
+        "MOVIE",
+        recommendations.map((recommendation) => ({
             movieId: recommendation.movie.id,
             score: recommendation.score,
             recommendedByCount: recommendation.recommendedByCount,
-            generatedAt,
         })),
-    });
+    );
 };
 
 export const invalidateMovieRecommendationsForUser = async (
     prisma: RecommendationPrismaClient,
     userId: string,
 ) => {
-    await prisma.recommendationCache.deleteMany({
-        where: { userId, mediaType: "MOVIE" },
-    });
+    await invalidateRecommendationsForUser(prisma, userId, "MOVIE");
 };
 
 const getCachedMovieRecommendationsForUser = async (
@@ -332,7 +247,8 @@ const getCachedMovieRecommendationsForUser = async (
     if (
         cachedRecommendations.length === 0 ||
         cachedRecommendations.some(
-            (recommendation) => !isFresh(recommendation.generatedAt),
+            (recommendation) =>
+                !isRecommendationCacheFresh(recommendation.generatedAt),
         )
     ) {
         return null;
@@ -421,10 +337,6 @@ const computeMovieRecommendationsForUser = async (
                 : [],
         ),
     );
-    const similarUsersById = new Map(
-        similarUsers.map((user) => [user.userId, user]),
-    );
-
     const candidateReviews = await prisma.review.findMany({
         where: {
             userId: {
@@ -445,46 +357,13 @@ const computeMovieRecommendationsForUser = async (
         },
     });
 
-    const movieScoresByMovieId = new Map<
-        string,
-        {
-            weightedRatingTotal: number;
-            similarityTotal: number;
-            recommendedByUserIds: Set<string>;
-        }
-    >();
-
-    for (const review of candidateReviews) {
-        const similarUser = similarUsersById.get(review.userId);
-        if (!similarUser) continue;
-
-        if (!review.movieId) continue;
-
-        const scoreData = movieScoresByMovieId.get(review.movieId) ?? {
-            weightedRatingTotal: 0,
-            similarityTotal: 0,
-            recommendedByUserIds: new Set<string>(),
-        };
-
-        scoreData.weightedRatingTotal +=
-            similarUser.similarityScore * review.rating;
-        scoreData.similarityTotal += similarUser.similarityScore;
-        scoreData.recommendedByUserIds.add(review.userId);
-        movieScoresByMovieId.set(review.movieId, scoreData);
-    }
-
-    const collaborativeScoresByMovieId = new Map(
-        [...movieScoresByMovieId.entries()].map(([movieId, scoreData]) => [
-            movieId,
-            {
-                score:
-                    scoreData.similarityTotal > 0
-                        ? scoreData.weightedRatingTotal /
-                          scoreData.similarityTotal
-                        : NEUTRAL_SCORE,
-                recommendedByCount: scoreData.recommendedByUserIds.size,
-            },
-        ]),
+    const collaborativeScoresByMovieId = buildCollaborativeScores(
+        candidateReviews.map((review) => ({
+            mediaId: review.movieId,
+            rating: review.rating,
+            userId: review.userId,
+        })),
+        similarUsers,
     );
 
     const candidateMovies = await prisma.movie.findMany({
@@ -519,8 +398,15 @@ const computeMovieRecommendationsForUser = async (
             const score =
                 contentSignals.score * SCORE_WEIGHTS.content +
                 collaborativeScore * SCORE_WEIGHTS.collaborative +
-                getPublicQualityScore(movie) * SCORE_WEIGHTS.publicQuality +
-                getPublicConfidenceScore(movie) *
+                getPublicQualityScore(
+                    movie,
+                    CONFIDENCE_COUNTS.publicQualityRatings,
+                ) *
+                    SCORE_WEIGHTS.publicQuality +
+                getPublicConfidenceScore(
+                    movie,
+                    CONFIDENCE_COUNTS.publicRankingRatings,
+                ) *
                     SCORE_WEIGHTS.publicConfidence;
 
             return {
