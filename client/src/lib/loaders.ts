@@ -16,7 +16,7 @@ import {
     getUserMovieReviews,
     getWishlist,
 } from "./api";
-import { BookRecommendationsData } from "./entities";
+import { BookRecommendationsData, UserActivityTab } from "./entities";
 
 const unavailableBookRecommendationsData: BookRecommendationsData = {
     recommendations: [],
@@ -97,8 +97,11 @@ export const userActivitiesLoader = async ({
     const { userId } = params as { userId: string };
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get("page") ?? "1");
-    const userActivities = await getUserActivities(userId, page);
-    return { userActivities };
+    const tabParam = url.searchParams.get("tab");
+    const selectedTab: UserActivityTab =
+        tabParam === "movies" || tabParam === "albums" ? tabParam : "books";
+    const userActivities = await getUserActivities(userId, page, selectedTab);
+    return { userActivities, selectedTab };
 };
 
 export const protectedLoader = async ({ params }: LoaderFunctionArgs) => {

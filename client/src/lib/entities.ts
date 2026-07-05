@@ -182,6 +182,8 @@ export interface UserActivities {
     hasMore: boolean;
 }
 
+export type UserActivityTab = "books" | "movies" | "albums";
+
 export interface UserMovieReviews {
     reviews: MovieReview[];
     currentPage: number;

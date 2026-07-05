@@ -13,6 +13,7 @@ import {
     MoviesData,
     User,
     UserActivities,
+    UserActivityTab,
     UserMovieReviews,
     WishlistData,
     UsersMessages,
@@ -269,11 +270,13 @@ export const getUser = async (userId: string): Promise<User> => {
 // User activities
 export const getUserActivities = async (
     userId: string,
-    page: number = 1
+    page: number = 1,
+    tab: UserActivityTab = "books",
 ): Promise<UserActivities> => {
     try {
         const response = await axiosInstance.get(
-            `/api/users/${userId}/activities?page=${page}`
+            `/api/users/${userId}/activities`,
+            { params: { page, tab } },
         );
         return response.data;
     } catch (error: any) {

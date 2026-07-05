@@ -143,77 +143,95 @@ export const getUserActivities = async (
 ): Promise<any> => {
     const { userId } = req.params;
     const page = parseInt(req.query.page as string) ?? 1;
+    const activityTab = req.query.tab as string | undefined;
     const limit = 15;
     const skip = (page - 1) * limit;
+    const selectedTab =
+        activityTab === "movies" ||
+        activityTab === "books" ||
+        activityTab === "albums"
+            ? activityTab
+            : "books";
+
+    if (selectedTab === "albums") {
+        return res.status(200).send({
+            activities: [],
+            totalCount: 0,
+            currentPage: page,
+            totalPages: 0,
+            hasMore: false,
+        });
+    }
 
     try {
-        const [activities, totalCount] = await Promise.all([
-            prisma.activity.findMany({
-                where: {
-                    userId: userId,
+        const allActivities = await prisma.activity.findMany({
+            where: {
+                userId,
+            },
+            include: {
+                movie: {
+                    select: {
+                        id: true,
+                        title: true,
+                        releaseYear: true,
+                        image: true,
+                    },
                 },
-                include: {
-                    movie: {
-                        select: {
-                            id: true,
-                            title: true,
-                            releaseYear: true,
-                            image: true,
-                        },
+                book: {
+                    select: {
+                        id: true,
+                        title: true,
+                        releaseYear: true,
+                        image: true,
+                        authors: true,
                     },
-                    book: {
-                        select: {
-                            id: true,
-                            title: true,
-                            releaseYear: true,
-                            image: true,
-                            authors: true,
-                        },
+                },
+                user: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        photo: true,
                     },
-                    user: {
-                        select: {
-                            firstName: true,
-                            lastName: true,
-                            photo: true,
-                        },
-                    },
-                    review: {
-                        include: {
-                            user: {
-                                select: {
-                                    id: true,
-                                    firstName: true,
-                                    lastName: true,
-                                },
+                },
+                review: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
                             },
-                            movie: {
-                                select: {
-                                    id: true,
-                                    title: true,
-                                    releaseYear: true,
-                                    image: true,
-                                },
+                        },
+                        movie: {
+                            select: {
+                                id: true,
+                                title: true,
+                                releaseYear: true,
+                                image: true,
                             },
-                            book: {
-                                select: {
-                                    id: true,
-                                    title: true,
-                                    releaseYear: true,
-                                    image: true,
-                                    authors: true,
-                                },
+                        },
+                        book: {
+                            select: {
+                                id: true,
+                                title: true,
+                                releaseYear: true,
+                                image: true,
+                                authors: true,
                             },
                         },
                     },
                 },
-                orderBy: { date: "desc" },
-                skip: skip,
-                take: limit,
-            }),
-            prisma.activity.count({
-                where: { userId: userId },
-            }),
-        ]);
+            },
+            orderBy: { date: "desc" },
+        });
+
+        const filteredActivities = allActivities.filter((activity) =>
+            selectedTab === "movies"
+                ? Boolean(activity.movie || activity.review?.movie)
+                : Boolean(activity.book || activity.review?.book),
+        );
+        const totalCount = filteredActivities.length;
+        const activities = filteredActivities.slice(skip, skip + limit);
 
         const totalPages = Math.ceil(totalCount / limit);
         const hasMore = page < totalPages;
