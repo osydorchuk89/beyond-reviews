@@ -127,7 +127,11 @@ model FriendRecommendationCache {
   recommendedUserId    String   @db.ObjectId
   similarityScore      Float
   sharedMovieCount     Int
+  sharedBookCount      Int      @default(0)
+  sharedFavoriteMovieIds String[] @default([])
+  sharedFavoriteBookIds String[] @default([])
   sharedFavoriteTitles String[]
+  cacheVersion         Int      @default(1)
   generatedAt          DateTime
 
   @@unique([userId, recommendedUserId])

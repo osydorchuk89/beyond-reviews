@@ -50,12 +50,13 @@ export const FriendRecommendationsSection = ({
                 <div className="rounded-lg border border-dashed border-sky-700 bg-white/70 p-4 text-center text-sky-950">
                     <p className="font-semibold">
                         Review {reviewsRemaining} more{" "}
-                        {reviewsRemaining === 1 ? "movie" : "movies"} to unlock
-                        friend recommendations.
+                        {reviewsRemaining === 1 ? "item" : "items"} in movies
+                        or books to unlock friend recommendations.
                     </p>
                     <p className="mt-1 text-sm">
                         Friend suggestions appear once you have reviewed at
-                        least {minReviewsRequired} movies.
+                        least {minReviewsRequired} movies or{" "}
+                        {minReviewsRequired} books.
                     </p>
                 </div>
             ) : recommendations.length > 0 ? (

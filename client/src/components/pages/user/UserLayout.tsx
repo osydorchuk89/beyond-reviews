@@ -24,7 +24,22 @@ export const UserLayout = () => {
     const profileUserFullName = `${profileUser.firstName} ${profileUser.lastName}`;
 
     const navigation = useNavigation();
-    const isLoading = navigation.state === "loading";
+    const nextPathname = navigation.location?.pathname;
+    const isNavigatingInsideUserProfile =
+        navigation.state === "loading" &&
+        nextPathname?.startsWith(`/users/${profileUser.id}/`);
+    const isLeavingUserProfile =
+        navigation.state === "loading" &&
+        nextPathname !== undefined &&
+        !nextPathname.startsWith(`/users/${profileUser.id}/`);
+
+    if (isLeavingUserProfile) {
+        return (
+            <div className="flex min-h-[70vh] w-full items-center justify-center">
+                <LoadingSpinner />
+            </div>
+        );
+    }
 
     return (
         <div
@@ -37,7 +52,11 @@ export const UserLayout = () => {
             >
                 {profileUserFullName}
             </Link>
-            {isLoading ? <LoadingSpinner /> : <Outlet key={profileUser.id} />}
+            {isNavigatingInsideUserProfile ? (
+                <LoadingSpinner />
+            ) : (
+                <Outlet key={profileUser.id} />
+            )}
             {visitingUser && !isSameUser && (
                 <div>
                     <ButtonLink

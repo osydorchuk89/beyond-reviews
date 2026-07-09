@@ -16,6 +16,12 @@ export interface FriendRecommendation {
     };
     similarityScore: number;
     sharedMovieCount: number;
+    sharedBookCount: number;
+    sharedFavoriteItems: {
+        id: string;
+        mediaType: "MOVIE" | "BOOK";
+        title: string;
+    }[];
     sharedFavoriteTitles: string[];
 }
 

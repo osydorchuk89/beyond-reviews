@@ -214,6 +214,7 @@ export const getSimilarUsersForUser = async (
 export const getSimilarBookUsersForUser = async (
     prisma: PrismaClient,
     userId: string,
+    excludedUserIds: string[] = [],
 ): Promise<BookUserSimilarityResult> => {
     const userReviews = (
         await prisma.review.findMany({
@@ -251,7 +252,7 @@ export const getSimilarBookUsersForUser = async (
                     in: userBookIds,
                 },
                 userId: {
-                    not: userId,
+                    notIn: [userId, ...excludedUserIds],
                 },
                 mediaType: "BOOK",
             },
