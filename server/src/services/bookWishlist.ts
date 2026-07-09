@@ -53,6 +53,7 @@ export const updateBookWishlist = async (
             data: {
                 userId,
                 action: saved ? "wishlisted" : "unwishlisted",
+                mediaType: "BOOK",
                 bookId,
                 date: new Date(),
             },

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { MediaType, PrismaClient } from "@prisma/client";
 
 import { DEFAULT_USER_PHOTO_URL } from "../config/constants";
 import { UserSchema } from "../lib/schemas";
@@ -142,7 +142,9 @@ export const getUserActivities = async (
     res: Response,
 ): Promise<any> => {
     const { userId } = req.params;
-    const page = parseInt(req.query.page as string) ?? 1;
+    const requestedPage = parseInt(req.query.page as string);
+    const page =
+        Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
     const activityTab = req.query.tab as string | undefined;
     const limit = 15;
     const skip = (page - 1) * limit;
@@ -164,79 +166,82 @@ export const getUserActivities = async (
     }
 
     try {
-        const allActivities = await prisma.activity.findMany({
-            where: {
-                userId,
-            },
-            include: {
-                movie: {
-                    select: {
-                        id: true,
-                        title: true,
-                        releaseYear: true,
-                        image: true,
-                    },
-                },
-                book: {
-                    select: {
-                        id: true,
-                        title: true,
-                        releaseYear: true,
-                        image: true,
-                        authors: true,
-                    },
-                },
-                user: {
-                    select: {
-                        firstName: true,
-                        lastName: true,
-                        photo: true,
-                    },
-                },
-                review: {
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
-                            },
-                        },
-                        movie: {
-                            select: {
-                                id: true,
-                                title: true,
-                                releaseYear: true,
-                                image: true,
-                            },
-                        },
-                        book: {
-                            select: {
-                                id: true,
-                                title: true,
-                                releaseYear: true,
-                                image: true,
-                                authors: true,
-                            },
+        const mediaType: MediaType =
+            selectedTab === "movies" ? "MOVIE" : "BOOK";
+        const whereClause = {
+            userId,
+            mediaType,
+        };
+        const [activities, totalCount] = await Promise.all([
+            prisma.activity.findMany({
+                where: whereClause,
+                include: {
+                    movie: {
+                        select: {
+                            id: true,
+                            title: true,
+                            releaseYear: true,
+                            image: true,
                         },
                     },
+                    book: {
+                        select: {
+                            id: true,
+                            title: true,
+                            releaseYear: true,
+                            image: true,
+                            authors: true,
+                        },
+                    },
+                    user: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            photo: true,
+                        },
+                    },
+                    review: {
+                        include: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                },
+                            },
+                            movie: {
+                                select: {
+                                    id: true,
+                                    title: true,
+                                    releaseYear: true,
+                                    image: true,
+                                },
+                            },
+                            book: {
+                                select: {
+                                    id: true,
+                                    title: true,
+                                    releaseYear: true,
+                                    image: true,
+                                    authors: true,
+                                },
+                            },
+                        },
+                    },
                 },
-            },
-            orderBy: { date: "desc" },
-        });
-
-        const filteredActivities = allActivities.filter((activity) =>
-            selectedTab === "movies"
-                ? Boolean(activity.movie || activity.review?.movie)
-                : Boolean(activity.book || activity.review?.book),
-        );
-        const totalCount = filteredActivities.length;
-        const activities = filteredActivities.slice(skip, skip + limit);
+                orderBy: { date: "desc" },
+                skip,
+                take: limit,
+            }),
+            prisma.activity.count({
+                where: whereClause,
+            }),
+        ]);
 
         const totalPages = Math.ceil(totalCount / limit);
         const hasMore = page < totalPages;
 
-        const movieActivities = activities.map((activity) => {
+        const activitiesResponse = activities.map((activity) => {
             const { movie, movieId, book, bookId, review, reviewId, ...rest } =
                 activity;
             return {
@@ -249,21 +254,25 @@ export const getUserActivities = async (
                 movieReview: review
                     ? {
                           ...toMovieReviewResponse(review),
-                          movie: review.movie ? toMovieResponse(review.movie) : review.movie,
+                          movie: review.movie
+                              ? toMovieResponse(review.movie)
+                              : review.movie,
                       }
                     : review,
                 bookReviewId: reviewId,
                 bookReview: review
                     ? {
                           ...toBookReviewResponse(review),
-                          book: review.book ? toBookResponse(review.book) : review.book,
+                          book: review.book
+                              ? toBookResponse(review.book)
+                              : review.book,
                       }
                     : review,
             };
         });
 
         res.status(200).send({
-            activities: movieActivities,
+            activities: activitiesResponse,
             totalCount,
             currentPage: page,
             totalPages,

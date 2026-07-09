@@ -91,6 +91,7 @@ export const createOrUpdateMovieReviewForUser = async (
             data: {
                 userId,
                 movieId,
+                mediaType: "MOVIE",
                 action: "rated",
                 reviewRating: review.rating,
                 reviewText: review.text,
@@ -155,6 +156,7 @@ export const likeOrUnlikeMovieReviewForUser = async (
             data: {
                 userId,
                 reviewId: movieReview.id,
+                mediaType: "MOVIE",
                 action: like ? "liked" : "unliked",
                 date: new Date(),
             },

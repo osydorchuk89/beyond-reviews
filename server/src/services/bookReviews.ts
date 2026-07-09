@@ -90,6 +90,7 @@ export const createOrUpdateBookReviewForUser = async (
             data: {
                 userId,
                 bookId,
+                mediaType: "BOOK",
                 action: "rated",
                 reviewRating: review.rating,
                 reviewText: review.text,
@@ -157,6 +158,7 @@ export const likeOrUnlikeBookReviewForUser = async (
             data: {
                 userId,
                 reviewId: bookReview.id,
+                mediaType: "BOOK",
                 action: like ? "liked" : "unliked",
                 date: new Date(),
             },
