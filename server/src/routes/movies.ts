@@ -9,7 +9,7 @@ import {
     getMovieReviews,
     likeOrUnlikeMovieReview,
     updateMovie,
-} from "../controllers/moviesController";
+} from "../controllers/moviesController.js";
 
 export const moviesRouter = Router();
 

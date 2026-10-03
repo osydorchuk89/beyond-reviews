@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
-import { ReviewSchema } from "../lib/schemas";
-import { invalidateBookRecommendationsForUser } from "./bookRecommendations";
-import { ServiceError } from "./errors";
+import { ReviewSchema } from "../lib/schemas.js";
+import { invalidateBookRecommendationsForUser } from "./bookRecommendations.js";
+import { ServiceError } from "./errors.js";
 
 interface CreateOrUpdateBookReviewArgs {
     bookId: string;

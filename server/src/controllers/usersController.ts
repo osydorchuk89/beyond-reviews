@@ -1,18 +1,19 @@
 import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
-import { MediaType, PrismaClient } from "@prisma/client";
+import { MediaType } from "@prisma/client";
+import { prisma } from "../lib/prisma.js";
 
-import { DEFAULT_USER_PHOTO_URL } from "../config/constants";
-import { UserSchema } from "../lib/schemas";
-import { login } from "./authController";
-import { getFriendRecommendationsForUser } from "../services/friendRecommendations";
-import { getBookRecommendationsForUser } from "../services/bookRecommendations";
-import { getMovieRecommendationsForUser } from "../services/movieRecommendations";
+import { DEFAULT_USER_PHOTO_URL } from "../config/constants.js";
+import { UserSchema } from "../lib/schemas.js";
+import { auth, AUTH_BASE_URL } from "../config/auth.js";
+import { callAuth, forwardCookies, readAuthResponse, toAppUser } from "../lib/auth-http.js";
+import { getFriendRecommendationsForUser } from "../services/friendRecommendations.js";
+import { getBookRecommendationsForUser } from "../services/bookRecommendations.js";
+import { getMovieRecommendationsForUser } from "../services/movieRecommendations.js";
 import {
     acceptFriendRequestFromUser,
     sendFriendRequestToUser,
-} from "../services/friendships";
-import { getErrorMessage, getErrorStatusCode } from "../services/errors";
+} from "../services/friendships.js";
+import { getErrorMessage, getErrorStatusCode } from "../services/errors.js";
 import {
     toMovieResponse,
     toMovieReviewResponse,
@@ -20,9 +21,7 @@ import {
     toBookResponse,
     toBookReviewResponse,
     toBookWishlistResponse,
-} from "../lib/media";
-
-const prisma = new PrismaClient();
+} from "../lib/media.js";
 
 export const registerNewUser = async (
     req: Request,
@@ -42,7 +41,7 @@ export const registerNewUser = async (
         const validatedData = validationResult.data;
         const userExists = await prisma.user.findUnique({
             where: {
-                email: validatedData.email,
+                email: validatedData.email.toLowerCase(),
             },
         });
         if (userExists) {
@@ -50,34 +49,25 @@ export const registerNewUser = async (
                 message: "User with this email already exists",
             });
         } else {
-            const hashedPassword = await bcrypt.hash(
-                validatedData.password,
-                12,
-            );
-            validatedData.password = hashedPassword;
-            try {
-                const newUser = await prisma.user.create({
-                    data: validatedData,
-                    omit: { password: true },
+            const response = await callAuth(auth, AUTH_BASE_URL, req, "/sign-up/email", {
+                name: `${validatedData.firstName} ${validatedData.lastName}`,
+                firstName: validatedData.firstName,
+                lastName: validatedData.lastName,
+                email: validatedData.email,
+                password: validatedData.password,
+                image: validatedData.photo,
+            });
+            forwardCookies(response, res);
+            const data = await readAuthResponse(response);
+            if (!response.ok) {
+                const duplicate = data.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL" ||
+                    data.code === "USER_ALREADY_EXISTS";
+                res.status(duplicate ? 409 : response.status).send({
+                    message: duplicate ? "User with this email already exists" : data.message,
                 });
-
-                req.login(newUser, (err) => {
-                    if (err) {
-                        console.error(
-                            "Auto-login error after registration:",
-                            err,
-                        );
-                        return res.status(201).send({
-                            message:
-                                "User created successfully, please login manually",
-                        });
-                    }
-
-                    login(req, res);
-                });
-            } catch (error: any) {
-                res.status(500).send({ message: error.message });
+                return;
             }
+            res.status(200).send(toAppUser(data.user));
         }
     }
 };
@@ -698,7 +688,7 @@ export const seedUsers = async (req: Request, res: Response): Promise<any> => {
         try {
             // Check if user already exists
             const userExists = await prisma.user.findUnique({
-                where: { email: validatedData.email },
+                where: { email: validatedData.email.toLowerCase() },
             });
 
             if (userExists) {
@@ -711,16 +701,16 @@ export const seedUsers = async (req: Request, res: Response): Promise<any> => {
                 continue;
             }
 
-            // Hash password
-            const hashedPassword = await bcrypt.hash(
-                validatedData.password,
-                12,
-            );
-            validatedData.password = hashedPassword;
-
-            // Create user
-            await prisma.user.create({
-                data: validatedData,
+            // Seed through the same auth service so new test users can sign in.
+            await auth.api.signUpEmail({
+                body: {
+                    name: `${validatedData.firstName} ${validatedData.lastName}`,
+                    firstName: validatedData.firstName,
+                    lastName: validatedData.lastName,
+                    email: validatedData.email,
+                    password: validatedData.password,
+                    image: validatedData.photo,
+                },
             });
 
             results.created++;
@@ -735,7 +725,7 @@ export const seedUsers = async (req: Request, res: Response): Promise<any> => {
     }
 
     console.log(
-        `✅ Seeding complete: ${results.created} created, ${results.failed} failed`,
+        `Seeding complete: ${results.created} created, ${results.failed} failed`,
     );
 
     res.status(201).send({

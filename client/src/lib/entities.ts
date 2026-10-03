@@ -8,7 +8,6 @@ export interface User {
     firstName: string;
     lastName: string;
     email: string;
-    password?: string;
     photo: string;
     likes: { movieId: string }[];
     watchList: { movieId: string }[];

@@ -1,19 +1,17 @@
 import { Request, Response } from "express";
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma.js";
 import {
     createOrUpdateBookReviewForUser,
     likeOrUnlikeBookReviewForUser,
-} from "../services/bookReviews";
-import { updateBookWishlist } from "../services/bookWishlist";
-import { getErrorMessage, getErrorStatusCode } from "../services/errors";
+} from "../services/bookReviews.js";
+import { updateBookWishlist } from "../services/bookWishlist.js";
+import { getErrorMessage, getErrorStatusCode } from "../services/errors.js";
 import {
     fromBookWriteData,
     toBookResponse,
     toBookReviewResponse,
-} from "../lib/media";
-
-const prisma = new PrismaClient();
+} from "../lib/media.js";
 
 const parsePositiveInteger = (
     value: string | undefined,

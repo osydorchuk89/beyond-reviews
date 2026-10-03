@@ -3,7 +3,7 @@ import { MediaType, Prisma, PrismaClient } from "@prisma/client";
 import {
     RECOMMENDATION_CACHE_TTL_MS,
     isFresh,
-} from "./recommendationScoring";
+} from "./recommendationScoring.js";
 
 export type RecommendationPrismaClient =
     | PrismaClient

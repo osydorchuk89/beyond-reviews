@@ -2,12 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import {
     FriendRecommendationsResult,
     FriendRecommendation,
-} from "../lib/entities";
+} from "../lib/entities.js";
 import {
     MIN_REVIEWS_FOR_RECOMMENDATIONS,
     getSimilarBookUsersForUser,
     getSimilarUsersForUser,
-} from "./userSimilarity";
+} from "./userSimilarity.js";
 
 const MAX_FRIEND_RECOMMENDATIONS = 5;
 const RECOMMENDATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;

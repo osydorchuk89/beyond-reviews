@@ -9,7 +9,7 @@ import {
     getBookReviews,
     likeOrUnlikeBookReview,
     updateBook,
-} from "../controllers/booksController";
+} from "../controllers/booksController.js";
 
 export const booksRouter = Router();
 

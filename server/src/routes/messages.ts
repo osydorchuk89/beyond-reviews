@@ -4,7 +4,7 @@ import {
     getUserMessages,
     markMessageAsRead,
     postMessage,
-} from "../controllers/messagesController";
+} from "../controllers/messagesController.js";
 
 export const messagesRouter = Router();
 

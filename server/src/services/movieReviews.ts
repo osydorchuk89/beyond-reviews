@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
-import { ReviewSchema } from "../lib/schemas";
-import { ServiceError } from "./errors";
-import { invalidateMovieRecommendationsForUser } from "./movieRecommendations";
+import { ReviewSchema } from "../lib/schemas.js";
+import { ServiceError } from "./errors.js";
+import { invalidateMovieRecommendationsForUser } from "./movieRecommendations.js";
 
 interface CreateOrUpdateMovieReviewArgs {
     movieId: string;

@@ -1,61 +1,42 @@
-import { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
+import { auth, AUTH_BASE_URL } from "../config/auth.js";
+import { BASE_CLIENT_URL } from "../config/constants.js";
+import { callAuth, forwardCookies, readAuthResponse, safeReturnPath, toAppUser } from "../lib/auth-http.js";
 
-import { BASE_CLIENT_URL } from "../config/constants";
-
-export const login = (req: Request, res: Response) => {
-    res.send(req.user);
+export const login = async (req: Request, res: Response) => {
+    const response = await callAuth(auth, AUTH_BASE_URL, req, "/sign-in/email", {
+        email: req.body.email, password: req.body.password,
+    });
+    forwardCookies(response, res);
+    const data = await readAuthResponse(response);
+    if (!response.ok) { res.status(response.status).send(data); return; }
+    res.send(toAppUser(data.user));
 };
 
 export const getAuthStatus = (req: Request, res: Response) => {
-    if (req.isAuthenticated()) {
-        res.status(200).send({ isAuthenticated: true, user: req.user });
-    } else {
-        res.status(200).send({ isAuthenticated: false });
-    }
+    res.send(req.user ? { isAuthenticated: true, user: req.user } : { isAuthenticated: false });
 };
 
-export const logout = (req: Request, res: Response, next: NextFunction) => {
-    req.logout((err) => {
-        if (err) {
-            return next(err);
-        }
-        req.session.destroy((err) => {
-            if (err) {
-                return next(err);
-            }
-            res.clearCookie("connect.sid"); 
-            res.status(200).send("Logged out");
-        });
+export const logout = async (req: Request, res: Response) => {
+    const response = await callAuth(auth, AUTH_BASE_URL, req, "/sign-out", {});
+    forwardCookies(response, res);
+    if (!response.ok) { res.status(response.status).send(await response.json()); return; }
+    res.clearCookie("connect.sid", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
+    res.send("Logged out");
 };
 
-export const googleCallback = (req: Request, res: Response) => {
-    let redirectPath = "/movies";
-
-    // Extract the 'from' parameter from the OAuth state
-    if (req.query.state) {
-        try {
-            const state = JSON.parse(req.query.state as string);
-            if (state.from) {
-                // Validate redirect path to prevent open redirect attacks
-                const requestedPath = state.from;
-
-                // Only allow relative paths that start with /
-                // Reject any path containing protocol schemes or domain names
-                if (
-                    typeof requestedPath === "string" &&
-                    requestedPath.startsWith("/") &&
-                    !requestedPath.startsWith("//") &&
-                    !/^(\/\\|https?:\/\/|javascript:)/i.test(requestedPath)
-                ) {
-                    redirectPath = requestedPath;
-                }
-            }
-        } catch (err) {
-            // If state parsing fails, use default redirect
-            console.error("Failed to parse OAuth state:", err);
-        }
-    }
-
-    res.redirect(BASE_CLIENT_URL + redirectPath);
+export const googleLogin = async (req: Request, res: Response) => {
+    const from = safeReturnPath(req.query.from ?? "/");
+    const response = await callAuth(auth, AUTH_BASE_URL, req, "/sign-in/social", {
+        provider: "google", callbackURL: BASE_CLIENT_URL + from,
+        errorCallbackURL: BASE_CLIENT_URL + "/login",
+    });
+    forwardCookies(response, res);
+    const data = await readAuthResponse(response);
+    if (!response.ok || !data.url) { res.redirect(BASE_CLIENT_URL + "/login"); return; }
+    res.redirect(data.url);
 };

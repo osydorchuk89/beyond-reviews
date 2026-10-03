@@ -8,7 +8,7 @@ Before starting code changes, read [AGENTS.md](AGENTS.md) for the product direct
 
 ## Features
 
-- User authentication with Google OAuth
+- User authentication with email/password and Google OAuth
 - Browse and filter movies by genre, year, and director
 - Rate and review movies
 - User profiles and watchlists
@@ -28,7 +28,7 @@ Before starting code changes, read [AGENTS.md](AGENTS.md) for the product direct
 - Node.js with express
 - TypeScript
 - Prisma ORM with MongoDB
-- Passport.js for authentication
+- Better Auth for authentication (native MongoDB adapter)
 
 ## Local Installation
 
@@ -59,12 +59,61 @@ npm install
 Create a `.env` file in the server directory and add the following environment variables:
 
 - `DATABASE_URL`
-- `EXPRESS_SESSION_SECRET`
+- `BETTER_AUTH_SECRET` (random secret of at least 32 characters)
+- `BETTER_AUTH_URL` (backend origin; defaults to the existing local/production backend URL)
+- `CLIENT_URL` (frontend origin; defaults to the existing local/production frontend URL)
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `GCS_BUCKET_NAME`
 - `GOOGLE_APPLICATION_CREDENTIALS` (local path to your Google service account key JSON file)
 - `GCS_PUBLIC_BASE_URL` (optional, if using a CDN or custom domain)
+
+Generate `BETTER_AUTH_SECRET` locally and store the result in your `.env` or hosting secret configuration:
+
+```bash
+node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"
+```
+
+Keep the same secret across server instances and restarts. `EXPRESS_SESSION_SECRET` is no longer used. MongoDB must support transactions (Atlas or a replica set), as required by the existing Prisma setup and the Better Auth adapter.
+
+### Authentication migration and deployment
+
+Existing accounts are retained in the `User` collection with their original ObjectIds. Better Auth uses separate `AuthAccount`, `AuthSession`, and `AuthVerification` collections. Prisma remains on v6, with no Prisma schema change.
+
+Before starting the migrated app against an existing database:
+
+1. Back up the database and pause the old backend's writes during cutover.
+2. Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `CLIENT_URL` in the backend environment. Keep the existing Google credentials and database URL.
+3. Add these authorized redirect URIs to the existing OAuth client in Google Cloud Console:
+   - Local: `http://localhost:8080/api/auth/callback/google`
+   - Production: `https://beyond-reviews-193634881435.europe-west1.run.app/api/auth/callback/google`
+   - For another backend origin: `<BETTER_AUTH_URL>/api/auth/callback/google`
+4. From `server/`, preview and then apply the additive backfill:
+
+   ```bash
+   npm run auth:migrate -- --dry-run
+   npm run auth:migrate -- --apply
+   ```
+
+5. Build and deploy the updated backend and frontend together. The backend entry point is now `dist/index.js`; `npm start` already uses it.
+6. Check credential login, Google login, registration with a photo, and logout in a real browser, including production's separate frontend/backend origins.
+
+If the deployment installs only production dependencies, run the compiled backfill after `npm run build`: `node dist/scripts/migrate-auth.js --dry-run`, followed by `node dist/scripts/migrate-auth.js --apply`.
+
+The backfill copies existing bcrypt hashes into credential accounts without changing passwords, adds missing auth metadata and indexes, and normalizes emails to lowercase. It stops on case-insensitive email collisions without merging users. It is safe to rerun and never replaces users, deletes accounts, or modifies reviews, ratings, friendships, wishlists, or recommendation data. The original password fields remain for rollback; new credentials are stored only in `AuthAccount`. Run the backfill again after legacy development scripts that create users directly through Prisma.
+
+Google identities were not stored by Passport. They are linked to the existing user on the next successful Google login with the same verified email. Existing profile names/photos are retained. Users must sign in again after cutover; legacy Passport sessions are not converted or deleted.
+
+For rollback, keep a database backup and the previous application revision. The additive backfill leaves existing IDs and password hashes intact. Users created after cutover have credentials only in `AuthAccount` and cannot use legacy password login without a separate reverse migration.
+
+Authentication integration tests run against a disposable MongoDB replica set and never use the configured application database:
+
+```bash
+cd server
+npm run test:auth
+```
+
+The first test run downloads a MongoDB binary. OAuth tests simulate Google's provider response; a real Google/browser check is still needed after configuring the OAuth client.
 
 Google Cloud Storage notes:
 

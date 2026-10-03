@@ -4,13 +4,13 @@ import {
     BookRecommendation,
     BookRecommendationsResult,
     PreferenceStats,
-} from "../lib/entities";
-import { toBookResponse } from "../lib/media";
+} from "../lib/entities.js";
+import { toBookResponse } from "../lib/media.js";
 import {
     FAVORITE_RATING_THRESHOLD,
     MIN_REVIEWS_FOR_RECOMMENDATIONS,
     getSimilarBookUsersForUser,
-} from "./userSimilarity";
+} from "./userSimilarity.js";
 import {
     MAX_RATING_RESIDUAL_FOR_FULL_SIGNAL,
     MIN_SPECIFIC_AFFINITY,
@@ -26,13 +26,13 @@ import {
     getPublicQualityScore,
     normalizeProfileTerm,
     preferenceToScore,
-} from "./recommendationScoring";
+} from "./recommendationScoring.js";
 import {
     invalidateRecommendationsForUser,
     isRecommendationCacheFresh,
     RecommendationPrismaClient,
     replaceRecommendationsForUser,
-} from "./recommendationCache";
+} from "./recommendationCache.js";
 
 const RECOMMENDATION_LIMITS = {
     maxSimilarUsers: 30,

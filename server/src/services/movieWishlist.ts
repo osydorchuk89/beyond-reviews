@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-import { ServiceError } from "./errors";
+import { ServiceError } from "./errors.js";
 
 interface UpdateMovieWishlistArgs {
     movieId: string;

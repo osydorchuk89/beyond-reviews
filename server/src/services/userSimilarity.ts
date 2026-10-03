@@ -4,7 +4,7 @@ import {
     CandidateRatingByMediaId,
     Rating,
     RatingByMediaId,
-} from "../lib/entities";
+} from "../lib/entities.js";
 
 export const MIN_REVIEWS_FOR_RECOMMENDATIONS = 3;
 export const MAX_RATING_DIFFERENCE = 9;

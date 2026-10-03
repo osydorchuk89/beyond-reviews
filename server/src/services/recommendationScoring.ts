@@ -1,4 +1,4 @@
-import { PreferenceStats } from "../lib/entities";
+import { PreferenceStats } from "../lib/entities.js";
 
 export const RECOMMENDATION_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 

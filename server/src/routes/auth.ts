@@ -1,33 +1,8 @@
 import { Router } from "express";
-import passport from "passport";
-
-import {
-    getAuthStatus,
-    googleCallback,
-    login,
-    logout,
-} from "../controllers/authController";
-import { BASE_CLIENT_URL } from "../config/constants";
+import { getAuthStatus, googleLogin, login, logout } from "../controllers/authController.js";
 
 export const authRouter = Router();
-
-authRouter.post("/login", passport.authenticate("local"), login);
-
+authRouter.post("/login", login);
 authRouter.get("/status", getAuthStatus);
-
-authRouter.get("/logout", logout);
-
-authRouter.get("/google", (req, res, next) => {
-    const from = req.query.from || "/";
-    passport.authenticate("google", {
-        state: JSON.stringify({ from }),
-    })(req, res, next);
-});
-
-authRouter.get(
-    "/google/callback",
-    passport.authenticate("google", {
-        failureRedirect: BASE_CLIENT_URL + "/login",
-    }),
-    googleCallback
-);
+authRouter.post("/logout", logout);
+authRouter.get("/google", googleLogin);

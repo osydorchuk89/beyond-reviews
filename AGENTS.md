@@ -19,7 +19,8 @@ The repository has two applications:
 
 Important server concerns:
 
-- Auth/session behavior uses Passport, Google OAuth, Express sessions, and Mongo-backed session storage.
+- Auth/session behavior uses Better Auth with its native MongoDB adapter, email/password login, and Google OAuth. Auth accounts/sessions are separate collections; users retain their Prisma MongoDB ObjectIds.
+- The server uses ESM, with `.js` extensions on relative TypeScript imports. The entry point is `server/src/index.ts`; development runs through `tsx`.
 - Prisma schema and generated client live under `server/prisma/`.
 - Upload/storage behavior uses Google Cloud Storage.
 - API code is organized under `server/src/controllers`, `server/src/routes`, `server/src/services`, `server/src/config`, and `server/src/lib`.
@@ -81,9 +82,10 @@ Server:
 ```bash
 cd server
 npm run build
+npm run test:auth
 ```
 
-The server currently has no real automated test script; `npm test` is a placeholder.
+The server has focused authentication integration tests under `server/tests/`; `npm test` is still a placeholder. `npm run test:auth` starts a disposable MongoDB replica set and may download its binary on the first run.
 
 ## Working Guidelines
 

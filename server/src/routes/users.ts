@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { fileUpload, uploadPhotoToGcs } from "../lib/upload";
+import { fileUpload, uploadPhotoToGcs } from "../lib/upload.js";
 import {
     acceptFriendRequest,
     getAllUsers,
@@ -17,7 +17,7 @@ import {
     registerNewUser,
     seedUsers,
     sendFriendRequest,
-} from "../controllers/usersController";
+} from "../controllers/usersController.js";
 
 export const usersRouter = Router();
 

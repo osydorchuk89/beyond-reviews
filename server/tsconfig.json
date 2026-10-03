@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS", // Changed for better compatibility
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": "./src",    // Added to define source root
     "outDir": "./dist",    // Correctly points to dist
     "lib": ["ES2022"],

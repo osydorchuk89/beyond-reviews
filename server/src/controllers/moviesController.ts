@@ -1,19 +1,17 @@
 import { Request, Response } from "express";
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma.js";
 import {
     createOrUpdateMovieReviewForUser,
     likeOrUnlikeMovieReviewForUser,
-} from "../services/movieReviews";
-import { updateMovieWishlist } from "../services/movieWishlist";
-import { getErrorMessage, getErrorStatusCode } from "../services/errors";
+} from "../services/movieReviews.js";
+import { updateMovieWishlist } from "../services/movieWishlist.js";
+import { getErrorMessage, getErrorStatusCode } from "../services/errors.js";
 import {
     fromMovieWriteData,
     toMovieResponse,
     toMovieReviewResponse,
-} from "../lib/media";
-
-const prisma = new PrismaClient();
+} from "../lib/media.js";
 
 export const getAllMovies = async (
     req: Request,
