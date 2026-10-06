@@ -10,13 +10,14 @@ const required = (name: string) => {
 };
 
 const secret = required("BETTER_AUTH_SECRET");
-if (secret.length < 32) throw new Error("BETTER_AUTH_SECRET must contain at least 32 characters");
+if (secret.length < 32)
+    throw new Error("BETTER_AUTH_SECRET must contain at least 32 characters");
 
-export const AUTH_BASE_URL = process.env.BETTER_AUTH_URL ?? (
-    process.env.NODE_ENV === "production"
+export const AUTH_BASE_URL =
+    process.env.BETTER_AUTH_URL ??
+    (process.env.NODE_ENV === "production"
         ? "https://beyond-reviews-193634881435.europe-west1.run.app"
-        : "http://localhost:8080"
-);
+        : "http://localhost:8080");
 
 export const authMongoClient = new MongoClient(required("DATABASE_URL"));
 export const auth = createAuth(authMongoClient.db(), authMongoClient, {

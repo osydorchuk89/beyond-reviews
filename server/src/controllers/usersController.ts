@@ -5,7 +5,12 @@ import { prisma } from "../lib/prisma.js";
 import { DEFAULT_USER_PHOTO_URL } from "../config/constants.js";
 import { UserSchema } from "../lib/schemas.js";
 import { auth, AUTH_BASE_URL } from "../config/auth.js";
-import { callAuth, forwardCookies, readAuthResponse, toAppUser } from "../lib/auth-http.js";
+import {
+    callAuth,
+    forwardCookies,
+    readAuthResponse,
+    toAppUser,
+} from "../lib/auth-http.js";
 import { getFriendRecommendationsForUser } from "../services/friendRecommendations.js";
 import { getBookRecommendationsForUser } from "../services/bookRecommendations.js";
 import { getMovieRecommendationsForUser } from "../services/movieRecommendations.js";
@@ -49,21 +54,30 @@ export const registerNewUser = async (
                 message: "User with this email already exists",
             });
         } else {
-            const response = await callAuth(auth, AUTH_BASE_URL, req, "/sign-up/email", {
-                name: `${validatedData.firstName} ${validatedData.lastName}`,
-                firstName: validatedData.firstName,
-                lastName: validatedData.lastName,
-                email: validatedData.email,
-                password: validatedData.password,
-                image: validatedData.photo,
-            });
+            const response = await callAuth(
+                auth,
+                AUTH_BASE_URL,
+                req,
+                "/sign-up/email",
+                {
+                    name: `${validatedData.firstName} ${validatedData.lastName}`,
+                    firstName: validatedData.firstName,
+                    lastName: validatedData.lastName,
+                    email: validatedData.email,
+                    password: validatedData.password,
+                    image: validatedData.photo,
+                },
+            );
             forwardCookies(response, res);
             const data = await readAuthResponse(response);
             if (!response.ok) {
-                const duplicate = data.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL" ||
+                const duplicate =
+                    data.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL" ||
                     data.code === "USER_ALREADY_EXISTS";
                 res.status(duplicate ? 409 : response.status).send({
-                    message: duplicate ? "User with this email already exists" : data.message,
+                    message: duplicate
+                        ? "User with this email already exists"
+                        : data.message,
                 });
                 return;
             }
@@ -520,14 +534,14 @@ export const getUserMovieReviews = async (
                     mediaType: "MOVIE",
                 },
                 include: {
-                movie: {
-                    select: {
-                        id: true,
-                        title: true,
-                        releaseYear: true,
-                        image: true,
+                    movie: {
+                        select: {
+                            id: true,
+                            title: true,
+                            releaseYear: true,
+                            image: true,
+                        },
                     },
-                },
                 },
                 orderBy: { date: "desc" },
                 skip,

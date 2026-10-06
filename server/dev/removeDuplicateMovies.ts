@@ -38,11 +38,13 @@ const normalizedTitle = (title: string) =>
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
 
-const duplicateKeyFor = (movie: Pick<MovieCandidate, "title" | "releaseYear">) =>
-    `${normalizedTitle(movie.title)}|${movie.releaseYear}`;
+const duplicateKeyFor = (
+    movie: Pick<MovieCandidate, "title" | "releaseYear">,
+) => `${normalizedTitle(movie.title)}|${movie.releaseYear}`;
 
 const movieScore = (movie: MovieCandidate) => {
-    const hasPoster = movie.poster && !movie.poster.includes("fallback") ? 1 : 0;
+    const hasPoster =
+        movie.poster && !movie.poster.includes("fallback") ? 1 : 0;
     const hasOverview = movie.overview ? 1 : 0;
 
     return (
@@ -224,7 +226,9 @@ async function main() {
     const movieIdsToRemove = moviesToRemove.map((movie) => movie.id);
 
     console.log(`Duplicate groups: ${duplicateGroups.length.toLocaleString()}`);
-    console.log(`Duplicate movies to remove: ${moviesToRemove.length.toLocaleString()}`);
+    console.log(
+        `Duplicate movies to remove: ${moviesToRemove.length.toLocaleString()}`,
+    );
 
     for (const group of duplicateGroups.slice(0, 20)) {
         console.log(
@@ -242,14 +246,18 @@ async function main() {
 
     console.log("Related entries to remove:");
     console.log(`- Movie reviews: ${related.reviewCount.toLocaleString()}`);
-    console.log(`- Movie review likes: ${related.reviewLikeCount.toLocaleString()}`);
+    console.log(
+        `- Movie review likes: ${related.reviewLikeCount.toLocaleString()}`,
+    );
     console.log(
         `- Activities with duplicate movieId: ${related.movieActivityCount.toLocaleString()}`,
     );
     console.log(
         `- Activities with duplicate movieReviewId: ${related.reviewActivityCount.toLocaleString()}`,
     );
-    console.log(`- Watchlist entries: ${related.watchListCount.toLocaleString()}`);
+    console.log(
+        `- Watchlist entries: ${related.watchListCount.toLocaleString()}`,
+    );
 
     if (!options.apply) {
         console.log("Dry run only. Re-run with --apply to delete these rows.");
@@ -266,10 +274,13 @@ async function main() {
                 where: { movieReviewId: { in: ids } },
             }),
     );
-    await deleteInChunks("Movie review likes", related.reviewIdsToRemove, (ids) =>
-        prisma.movieReviewLike.deleteMany({
-            where: { reviewId: { in: ids } },
-        }),
+    await deleteInChunks(
+        "Movie review likes",
+        related.reviewIdsToRemove,
+        (ids) =>
+            prisma.movieReviewLike.deleteMany({
+                where: { reviewId: { in: ids } },
+            }),
     );
     await deleteInChunks("Activities by movieId", movieIdsToRemove, (ids) =>
         prisma.activity.deleteMany({
@@ -292,7 +303,9 @@ async function main() {
         }),
     );
 
-    console.log(`Done: removed ${movieIdsToRemove.length.toLocaleString()} duplicate movies.`);
+    console.log(
+        `Done: removed ${movieIdsToRemove.length.toLocaleString()} duplicate movies.`,
+    );
 }
 
 main()

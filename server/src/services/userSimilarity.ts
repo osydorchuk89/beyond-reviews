@@ -61,8 +61,7 @@ export const calculateSimilarityScore = (
             return sum + Math.abs(review.rating - (candidateRating ?? 0));
         }, 0) / sharedReviews.length;
 
-    const agreementScore =
-        1 - averageRatingDifference / MAX_RATING_DIFFERENCE;
+    const agreementScore = 1 - averageRatingDifference / MAX_RATING_DIFFERENCE;
     const overlapConfidence = Math.min(
         sharedReviews.length / MIN_REVIEWS_FOR_RECOMMENDATIONS,
         1,
@@ -104,9 +103,7 @@ const getSimilarMediaUsersFromReviews = (
             );
             const sharedFavoriteMediaIds = reviews
                 .filter((review) => {
-                    const userReview = userReviewsByMediaId.get(
-                        review.mediaId,
-                    );
+                    const userReview = userReviewsByMediaId.get(review.mediaId);
                     return (
                         review.rating >= FAVORITE_RATING_THRESHOLD &&
                         (userReview?.rating ?? 0) >= FAVORITE_RATING_THRESHOLD
@@ -147,10 +144,12 @@ export const getSimilarUsersForUser = async (
                 rating: true,
             },
         })
-    ).map((review) => ({
-        mediaId: review.movieId ?? "",
-        rating: review.rating,
-    })).filter((review) => review.mediaId);
+    )
+        .map((review) => ({
+            mediaId: review.movieId ?? "",
+            rating: review.rating,
+        }))
+        .filter((review) => review.mediaId);
 
     if (userReviewsByMediaId.length < MIN_REVIEWS_FOR_RECOMMENDATIONS) {
         return {
@@ -183,11 +182,13 @@ export const getSimilarUsersForUser = async (
                 userId: true,
             },
         })
-    ).map((review) => ({
-        mediaId: review.movieId ?? "",
-        rating: review.rating,
-        userId: review.userId,
-    })).filter((review) => review.mediaId);
+    )
+        .map((review) => ({
+            mediaId: review.movieId ?? "",
+            rating: review.rating,
+            userId: review.userId,
+        }))
+        .filter((review) => review.mediaId);
 
     const similarUsers = getSimilarMediaUsersFromReviews(
         userReviewsByMediaId,

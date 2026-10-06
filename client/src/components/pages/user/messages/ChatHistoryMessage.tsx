@@ -24,13 +24,11 @@ export const ChatHistoryMessage = ({ message }: MessageProps) => {
                     message.senderId === userId
                         ? messageStyle + " bg-orange-200 self-end"
                         : message.wasRead
-                        ? messageStyle + " bg-sky-200 self-start"
-                        : messageStyle + " bg-sky-200 self-start"
+                          ? messageStyle + " bg-sky-200 self-start"
+                          : messageStyle + " bg-sky-200 self-start"
                 }
             >
-                <span className="mr-8 min-w-0 break-words">
-                    {message.text}
-                </span>
+                <span className="mr-8 min-w-0 break-words">{message.text}</span>
                 <span className="absolute right-1 bottom-1 text-[10px]">
                     {new Date(message.date).toLocaleTimeString("default", {
                         hour: "2-digit",

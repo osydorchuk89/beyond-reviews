@@ -13,10 +13,7 @@ import {
     toBookReviewResponse,
 } from "../lib/media.js";
 
-const parsePositiveInteger = (
-    value: string | undefined,
-    fallback: number,
-) => {
+const parsePositiveInteger = (value: string | undefined, fallback: number) => {
     const parsedValue = Number.parseInt(value ?? "", 10);
 
     return Number.isInteger(parsedValue) && parsedValue > 0
@@ -114,9 +111,8 @@ export const getBookById = async (
     res: Response,
 ): Promise<any> => {
     const { bookId } = req.params;
-    const userId =
-        ((req.user as { id?: string } | undefined)?.id ??
-            req.query.userId) as string | undefined;
+    const userId = ((req.user as { id?: string } | undefined)?.id ??
+        req.query.userId) as string | undefined;
 
     try {
         const book = await prisma.book.findUnique({
@@ -235,7 +231,9 @@ export const getBookReviews = async (
             currentPage: page,
             totalPages,
             hasMore,
-            userReview: userReview ? toBookReviewResponse(userReview) : userReview,
+            userReview: userReview
+                ? toBookReviewResponse(userReview)
+                : userReview,
         });
     } catch (error) {
         res.status(500).send({ message: "Could not get book reviews", error });
@@ -260,7 +258,10 @@ export const createOrUpdateBookReview = async (
         res.status(200).send(toBookReviewResponse(bookReview));
     } catch (error) {
         res.status(getErrorStatusCode(error)).send({
-            message: getErrorMessage(error, "Could not create or update review"),
+            message: getErrorMessage(
+                error,
+                "Could not create or update review",
+            ),
             error,
         });
     }
@@ -300,7 +301,9 @@ export const createBooks = async (
                 return prisma.book.create({
                     data: {
                         ...(data as any),
-                        authors: Array.isArray(book.authors) ? book.authors : [],
+                        authors: Array.isArray(book.authors)
+                            ? book.authors
+                            : [],
                     },
                 });
             }),
@@ -315,10 +318,7 @@ export const createBooks = async (
 };
 
 // For dev purposes only
-export const updateBook = async (
-    req: Request,
-    res: Response,
-): Promise<any> => {
+export const updateBook = async (req: Request, res: Response): Promise<any> => {
     const { bookId } = req.params;
     const updateData = fromBookWriteData(req.body);
 

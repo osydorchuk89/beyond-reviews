@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getAuthStatus, googleLogin, login, logout } from "../controllers/authController.js";
+import {
+    getAuthStatus,
+    googleLogin,
+    login,
+    logout,
+} from "../controllers/authController.js";
 
 export const authRouter = Router();
 authRouter.post("/login", login);

@@ -22,10 +22,9 @@ export const UserFriendsPage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
         user: User;
     };
-    const { friendRecommendationsResultPromise } =
-        useLoaderData() as {
-            friendRecommendationsResultPromise: Promise<FriendRecommendationsLoaderResult>;
-        };
+    const { friendRecommendationsResultPromise } = useLoaderData() as {
+        friendRecommendationsResultPromise: Promise<FriendRecommendationsLoaderResult>;
+    };
 
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
 

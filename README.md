@@ -156,3 +156,14 @@ The server will start on `http://localhost:5173`
 ### 5. Access the Application
 
 Open your browser and navigate to `http://localhost:5173` to use the application.
+
+## Formatting
+
+Biome is installed as a development dependency in both projects. Run each project's command from the repository root:
+
+```bash
+npm --prefix client run format
+npm --prefix server run format
+```
+
+Alternatively, run `npm run format` inside `client/` or `server/`. Each command formats that project's JavaScript and TypeScript files, including tests and configuration scripts, using four-space indentation. Git-ignored files, build output, dependencies, and generated Prisma files are excluded.

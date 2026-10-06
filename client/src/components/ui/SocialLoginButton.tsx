@@ -6,7 +6,7 @@ export const SocialLoginButton = () => {
     const location = useLocation();
     const from = location.state?.from ?? "/";
     const googleAuthUrl = `${BASE_URL}/auth/google?from=${encodeURIComponent(
-        from
+        from,
     )}`;
 
     return (

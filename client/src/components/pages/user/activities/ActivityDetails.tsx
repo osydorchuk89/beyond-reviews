@@ -26,9 +26,7 @@ export const ActivityDetails = ({
     const mediaUrl = activity.movieId
         ? `/movies/${activity.movieId}`
         : `/books/${activity.bookId}`;
-    const mediaFullTitle = media
-        ? `${media.title} (${media.releaseYear})`
-        : "";
+    const mediaFullTitle = media ? `${media.title} (${media.releaseYear})` : "";
     const isRatingActivity = mediaId && activity.action === "rated";
     const isWishlistActivity =
         mediaId &&
@@ -95,11 +93,9 @@ export const ActivityDetails = ({
                     <strong>Review</strong>: {activity.reviewText}
                 </p>
             )}
-            {mediaId &&
-                activity.action === "rated" &&
-                !activity.reviewText && (
-                    <p className="italic mt-2">No review</p>
-                )}
+            {mediaId && activity.action === "rated" && !activity.reviewText && (
+                <p className="italic mt-2">No review</p>
+            )}
         </>
     );
 };

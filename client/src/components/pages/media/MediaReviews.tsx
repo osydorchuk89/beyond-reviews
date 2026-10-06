@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import {
-    MediaReviewCard,
-    MediaReviewCardData,
-} from "./MediaReviewCard";
+import { MediaReviewCard, MediaReviewCardData } from "./MediaReviewCard";
 import { Pagination } from "../../ui/Pagination";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 

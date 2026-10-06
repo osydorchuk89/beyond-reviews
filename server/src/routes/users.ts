@@ -48,16 +48,10 @@ usersRouter.get(
 );
 
 // get user movie recommendations
-usersRouter.get(
-    "/:userId/recommendations/movies",
-    getUserMovieRecommendations,
-);
+usersRouter.get("/:userId/recommendations/movies", getUserMovieRecommendations);
 
 // get user book recommendations
-usersRouter.get(
-    "/:userId/recommendations/books",
-    getUserBookRecommendations,
-);
+usersRouter.get("/:userId/recommendations/books", getUserBookRecommendations);
 
 // send a friend request
 usersRouter.post("/:userId/friend-requests", sendFriendRequest);

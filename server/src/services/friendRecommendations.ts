@@ -280,7 +280,8 @@ const computeFriendRecommendationsForUser = async (
             combined.similarityScore +=
                 recommendation.similarityScore * bookWeight;
             combined.sharedBookCount = recommendation.sharedBookCount;
-            combined.sharedFavoriteBookIds = recommendation.sharedFavoriteBookIds;
+            combined.sharedFavoriteBookIds =
+                recommendation.sharedFavoriteBookIds;
             continue;
         }
 

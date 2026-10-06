@@ -16,7 +16,7 @@ export const ProfilePage = () => {
 
     const areFriends = Boolean(
         visitingUser &&
-        profileUser.friends.some((friend) => friend.id === visitingUser.id),
+            profileUser.friends.some((friend) => friend.id === visitingUser.id),
     );
 
     const visibleNavLinks = profileNavLinks.filter(

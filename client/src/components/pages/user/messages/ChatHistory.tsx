@@ -27,13 +27,13 @@ export const ChatHistory = ({
                       {
                           month: "short",
                           day: "numeric",
-                      }
+                      },
                   );
                   if (index === 0) {
                       msg.dateSeparator = currentMessageDate;
                   } else {
                       const prevDateObj = new Date(
-                          arr[index - 1].date as string
+                          arr[index - 1].date as string,
                       );
                       const previousMessageDate =
                           prevDateObj.toLocaleDateString("default", {

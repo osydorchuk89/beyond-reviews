@@ -112,9 +112,8 @@ export const getMovieById = async (
     res: Response,
 ): Promise<any> => {
     const { movieId } = req.params;
-    const userId =
-        ((req.user as { id?: string } | undefined)?.id ??
-            req.query.userId) as string | undefined;
+    const userId = ((req.user as { id?: string } | undefined)?.id ??
+        req.query.userId) as string | undefined;
     try {
         const movie = await prisma.movie.findUnique({
             where: {
@@ -259,7 +258,10 @@ export const createOrUpdateMovieReview = async (
         res.status(200).send(toMovieReviewResponse(movieReview));
     } catch (error) {
         res.status(getErrorStatusCode(error)).send({
-            message: getErrorMessage(error, "Could not create or update review"),
+            message: getErrorMessage(
+                error,
+                "Could not create or update review",
+            ),
             error,
         });
     }

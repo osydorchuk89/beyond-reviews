@@ -13,9 +13,7 @@ export const ActivityOtherReview = ({ activity }: ActivityOtherReviewProps) => {
     const review = movieReview ?? bookReview;
     const media = movieReview?.movie ?? bookReview?.book;
     const mediaId = movieReview?.movieId ?? bookReview?.bookId;
-    const mediaUrl = movieReview
-        ? `/movies/${mediaId}`
-        : `/books/${mediaId}`;
+    const mediaUrl = movieReview ? `/movies/${mediaId}` : `/books/${mediaId}`;
     const mediaLabel = movieReview ? "Movie" : "Book";
 
     if (!review || !media || !mediaId) return null;
@@ -26,9 +24,7 @@ export const ActivityOtherReview = ({ activity }: ActivityOtherReviewProps) => {
         <div className="mt-2 space-y-1 break-words">
             <p>
                 <strong>{mediaLabel}</strong>:{" "}
-                <BaseLink to={mediaUrl}>
-                    {reviewLinkText}
-                </BaseLink>
+                <BaseLink to={mediaUrl}>{reviewLinkText}</BaseLink>
             </p>
             <p>
                 <strong>Rating</strong>: {`${review.rating}/10`}

@@ -17,7 +17,7 @@ const createMockRouter = (actionData?: any) => {
         ],
         {
             initialEntries: ["/login"],
-        }
+        },
     );
 };
 
@@ -63,7 +63,7 @@ describe("LoginPage", () => {
         await userEvent.click(submitButton);
 
         expect(
-            await screen.findByText(/email is required/i)
+            await screen.findByText(/email is required/i),
         ).toBeInTheDocument();
     });
 
@@ -74,12 +74,12 @@ describe("LoginPage", () => {
         const submitButton = screen.getByRole("button", { name: "LOGIN" });
         await userEvent.type(
             screen.getByLabelText(/email/i),
-            "john.doe@email.com"
+            "john.doe@email.com",
         );
         await userEvent.click(submitButton);
 
         expect(
-            await screen.findByText(/password is required/i)
+            await screen.findByText(/password is required/i),
         ).toBeInTheDocument();
     });
 

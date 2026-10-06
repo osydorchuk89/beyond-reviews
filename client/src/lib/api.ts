@@ -39,7 +39,7 @@ export const getMovies = async (
     actor?: string,
     sortBy?: string,
     sortOrder?: string,
-    search?: string
+    search?: string,
 ): Promise<MoviesData> => {
     try {
         const params: any = { page, limit };
@@ -67,7 +67,7 @@ export const getBooks = async (
     author?: string,
     sortBy?: string,
     sortOrder?: string,
-    search?: string
+    search?: string,
 ): Promise<BooksData> => {
     try {
         const params: any = { page, limit };
@@ -126,7 +126,7 @@ export const getMovieReviews = async (
     movieId: string,
     page: number = 1,
     limit: number = 10,
-    userId?: string
+    userId?: string,
 ): Promise<MovieReviewsData> => {
     try {
         const params: Record<string, string | number> = { page, limit };
@@ -134,7 +134,7 @@ export const getMovieReviews = async (
 
         const response = await axiosInstance.get(
             `/api/movies/${movieId}/reviews`,
-            { params }
+            { params },
         );
         return response.data;
     } catch (error) {
@@ -147,7 +147,7 @@ export const getBookReviews = async (
     bookId: string,
     page: number = 1,
     limit: number = 10,
-    userId?: string
+    userId?: string,
 ): Promise<BookReviewsData> => {
     try {
         const params: Record<string, string | number> = { page, limit };
@@ -155,7 +155,7 @@ export const getBookReviews = async (
 
         const response = await axiosInstance.get(
             `/api/books/${bookId}/reviews`,
-            { params }
+            { params },
         );
         return response.data;
     } catch (error) {
@@ -166,11 +166,11 @@ export const getBookReviews = async (
 
 export const getUserMovieReviews = async (
     userId: string,
-    page: number = 1
+    page: number = 1,
 ): Promise<UserMovieReviews> => {
     try {
         const response = await axiosInstance.get(
-            `/api/users/${userId}/movie-reviews?page=${page}`
+            `/api/users/${userId}/movie-reviews?page=${page}`,
         );
         return response.data;
     } catch (error) {
@@ -199,7 +199,7 @@ export const sendLikeOrUnlike = async (
     movieId: string,
     reviewId: string,
     userId: string,
-    hasLiked: boolean
+    hasLiked: boolean,
 ) => {
     try {
         await axiosInstance.put(`/api/movies/${movieId}/reviews/${reviewId}`, {
@@ -215,7 +215,7 @@ export const sendBookLikeOrUnlike = async (
     bookId: string,
     reviewId: string,
     userId: string,
-    hasLiked: boolean
+    hasLiked: boolean,
 ) => {
     try {
         await axiosInstance.put(`/api/books/${bookId}/reviews/${reviewId}`, {
@@ -231,7 +231,7 @@ export const sendBookLikeOrUnlike = async (
 export const addOrRemoveMovieFromWishlist = async (
     movieId: string,
     userId: string,
-    hasSaved: boolean
+    hasSaved: boolean,
 ) => {
     try {
         await axiosInstance.put(`/api/movies/${movieId}`, {
@@ -247,7 +247,7 @@ export const addOrRemoveMovieFromWishlist = async (
 export const addOrRemoveBookFromWishlist = async (
     bookId: string,
     userId: string,
-    hasSaved: boolean
+    hasSaved: boolean,
 ) => {
     try {
         await axiosInstance.put(`/api/books/${bookId}`, {
@@ -263,7 +263,7 @@ export const addOrRemoveBookFromWishlist = async (
 export const getWishlist = async (userId: string): Promise<WishlistData> => {
     try {
         const response = await axiosInstance.get(
-            `/api/users/${userId}/wishlist`
+            `/api/users/${userId}/wishlist`,
         );
         return response.data;
     } catch (error) {
@@ -305,7 +305,7 @@ export const getUserActivities = async (
 export const getUserFriends = async (userId: string): Promise<User[]> => {
     try {
         const response = await axiosInstance.get(
-            `/api/users/${userId}/friends/`
+            `/api/users/${userId}/friends/`,
         );
         return response.data;
     } catch (error) {
@@ -358,7 +358,7 @@ export const getBookRecommendations = async (
 
 export const sendFriendRequest = async (
     userId: string,
-    otherUserId: string
+    otherUserId: string,
 ) => {
     try {
         await axiosInstance.post(`/api/users/${userId}/friend-requests/`, {
@@ -372,7 +372,7 @@ export const sendFriendRequest = async (
 
 export const acceptFriendRequest = async (
     userId: string,
-    otherUserId: string
+    otherUserId: string,
 ) => {
     try {
         await axiosInstance.post(`/api/users/${userId}/friends/`, {
@@ -420,7 +420,7 @@ export const getChatHistory = async (senderId: string, recipientId: string) => {
 export const sendMessage = async (
     senderId: string,
     recipientId: string,
-    text: string
+    text: string,
 ): Promise<Message> => {
     const date = new Date();
     try {
@@ -436,7 +436,7 @@ export const sendMessage = async (
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
         return response.data;
     } catch (error) {

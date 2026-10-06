@@ -7,7 +7,8 @@ interface BookReviewDetailsProps {
 }
 
 export const BookReviewDetails = ({ review }: BookReviewDetailsProps) => {
-    const bookPoster = review.book.poster || "/images/fallback-movie-poster.jpg";
+    const bookPoster =
+        review.book.poster || "/images/fallback-movie-poster.jpg";
 
     return (
         <div className="flex flex-col sm:flex-row bg-sky-100 rounded-lg shadow-lg p-4 sm:p-5 gap-6 sm:gap-8">

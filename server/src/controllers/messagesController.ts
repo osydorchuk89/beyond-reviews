@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 
 import { prisma } from "../lib/prisma.js";
 
-export const getUserMessages = async (req: Request, res: Response): Promise<any> => {
+export const getUserMessages = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     try {
         const senderId = req.query.senderId as string;
         const recipientId = req.query.recipientId as string;
@@ -39,7 +42,10 @@ export const getUserMessages = async (req: Request, res: Response): Promise<any>
     }
 };
 
-export const postMessage = async (req: Request, res: Response): Promise<any> => {
+export const postMessage = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     const text = req.body.text;
     const date = req.body.date.toString();
     const senderId = req.body.senderId;
@@ -77,7 +83,10 @@ export const postMessage = async (req: Request, res: Response): Promise<any> => 
     }
 };
 
-export const markMessageAsRead = async (req: Request, res: Response): Promise<any> => {
+export const markMessageAsRead = async (
+    req: Request,
+    res: Response,
+): Promise<any> => {
     try {
         const { messageId } = req.params;
 

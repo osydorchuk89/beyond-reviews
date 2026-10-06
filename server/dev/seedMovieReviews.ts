@@ -289,7 +289,11 @@ const sentimentMixFromImdbRating = (rating: number): SentimentMix => {
     const normalized = clamp(rating, 1, 10);
     const quality = (normalized - 1) / 9;
     const positive = clamp(0.05 + Math.pow(quality, 1.7) * 0.86, 0.05, 0.91);
-    const negative = clamp(0.04 + Math.pow(1 - quality, 1.65) * 0.78, 0.04, 0.82);
+    const negative = clamp(
+        0.04 + Math.pow(1 - quality, 1.65) * 0.78,
+        0.04,
+        0.82,
+    );
     const neutral = Math.max(0.05, 1 - positive - negative);
     const total = positive + neutral + negative;
 
@@ -307,11 +311,24 @@ const fallbackExpectedRatingForMovie = (movie: MovieSeedData) => {
         return publicRating;
     }
 
-    const popularitySignal = clamp(Math.log10(movie.popularity + 1) / 2.25, 0, 1);
-    const voteSignal = clamp(Math.log10(Math.max(1, movie.numRatings)) / 5.5, 0, 1);
-    const releasePenalty = movie.releaseYear > new Date().getFullYear() ? -0.35 : 0;
+    const popularitySignal = clamp(
+        Math.log10(movie.popularity + 1) / 2.25,
+        0,
+        1,
+    );
+    const voteSignal = clamp(
+        Math.log10(Math.max(1, movie.numRatings)) / 5.5,
+        0,
+        1,
+    );
+    const releasePenalty =
+        movie.releaseYear > new Date().getFullYear() ? -0.35 : 0;
 
-    return clamp(5.2 + popularitySignal * 1.6 + voteSignal * 0.8 + releasePenalty, 4.8, 7.8);
+    return clamp(
+        5.2 + popularitySignal * 1.6 + voteSignal * 0.8 + releasePenalty,
+        4.8,
+        7.8,
+    );
 };
 
 const loadImdbMovieRatings = async (
@@ -388,11 +405,7 @@ const moviePopularityWeight = (movie: MovieSeedData) => {
     const popularity = Math.max(0, movie.popularity);
     const voteSignal = Math.log10(Math.max(1, movie.numRatings));
     const ratingSignal = clamp(fallbackExpectedRatingForMovie(movie), 1, 10);
-    const ageSignal = clamp(
-        1 + (movie.releaseYear - 1980) / 130,
-        0.65,
-        1.35,
-    );
+    const ageSignal = clamp(1 + (movie.releaseYear - 1980) / 130, 0.65, 1.35);
 
     return (
         Math.pow(popularity + 1, 1.25) *
@@ -429,7 +442,8 @@ const allocateReviewCounts = (
 
     return movies.map((movie, index) => {
         const imdbRating = externalRatingForMovie(movie, ratingsByTitleYear);
-        const expectedRating = imdbRating?.rating ?? fallbackExpectedRatingForMovie(movie);
+        const expectedRating =
+            imdbRating?.rating ?? fallbackExpectedRatingForMovie(movie);
 
         return {
             ...movie,
@@ -832,7 +846,10 @@ const localReviewTextFor = (movie: MoviePlan, rating: number, rng: Rng) => {
             : availableNotes,
         rng,
     );
-    const opener = interpolateReviewText(pick(reviewOpeners[sentiment], rng), movie);
+    const opener = interpolateReviewText(
+        pick(reviewOpeners[sentiment], rng),
+        movie,
+    );
     const prefix = pick(casualPrefixes, rng);
     const closer = pick(closers[sentiment], rng);
     const formats = [
@@ -847,9 +864,19 @@ const localReviewTextFor = (movie: MoviePlan, rating: number, rng: Rng) => {
     return sentence(interpolateReviewText(pick(formats, rng), movie)).trim();
 };
 
-const likedByCountFor = (reviewRating: number, movieReviewCount: number, rng: Rng) => {
+const likedByCountFor = (
+    reviewRating: number,
+    movieReviewCount: number,
+    rng: Rng,
+) => {
     const base =
-        reviewRating >= 8 ? 1.4 : reviewRating >= 5 ? 0.8 : reviewRating <= 3 ? 1 : 0.45;
+        reviewRating >= 8
+            ? 1.4
+            : reviewRating >= 5
+              ? 0.8
+              : reviewRating <= 3
+                ? 1
+                : 0.45;
     const movieScale = Math.log10(movieReviewCount + 10) / 3;
     const raw = Math.max(0, Math.round((base + gaussian(rng)) * movieScale));
     const viral = rng() < 0.015 ? Math.floor(rng() * 18) : 0;
@@ -864,19 +891,20 @@ const chunkedCreateMany = async <T>(
     for (let i = 0; i < data.length; i += BATCH_SIZE) {
         const chunk = data.slice(i, i + BATCH_SIZE);
         await createMany(chunk);
-        console.log(`${label}: ${Math.min(i + chunk.length, data.length)}/${data.length}`);
+        console.log(
+            `${label}: ${Math.min(i + chunk.length, data.length)}/${data.length}`,
+        );
     }
 };
 
 const resetSyntheticReviewData = async () => {
-    console.log("Deleting existing review likes, review activities, and movie reviews...");
+    console.log(
+        "Deleting existing review likes, review activities, and movie reviews...",
+    );
     await prisma.movieReviewLike.deleteMany({});
     await prisma.activity.deleteMany({
         where: {
-            OR: [
-                { movieReviewId: { not: null } },
-                { action: "rated" },
-            ],
+            OR: [{ movieReviewId: { not: null } }, { action: "rated" }],
         },
     });
     await prisma.movieReview.deleteMany({});
@@ -915,10 +943,14 @@ async function main() {
     ]);
 
     if (movies.length === 0) {
-        throw new Error("No movies found. Seed movies before generating reviews.");
+        throw new Error(
+            "No movies found. Seed movies before generating reviews.",
+        );
     }
     if (users.length === 0) {
-        throw new Error("No users found. Seed users before generating reviews.");
+        throw new Error(
+            "No users found. Seed users before generating reviews.",
+        );
     }
 
     if (options.imdbDownload) {
@@ -1015,13 +1047,19 @@ async function main() {
     const allReviews: SyntheticReview[] = [];
     const userReviewCounts = new Map<string, number>();
     const movieAggregates = new Map<string, { sum: number; count: number }>();
-    const moviePlanById = new Map(plannedMovies.map((movie) => [movie.id, movie]));
+    const moviePlanById = new Map(
+        plannedMovies.map((movie) => [movie.id, movie]),
+    );
 
     for (const movie of plannedMovies) {
         const underusedUsers = users.filter(
-            (user) => (userReviewCounts.get(user.id) ?? 0) < MAX_REVIEWS_PER_USER,
+            (user) =>
+                (userReviewCounts.get(user.id) ?? 0) < MAX_REVIEWS_PER_USER,
         );
-        const pool = underusedUsers.length >= movie.targetReviewCount ? underusedUsers : users;
+        const pool =
+            underusedUsers.length >= movie.targetReviewCount
+                ? underusedUsers
+                : users;
         const reviewers = uniqueSample(pool, movie.targetReviewCount, rng);
 
         for (const user of reviewers) {
@@ -1036,9 +1074,15 @@ async function main() {
                 likeCount: 0,
             });
 
-            userReviewCounts.set(user.id, (userReviewCounts.get(user.id) ?? 0) + 1);
+            userReviewCounts.set(
+                user.id,
+                (userReviewCounts.get(user.id) ?? 0) + 1,
+            );
 
-            const aggregate = movieAggregates.get(movie.id) ?? { sum: 0, count: 0 };
+            const aggregate = movieAggregates.get(movie.id) ?? {
+                sum: 0,
+                count: 0,
+            };
             aggregate.sum += rating;
             aggregate.count++;
             movieAggregates.set(movie.id, aggregate);
@@ -1066,10 +1110,19 @@ async function main() {
             continue;
         }
 
-        const likeCount = likedByCountFor(review.rating, movie.targetReviewCount, rng);
+        const likeCount = likedByCountFor(
+            review.rating,
+            movie.targetReviewCount,
+            rng,
+        );
         reviewLikeCounts.set(review.id, likeCount);
 
-        for (const user of sampleUsersExcept(users, likeCount, review.userId, rng)) {
+        for (const user of sampleUsersExcept(
+            users,
+            likeCount,
+            review.userId,
+            rng,
+        )) {
             reviewLikes.push({
                 reviewId: review.id,
                 userId: user.id,
@@ -1098,8 +1151,10 @@ async function main() {
             date: new Date(),
         }));
 
-        await chunkedCreateMany("Review activities", reviewActivities, (chunk) =>
-            prisma.activity.createMany({ data: chunk }),
+        await chunkedCreateMany(
+            "Review activities",
+            reviewActivities,
+            (chunk) => prisma.activity.createMany({ data: chunk }),
         );
     }
 

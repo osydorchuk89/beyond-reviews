@@ -40,8 +40,7 @@ export const clamp = (value: number, min: number, max: number) =>
 export const getDecade = (releaseYear: number) =>
     Math.floor(releaseYear / 10) * 10;
 
-export const normalizeProfileTerm = (term: string) =>
-    term.trim().toLowerCase();
+export const normalizeProfileTerm = (term: string) => term.trim().toLowerCase();
 
 export const addPreference = <T>(
     preferences: Map<T, PreferenceStats>,
@@ -100,9 +99,7 @@ export const getPublicQualityScore = (
 ) => {
     const confidence = clamp(candidate.numRatings / confidenceCount, 0, 1);
 
-    return (
-        candidate.avgRating * confidence + NEUTRAL_SCORE * (1 - confidence)
-    );
+    return candidate.avgRating * confidence + NEUTRAL_SCORE * (1 - confidence);
 };
 
 export const getPublicConfidenceScore = (

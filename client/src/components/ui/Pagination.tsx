@@ -82,7 +82,7 @@ export const Pagination = ({
                     >
                         {page}
                     </button>
-                )
+                ),
             )}
 
             <BaseButton

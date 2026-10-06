@@ -7,7 +7,9 @@ export const useFilterNavigation = (basePath = "/movies") => {
         filterType: string,
         filterValue: string,
     ) => {
-        navigate(`${basePath}?${filterType}=${encodeURIComponent(filterValue)}`);
+        navigate(
+            `${basePath}?${filterType}=${encodeURIComponent(filterValue)}`,
+        );
     };
 
     return handleFilterNavigation;

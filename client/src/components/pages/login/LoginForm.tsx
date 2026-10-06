@@ -38,7 +38,7 @@ export const LoginForm = () => {
                 password: data.password,
                 from,
             },
-            { method: "post" }
+            { method: "post" },
         );
     };
 
