@@ -73,6 +73,7 @@ Client:
 ```bash
 cd client
 npm run build
+npm run typecheck
 npm run lint
 npm run test
 ```
