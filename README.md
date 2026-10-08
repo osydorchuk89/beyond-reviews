@@ -19,143 +19,76 @@ Before starting code changes, read [AGENTS.md](AGENTS.md) for the product direct
 
 **Frontend:**
 
-- React 18 with TypeScript
+- React 19 with TypeScript 7
 - React Router v7
 - Tailwind CSS for styling
 
 **Backend:**
 
-- Node.js with express
-- TypeScript
+- Node.js with Express
+- TypeScript 7
 - Prisma ORM with MongoDB
 - Better Auth for authentication (native MongoDB adapter)
 
 ## Local Installation
 
-### Prerequisites
+Prerequisites: Node.js, npm, Git, and MongoDB Atlas or a local MongoDB replica set (transactions are required).
 
-Before running this application, make sure you have the following installed:
+### 1. Clone and Install
 
-- [Node.js](https://nodejs.org/)
-- [MongoDB](https://www.mongodb.com/) (local installation or MongoDB Atlas account)
-- [Git](https://git-scm.com/)
-
-### 1. Clone the Repository
+Clone the repository and install both projects:
 
 ```bash
 git clone https://github.com/osydorchuk89/beyond-reviews.git
 cd beyond-reviews
+npm --prefix server install
+npm --prefix client install
 ```
 
-### 2. Set Up the Server
+The server installation generates the Prisma client automatically.
 
-Navigate to the server directory and install dependencies:
+### 2. Configure the Server
 
-```bash
-cd server
-npm install
+Create `server/.env`:
+
+```dotenv
+DATABASE_URL=<mongodb-connection-string>
+BETTER_AUTH_SECRET=<random-secret-of-at-least-32-characters>
+BETTER_AUTH_URL=http://localhost:8080
+CLIENT_URL=http://localhost:5173
+GOOGLE_CLIENT_ID=<google-oauth-client-id>
+GOOGLE_CLIENT_SECRET=<google-oauth-client-secret>
 ```
 
-Create a `.env` file in the server directory and add the following environment variables:
-
-- `DATABASE_URL`
-- `BETTER_AUTH_SECRET` (random secret of at least 32 characters)
-- `BETTER_AUTH_URL` (backend origin; defaults to the existing local/production backend URL)
-- `CLIENT_URL` (frontend origin; defaults to the existing local/production frontend URL)
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GCS_BUCKET_NAME`
-- `GOOGLE_APPLICATION_CREDENTIALS` (local path to your Google service account key JSON file)
-- `GCS_PUBLIC_BASE_URL` (optional, if using a CDN or custom domain)
-
-Generate `BETTER_AUTH_SECRET` locally and store the result in your `.env` or hosting secret configuration:
+Generate a value for `BETTER_AUTH_SECRET` and paste it into the file:
 
 ```bash
 node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"
 ```
 
-Keep the same secret across server instances and restarts. `EXPRESS_SESSION_SECRET` is no longer used. MongoDB must support transactions (Atlas or a replica set), as required by the existing Prisma setup and the Better Auth adapter.
+Google credentials are required by the backend configuration. In your Google OAuth client, add `http://localhost:8080/api/auth/callback/google` as an authorized redirect URI.
 
-### Authentication migration and deployment
+For profile photo uploads, also set `GCS_BUCKET_NAME` and `GOOGLE_APPLICATION_CREDENTIALS` (the path to your Google Cloud service account JSON file). Set `GCS_PUBLIC_BASE_URL` only if using a custom public storage URL.
 
-Existing accounts are retained in the `User` collection with their original ObjectIds. Better Auth uses separate `AuthAccount`, `AuthSession`, and `AuthVerification` collections. Prisma remains on v6, with no Prisma schema change.
+### 3. Run the App
 
-Before starting the migrated app against an existing database:
-
-1. Back up the database and pause the old backend's writes during cutover.
-2. Set `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `CLIENT_URL` in the backend environment. Keep the existing Google credentials and database URL.
-3. Add these authorized redirect URIs to the existing OAuth client in Google Cloud Console:
-   - Local: `http://localhost:8080/api/auth/callback/google`
-   - Production: `https://beyond-reviews-193634881435.europe-west1.run.app/api/auth/callback/google`
-   - For another backend origin: `<BETTER_AUTH_URL>/api/auth/callback/google`
-4. From `server/`, preview and then apply the additive backfill:
-
-   ```bash
-   npm run auth:migrate -- --dry-run
-   npm run auth:migrate -- --apply
-   ```
-
-5. Build and deploy the updated backend and frontend together. The backend entry point is now `dist/index.js`; `npm start` already uses it.
-6. Check credential login, Google login, registration with a photo, and logout in a real browser, including production's separate frontend/backend origins.
-
-If the deployment installs only production dependencies, run the compiled backfill after `npm run build`: `node dist/scripts/migrate-auth.js --dry-run`, followed by `node dist/scripts/migrate-auth.js --apply`.
-
-The backfill copies existing bcrypt hashes into credential accounts without changing passwords, adds missing auth metadata and indexes, and normalizes emails to lowercase. It stops on case-insensitive email collisions without merging users. It is safe to rerun and never replaces users, deletes accounts, or modifies reviews, ratings, friendships, wishlists, or recommendation data. The original password fields remain for rollback; new credentials are stored only in `AuthAccount`. Run the backfill again after legacy development scripts that create users directly through Prisma.
-
-Google identities were not stored by Passport. They are linked to the existing user on the next successful Google login with the same verified email. Existing profile names/photos are retained. Users must sign in again after cutover; legacy Passport sessions are not converted or deleted.
-
-For rollback, keep a database backup and the previous application revision. The additive backfill leaves existing IDs and password hashes intact. Users created after cutover have credentials only in `AuthAccount` and cannot use legacy password login without a separate reverse migration.
-
-Authentication integration tests run against a disposable MongoDB replica set and never use the configured application database:
+From the repository root, start the server in one terminal:
 
 ```bash
-cd server
-npm run test:auth
+npm --prefix server run dev
 ```
 
-The first test run downloads a MongoDB binary. OAuth tests simulate Google's provider response; a real Google/browser check is still needed after configuring the OAuth client.
-
-Google Cloud Storage notes:
-
-- Create a bucket and set `GCS_BUCKET_NAME` to that bucket name.
-- Grant your service account `Storage Object Admin` (or a least-privilege equivalent with object create/read permissions).
-- For local development, point `GOOGLE_APPLICATION_CREDENTIALS` to your service account JSON key file.
-- If your bucket is private, use a signed URL flow instead of public object URLs.
-
-### 3. Set Up the Client
-
-Open a new terminal, navigate to the client directory and install dependencies:
+Start the client in another terminal:
 
 ```bash
-cd client
-npm install
+npm --prefix client run dev
 ```
 
-### 4. Run the Application
+Open [http://localhost:5173](http://localhost:5173). The backend runs at `http://localhost:8080`.
 
-You need to run both the server and client simultaneously.
+## Existing Installations
 
-#### Terminal 1 - Start the Server:
-
-```bash
-cd server
-npm run dev
-```
-
-The server will start on `http://localhost:8080`
-
-#### Terminal 2 - Start the Client:
-
-```bash
-cd client
-npm run dev
-```
-
-The server will start on `http://localhost:5173`
-
-### 5. Access the Application
-
-Open your browser and navigate to `http://localhost:5173` to use the application.
+For upgrading an existing Passport-based database, see [Authentication Migration and Deployment](docs/auth-migration.md).
 
 ## Linting and Formatting
 
