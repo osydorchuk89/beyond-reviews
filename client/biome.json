@@ -12,6 +12,24 @@
             "!**/node_modules"
         ]
     },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "preset": "recommended",
+            "correctness": {
+                "useHookAtTopLevel": "error",
+                "useExhaustiveDependencies": "warn"
+            },
+            "style": {
+                "useComponentExportOnlyModules": {
+                    "level": "warn",
+                    "options": {
+                        "allowConstantExport": true
+                    }
+                }
+            }
+        }
+    },
     "formatter": {
         "indentStyle": "space",
         "indentWidth": 4
