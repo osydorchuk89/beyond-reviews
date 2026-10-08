@@ -62,13 +62,13 @@ export const googleLogin = async (req: Request, res: Response) => {
         {
             provider: "google",
             callbackURL: BASE_CLIENT_URL + from,
-            errorCallbackURL: BASE_CLIENT_URL + "/login",
+            errorCallbackURL: `${BASE_CLIENT_URL}/login`,
         },
     );
     forwardCookies(response, res);
     const data = await readAuthResponse(response);
     if (!response.ok || !data.url) {
-        res.redirect(BASE_CLIENT_URL + "/login");
+        res.redirect(`${BASE_CLIENT_URL}/login`);
         return;
     }
     res.redirect(data.url);

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 import { ReviewSchema } from "../lib/schemas.js";
 import { invalidateBookRecommendationsForUser } from "./bookRecommendations.js";

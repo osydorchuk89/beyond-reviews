@@ -82,6 +82,7 @@ Server:
 ```bash
 cd server
 npm run build
+npm run typecheck
 npm run lint
 npm run test:auth
 ```

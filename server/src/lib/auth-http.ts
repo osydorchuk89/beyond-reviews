@@ -91,6 +91,7 @@ export const safeReturnPath = (value: unknown, fallback = "/movies") => {
         typeof value !== "string" ||
         !value.startsWith("/") ||
         value.startsWith("//") ||
+        // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject control characters and backslashes in redirect paths.
         /[\\\u0000-\u001f\u007f]/.test(value)
     )
         return fallback;

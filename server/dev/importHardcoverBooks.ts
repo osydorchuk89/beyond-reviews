@@ -611,7 +611,7 @@ async function main() {
                 continue;
             }
 
-            const results = resultsFromSearch(data.data?.search?.results);
+            const results = resultsFromSearch(data.data?.search?.results ?? []);
             stats.fetched += results.length;
 
             for (const result of results) {

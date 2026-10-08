@@ -1,13 +1,13 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import { createReadStream, createWriteStream } from "fs";
-import { mkdir } from "fs/promises";
-import { get } from "https";
-import { dirname } from "path";
-import { createInterface } from "readline";
-import { pipeline } from "stream/promises";
-import { createGunzip } from "zlib";
+import { createReadStream, createWriteStream } from "node:fs";
+import { mkdir } from "node:fs/promises";
+import { get } from "node:https";
+import { dirname } from "node:path";
+import { createInterface } from "node:readline";
+import { pipeline } from "node:stream/promises";
+import { createGunzip } from "node:zlib";
 
 const prisma = new PrismaClient();
 
@@ -288,12 +288,8 @@ const lineReaderFor = (source: string) => {
 const sentimentMixFromImdbRating = (rating: number): SentimentMix => {
     const normalized = clamp(rating, 1, 10);
     const quality = (normalized - 1) / 9;
-    const positive = clamp(0.05 + Math.pow(quality, 1.7) * 0.86, 0.05, 0.91);
-    const negative = clamp(
-        0.04 + Math.pow(1 - quality, 1.65) * 0.78,
-        0.04,
-        0.82,
-    );
+    const positive = clamp(0.05 + quality ** 1.7 * 0.86, 0.05, 0.91);
+    const negative = clamp(0.04 + (1 - quality) ** 1.65 * 0.78, 0.04, 0.82);
     const neutral = Math.max(0.05, 1 - positive - negative);
     const total = positive + neutral + negative;
 
@@ -408,9 +404,9 @@ const moviePopularityWeight = (movie: MovieSeedData) => {
     const ageSignal = clamp(1 + (movie.releaseYear - 1980) / 130, 0.65, 1.35);
 
     return (
-        Math.pow(popularity + 1, 1.25) *
-        Math.pow(voteSignal + 1, 0.8) *
-        Math.pow(ratingSignal / 6.5, 0.45) *
+        (popularity + 1) ** 1.25 *
+        (voteSignal + 1) ** 0.8 *
+        (ratingSignal / 6.5) ** 0.45 *
         ageSignal
     );
 };
@@ -488,7 +484,7 @@ const ratingForMovie = (movie: MoviePlan, rng: Rng) => {
 
 const reviewDate = (releaseYear: number, rng: Rng) => {
     const startYear = clamp(releaseYear, 1985, new Date().getFullYear());
-    const recentBias = Math.pow(rng(), 0.45);
+    const recentBias = rng() ** 0.45;
     const year =
         startYear +
         Math.floor((new Date().getFullYear() - startYear + 1) * recentBias);
@@ -901,13 +897,16 @@ const resetSyntheticReviewData = async () => {
     console.log(
         "Deleting existing review likes, review activities, and movie reviews...",
     );
-    await prisma.movieReviewLike.deleteMany({});
+    await prisma.reviewLike.deleteMany({
+        where: { review: { mediaType: "MOVIE" } },
+    });
     await prisma.activity.deleteMany({
         where: {
-            OR: [{ movieReviewId: { not: null } }, { action: "rated" }],
+            mediaType: "MOVIE",
+            OR: [{ reviewId: { not: null } }, { action: "rated" }],
         },
     });
-    await prisma.movieReview.deleteMany({});
+    await prisma.review.deleteMany({ where: { mediaType: "MOVIE" } });
     await prisma.movie.updateMany({
         data: {
             avgRating: 0,
@@ -954,9 +953,12 @@ async function main() {
     }
 
     if (options.imdbDownload) {
+        if (!options.imdbBasicsPath || !options.imdbRatingsPath) {
+            throw new Error("IMDb download requires both dataset paths");
+        }
         await Promise.all([
-            downloadFile(DEFAULT_IMDB_BASICS_URL, options.imdbBasicsPath!),
-            downloadFile(DEFAULT_IMDB_RATINGS_URL, options.imdbRatingsPath!),
+            downloadFile(DEFAULT_IMDB_BASICS_URL, options.imdbBasicsPath),
+            downloadFile(DEFAULT_IMDB_RATINGS_URL, options.imdbRatingsPath),
         ]);
     }
 
@@ -1033,7 +1035,9 @@ async function main() {
         return;
     }
 
-    const existingReviewCount = await prisma.movieReview.count();
+    const existingReviewCount = await prisma.review.count({
+        where: { mediaType: "MOVIE" },
+    });
     if (existingReviewCount > 0 && !options.reset) {
         throw new Error(
             `Found ${existingReviewCount.toLocaleString()} existing reviews. Re-run with --reset to replace them.`,
@@ -1090,10 +1094,11 @@ async function main() {
     }
 
     await chunkedCreateMany("Reviews", allReviews, (chunk) =>
-        prisma.movieReview.createMany({ data: chunk }),
+        prisma.review.createMany({ data: chunk }),
     );
 
-    const createdReviews = await prisma.movieReview.findMany({
+    const createdReviews = await prisma.review.findMany({
+        where: { mediaType: "MOVIE", movieId: { not: null } },
         select: {
             id: true,
             userId: true,
@@ -1105,6 +1110,7 @@ async function main() {
     const reviewLikeCounts = new Map<string, number>();
 
     for (const review of createdReviews) {
+        if (!review.movieId) continue;
         const movie = moviePlanById.get(review.movieId);
         if (!movie) {
             continue;
@@ -1131,11 +1137,11 @@ async function main() {
     }
 
     await chunkedCreateMany("Review likes", reviewLikes, (chunk) =>
-        prisma.movieReviewLike.createMany({ data: chunk }),
+        prisma.reviewLike.createMany({ data: chunk }),
     );
 
     for (const [reviewId, likeCount] of reviewLikeCounts) {
-        await prisma.movieReview.update({
+        await prisma.review.update({
             where: { id: reviewId },
             data: { likeCount },
         });
@@ -1145,7 +1151,7 @@ async function main() {
         const reviewActivities = createdReviews.map((review) => ({
             userId: review.userId,
             movieId: review.movieId,
-            movieReviewId: review.id,
+            reviewId: review.id,
             action: "rated",
             reviewRating: review.rating,
             date: new Date(),

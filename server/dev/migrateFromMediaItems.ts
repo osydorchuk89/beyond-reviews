@@ -1,11 +1,11 @@
 import "dotenv/config";
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 type MongoId = { $oid: string };
-type MongoDocument = Record<string, unknown> & { _id: MongoId };
+type MongoDocument = Prisma.InputJsonObject & { _id: MongoId };
 
 const BATCH_SIZE = 500;
 
@@ -14,7 +14,7 @@ const oid = (id: MongoId | string) =>
 
 const findBatch = async <T extends MongoDocument>(
     collection: string,
-    filter: Record<string, unknown>,
+    filter: Prisma.InputJsonObject,
     skip: number,
 ) => {
     const result = (await prisma.$runCommandRaw({
@@ -33,7 +33,7 @@ const findBatch = async <T extends MongoDocument>(
 
 const countCollection = async (
     collection: string,
-    filter: Record<string, unknown> = {},
+    filter: Prisma.InputJsonObject = {},
 ) => {
     const result = (await prisma.$runCommandRaw({
         count: collection,
@@ -45,8 +45,8 @@ const countCollection = async (
 
 const updateOne = async (
     collection: string,
-    filter: Record<string, unknown>,
-    update: Record<string, unknown>,
+    filter: Prisma.InputJsonObject,
+    update: Prisma.InputJsonObject,
 ) =>
     prisma.$runCommandRaw({
         update: collection,

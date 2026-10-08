@@ -1,8 +1,8 @@
-import { randomUUID } from "crypto";
-import { NextFunction, Request, Response } from "express";
+import { randomUUID } from "node:crypto";
+import type { NextFunction, Request, Response } from "express";
 import { Storage } from "@google-cloud/storage";
 import multer from "multer";
-import path from "path";
+import path from "node:path";
 
 const storage = new Storage();
 
@@ -57,7 +57,10 @@ export const uploadPhotoToGcs = async (
     next: NextFunction,
 ) => {
     try {
-        if (!req.file) {
+        const uploadedPhoto = req.file as
+            | (Express.Multer.File & { location?: string })
+            | undefined;
+        if (!uploadedPhoto) {
             next();
             return;
         }
@@ -69,8 +72,8 @@ export const uploadPhotoToGcs = async (
             return;
         }
 
-        const extension = path.extname(req.file.originalname);
-        const baseName = path.basename(req.file.originalname, extension);
+        const extension = path.extname(uploadedPhoto.originalname);
+        const baseName = path.basename(uploadedPhoto.originalname, extension);
         const sanitizedBaseName = sanitizeFileName(baseName);
         const objectPath = `users/${Date.now()}-${randomUUID()}-${sanitizedBaseName}${extension}`;
 
@@ -81,19 +84,16 @@ export const uploadPhotoToGcs = async (
             const stream = file.createWriteStream({
                 resumable: false,
                 metadata: {
-                    contentType: req.file!.mimetype,
+                    contentType: uploadedPhoto.mimetype,
                     cacheControl: "public, max-age=31536000",
                 },
             });
 
             stream.on("error", reject);
             stream.on("finish", resolve);
-            stream.end(req.file!.buffer);
+            stream.end(uploadedPhoto.buffer);
         });
 
-        const uploadedPhoto = req.file as Express.Multer.File & {
-            location?: string;
-        };
         uploadedPhoto.location = buildPublicFileUrl(bucketName, objectPath);
 
         next();

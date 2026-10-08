@@ -1,13 +1,13 @@
 import "dotenv/config";
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const BATCH_SIZE = 1_000;
 
 type MongoUpdateOperation = {
     q: { _id: { $oid: string } };
-    u: { $set: Record<string, unknown> };
+    u: { $set: Prisma.InputJsonObject };
 };
 
 const chunk = <T>(items: T[], size: number) => {
@@ -55,7 +55,7 @@ const createManyInBatches = async <T>(
 };
 
 async function main() {
-    const bookReviews = await prisma.review.findMany({
+    const fetchedBookReviews = await prisma.review.findMany({
         where: {
             mediaType: "BOOK",
             bookId: {
@@ -71,6 +71,10 @@ async function main() {
         },
     });
 
+    const bookReviews = fetchedBookReviews.filter(
+        (review): review is typeof review & { bookId: string } =>
+            review.bookId !== null,
+    );
     console.log(`Book reviews: ${bookReviews.length}`);
 
     const reviewIds = bookReviews.map((review) => review.id);
@@ -134,7 +138,7 @@ async function main() {
 
     const activities = bookReviews.map((review) => ({
         userId: review.userId,
-        bookId: review.bookId!,
+        bookId: review.bookId,
         reviewId: review.id,
         action: "rated",
         reviewRating: review.rating,
@@ -148,13 +152,13 @@ async function main() {
 
     const aggregates = new Map<string, { sum: number; count: number }>();
     for (const review of bookReviews) {
-        const aggregate = aggregates.get(review.bookId!) ?? {
+        const aggregate = aggregates.get(review.bookId) ?? {
             sum: 0,
             count: 0,
         };
         aggregate.sum += review.rating;
         aggregate.count += 1;
-        aggregates.set(review.bookId!, aggregate);
+        aggregates.set(review.bookId, aggregate);
     }
 
     await prisma.book.updateMany({

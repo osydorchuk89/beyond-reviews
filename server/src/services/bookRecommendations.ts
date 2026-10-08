@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
-import {
+import type {
     BookRecommendation,
     BookRecommendationsResult,
     PreferenceStats,
@@ -30,7 +30,7 @@ import {
 import {
     invalidateRecommendationsForUser,
     isRecommendationCacheFresh,
-    RecommendationPrismaClient,
+    type RecommendationPrismaClient,
     replaceRecommendationsForUser,
 } from "./recommendationCache.js";
 
@@ -261,9 +261,15 @@ const getCachedBookRecommendationsForUser = async (
 
     return {
         recommendations: cachedRecommendations
-            .filter((recommendation) => recommendation.book !== null)
+            .filter(
+                (
+                    recommendation,
+                ): recommendation is typeof recommendation & {
+                    book: NonNullable<typeof recommendation.book>;
+                } => recommendation.book !== null,
+            )
             .map((recommendation) => ({
-                book: toBookResponse(recommendation.book!),
+                book: toBookResponse(recommendation.book),
                 score: recommendation.score,
                 recommendedByCount: recommendation.recommendedByCount,
             })),

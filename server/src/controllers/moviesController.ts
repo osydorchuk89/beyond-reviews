@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import type { Prisma } from "@prisma/client";
+import type { Request, Response } from "express";
 
 import { prisma } from "../lib/prisma.js";
 import {
@@ -16,10 +17,10 @@ import {
 export const getAllMovies = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     try {
-        const page = parseInt(req.query.page as string) ?? 1;
-        const limit = parseInt(req.query.limit as string) ?? 15;
+        const page = parseInt(req.query.page as string, 10) ?? 1;
+        const limit = parseInt(req.query.limit as string, 10) ?? 15;
         const skip = (page - 1) * limit;
 
         // get filter, sort, and search parameters
@@ -28,17 +29,18 @@ export const getAllMovies = async (
         const director = req.query.director as string;
         const actor = req.query.actor as string;
         const sortBy = (req.query.sortBy as string) ?? "id";
-        const sortOrder = (req.query.sortOrder as string) ?? "asc";
+        const sortOrder = ((req.query.sortOrder as string) ??
+            "asc") as Prisma.SortOrder;
         const search = req.query.search as string;
 
-        const whereClause: any = {};
+        const whereClause: Prisma.MovieWhereInput = {};
         if (genre) {
             whereClause.genres = {
                 has: genre,
             };
         }
         if (releaseYear) {
-            whereClause.releaseYear = parseInt(releaseYear);
+            whereClause.releaseYear = parseInt(releaseYear, 10);
         }
         if (director) {
             whereClause.director = {
@@ -58,7 +60,7 @@ export const getAllMovies = async (
             };
         }
 
-        const orderByClause: any = {};
+        const orderByClause: Prisma.MovieOrderByWithRelationInput = {};
         switch (sortBy) {
             case "numRatings":
                 orderByClause.numRatings = sortOrder;
@@ -110,7 +112,7 @@ export const getAllMovies = async (
 export const getMovieById = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { movieId } = req.params;
     const userId = ((req.user as { id?: string } | undefined)?.id ??
         req.query.userId) as string | undefined;
@@ -134,7 +136,8 @@ export const getMovieById = async (
         });
 
         if (!movie) {
-            return res.status(404).send({ message: "Movie not found" });
+            res.status(404).send({ message: "Movie not found" });
+            return;
         }
 
         const { wishlistedByUsers, ...movieData } = movie;
@@ -153,7 +156,7 @@ export const getMovieById = async (
 export const addOrRemoveMovieFromWishlist = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { movieId } = req.params;
     const { saved, userId } = req.body;
 
@@ -175,10 +178,10 @@ export const addOrRemoveMovieFromWishlist = async (
 export const getMovieReviews = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { movieId } = req.params;
-    const page = parseInt(req.query.page as string) ?? 1;
-    const limit = parseInt(req.query.limit as string) ?? 10;
+    const page = parseInt(req.query.page as string, 10) ?? 1;
+    const limit = parseInt(req.query.limit as string, 10) ?? 10;
     const skip = (page - 1) * limit;
     const userId = req.query.userId as string | undefined;
 
@@ -243,7 +246,7 @@ export const getMovieReviews = async (
 export const createOrUpdateMovieReview = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { rating, text } = req.body;
 
     try {
@@ -270,7 +273,7 @@ export const createOrUpdateMovieReview = async (
 export const likeOrUnlikeMovieReview = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const reviewId = req.params.reviewId;
     const { like, userId } = req.body;
     try {
@@ -292,7 +295,7 @@ export const likeOrUnlikeMovieReview = async (
 export const createMovies = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     try {
         const movies = Array.isArray(req.body) ? req.body : [req.body];
         const response = await Promise.all(
@@ -300,7 +303,7 @@ export const createMovies = async (
                 const data = fromMovieWriteData(movie);
                 return prisma.movie.create({
                     data: {
-                        ...(data as any),
+                        ...(data as Prisma.MovieUncheckedCreateInput),
                         director:
                             typeof movie.director === "string"
                                 ? movie.director
@@ -332,17 +335,17 @@ export const createMovies = async (
 export const updateMovie = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { movieId } = req.params;
     const updateData = fromMovieWriteData(req.body);
 
     try {
         const updatedMovie = await prisma.movie.update({
             where: { id: movieId },
-            data: updateData as any,
+            data: updateData as Prisma.MovieUpdateInput,
         });
         res.status(200).send(toMovieResponse(updatedMovie));
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({
             message: "Could not update movie",
             error,

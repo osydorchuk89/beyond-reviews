@@ -51,8 +51,8 @@ const chunkedCreateMany = async <T>(
 const ratedActivityKey = (userId: string, movieId: string) =>
     `${userId}:${movieId}`;
 
-const likedActivityKey = (userId: string, movieReviewId: string) =>
-    `${userId}:${movieReviewId}`;
+const likedActivityKey = (userId: string, reviewId: string) =>
+    `${userId}:${reviewId}`;
 
 async function main() {
     const options = parseArgs();
@@ -63,13 +63,14 @@ async function main() {
         reviewRating?: number;
         reviewText?: string | null;
         movieId?: string;
-        movieReviewId?: string;
+        reviewId?: string;
         date: Date;
     }[] = [];
 
     if (options.includeRated) {
         const [reviews, existingRatedActivities] = await Promise.all([
-            prisma.movieReview.findMany({
+            prisma.review.findMany({
+                where: { mediaType: "MOVIE", movieId: { not: null } },
                 select: {
                     userId: true,
                     movieId: true,
@@ -91,14 +92,15 @@ async function main() {
         ]);
 
         const existingRatedKeys = new Set(
-            existingRatedActivities
-                .filter((activity) => activity.movieId)
-                .map((activity) =>
-                    ratedActivityKey(activity.userId, activity.movieId!),
-                ),
+            existingRatedActivities.flatMap((activity) =>
+                activity.movieId
+                    ? [ratedActivityKey(activity.userId, activity.movieId)]
+                    : [],
+            ),
         );
 
         for (const review of reviews) {
+            if (!review.movieId) continue;
             const key = ratedActivityKey(review.userId, review.movieId);
 
             if (existingRatedKeys.has(key)) {
@@ -124,7 +126,8 @@ async function main() {
 
     if (options.includeLiked) {
         const [likes, existingLikedActivities] = await Promise.all([
-            prisma.movieReviewLike.findMany({
+            prisma.reviewLike.findMany({
+                where: { review: { mediaType: "MOVIE" } },
                 select: {
                     userId: true,
                     reviewId: true,
@@ -133,21 +136,22 @@ async function main() {
             prisma.activity.findMany({
                 where: {
                     action: "liked",
-                    movieReviewId: { not: null },
+                    mediaType: "MOVIE",
+                    reviewId: { not: null },
                 },
                 select: {
                     userId: true,
-                    movieReviewId: true,
+                    reviewId: true,
                 },
             }),
         ]);
 
         const existingLikedKeys = new Set(
-            existingLikedActivities
-                .filter((activity) => activity.movieReviewId)
-                .map((activity) =>
-                    likedActivityKey(activity.userId, activity.movieReviewId!),
-                ),
+            existingLikedActivities.flatMap((activity) =>
+                activity.reviewId
+                    ? [likedActivityKey(activity.userId, activity.reviewId)]
+                    : [],
+            ),
         );
 
         for (const like of likes) {
@@ -159,7 +163,7 @@ async function main() {
 
             activitiesToCreate.push({
                 userId: like.userId,
-                movieReviewId: like.reviewId,
+                reviewId: like.reviewId,
                 action: "liked",
                 date: new Date(),
             });

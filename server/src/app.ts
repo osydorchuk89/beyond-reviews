@@ -1,5 +1,10 @@
 import "dotenv/config";
-import express from "express";
+import express, {
+    type NextFunction,
+    type Request,
+    type Response,
+} from "express";
+import { MulterError } from "multer";
 import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -43,24 +48,30 @@ app.get("/", (_req, res) => {
     res.send("Hello World!!!");
 });
 
-app.use((err: any, _req: any, res: any, _next: any) => {
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     console.error(err);
 
-    if (err?.name === "MulterError" && err?.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).send({
+    if (err instanceof MulterError && err.code === "LIMIT_FILE_SIZE") {
+        res.status(400).send({
             message: "Photo size should not exceed 5MB",
         });
+        return;
     }
 
-    if (err?.message === "Only jpg, jpeg, png, or webp formats are accepted") {
-        return res.status(400).send({
+    if (
+        err instanceof Error &&
+        err.message === "Only jpg, jpeg, png, or webp formats are accepted"
+    ) {
+        res.status(400).send({
             message: err.message,
         });
+        return;
     }
 
-    return res.status(500).send({
-        message: err?.message ?? "Internal server error",
+    res.status(500).send({
+        message: err instanceof Error ? err.message : "Internal server error",
     });
+    return;
 });
 
 export { app };

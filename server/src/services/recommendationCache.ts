@@ -1,4 +1,4 @@
-import { MediaType, Prisma, PrismaClient } from "@prisma/client";
+import type { MediaType, Prisma, PrismaClient } from "@prisma/client";
 
 import {
     RECOMMENDATION_CACHE_TTL_MS,

@@ -15,13 +15,15 @@ async function main() {
     const { dryRun } = parseArgs();
 
     const [reviews, likeCounts] = await Promise.all([
-        prisma.movieReview.findMany({
+        prisma.review.findMany({
+            where: { mediaType: "MOVIE" },
             select: {
                 id: true,
                 likeCount: true,
             },
         }),
-        prisma.movieReviewLike.groupBy({
+        prisma.reviewLike.groupBy({
+            where: { review: { mediaType: "MOVIE" } },
             by: ["reviewId"],
             _count: {
                 reviewId: true,
@@ -49,7 +51,7 @@ async function main() {
     }
 
     for (const [index, review] of updates.entries()) {
-        await prisma.movieReview.update({
+        await prisma.review.update({
             where: { id: review.id },
             data: {
                 likeCount: review.next,

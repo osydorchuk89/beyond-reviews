@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { MediaType } from "@prisma/client";
+import type { Request, Response } from "express";
+import type { MediaType } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 
 import { DEFAULT_USER_PHOTO_URL } from "../config/constants.js";
@@ -31,10 +31,12 @@ import {
 export const registerNewUser = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const userData = req.body;
     if (req.file) {
-        const userPhotoFile: { [key: string]: any } = req.file;
+        const userPhotoFile = req.file as Express.Multer.File & {
+            location?: string;
+        };
         userData.photo = userPhotoFile.location;
     } else {
         userData.photo = DEFAULT_USER_PHOTO_URL;
@@ -89,7 +91,7 @@ export const registerNewUser = async (
 export const getUserData = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
     try {
         const user = await prisma.user.findUnique({
@@ -130,11 +132,12 @@ export const getUserData = async (
         });
 
         if (!user) {
-            return res.status(404).send({ message: "User not found" });
+            res.status(404).send({ message: "User not found" });
+            return;
         }
 
         res.status(200).send(user);
-    } catch (error) {
+    } catch {
         res.status(500).send({
             message: "Could not fetch user data",
         });
@@ -144,9 +147,9 @@ export const getUserData = async (
 export const getUserActivities = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
-    const requestedPage = parseInt(req.query.page as string);
+    const requestedPage = parseInt(req.query.page as string, 10);
     const page =
         Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
     const activityTab = req.query.tab as string | undefined;
@@ -160,13 +163,14 @@ export const getUserActivities = async (
             : "books";
 
     if (selectedTab === "albums") {
-        return res.status(200).send({
+        res.status(200).send({
             activities: [],
             totalCount: 0,
             currentPage: page,
             totalPages: 0,
             hasMore: false,
         });
+        return;
     }
 
     try {
@@ -293,7 +297,7 @@ export const getUserActivities = async (
 export const getUserFriends = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
     try {
         const user = await prisma.user.findUnique({
@@ -310,7 +314,7 @@ export const getUserFriends = async (
             },
         });
         res.status(200).send(user?.friends ?? []);
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({
             message: "Could not fetch user friends",
             error,
@@ -321,7 +325,7 @@ export const getUserFriends = async (
 export const getUserFriendRecommendations = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
 
     try {
@@ -330,7 +334,7 @@ export const getUserFriendRecommendations = async (
             userId,
         );
         res.status(200).send(recommendations);
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({
             message: "Could not fetch friend recommendations",
             error,
@@ -341,7 +345,7 @@ export const getUserFriendRecommendations = async (
 export const getUserMovieRecommendations = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
 
     try {
@@ -350,7 +354,7 @@ export const getUserMovieRecommendations = async (
             userId,
         );
         res.status(200).send(recommendations);
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({
             message: "Could not fetch movie recommendations",
             error,
@@ -361,7 +365,7 @@ export const getUserMovieRecommendations = async (
 export const getUserBookRecommendations = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
 
     try {
@@ -370,7 +374,7 @@ export const getUserBookRecommendations = async (
             userId,
         );
         res.status(200).send(recommendations);
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({
             message: "Could not fetch book recommendations",
             error,
@@ -381,7 +385,7 @@ export const getUserBookRecommendations = async (
 export const sendFriendRequest = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
     const { otherUserId }: { otherUserId: string } = req.body;
 
@@ -391,7 +395,7 @@ export const sendFriendRequest = async (
             otherUserId,
         });
         res.status(200).send();
-    } catch (error: any) {
+    } catch (error) {
         res.status(getErrorStatusCode(error)).send({
             message: getErrorMessage(error, "Could not send friend request"),
             error,
@@ -402,7 +406,7 @@ export const sendFriendRequest = async (
 export const acceptFriendRequest = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
     const { otherUserId } = req.body;
 
@@ -413,7 +417,7 @@ export const acceptFriendRequest = async (
         });
 
         res.status(200).send();
-    } catch (error: any) {
+    } catch (error) {
         res.status(getErrorStatusCode(error)).send({
             message: getErrorMessage(error, "Could not accept friend request"),
             error,
@@ -424,7 +428,7 @@ export const acceptFriendRequest = async (
 export const getUserWishlist = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
     try {
         const wishlist = await prisma.wishlistItem.findMany({
@@ -482,7 +486,7 @@ export const getUserWishlist = async (
 export const getUserBookWishlist = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
     try {
         const wishlist = await prisma.wishlistItem.findMany({
@@ -520,9 +524,9 @@ export const getUserBookWishlist = async (
 export const getUserMovieReviews = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
-    const page = parseInt(req.query.page as string) ?? 1;
+    const page = parseInt(req.query.page as string, 10) ?? 1;
     const limit = 15;
     const skip = (page - 1) * limit;
 
@@ -582,9 +586,9 @@ export const getUserMovieReviews = async (
 export const getUserBookReviews = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { userId } = req.params;
-    const page = parseInt(req.query.page as string) ?? 1;
+    const page = parseInt(req.query.page as string, 10) ?? 1;
     const limit = 15;
     const skip = (page - 1) * limit;
 
@@ -645,7 +649,7 @@ export const getUserBookReviews = async (
 export const getAllUsers = async (
     _req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     try {
         const users = await prisma.user.findMany({
             select: {
@@ -657,27 +661,38 @@ export const getAllUsers = async (
             },
         });
         res.send(users);
-    } catch (error: any) {
+    } catch (error) {
         console.error("Failed to fetch users:", error);
-        res.status(500).send({ message: error.message });
+        res.status(500).send({
+            message:
+                error instanceof Error
+                    ? error.message
+                    : "Failed to fetch users",
+        });
     }
 };
 
 // For dev purposes only
-export const seedUsers = async (req: Request, res: Response): Promise<any> => {
+export const seedUsers = async (req: Request, res: Response): Promise<void> => {
     const usersData = req.body;
 
     // Validate input is an array
     if (!Array.isArray(usersData)) {
-        return res
-            .status(400)
-            .send({ message: "Request body must be an array of users" });
+        res.status(400).send({
+            message: "Request body must be an array of users",
+        });
+        return;
     }
 
     const results = {
         created: 0,
         failed: 0,
-        errors: [] as any[],
+        errors: [] as {
+            index: number;
+            email?: string;
+            error: string;
+            details?: import("zod").ZodIssue[];
+        }[],
     };
 
     // Process users one by one to handle duplicates gracefully
@@ -728,12 +743,15 @@ export const seedUsers = async (req: Request, res: Response): Promise<any> => {
             });
 
             results.created++;
-        } catch (error: any) {
+        } catch (error) {
             results.failed++;
             results.errors.push({
                 index: i,
                 email: validatedData.email,
-                error: error.message,
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : "Could not seed user",
             });
         }
     }

@@ -190,8 +190,8 @@ const expectedRatingForBook = (book: BookSeedData) => {
 const sentimentMixFromRating = (rating: number): SentimentMix => {
     const normalized = clamp(rating, 1, 10);
     const quality = (normalized - 1) / 9;
-    const positive = clamp(0.08 + Math.pow(quality, 1.55) * 0.82, 0.08, 0.9);
-    const negative = clamp(0.04 + Math.pow(1 - quality, 1.8) * 0.7, 0.04, 0.76);
+    const positive = clamp(0.08 + quality ** 1.55 * 0.82, 0.08, 0.9);
+    const negative = clamp(0.04 + (1 - quality) ** 1.8 * 0.7, 0.04, 0.76);
     const neutral = Math.max(0.06, 1 - positive - negative);
     const total = positive + neutral + negative;
 
@@ -211,9 +211,9 @@ const bookPopularityWeight = (book: BookSeedData) => {
         : 1;
 
     return (
-        Math.pow(popularity + 1, 0.9) *
-        Math.pow(voteSignal + 1, 0.65) *
-        Math.pow(ratingSignal / 6.7, 0.6) *
+        (popularity + 1) ** 0.9 *
+        (voteSignal + 1) ** 0.65 *
+        (ratingSignal / 6.7) ** 0.6 *
         pageSignal
     );
 };
@@ -287,7 +287,7 @@ const sentimentForRating = (rating: number): Sentiment => {
 
 const reviewDate = (releaseYear: number, rng: Rng) => {
     const startYear = clamp(releaseYear, 1990, new Date().getFullYear());
-    const recentBias = Math.pow(rng(), 0.42);
+    const recentBias = rng() ** 0.42;
     const year =
         startYear +
         Math.floor((new Date().getFullYear() - startYear + 1) * recentBias);
@@ -780,10 +780,12 @@ async function main() {
 
     if (options.withActivities) {
         const reviewActivities = createdReviews
-            .filter((review) => review.bookId)
+            .filter((review): review is typeof review & { bookId: string } =>
+                Boolean(review.bookId),
+            )
             .map((review) => ({
                 userId: review.userId,
-                bookId: review.bookId!,
+                bookId: review.bookId,
                 reviewId: review.id,
                 action: "rated",
                 reviewRating: review.rating,

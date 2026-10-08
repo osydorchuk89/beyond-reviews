@@ -109,7 +109,7 @@ const findBestTmdbMatch = async (movie: LocalMovie) => {
 
     const best = matches[0];
 
-    if (!best || !best.titleMatches || !best.yearMatches) {
+    if (!best?.titleMatches || !best.yearMatches) {
         return null;
     }
 

@@ -204,6 +204,7 @@ const candidateFromDoc = (
     if (
         !doc.key ||
         !title ||
+        typeof releaseYear !== "number" ||
         !Number.isInteger(releaseYear) ||
         releaseYear < 1400 ||
         releaseYear > new Date().getFullYear() + 1 ||

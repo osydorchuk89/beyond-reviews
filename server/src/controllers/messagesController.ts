@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 
 import { prisma } from "../lib/prisma.js";
 
 export const getUserMessages = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     try {
         const senderId = req.query.senderId as string;
         const recipientId = req.query.recipientId as string;
@@ -45,7 +45,7 @@ export const getUserMessages = async (
 export const postMessage = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const text = req.body.text;
     const date = req.body.date.toString();
     const senderId = req.body.senderId;
@@ -56,7 +56,8 @@ export const postMessage = async (
     });
 
     if (!sender) {
-        return res.status(404).send({ message: "Sender not found" });
+        res.status(404).send({ message: "Sender not found" });
+        return;
     }
 
     const recipient = await prisma.user.findUnique({
@@ -64,7 +65,8 @@ export const postMessage = async (
     });
 
     if (!recipient) {
-        return res.status(404).send({ message: "Recipient not found" });
+        res.status(404).send({ message: "Recipient not found" });
+        return;
     }
 
     try {
@@ -78,7 +80,7 @@ export const postMessage = async (
             },
         });
         res.status(200).send(message);
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({ message: "Could not post message", error });
     }
 };
@@ -86,7 +88,7 @@ export const postMessage = async (
 export const markMessageAsRead = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     try {
         const { messageId } = req.params;
 
@@ -95,7 +97,8 @@ export const markMessageAsRead = async (
         });
 
         if (!message) {
-            return res.status(404).send({ message: "Message not found" });
+            res.status(404).send({ message: "Message not found" });
+            return;
         }
 
         await prisma.message.update({
@@ -103,7 +106,7 @@ export const markMessageAsRead = async (
             data: { wasRead: true },
         });
         res.status(200).send();
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({
             message: "Could not mark message as read",
             error,

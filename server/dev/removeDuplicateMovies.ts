@@ -16,7 +16,7 @@ type MovieCandidate = {
     avgRating?: number;
     numRatings?: number;
     overview?: string;
-    poster?: string;
+    image?: string;
 };
 
 type DuplicateGroup = {
@@ -43,8 +43,7 @@ const duplicateKeyFor = (
 ) => `${normalizedTitle(movie.title)}|${movie.releaseYear}`;
 
 const movieScore = (movie: MovieCandidate) => {
-    const hasPoster =
-        movie.poster && !movie.poster.includes("fallback") ? 1 : 0;
+    const hasPoster = movie.image && !movie.image.includes("fallback") ? 1 : 0;
     const hasOverview = movie.overview ? 1 : 0;
 
     return (
@@ -100,7 +99,7 @@ const countRelatedRows = async (movieIdsToRemove: string[]) => {
 
     for (const ids of chunk(movieIdsToRemove)) {
         duplicateReviews.push(
-            ...(await prisma.movieReview.findMany({
+            ...(await prisma.review.findMany({
                 where: { movieId: { in: ids } },
                 select: { id: true },
             })),
@@ -119,11 +118,11 @@ const countRelatedRows = async (movieIdsToRemove: string[]) => {
 
     for (const ids of chunk(reviewIdsToRemove)) {
         const [likes, reviewActivities] = await Promise.all([
-            prisma.movieReviewLike.count({
+            prisma.reviewLike.count({
                 where: { reviewId: { in: ids } },
             }),
             prisma.activity.count({
-                where: { movieReviewId: { in: ids } },
+                where: { reviewId: { in: ids } },
             }),
         ]);
 
@@ -136,10 +135,10 @@ const countRelatedRows = async (movieIdsToRemove: string[]) => {
             prisma.activity.count({
                 where: { movieId: { in: ids } },
             }),
-            prisma.movieWatchList.count({
+            prisma.wishlistItem.count({
                 where: { movieId: { in: ids } },
             }),
-            prisma.movieReview.count({
+            prisma.review.count({
                 where: { movieId: { in: ids } },
             }),
         ]);
@@ -208,7 +207,7 @@ async function main() {
                 avgRating: true,
                 numRatings: true,
                 overview: true,
-                poster: true,
+                image: true,
             },
         });
 
@@ -253,7 +252,7 @@ async function main() {
         `- Activities with duplicate movieId: ${related.movieActivityCount.toLocaleString()}`,
     );
     console.log(
-        `- Activities with duplicate movieReviewId: ${related.reviewActivityCount.toLocaleString()}`,
+        `- Activities with duplicate reviewId: ${related.reviewActivityCount.toLocaleString()}`,
     );
     console.log(
         `- Watchlist entries: ${related.watchListCount.toLocaleString()}`,
@@ -267,18 +266,18 @@ async function main() {
     console.log("Deleting duplicate movie related data...");
 
     await deleteInChunks(
-        "Activities by movieReviewId",
+        "Activities by reviewId",
         related.reviewIdsToRemove,
         (ids) =>
             prisma.activity.deleteMany({
-                where: { movieReviewId: { in: ids } },
+                where: { reviewId: { in: ids } },
             }),
     );
     await deleteInChunks(
         "Movie review likes",
         related.reviewIdsToRemove,
         (ids) =>
-            prisma.movieReviewLike.deleteMany({
+            prisma.reviewLike.deleteMany({
                 where: { reviewId: { in: ids } },
             }),
     );
@@ -288,12 +287,12 @@ async function main() {
         }),
     );
     await deleteInChunks("Watchlist entries", movieIdsToRemove, (ids) =>
-        prisma.movieWatchList.deleteMany({
+        prisma.wishlistItem.deleteMany({
             where: { movieId: { in: ids } },
         }),
     );
     await deleteInChunks("Movie reviews", related.reviewIdsToRemove, (ids) =>
-        prisma.movieReview.deleteMany({
+        prisma.review.deleteMany({
             where: { id: { in: ids } },
         }),
     );

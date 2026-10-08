@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import type { Prisma } from "@prisma/client";
+import type { Request, Response } from "express";
 
 import { prisma } from "../lib/prisma.js";
 import {
@@ -24,7 +25,7 @@ const parsePositiveInteger = (value: string | undefined, fallback: number) => {
 export const getAllBooks = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     try {
         const page = parsePositiveInteger(req.query.page as string, 1);
         const limit = parsePositiveInteger(req.query.limit as string, 15);
@@ -34,17 +35,18 @@ export const getAllBooks = async (
         const releaseYear = req.query.releaseYear as string;
         const author = req.query.author as string;
         const sortBy = (req.query.sortBy as string) ?? "id";
-        const sortOrder = (req.query.sortOrder as string) ?? "asc";
+        const sortOrder = ((req.query.sortOrder as string) ??
+            "asc") as Prisma.SortOrder;
         const search = req.query.search as string;
 
-        const whereClause: any = {};
+        const whereClause: Prisma.BookWhereInput = {};
         if (genre) {
             whereClause.genres = {
                 has: genre,
             };
         }
         if (releaseYear) {
-            whereClause.releaseYear = parseInt(releaseYear);
+            whereClause.releaseYear = parseInt(releaseYear, 10);
         }
         if (author) {
             whereClause.authors = {
@@ -58,7 +60,7 @@ export const getAllBooks = async (
             };
         }
 
-        const orderByClause: any = {};
+        const orderByClause: Prisma.BookOrderByWithRelationInput = {};
         switch (sortBy) {
             case "numRatings":
                 orderByClause.numRatings = sortOrder;
@@ -109,7 +111,7 @@ export const getAllBooks = async (
 export const getBookById = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { bookId } = req.params;
     const userId = ((req.user as { id?: string } | undefined)?.id ??
         req.query.userId) as string | undefined;
@@ -122,7 +124,8 @@ export const getBookById = async (
         });
 
         if (!book) {
-            return res.status(404).send({ message: "Book not found" });
+            res.status(404).send({ message: "Book not found" });
+            return;
         }
 
         const wishlistedByUsers = userId
@@ -153,7 +156,7 @@ export const getBookById = async (
 export const addOrRemoveBookFromWishlist = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { bookId } = req.params;
     const { saved, userId } = req.body;
 
@@ -175,7 +178,7 @@ export const addOrRemoveBookFromWishlist = async (
 export const getBookReviews = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { bookId } = req.params;
     const page = parsePositiveInteger(req.query.page as string, 1);
     const limit = parsePositiveInteger(req.query.limit as string, 10);
@@ -243,7 +246,7 @@ export const getBookReviews = async (
 export const createOrUpdateBookReview = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const { rating, text } = req.body;
 
     try {
@@ -270,7 +273,7 @@ export const createOrUpdateBookReview = async (
 export const likeOrUnlikeBookReview = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     const reviewId = req.params.reviewId;
     const { like, userId } = req.body;
     try {
@@ -292,7 +295,7 @@ export const likeOrUnlikeBookReview = async (
 export const createBooks = async (
     req: Request,
     res: Response,
-): Promise<any> => {
+): Promise<void> => {
     try {
         const books = Array.isArray(req.body) ? req.body : [req.body];
         const response = await Promise.all(
@@ -300,7 +303,7 @@ export const createBooks = async (
                 const data = fromBookWriteData(book);
                 return prisma.book.create({
                     data: {
-                        ...(data as any),
+                        ...(data as Prisma.BookUncheckedCreateInput),
                         authors: Array.isArray(book.authors)
                             ? book.authors
                             : [],
@@ -318,17 +321,20 @@ export const createBooks = async (
 };
 
 // For dev purposes only
-export const updateBook = async (req: Request, res: Response): Promise<any> => {
+export const updateBook = async (
+    req: Request,
+    res: Response,
+): Promise<void> => {
     const { bookId } = req.params;
     const updateData = fromBookWriteData(req.body);
 
     try {
         const updatedBook = await prisma.book.update({
             where: { id: bookId },
-            data: updateData as any,
+            data: updateData as Prisma.BookUpdateInput,
         });
         res.status(200).send(toBookResponse(updatedBook));
-    } catch (error: any) {
+    } catch (error) {
         res.status(500).send({
             message: "Could not update book",
             error,

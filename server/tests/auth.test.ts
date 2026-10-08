@@ -9,6 +9,24 @@ import { migrateAuth } from "../src/lib/auth-migration.js";
 import { createAuth, type AppAuth } from "../src/lib/auth-config.js";
 import { safeReturnPath } from "../src/lib/auth-http.js";
 import express from "express";
+import { Readable } from "node:stream";
+import { z } from "zod";
+
+const userResponseSchema = z.object({
+    id: z.string(),
+    firstName: z.string(),
+    photo: z.string(),
+    password: z.unknown().optional(),
+});
+const readUser = async (response: Response) =>
+    userResponseSchema.parse(await response.json());
+const readStatus = async (response: Response) =>
+    z
+        .object({
+            isAuthenticated: z.boolean(),
+            user: userResponseSchema.optional(),
+        })
+        .parse(await response.json());
 
 const origin = "http://localhost:5173";
 const secret = randomBytes(32).toString("base64");
@@ -139,12 +157,13 @@ test("migration preserves recommendation data and bcrypt passwords, and can be r
         password: "existing-password",
     });
     assert.equal(login.status, 200, await login.clone().text());
-    assert.equal((await login.json()).id, id.toHexString());
-    const status = await fetch(baseURL + "/auth/status", {
+    assert.equal((await readUser(login)).id, id.toHexString());
+    const status = await fetch(`${baseURL}/auth/status`, {
         headers: { cookie: cookies(login) },
     });
-    const data = await status.json();
+    const data = await readStatus(status);
     assert.equal(data.isAuthenticated, true);
+    assert.ok(data.user);
     assert.equal(data.user.photo, user.photo);
     assert.equal(data.user.password, undefined);
     assert.equal(
@@ -189,9 +208,20 @@ test("registration retains an uploaded photo URL", async () => {
     const app = express();
     app.use(express.json());
     app.post("/", (req, res) => {
-        req.file = {
+        const uploadedFile: Express.Multer.File & { location: string } = {
             location: "https://example.com/uploaded-avatar.jpg",
-        } as Express.Multer.File;
+            fieldname: "photo",
+            originalname: "avatar.jpg",
+            encoding: "7bit",
+            mimetype: "image/jpeg",
+            size: 0,
+            buffer: Buffer.alloc(0),
+            stream: Readable.from([]),
+            destination: "",
+            filename: "avatar.jpg",
+            path: "",
+        };
+        req.file = uploadedFile;
         return registerNewUser(req, res);
     });
     const photoServer = await new Promise<Server>((resolve) => {
@@ -212,7 +242,7 @@ test("registration retains an uploaded photo URL", async () => {
         });
         assert.equal(response.status, 200, await response.clone().text());
         assert.equal(
-            (await response.json()).photo,
+            (await readUser(response)).photo,
             "https://example.com/uploaded-avatar.jpg",
         );
         assert.equal(
@@ -239,19 +269,19 @@ test("registration creates a Prisma-readable profile and session; logout and exp
         password: "new-password",
     }))
         form.set(key, value);
-    const response = await fetch(baseURL + "/api/users/", {
+    const response = await fetch(`${baseURL}/api/users/`, {
         method: "POST",
         headers: { origin },
         body: form,
     });
     assert.equal(response.status, 200, await response.clone().text());
-    const user = await response.json();
+    const user = await readUser(response);
     assert.match(user.id, /^[a-f0-9]{24}$/);
     assert.match(user.photo, /default_user_image/);
     assert.equal(user.password, undefined);
-    const profile = await fetch(baseURL + `/api/users/${user.id}`);
+    const profile = await fetch(`${baseURL}/api/users/${user.id}`);
     assert.equal(profile.status, 200, await profile.clone().text());
-    assert.equal((await profile.json()).firstName, "New");
+    assert.equal((await readUser(profile)).firstName, "New");
     const cookie = cookies(response);
     assert(cookie.includes("better-auth.session_token"));
     assert(
@@ -259,7 +289,7 @@ test("registration creates a Prisma-readable profile and session; logout and exp
             .getSetCookie()
             .some((value) => value.includes("Max-Age=1440")),
     );
-    const duplicate = await fetch(baseURL + "/api/users/", {
+    const duplicate = await fetch(`${baseURL}/api/users/`, {
         method: "POST",
         headers: { origin },
         body: form,
@@ -267,8 +297,8 @@ test("registration creates a Prisma-readable profile and session; logout and exp
     assert.equal(duplicate.status, 409);
     assert.equal(
         (
-            await fetch(baseURL + "/auth/status", { headers: { cookie } }).then(
-                (r) => r.json(),
+            await fetch(`${baseURL}/auth/status`, { headers: { cookie } }).then(
+                readStatus,
             )
         ).isAuthenticated,
         true,
@@ -276,8 +306,8 @@ test("registration creates a Prisma-readable profile and session; logout and exp
     assert.equal((await post("/auth/logout", {}, cookie)).status, 200);
     assert.equal(
         (
-            await fetch(baseURL + "/auth/status", { headers: { cookie } }).then(
-                (r) => r.json(),
+            await fetch(`${baseURL}/auth/status`, { headers: { cookie } }).then(
+                readStatus,
             )
         ).isAuthenticated,
         false,
@@ -294,9 +324,9 @@ test("registration creates a Prisma-readable profile and session; logout and exp
         );
     assert.equal(
         (
-            await fetch(baseURL + "/auth/status", {
+            await fetch(`${baseURL}/auth/status`, {
                 headers: { cookie: cookies(login) },
-            }).then((r) => r.json())
+            }).then(readStatus)
         ).isAuthenticated,
         false,
     );
@@ -313,9 +343,9 @@ test("registration creates a Prisma-readable profile and session; logout and exp
     assert.equal(forbidden.status, 403);
     assert.equal(
         (
-            await fetch(baseURL + "/auth/status", {
+            await fetch(`${baseURL}/auth/status`, {
                 headers: { cookie: cookies(session) },
-            }).then((r) => r.json())
+            }).then(readStatus)
         ).isAuthenticated,
         true,
     );
@@ -325,7 +355,8 @@ test("Google links existing users without changing profiles and creates new Goog
     const context = await auth.$context;
     const provider = context.socialProviders.find(
         (provider) => provider.id === "google",
-    )!;
+    );
+    assert.ok(provider, "Google provider must be configured");
     const originalValidate = provider.validateAuthorizationCode;
     const originalUserInfo = provider.getUserInfo;
     let email = "existing@example.com";
@@ -337,7 +368,6 @@ test("Google links existing users without changing profiles and creates new Goog
     });
     provider.getUserInfo = async () => ({
         user: {
-            id: googleId,
             email,
             emailVerified: verified,
             name: "Google Name",
@@ -349,16 +379,19 @@ test("Google links existing users without changing profiles and creates new Goog
     });
     const oauth = async (from = "/books") => {
         const start = await fetch(
-            baseURL + `/auth/google?from=${encodeURIComponent(from)}`,
+            `${baseURL}/auth/google?from=${encodeURIComponent(from)}`,
             { redirect: "manual" },
         );
         assert.equal(start.status, 302);
-        const location = new URL(start.headers.get("location")!);
+        const redirectLocation = start.headers.get("location");
+        assert.ok(redirectLocation, "OAuth must return a redirect location");
+        const location = new URL(redirectLocation);
         assert.equal(
             location.searchParams.get("redirect_uri"),
             "http://localhost:8080/api/auth/callback/google",
         );
-        const state = location.searchParams.get("state")!;
+        const state = location.searchParams.get("state");
+        assert.ok(state, "OAuth redirect must contain state");
         return fetch(
             baseURL +
                 `/api/auth/callback/google?code=test&state=${encodeURIComponent(state)}`,
@@ -373,7 +406,7 @@ test("Google links existing users without changing profiles and creates new Goog
         const linked = await oauth();
         assert.equal(
             linked.headers.get("location"),
-            origin + "/books",
+            `${origin}/books`,
             await linked.clone().text(),
         );
         const linkedAccount = await db
@@ -384,18 +417,15 @@ test("Google links existing users without changing profiles and creates new Goog
         const unchanged = await db.collection("User").findOne({ email });
         assert.equal(unchanged?.firstName, existing?.firstName);
         assert.equal(unchanged?.photo, existing?.photo);
-        assert.equal(
-            (
-                await fetch(baseURL + "/auth/status", {
-                    headers: { cookie: cookies(linked) },
-                }).then((r) => r.json())
-            ).user.id,
-            existing?._id.toHexString(),
-        );
+        const linkedStatus = await fetch(`${baseURL}/auth/status`, {
+            headers: { cookie: cookies(linked) },
+        }).then(readStatus);
+        assert.ok(linkedStatus.user);
+        assert.equal(linkedStatus.user.id, existing?._id.toHexString());
         email = "google-only@example.com";
         googleId = "new-google-id";
         const created = await oauth();
-        assert.equal(created.headers.get("location"), origin + "/books");
+        assert.equal(created.headers.get("location"), `${origin}/books`);
         const googleUser = await db.collection("User").findOne({ email });
         assert.equal(googleUser?.firstName, "Google");
         assert.deepEqual(googleUser?.friendsIds, []);
@@ -410,21 +440,19 @@ test("Google links existing users without changing profiles and creates new Goog
         const legacyId = new ObjectId();
         email = "legacy-google@example.com";
         googleId = "legacy-google-subject";
-        await db
-            .collection("User")
-            .insertOne({
-                _id: legacyId,
-                firstName: "Legacy",
-                lastName: "Google",
-                email,
-                photo: "https://example.com/legacy.jpg",
-                friendsIds: [],
-                friendOfIds: [],
-            });
+        await db.collection("User").insertOne({
+            _id: legacyId,
+            firstName: "Legacy",
+            lastName: "Google",
+            email,
+            photo: "https://example.com/legacy.jpg",
+            friendsIds: [],
+            friendOfIds: [],
+        });
         await migrateAuth(db, true);
         assert.equal(
             (await oauth()).headers.get("location"),
-            origin + "/books",
+            `${origin}/books`,
         );
         assert.equal(await db.collection("User").countDocuments({ email }), 1);
         assert(
@@ -438,7 +466,7 @@ test("Google links existing users without changing profiles and creates new Goog
         googleId = "unverified-google-id";
         verified = false;
         const denied = await oauth();
-        assert(denied.headers.get("location")?.startsWith(origin + "/login?"));
+        assert(denied.headers.get("location")?.startsWith(`${origin}/login?`));
         assert.equal(
             await db
                 .collection("AuthAccount")
@@ -446,13 +474,13 @@ test("Google links existing users without changing profiles and creates new Goog
             0,
         );
         const invalidState = await fetch(
-            baseURL + "/api/auth/callback/google?code=test&state=invalid",
+            `${baseURL}/api/auth/callback/google?code=test&state=invalid`,
             { redirect: "manual" },
         );
         assert(
             invalidState.headers
                 .get("location")
-                ?.startsWith(origin + "/login?"),
+                ?.startsWith(`${origin}/login?`),
         );
     } finally {
         provider.validateAuthorizationCode = originalValidate;
@@ -485,7 +513,8 @@ test("production sessions use secure cross-site cookies; redirects reject extern
     assert.equal(response.status, 200);
     const cookie = response.headers
         .getSetCookie()
-        .find((value) => value.includes("session_token"))!;
+        .find((value) => value.includes("session_token"));
+    assert.ok(cookie, "Login must set a session cookie");
     assert.match(cookie, /Secure/i);
     assert.match(cookie, /HttpOnly/i);
     assert.match(cookie, /SameSite=None/i);

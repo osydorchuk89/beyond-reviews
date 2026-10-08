@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
-import {
+import type {
     CandidateRatingByMediaId,
     Rating,
     RatingByMediaId,

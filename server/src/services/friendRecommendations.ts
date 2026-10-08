@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import {
+import type { PrismaClient } from "@prisma/client";
+import type {
     FriendRecommendationsResult,
     FriendRecommendation,
 } from "../lib/entities.js";

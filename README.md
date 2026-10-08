@@ -171,3 +171,5 @@ npm --prefix server run format
 Alternatively, run `npm run format` inside `client/` or `server/`. Each command formats that project's JavaScript and TypeScript files, including tests and configuration scripts, using four-space indentation. Git-ignored files, build output, dependencies, and generated Prisma files are excluded.
 
 Run `npm run lint` inside either project to check Biome's recommended rules without changing files. The client also explicitly enables React Hooks and component export checks for Fast Refresh. Linting and TypeScript compilation are separate checks; use `npm run build` for compiler validation.
+
+In `server/`, run `npm run typecheck` to check application code, development scripts, and tests together without emitting JavaScript. The server build checks only production application code under `src/`.
