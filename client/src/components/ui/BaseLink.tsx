@@ -1,5 +1,5 @@
-import { Link, RelativeRoutingType } from "react-router";
-import { LocationState } from "../../lib/entities";
+import { Link, type RelativeRoutingType } from "react-router";
+import type { LocationState } from "../../lib/entities";
 
 interface BaseLinkProps {
     to: string;

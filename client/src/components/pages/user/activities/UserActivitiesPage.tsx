@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
-import {
+import type {
     User,
     UserActivities,
     UserActivityTab,

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { FriendRecommendation } from "../../../../lib/entities";
+import type { FriendRecommendation } from "../../../../lib/entities";
 import { useHorizontalScroll } from "../../../../hooks/useHorizontalScroll";
 import { ArrowIcon } from "../../../icons/ArrowIcon";
 import { FriendRecommendationCard } from "./FriendRecommendationCard";

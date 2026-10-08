@@ -4,7 +4,7 @@ import { Form, useActionData, useNavigation, useSubmit } from "react-router";
 
 import { UserSchema } from "../../../lib/schemas";
 import { BaseButton } from "../../ui/BaseButton";
-import { RegistrationInputs } from "../../../lib/entities";
+import type { RegistrationInputs } from "../../../lib/entities";
 
 export const RegistrationForm = () => {
     const actionData = useActionData() as { error?: string } | undefined;

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { BaseButton } from "../../ui/BaseButton";
@@ -58,6 +58,7 @@ export function MediaListSection<TItem>({
         }
     };
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies(items): New catalog results must reset loaded items even when pagination is unchanged.
     useEffect(() => {
         setAdditionalItems([]);
         setPage(currentPage);

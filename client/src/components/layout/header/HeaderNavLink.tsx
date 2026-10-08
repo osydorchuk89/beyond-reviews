@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { NavLink, To } from "react-router";
+import type { ReactNode } from "react";
+import { NavLink, type To } from "react-router";
 
 interface HeaderNavLinkProps {
     to: To;

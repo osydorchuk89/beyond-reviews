@@ -5,6 +5,7 @@ export const ScrollToTop = () => {
     const { pathname } = useLocation();
     const navigation = useNavigation();
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Scroll again when the route changes, even if navigation stays idle.
     useEffect(() => {
         // Scroll only when the navigation state changes or the route changes
         if (navigation.state === "idle") {

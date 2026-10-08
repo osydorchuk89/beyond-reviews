@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, RefObject } from "react";
+import { useLayoutEffect, useState, type RefObject } from "react";
 
 export const useTruncatedElement = ({
     ref,

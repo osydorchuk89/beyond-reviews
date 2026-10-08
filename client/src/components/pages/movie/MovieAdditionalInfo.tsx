@@ -3,7 +3,7 @@ import { useFetchers, useRouteLoaderData } from "react-router";
 import { MovieBookmark } from "./MovieBookmark";
 import { MovieDetails } from "./MovieDetails";
 import { MovieReviewSection } from "./MovieReviewSection";
-import { Movie, MovieReview, AuthData } from "../../../lib/entities";
+import type { Movie, MovieReview, AuthData } from "../../../lib/entities";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 
 interface MovieAdditionalInfoProps {

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { BookReview } from "../../../../lib/entities";
+import type { BookReview } from "../../../../lib/entities";
 
 interface BookReviewDetailsProps {
     review: BookReview;

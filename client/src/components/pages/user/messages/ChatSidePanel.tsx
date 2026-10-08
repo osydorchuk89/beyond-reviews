@@ -1,4 +1,4 @@
-import { Friend, User } from "../../../../lib/entities";
+import type { Friend, User } from "../../../../lib/entities";
 
 interface ChatSidePanelProps {
     user: User;
@@ -22,10 +22,11 @@ export const ChatSidePanel = ({
             <ul className="flex flex-col bg-sky-200 flex-1">
                 {user.friends.map((friend) => (
                     <button
+                        type="button"
                         key={friend.id}
                         className={
                             selectedFriend?.id === friend.id
-                                ? baseFriendItemStyle + " bg-sky-500"
+                                ? `${baseFriendItemStyle} bg-sky-500`
                                 : baseFriendItemStyle
                         }
                         onClick={() => setSelectedFriend(friend)}

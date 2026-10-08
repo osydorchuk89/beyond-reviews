@@ -16,13 +16,15 @@ export const MobileMenu = ({ user }: MobileMenuProps) => {
     );
     const location = useLocation();
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: Route and user changes intentionally close the menu.
     useEffect(() => {
         closeMenu();
-    }, [location.pathname, user]);
+    }, [location.pathname, user, closeMenu]);
 
     return (
         <>
             <button
+                type="button"
                 onClick={openMenu}
                 className="sm:hidden p-2 hover:bg-sky-700 rounded-lg cursor-pointer"
                 aria-label="Toggle menu"

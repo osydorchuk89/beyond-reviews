@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { LocationState } from "../../lib/entities";
+import type { LocationState } from "../../lib/entities";
 import { buttonStyles } from "../../styles/buttonStyles";
 
 interface ButtonLinkProps {

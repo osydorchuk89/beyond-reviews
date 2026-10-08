@@ -1,4 +1,4 @@
-import { AuthData, User } from "../lib/entities";
+import type { AuthData, User } from "../lib/entities";
 import { useRouteLoaderData } from "react-router";
 
 export const useIsSameUser = (profileUser: User) => {

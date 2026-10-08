@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-import { AuthData } from "../../../lib/entities";
+import type { AuthData } from "../../../lib/entities";
 import { BookMarkIcon } from "../../icons/BookMarkIcon";
 import { ToastNotification } from "../../ui/ToastNotification";
 

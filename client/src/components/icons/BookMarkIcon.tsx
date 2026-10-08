@@ -12,8 +12,14 @@ export const BookMarkIcon = ({
     handleMouseLeave,
 }: BookMarkIconProps) => {
     return (
-        <button onClick={handleClick} className="z-5">
+        <button
+            onClick={handleClick}
+            className="z-5"
+            type="button"
+            aria-label="Toggle wishlist"
+        >
             <svg
+                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill={color}
                 viewBox="0 0 24 24"

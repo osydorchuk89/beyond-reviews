@@ -1,6 +1,6 @@
 import { useRouteLoaderData } from "react-router";
 
-import { AuthData, Book } from "../../../lib/entities";
+import type { AuthData, Book } from "../../../lib/entities";
 import { QueryLink } from "../../ui/QueryLink";
 import { useFilterNavigation } from "../../../hooks/useFilterNavigation";
 import { BookBookmark } from "./BookBookmark";

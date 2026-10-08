@@ -1,4 +1,4 @@
-import { useRef, RefObject } from "react";
+import { useRef, type RefObject } from "react";
 
 import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
 import { BaseButton } from "../../ui/BaseButton";
@@ -34,6 +34,7 @@ export const MovieReviewDisplay = ({
                 {isTruncated && (
                     <div>
                         <button
+                            type="button"
                             className="mt-1 text-sky-700 hover:text-green-950 text-base font-medium uppercase cursor-pointer"
                             onClick={toggleIsShowingMore}
                         >

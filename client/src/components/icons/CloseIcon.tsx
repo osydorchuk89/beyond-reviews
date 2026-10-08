@@ -5,8 +5,9 @@ interface CloseIconProps {
 
 export const CloseIcon = ({ handleClick, style }: CloseIconProps) => {
     return (
-        <button onClick={handleClick}>
+        <button onClick={handleClick} type="button" aria-label="Close">
             <svg
+                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"

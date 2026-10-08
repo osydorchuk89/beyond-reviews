@@ -3,7 +3,7 @@ import { useFetcher } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { MovieReviewInputs } from "../../../lib/entities";
+import type { MovieReviewInputs } from "../../../lib/entities";
 import { ReviewSchema } from "../../../lib/schemas";
 import { StarIcon } from "../../icons/StarIcon";
 import { BaseButton } from "../../ui/BaseButton";
@@ -63,6 +63,7 @@ export const MovieReviewForm = ({
                     return (
                         <div key={index}>
                             <StarIcon
+                                label={`Rate ${index} out of 10`}
                                 className={`w-8 h-8 border-none hover:cursor-pointer ${
                                     index <= (hover || userRating)
                                         ? "fill-orange-500"

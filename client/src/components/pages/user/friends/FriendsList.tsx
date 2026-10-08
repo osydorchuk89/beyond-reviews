@@ -1,4 +1,4 @@
-import { Friend } from "../../../../lib/entities";
+import type { Friend } from "../../../../lib/entities";
 import { horizontalPadding } from "../../../../styles/responsive";
 import { BaseLink } from "../../../ui/BaseLink";
 

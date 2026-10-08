@@ -1,6 +1,6 @@
 import { useFetchers, useRouteLoaderData } from "react-router";
 
-import { AuthData, Book, BookReview } from "../../../lib/entities";
+import type { AuthData, Book, BookReview } from "../../../lib/entities";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { BookBookmark } from "./BookBookmark";
 import { BookDetails } from "./BookDetails";

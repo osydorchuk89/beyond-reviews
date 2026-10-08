@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Await } from "react-router";
 
-import {
+import type {
     MovieRecommendationsData,
     WishlistData,
 } from "../../../../lib/entities";

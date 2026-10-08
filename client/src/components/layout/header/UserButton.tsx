@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { User } from "../../../lib/entities";
+import type { User } from "../../../lib/entities";
 
 interface UserButtonProps {
     user: User;

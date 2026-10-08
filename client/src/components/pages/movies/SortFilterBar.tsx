@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
 
-import { SearchItem } from "../../../lib/entities";
+import type { SearchItem } from "../../../lib/entities";
 import { SortFilterItem } from "./SortFilterItem";
 
 interface SortFilterProps {

@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 
-import { Message } from "../../../../lib/entities";
+import type { Message } from "../../../../lib/entities";
 
 interface MessageProps {
     message: Message;
@@ -22,10 +22,8 @@ export const ChatHistoryMessage = ({ message }: MessageProps) => {
             <div
                 className={
                     message.senderId === userId
-                        ? messageStyle + " bg-orange-200 self-end"
-                        : message.wasRead
-                          ? messageStyle + " bg-sky-200 self-start"
-                          : messageStyle + " bg-sky-200 self-start"
+                        ? `${messageStyle} bg-orange-200 self-end`
+                        : `${messageStyle} bg-sky-200 self-start`
                 }
             >
                 <span className="mr-8 min-w-0 break-words">{message.text}</span>

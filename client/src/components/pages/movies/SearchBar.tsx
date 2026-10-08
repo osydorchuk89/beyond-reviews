@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 
 import { BaseButton } from "../../ui/BaseButton";
 import { CloseIcon } from "../../icons/CloseIcon";

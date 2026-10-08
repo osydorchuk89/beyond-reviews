@@ -1,5 +1,5 @@
 import { getMovieReviews, sendLikeOrUnlike } from "../../../lib/api";
-import { MovieReview, MovieReviewsData } from "../../../lib/entities";
+import type { MovieReview, MovieReviewsData } from "../../../lib/entities";
 import { MediaReviews } from "../media/MediaReviews";
 
 interface MovieReviewsProps {

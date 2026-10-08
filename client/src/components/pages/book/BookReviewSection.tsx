@@ -1,4 +1,4 @@
-import { AuthData, BookReview } from "../../../lib/entities";
+import type { AuthData, BookReview } from "../../../lib/entities";
 import { MediaReviewSection } from "../media/MediaReviewSection";
 
 interface BookReviewSectionProps {

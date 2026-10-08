@@ -6,7 +6,7 @@ import "@testing-library/jest-dom/vitest";
 
 import { LoginPage } from "./LoginPage";
 
-const createMockRouter = (actionData?: any) => {
+const createMockRouter = (actionData?: unknown) => {
     return createMemoryRouter(
         [
             {

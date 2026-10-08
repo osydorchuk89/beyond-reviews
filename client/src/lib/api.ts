@@ -1,5 +1,5 @@
 import axiosInstance from "./axiosInstance";
-import {
+import type {
     AuthData,
     Book,
     BookRecommendationsData,
@@ -42,7 +42,7 @@ export const getMovies = async (
     search?: string,
 ): Promise<MoviesData> => {
     try {
-        const params: any = { page, limit };
+        const params: Record<string, string | number> = { page, limit };
         if (genre) params.genre = genre;
         if (releaseYear) params.releaseYear = releaseYear;
         if (director) params.director = director;
@@ -70,7 +70,7 @@ export const getBooks = async (
     search?: string,
 ): Promise<BooksData> => {
     try {
-        const params: any = { page, limit };
+        const params: Record<string, string | number> = { page, limit };
         if (genre) params.genre = genre;
         if (releaseYear) params.releaseYear = releaseYear;
         if (author) params.author = author;
@@ -206,7 +206,7 @@ export const sendLikeOrUnlike = async (
             like: !hasLiked,
             userId,
         });
-    } catch (error: any) {
+    } catch (error) {
         console.log(error);
     }
 };
@@ -222,7 +222,7 @@ export const sendBookLikeOrUnlike = async (
             like: !hasLiked,
             userId,
         });
-    } catch (error: any) {
+    } catch (error) {
         console.log(error);
     }
 };
@@ -238,7 +238,7 @@ export const addOrRemoveMovieFromWishlist = async (
             saved: !hasSaved,
             userId,
         });
-    } catch (error: any) {
+    } catch (error) {
         console.log(error);
         throw error;
     }
@@ -254,7 +254,7 @@ export const addOrRemoveBookFromWishlist = async (
             saved: !hasSaved,
             userId,
         });
-    } catch (error: any) {
+    } catch (error) {
         console.log(error);
         throw error;
     }
@@ -295,7 +295,7 @@ export const getUserActivities = async (
             { params: { page, tab } },
         );
         return response.data;
-    } catch (error: any) {
+    } catch (error) {
         console.log(error);
         throw error;
     }

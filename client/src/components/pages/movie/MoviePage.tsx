@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieReviews } from "./MovieReviews";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
-import { Movie, MovieReviewsData } from "../../../lib/entities";
+import type { Movie, MovieReviewsData } from "../../../lib/entities";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { horizontalPadding } from "../../../styles/responsive";
 

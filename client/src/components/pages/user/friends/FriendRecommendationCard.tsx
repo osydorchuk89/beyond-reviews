@@ -1,4 +1,4 @@
-import { FriendRecommendation } from "../../../../lib/entities";
+import type { FriendRecommendation } from "../../../../lib/entities";
 import { BaseButton } from "../../../ui/BaseButton";
 import { BaseLink } from "../../../ui/BaseLink";
 
@@ -34,7 +34,7 @@ export const FriendRecommendationCard = ({
                 <img
                     src={recommendation.user.photo}
                     className="h-12 w-12 shrink-0 rounded-full object-cover object-top"
-                    alt="user photo"
+                    alt=""
                 />
                 <div className="min-w-0">
                     <BaseLink to={`/users/${recommendation.user.id}/profile`}>

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import { UsersMessages } from "../../../../lib/entities";
+import type { UsersMessages } from "../../../../lib/entities";
 import { ChatHistoryMessage } from "./ChatHistoryMessage";
 import { LoadingSpinner } from "../../../ui/LoadingSpinner";
 import { ChatMessageForm } from "./ChatMessageForm";

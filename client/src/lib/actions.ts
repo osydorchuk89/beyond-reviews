@@ -1,7 +1,16 @@
-import { ActionFunctionArgs, redirect } from "react-router";
+import { type ActionFunctionArgs, redirect } from "react-router";
+import { isAxiosError } from "axios";
 
 import axiosInstance from "./axiosInstance";
 import { getAuthData } from "./api";
+
+const getErrorMessage = (error: unknown, fallback: string): string => {
+    if (isAxiosError<{ message?: unknown }>(error)) {
+        const message = error.response?.data?.message;
+        if (typeof message === "string") return message;
+    }
+    return fallback;
+};
 
 // Registration
 export const registrationAction = async ({ request }: { request: Request }) => {
@@ -15,12 +24,12 @@ export const registrationAction = async ({ request }: { request: Request }) => {
         } else {
             return { error: "Registration successful but auto-login failed" };
         }
-    } catch (error: any) {
-        if (error.response?.status === 409) {
+    } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 409) {
             return { error: "User with this email already exists" };
         }
         return {
-            error: error.response?.data?.message ?? "Registration failed",
+            error: getErrorMessage(error, "Registration failed"),
         };
     }
 };
@@ -38,11 +47,11 @@ export const loginAction = async ({ request }: { request: Request }) => {
             password,
         });
         return redirect(from);
-    } catch (error: any) {
-        if (error.response?.status === 401) {
+    } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 401) {
             return { error: "Invalid credentials" };
         }
-        return { error: error.response?.data?.message ?? "Login failed" };
+        return { error: getErrorMessage(error, "Login failed") };
     }
 };
 
@@ -50,7 +59,7 @@ export const logoutAction = async () => {
     try {
         await axiosInstance.post("/auth/logout");
         return null;
-    } catch (error: any) {
+    } catch {
         return { error: "Logout failed" };
     }
 };
@@ -79,9 +88,9 @@ export const movieReviewAction = async ({
             date,
         });
         return { success: true };
-    } catch (error: any) {
+    } catch (error) {
         return {
-            error: error.response?.data?.message ?? "Failed to submit review",
+            error: getErrorMessage(error, "Failed to submit review"),
         };
     }
 };
@@ -109,9 +118,9 @@ export const bookReviewAction = async ({
             date,
         });
         return { success: true };
-    } catch (error: any) {
+    } catch (error) {
         return {
-            error: error.response?.data?.message ?? "Failed to submit review",
+            error: getErrorMessage(error, "Failed to submit review"),
         };
     }
 };

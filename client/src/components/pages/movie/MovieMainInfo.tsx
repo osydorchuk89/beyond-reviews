@@ -1,6 +1,6 @@
 import { useRouteLoaderData } from "react-router";
 
-import { AuthData, Movie } from "../../../lib/entities";
+import type { AuthData, Movie } from "../../../lib/entities";
 import { getMoviePoster } from "../../../lib/utils";
 import { MovieBookmark } from "./MovieBookmark";
 import { QueryLink } from "../../ui/QueryLink";

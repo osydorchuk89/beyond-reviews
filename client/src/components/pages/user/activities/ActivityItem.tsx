@@ -1,4 +1,4 @@
-import { UserActivity } from "../../../../lib/entities";
+import type { UserActivity } from "../../../../lib/entities";
 import { ActivityDetails } from "./ActivityDetails";
 import { ActivityOtherReview } from "./ActivityOtherReview";
 

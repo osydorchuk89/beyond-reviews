@@ -1,4 +1,4 @@
-import { LoaderFunctionArgs, redirect } from "react-router";
+import { type LoaderFunctionArgs, redirect } from "react-router";
 
 import {
     getAuthData,
@@ -17,7 +17,7 @@ import {
     getUserMovieReviews,
     getWishlist,
 } from "./api";
-import {
+import type {
     BookRecommendationsData,
     UserActivityTab,
     UserReviewTab,
@@ -39,7 +39,7 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
     const url = new URL(request.url);
     const searchParams = url.searchParams;
 
-    const page = parseInt(searchParams.get("page") ?? "1");
+    const page = parseInt(searchParams.get("page") ?? "1", 10);
     const genre = searchParams.get("genre") ?? undefined;
     const releaseYear = searchParams.get("releaseYear") ?? undefined;
     const director = searchParams.get("director") ?? undefined;
@@ -101,7 +101,7 @@ export const userActivitiesLoader = async ({
 }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
     const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") ?? "1");
+    const page = parseInt(url.searchParams.get("page") ?? "1", 10);
     const tabParam = url.searchParams.get("tab");
     const selectedTab: UserActivityTab =
         tabParam === "movies" || tabParam === "albums" ? tabParam : "books";
@@ -164,7 +164,7 @@ export const booksLoader = ({ request }: LoaderFunctionArgs) => {
     const url = new URL(request.url);
     const searchParams = url.searchParams;
 
-    const page = parseInt(searchParams.get("page") ?? "1");
+    const page = parseInt(searchParams.get("page") ?? "1", 10);
     const genre = searchParams.get("genre") ?? undefined;
     const releaseYear = searchParams.get("releaseYear") ?? undefined;
     const author = searchParams.get("author") ?? undefined;
@@ -230,7 +230,7 @@ export const userReviewsLoader = async ({
 }: LoaderFunctionArgs) => {
     const { userId } = params as { userId: string };
     const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") ?? "1");
+    const page = parseInt(url.searchParams.get("page") ?? "1", 10);
     const tabParam = url.searchParams.get("tab");
     const selectedTab: UserReviewTab =
         tabParam === "movies" || tabParam === "albums" ? tabParam : "books";

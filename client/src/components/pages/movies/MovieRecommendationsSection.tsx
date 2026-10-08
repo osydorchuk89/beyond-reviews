@@ -1,4 +1,4 @@
-import { MovieRecommendationsData } from "../../../lib/entities";
+import type { MovieRecommendationsData } from "../../../lib/entities";
 import { MovieCard } from "./MovieCard";
 import { ArrowIcon } from "../../icons/ArrowIcon";
 import { useHorizontalScroll } from "../../../hooks/useHorizontalScroll";

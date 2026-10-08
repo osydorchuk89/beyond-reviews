@@ -1,5 +1,6 @@
 interface StarIconProps {
     className: string;
+    label?: string;
     handleClick?: React.MouseEventHandler<HTMLButtonElement>;
     handleMouseEnter?: React.MouseEventHandler<SVGSVGElement>;
     handleMouseLeave?: React.MouseEventHandler<SVGSVGElement>;
@@ -8,14 +9,21 @@ interface StarIconProps {
 
 export const StarIcon = ({
     className,
+    label = "Set rating",
     handleClick,
     handleMouseEnter,
     handleMouseLeave,
     children,
 }: StarIconProps) => {
+    const Wrapper = handleClick ? "button" : "span";
     return (
-        <button onClick={handleClick} type="button">
+        <Wrapper
+            onClick={handleClick}
+            type={handleClick ? "button" : undefined}
+            aria-label={handleClick ? label : undefined}
+        >
             <svg
+                aria-hidden="true"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 xmlns="http://www.w3.org/2000/svg"
@@ -31,6 +39,6 @@ export const StarIcon = ({
                 />
                 {children}
             </svg>
-        </button>
+        </Wrapper>
     );
 };

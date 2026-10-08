@@ -1,4 +1,4 @@
-import { SearchItem } from "../../../lib/entities";
+import type { SearchItem } from "../../../lib/entities";
 import { CloseIcon } from "../../icons/CloseIcon";
 
 interface SortFilterItemProps {
@@ -23,6 +23,7 @@ export const SortFilterItem = ({
             }`}
         >
             <button
+                type="button"
                 className="w-full py-2 cursor-pointer"
                 onClick={() => handleItemClick(item)}
             >

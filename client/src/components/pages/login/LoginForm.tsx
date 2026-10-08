@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
     Form,
-    Location,
+    type Location,
     useLocation,
     useNavigation,
     useSubmit,
@@ -12,7 +12,7 @@ import { LoginSchema } from "../../../lib/schemas";
 import { BaseButton } from "../../ui/BaseButton";
 import { BaseLink } from "../../ui/BaseLink";
 import { SocialLoginButton } from "../../ui/SocialLoginButton";
-import { LocationState, LoginInputs } from "../../../lib/entities";
+import type { LocationState, LoginInputs } from "../../../lib/entities";
 
 export const LoginForm = () => {
     const navigation = useNavigation();

@@ -1,4 +1,4 @@
-import { Book } from "../../../lib/entities";
+import type { Book } from "../../../lib/entities";
 import { BookCard } from "./BookCard";
 
 interface BooksListProps {

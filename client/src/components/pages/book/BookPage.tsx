@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { ToastContainer } from "react-toastify";
 
-import { Book, BookReviewsData } from "../../../lib/entities";
+import type { Book, BookReviewsData } from "../../../lib/entities";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { horizontalPadding } from "../../../styles/responsive";
 import { BookMainInfo } from "./BookMainInfo";

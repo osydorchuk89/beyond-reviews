@@ -1,4 +1,4 @@
-import { Movie } from "../../../lib/entities";
+import type { Movie } from "../../../lib/entities";
 import { getMovies } from "../../../lib/api";
 import { MediaListSection } from "../media/MediaListSection";
 import { MoviesList } from "./MoviesList";

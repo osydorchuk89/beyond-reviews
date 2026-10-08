@@ -1,4 +1,4 @@
-import {
+import type {
     ReceivedFriendRequest,
     SentFriendRequest,
 } from "../../../../lib/entities";

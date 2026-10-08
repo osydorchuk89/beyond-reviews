@@ -25,7 +25,7 @@ export const Pagination = ({
     };
 
     const getPageNumbers = () => {
-        const pages: (number | string)[] = [];
+        const pages: (number | "ellipsis-start" | "ellipsis-end")[] = [];
         const maxVisible = 5;
 
         if (totalPages <= maxVisible) {
@@ -35,7 +35,7 @@ export const Pagination = ({
         pages.push(1);
 
         if (currentPage > 3) {
-            pages.push("...");
+            pages.push("ellipsis-start");
         }
 
         for (
@@ -47,7 +47,7 @@ export const Pagination = ({
         }
 
         if (currentPage < totalPages - 2) {
-            pages.push("...");
+            pages.push("ellipsis-end");
         }
 
         pages.push(totalPages);
@@ -65,15 +65,16 @@ export const Pagination = ({
                 PREVIOUS
             </BaseButton>
 
-            {getPageNumbers().map((page, index) =>
-                page === "..." ? (
-                    <span key={`ellipsis-${index}`} className="px-2">
+            {getPageNumbers().map((page) =>
+                typeof page !== "number" ? (
+                    <span key={page} className="px-2">
                         ...
                     </span>
                 ) : (
                     <button
+                        type="button"
                         key={page}
-                        onClick={() => handlePageChange(page as number)}
+                        onClick={() => handlePageChange(page)}
                         className={`cursor-pointer px-4 py-2 rounded-lg ${
                             currentPage === page
                                 ? "bg-sky-500 text-white"

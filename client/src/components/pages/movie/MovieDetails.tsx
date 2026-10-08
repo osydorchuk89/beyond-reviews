@@ -1,4 +1,4 @@
-import { Movie } from "../../../lib/entities";
+import type { Movie } from "../../../lib/entities";
 import { StarIcon } from "../../icons/StarIcon";
 import { QueryLink } from "../../ui/QueryLink";
 import { useFilterNavigation } from "../../../hooks/useFilterNavigation";

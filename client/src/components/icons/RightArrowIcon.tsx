@@ -4,8 +4,9 @@ interface RightArrowIconProps {
 
 export const RightArrowIcon = ({ onClick }: RightArrowIconProps) => {
     return (
-        <button onClick={onClick}>
+        <button onClick={onClick} type="button" aria-label="Next">
             <svg
+                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"

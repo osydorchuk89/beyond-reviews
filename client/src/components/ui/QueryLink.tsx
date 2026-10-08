@@ -1,7 +1,7 @@
 interface QueryLinkProps {
     children: React.ReactNode;
     isBold?: boolean;
-    onClick?: React.MouseEventHandler<HTMLSpanElement>;
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export const QueryLink = ({
@@ -10,11 +10,12 @@ export const QueryLink = ({
     onClick,
 }: QueryLinkProps) => {
     return (
-        <a
+        <button
+            type="button"
             className={`${isBold && "text-lg"} text-sky-800 hover:text-sky-500 ${isBold && "font-medium"} hover:underline cursor-pointer`}
             onClick={onClick}
         >
             {children}
-        </a>
+        </button>
     );
 };

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { AuthData } from "../../../lib/entities";
+import type { AuthData } from "../../../lib/entities";
 import { BaseLink } from "../../ui/BaseLink";
 import { MovieReviewDisplay } from "../movie/MovieReviewDisplay";
 import { MovieReviewForm } from "../movie/MovieReviewForm";

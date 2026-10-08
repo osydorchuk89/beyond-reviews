@@ -1,5 +1,5 @@
 import { addOrRemoveMovieFromWishlist } from "../../../lib/api";
-import { Movie, AuthData } from "../../../lib/entities";
+import type { Movie, AuthData } from "../../../lib/entities";
 import { MediaBookmark } from "../media/MediaBookmark";
 
 interface MovieBookmarkProps {

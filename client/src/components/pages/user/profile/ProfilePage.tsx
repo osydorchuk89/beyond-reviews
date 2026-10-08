@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
-import { User } from "../../../../lib/entities";
+import type { User } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { profileNavLinks } from "../../../../lib/data";
 import { BaseLink } from "../../../ui/BaseLink";

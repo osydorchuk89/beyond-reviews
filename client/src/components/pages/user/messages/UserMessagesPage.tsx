@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
-import { Friend, Message, User, UsersMessages } from "../../../../lib/entities";
+import type {
+    Friend,
+    Message,
+    User,
+    UsersMessages,
+} from "../../../../lib/entities";
 import { ChatSidePanel } from "./ChatSidePanel";
 import { ChatHistory } from "./ChatHistory";
 import { getChatHistory, sendMessage } from "../../../../lib/api";

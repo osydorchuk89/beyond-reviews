@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Await, useLoaderData } from "react-router";
 
-import { BookRecommendationsData, BooksData } from "../../../lib/entities";
+import type { BookRecommendationsData, BooksData } from "../../../lib/entities";
 import {
     booksSideBarFilterList,
     booksSideBarSortList,

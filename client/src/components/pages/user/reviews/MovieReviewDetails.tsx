@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { MovieReview } from "../../../../lib/entities";
+import type { MovieReview } from "../../../../lib/entities";
 import { getMoviePoster } from "../../../../lib/utils";
 
 interface MovieReviewDetailsProps {

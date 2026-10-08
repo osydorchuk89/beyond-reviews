@@ -1,5 +1,5 @@
 import { useRouteLoaderData } from "react-router";
-import { User, UserActivity } from "../../../../lib/entities";
+import type { User, UserActivity } from "../../../../lib/entities";
 import { BaseLink } from "../../../ui/BaseLink";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 
@@ -43,7 +43,7 @@ export const ActivityDetails = ({
                     <img
                         src={activity.user.photo}
                         className="object-cover object-top w-8 h-8 rounded-full shrink-0 mr-2"
-                        alt="user photo"
+                        alt=""
                     />
                     <span className="font-bold break-words">
                         {isRatingActivity && (

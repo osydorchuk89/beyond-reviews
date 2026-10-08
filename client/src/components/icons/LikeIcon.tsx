@@ -12,8 +12,13 @@ export const LikeIcon = ({
     handleMouseLeave,
 }: LikeIconProps) => {
     return (
-        <button onClick={handleClick}>
+        <button
+            onClick={handleClick}
+            type="button"
+            aria-label="Toggle review like"
+        >
             <svg
+                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 stroke="#0891b2"

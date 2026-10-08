@@ -16,6 +16,7 @@ export const useHorizontalScroll = (itemCount: number) => {
         });
     };
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies(itemCount): Recalculate scroll limits after the rendered item count changes.
     useEffect(() => {
         const scrollContainer = scrollContainerRef.current;
         if (!scrollContainer) return;

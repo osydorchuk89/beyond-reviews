@@ -1,4 +1,4 @@
-import { Book } from "../../../lib/entities";
+import type { Book } from "../../../lib/entities";
 import { StarIcon } from "../../icons/StarIcon";
 import { QueryLink } from "../../ui/QueryLink";
 import { useFilterNavigation } from "../../../hooks/useFilterNavigation";

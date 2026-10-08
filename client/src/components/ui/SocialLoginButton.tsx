@@ -16,6 +16,7 @@ export const SocialLoginButton = () => {
         >
             <div className="absolute left-3">
                 <svg
+                    aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     x="0px"
                     y="0px"

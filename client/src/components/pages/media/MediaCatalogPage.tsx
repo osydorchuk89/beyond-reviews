@@ -1,7 +1,7 @@
-import { ReactNode, Suspense } from "react";
+import { type ReactNode, Suspense } from "react";
 import { Await } from "react-router";
 
-import { SearchItem } from "../../../lib/entities";
+import type { SearchItem } from "../../../lib/entities";
 import { horizontalPadding } from "../../../styles/responsive";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { SearchBar } from "../movies/SearchBar";

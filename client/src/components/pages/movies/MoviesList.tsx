@@ -1,4 +1,4 @@
-import { Movie } from "../../../lib/entities";
+import type { Movie } from "../../../lib/entities";
 import { MovieCard } from "./MovieCard";
 
 interface MoviesListProps {

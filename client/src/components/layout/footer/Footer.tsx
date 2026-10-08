@@ -7,13 +7,13 @@ export const Footer = () => {
         >
             <ul className="flex flex-col items-center sm:flex-row sm:gap-8">
                 <li>
-                    <a href="#">About Us</a>
+                    <span>About Us</span>
                 </li>
                 <li>
-                    <a href="#">Contacts</a>
+                    <span>Contacts</span>
                 </li>
                 <li>
-                    <a href="#">Privacy Policy</a>
+                    <span>Privacy Policy</span>
                 </li>
             </ul>
             <span>&copy; Beyond Reviews 2025</span>

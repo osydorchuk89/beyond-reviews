@@ -1,4 +1,4 @@
-import { BookRecommendationsData } from "../../../lib/entities";
+import type { BookRecommendationsData } from "../../../lib/entities";
 import { ArrowIcon } from "../../icons/ArrowIcon";
 import { useHorizontalScroll } from "../../../hooks/useHorizontalScroll";
 import { BookCard } from "./BookCard";

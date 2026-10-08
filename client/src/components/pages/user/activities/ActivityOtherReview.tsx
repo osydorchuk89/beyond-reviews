@@ -1,4 +1,4 @@
-import { UserActivity } from "../../../../lib/entities";
+import type { UserActivity } from "../../../../lib/entities";
 import { BaseLink } from "../../../ui/BaseLink";
 
 interface ActivityOtherReviewProps {

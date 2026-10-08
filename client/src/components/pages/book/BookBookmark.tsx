@@ -1,5 +1,5 @@
 import { addOrRemoveBookFromWishlist } from "../../../lib/api";
-import { AuthData, Book } from "../../../lib/entities";
+import type { AuthData, Book } from "../../../lib/entities";
 import { MediaBookmark } from "../media/MediaBookmark";
 
 interface BookBookmarkProps {

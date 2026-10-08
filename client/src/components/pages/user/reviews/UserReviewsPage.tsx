@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { getUserBookReviews, getUserMovieReviews } from "../../../../lib/api";
-import {
+import type {
     BookReview,
     MovieReview,
     User,

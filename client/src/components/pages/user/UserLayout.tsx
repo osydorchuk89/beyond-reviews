@@ -6,7 +6,7 @@ import {
     useRouteLoaderData,
 } from "react-router";
 
-import { AuthData, User } from "../../../lib/entities";
+import type { AuthData, User } from "../../../lib/entities";
 import { horizontalPadding } from "../../../styles/responsive";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";

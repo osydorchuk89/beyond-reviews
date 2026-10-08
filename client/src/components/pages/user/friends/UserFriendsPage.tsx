@@ -1,7 +1,7 @@
 import { Suspense, useState } from "react";
 import { Await, useLoaderData, useRouteLoaderData } from "react-router";
 
-import {
+import type {
     Friend,
     FriendRecommendationsData,
     User,

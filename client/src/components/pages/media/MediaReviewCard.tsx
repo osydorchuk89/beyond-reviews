@@ -1,8 +1,8 @@
-import { RefObject, useRef, useState } from "react";
+import { type RefObject, useRef, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
-import { AuthData } from "../../../lib/entities";
+import type { AuthData } from "../../../lib/entities";
 import { LikeIcon } from "../../icons/LikeIcon";
 import { StarIcon } from "../../icons/StarIcon";
 import { BaseLink } from "../../ui/BaseLink";
@@ -108,6 +108,7 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
                     {isTruncated && (
                         <div>
                             <button
+                                type="button"
                                 className="mt-1 text-sky-700 hover:text-green-950 text-base font-medium uppercase cursor-pointer"
                                 onClick={toggleIsShowingMore}
                             >

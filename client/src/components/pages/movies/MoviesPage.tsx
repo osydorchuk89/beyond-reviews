@@ -3,7 +3,10 @@ import { Await, useLoaderData } from "react-router";
 
 import { MoviesListSection } from "./MoviesListSection";
 import { MovieRecommendationsSection } from "./MovieRecommendationsSection";
-import { MovieRecommendationsData, MoviesData } from "../../../lib/entities";
+import type {
+    MovieRecommendationsData,
+    MoviesData,
+} from "../../../lib/entities";
 import { sideBarFilterList, sideBarSortList } from "../../../lib/data";
 import { horizontalPadding } from "../../../styles/responsive";
 import { MovieRecommendationsLoadingSection } from "./MovieRecommendationsLoadingSection";

@@ -14,7 +14,9 @@ export const MobileMenuModal = () => {
 
     return (
         <>
-            <div
+            <button
+                type="button"
+                aria-label="Close menu"
                 className="sm:hidden fixed inset-0 bg-black/70 z-40"
                 onClick={closeMenu}
             />
@@ -24,7 +26,9 @@ export const MobileMenuModal = () => {
                 </div>
                 <nav className="flex flex-col px-4 gap-2">
                     {headerNavLinks.map((link) => (
-                        <HeaderNavLink to={link.to}>{link.text}</HeaderNavLink>
+                        <HeaderNavLink key={link.to} to={link.to}>
+                            {link.text}
+                        </HeaderNavLink>
                     ))}
 
                     <div className="border-t border-sky-600 my-4" />
