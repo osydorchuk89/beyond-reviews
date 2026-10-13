@@ -1,0 +1,66 @@
+[
+  {
+    "rule": "landmark-one-main",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-main"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "list",
+    "findings": [
+      "A12"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".gap-5"
+        ],
+        "failedChecks": [
+          "only-listitems"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-heading-one"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "region",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".gap-6"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      }
+    ]
+  }
+]

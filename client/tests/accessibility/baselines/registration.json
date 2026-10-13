@@ -1,0 +1,106 @@
+[
+  {
+    "rule": "color-contrast",
+    "findings": [
+      "A08"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".bg-sky-600"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "landmark-one-main",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-main"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-heading-one"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "region",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".gap-2:nth-child(1)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-2:nth-child(2)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-2:nth-child(3)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-2:nth-child(4)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".my-10"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      }
+    ]
+  }
+]

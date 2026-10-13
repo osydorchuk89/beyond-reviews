@@ -1,0 +1,194 @@
+[
+  {
+    "rule": "landmark-one-main",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-main"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-heading-one"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "region",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > a[href$=\"movie-1\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(2) > .w-76.justify-start.p-5 > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(2) > .w-76.justify-start.p-5 > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(2) > .w-76.justify-start.p-5 > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(3) > .w-76.justify-start.p-5 > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(3) > .w-76.justify-start.p-5 > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(3) > .w-76.justify-start.p-5 > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-5 > h2"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".shadow-lg > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".shadow-lg > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".shadow-lg > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".shadow-lg > a[href$=\"movie-1\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".sm\\:text-2xl"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".text-fuchsia-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5 > a[href$=\"movie-2\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5 > a[href$=\"movie-3\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      }
+    ]
+  }
+]

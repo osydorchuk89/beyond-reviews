@@ -1,0 +1,74 @@
+[
+  {
+    "rule": "color-contrast",
+    "findings": [
+      "A08"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".bg-sky-600"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "region",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".gap-2.flex-col:nth-child(1)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-2.flex-col:nth-child(3)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-2.flex-col:nth-child(4)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".my-10"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          "form > .gap-2.flex-col:nth-child(2)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      }
+    ]
+  }
+]

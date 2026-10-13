@@ -108,3 +108,9 @@ Run `npm run lint` inside either project to check Biome's recommended rules with
 In `server/`, run `npm run typecheck` to check application code, development scripts, and tests together without emitting JavaScript. The server build checks only production application code under `src/`.
 
 Both projects use TypeScript 7. Run `npm --prefix client run typecheck` to check frontend code, its tests, and the Vite/Vitest configuration without bundling. The client build also performs this type check before the Vite production build. Run `npm --prefix server run typecheck` for the full server check.
+
+## Accessibility Checks
+
+Run `npm --prefix client run test:run` for non-watch component tests and `npm --prefix client run test:a11y` for browser accessibility checks. Install Chromium first with `npm --prefix client exec playwright install chromium`. Browser tests start a separate client on port 5174 and use synthetic API responses, so no server or account credentials are needed.
+
+See [Accessibility Testing](docs/accessibility-testing.md) for commands, current failure baselines, and the manual checklist. The work follows the [WCAG 2.2 AA plan](docs/accessibility-plan.md); user messaging is deferred until after its refactor.

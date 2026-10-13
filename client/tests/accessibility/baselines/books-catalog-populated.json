@@ -1,0 +1,282 @@
+[
+  {
+    "rule": "color-contrast",
+    "findings": [
+      "A08"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".text-orange-500"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "landmark-one-main",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-main"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "list",
+    "findings": [
+      "A12"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".grid"
+        ],
+        "failedChecks": [
+          "only-listitems"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-heading-one"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "region",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(1) > .w-76.justify-start.p-5 > a[href$=\"book-1\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(2) > .w-76.justify-start.p-5 > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(2) > .w-76.justify-start.p-5 > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(2) > .w-76.justify-start.p-5 > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(2) > .w-76.justify-start.p-5 > a[href$=\"book-2\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(3) > .w-76.justify-start.p-5 > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(3) > .w-76.justify-start.p-5 > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(3) > .w-76.justify-start.p-5 > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-3.shrink-0.flex-col:nth-child(3) > .w-76.justify-start.p-5 > a[href$=\"book-3\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".grid > .w-76.justify-start.p-5:nth-child(1) > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".grid > .w-76.justify-start.p-5:nth-child(1) > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".grid > .w-76.justify-start.p-5:nth-child(1) > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".grid > .w-76.justify-start.p-5:nth-child(1) > a[href$=\"book-1\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".text-4xl"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(2) > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(2) > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(2) > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(2) > a[href$=\"book-2\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(3) > .h-16.rounded-t-lg.absolute"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(3) > .mt-4 > .text-gray-600.ml-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(3) > .mt-4 > .text-sky-950"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".w-76.justify-start.p-5:nth-child(3) > a[href$=\"book-3\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          "h2"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      }
+    ]
+  }
+]

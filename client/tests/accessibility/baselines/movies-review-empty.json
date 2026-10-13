@@ -1,0 +1,210 @@
+[
+  {
+    "rule": "color-contrast",
+    "findings": [
+      "A08"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".bg-sky-600"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      },
+      {
+        "target": [
+          ".mb-5.w-full.flex-col > .text-sm.text-gray-500"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      },
+      {
+        "target": [
+          ".mt-5"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      },
+      {
+        "target": [
+          ".text-gray-500.font-bold"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      },
+      {
+        "target": [
+          ".text-orange-500"
+        ],
+        "failedChecks": [
+          "color-contrast"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "landmark-one-main",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-main"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          "html"
+        ],
+        "failedChecks": [
+          "page-has-heading-one"
+        ]
+      }
+    ]
+  },
+  {
+    "rule": "region",
+    "findings": [
+      "A06"
+    ],
+    "nodes": [
+      {
+        "target": [
+          ".gap-5.mb-5.text-lg > div:nth-child(1) > .font-semibold"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".gap-5.mb-5.text-lg > p"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".items-start > div:nth-child(2)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".justify-between.flex > .flex > .font-bold:nth-child(2)"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".mb-5.w-full.flex-col > .justify-between.flex > .font-semibold"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".mb-5.w-full.flex-col > .text-sm.text-gray-500"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".mb-6"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".mt-5"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".text-center.text-xl.font-bold"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".text-gray-500.font-bold"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          ".text-gray-600"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          "div:nth-child(2) > .font-semibold"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          "form > .my-5.flex-col.flex"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          "img"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      },
+      {
+        "target": [
+          "label[for=\"ratng\"]"
+        ],
+        "failedChecks": [
+          "region"
+        ]
+      }
+    ]
+  }
+]

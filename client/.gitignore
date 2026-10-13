@@ -25,3 +25,7 @@ dist-ssr
 
 .env
 dev.ts
+
+# Browser test output (checked-in accessibility baselines are not ignored)
+playwright-report/
+test-results/
