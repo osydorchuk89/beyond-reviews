@@ -44,6 +44,7 @@ export const BookPage = () => {
             <div className="flex flex-col md:flex-row gap-8 md:gap-10 py-6 sm:py-10">
                 <BookMainInfo book={book} />
                 <BookAdditionalInfo
+                    key={book.id}
                     book={book}
                     userReview={bookReviewsData.userReview}
                 />

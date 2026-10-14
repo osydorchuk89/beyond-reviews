@@ -90,9 +90,8 @@ test.describe("Anonymous pages", () => {
         await expect(
             page.getByText("The Quiet Library", { exact: true }),
         ).toBeVisible();
-        // Placeholder is a temporary locator while A04 remains open; switch to the label when fixed.
         await page
-            .getByPlaceholder("enter book title")
+            .getByLabel("Search", { exact: true })
             .fill("No matching fixture");
         await page
             .getByRole("button", { name: "Search", exact: true })

@@ -1,7 +1,6 @@
-import { useFetchers, useRouteLoaderData } from "react-router";
+import { useRouteLoaderData } from "react-router";
 
 import type { AuthData, Book, BookReview } from "../../../lib/entities";
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
 import { BookBookmark } from "./BookBookmark";
 import { BookDetails } from "./BookDetails";
 import { BookReviewSection } from "./BookReviewSection";
@@ -19,27 +18,15 @@ export const BookAdditionalInfo = ({
         authData: AuthData;
     };
 
-    const fetchers = useFetchers();
-    const isUpdating = fetchers.some((f) => f.state !== "idle");
-
     return (
         <div className="flex flex-col w-full lg:w-2/3 text-base md:text-lg relative">
-            {isUpdating ? (
-                <LoadingSpinner />
-            ) : (
-                <>
-                    <div className="hidden md:block">
-                        {authData.user && (
-                            <BookBookmark book={book} authData={authData} />
-                        )}
-                    </div>
-                    <BookDetails book={book} />
-                    <BookReviewSection
-                        userReview={userReview}
-                        authData={authData}
-                    />
-                </>
-            )}
+            <div className="hidden md:block">
+                {authData.user && (
+                    <BookBookmark book={book} authData={authData} />
+                )}
+            </div>
+            <BookDetails book={book} />
+            <BookReviewSection userReview={userReview} authData={authData} />
         </div>
     );
 };

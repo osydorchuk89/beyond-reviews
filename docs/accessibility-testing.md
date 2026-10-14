@@ -1,6 +1,6 @@
 # Accessibility checks and remaining work
 
-Updated: 14 October 2026, after Phase 2. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet.
+Updated: 14 October 2026, after Phase 3. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet.
 
 ## Run the checks
 
@@ -45,7 +45,7 @@ Use `api.respond(method, path, { status, body })` to add a response for an error
 - Skip links, page headings/titles, Back/Forward focus, forced-color focus outlines, and focus during search, filters, tabs, and pagination.
 - Missing media, the existing user-route error boundary, and review Cancel without a save request.
 
-`pages.spec.ts` contains the axe scans. `navigation.spec.ts` checks navigation and keyboard behavior. Every non-dialog scanned state also requires one main landmark, one main heading, and a page-specific document title. When the modal menu is open, its background is intentionally unavailable to assistive technology.
+`pages.spec.ts` contains the original axe scans. `navigation.spec.ts` checks navigation and keyboard behavior. `forms.spec.ts` checks form labels, validation, autofill/paste support, upload errors, review creation/editing, slow saves, failures, retries, and expired sessions; it also scans failed review-save states. Every non-dialog scanned state also requires one main landmark, one main heading, and a page-specific document title. When the modal menu is open, its background is intentionally unavailable to assistive technology.
 
 Tests wait for the expected content or error before scanning. They fail on an unexpected application crash rather than treating its error screen as a successful page scan.
 
@@ -71,20 +71,20 @@ Changed selectors can change a fingerprint without changing the defect. Review t
 
 ## Short findings checklist
 
-Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). Phase 1 added checks; Phase 2 implements navigation fixes and the early Cancel fix. The client maintainer owns follow-up. Automated results below cover the specified states; screen-reader and final journey evaluation remain pending.
+Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). Phases 2 and 3 implement navigation and form fixes. The client maintainer owns follow-up. Automated results below cover the specified states; screen-reader and final journey evaluation remain pending.
 
 | ID | What needs fixing | Planned phase | Status / retest |
 | --- | --- | --- | --- |
 | A01 | Mobile-menu keyboard and focus behavior | 2 | Implemented; automated keyboard retest passed 14 October; screen-reader/final journey checks pending |
-| A02 | Review Cancel, validation, rating labels and selection | 3, urgent fixes early | Cancel fixed and retested for books/movies 14 October; rating and validation work remains open |
-| A03 | Review draft loss and focus during saves | 3, urgent fixes early | Open; success/failure retest pending |
-| A04 | Search labels | 3 | Open; message-input portion deferred |
-| A05 | Authentication labels, errors, instructions, autofill | 3 | Open; password-manager and screen-reader retest pending |
+| A02 | Review Cancel, validation, rating labels and selection | 3, urgent fixes early | Partly implemented: native radio semantics behind the original stars, required rating, create/edit/cancel, and invalid action payloads retested 14 October; a visible selected-value cue beyond color and screen-reader evaluation remain pending |
+| A03 | Review draft loss and focus during saves | 3, urgent fixes early | Implemented; slow saves, duplicate prevention, failure/retry, network/session failures, reopening, and focus retested for books/movies 14 October |
+| A04 | Search labels | 3 | Search portion implemented and retested 14 October; message-input portion deferred |
+| A05 | Authentication labels, errors, instructions, autofill | 3 | Partly implemented: field associations, first-error focus, server errors, clipboard paste, autocomplete tokens, and photo validation retested 14 October; instruction text is screen-reader-only to preserve the UI; visible requirements and actual password-manager/screen-reader evaluation remain pending |
 | A06 | Main content, headings, titles, route focus | 2 | Implemented for normal/placeholder/missing-item pages and the existing user error boundary; structural and route-focus checks passed 14 October; screen-reader evaluation pending |
 | A07 | Tabs, toggles, and selected filters | 4 | Open; pagination now exposes its current page and unavailable controls; chat-selection portion deferred |
 | A08 | Contrast | 5 | Open; contrast baseline and rendered-state retest pending |
-| A09 | Narrow layouts, zoom, and text spacing | 5 | Open; messaging layout portion deferred |
-| A10 | Loading, errors, success feedback, removed-control focus | 4 | Open; announcements and failures retest pending |
+| A09 | Narrow layouts, zoom, and text spacing | 5 | Open; original star row, textarea size, form widths, and button spacing restored at the maintainer's request; responsive form changes require an agreed visual design; messaging layout portion deferred |
+| A10 | Loading, errors, success feedback, removed-control focus | 4 | Review-saving feedback/focus implemented in Phase 3; other actions and screen-reader announcements remain pending |
 | A11 | Message input, sending, history, and announcements | After refactor | Deferred; remains unresolved |
 | A12 | Link/image names and list structure | 4 | Profile navigation list and header profile-link name fixed in Phase 2; media/image work remains open; chat-list portion deferred |
 | A13 | Visible focus and keyboard access in scrolling areas | 2, 4, 5 | Partly implemented: shared focus outlines, header scroll clearance, scrollable menu, and stable paging focus retested 14 October; full scrolling/zoom checks remain open |
@@ -118,6 +118,29 @@ Route metadata supplies titles. `PageNavigation` moves focus to the destination 
 Vite ignores test snapshots and reports so writing them cannot reload a page in the middle of a test. Reports, screenshots, and build output remain untracked.
 
 These are local Chromium checks with synthetic data. Actual screen-reader use, broader contrast/layout/zoom evaluation, root/catalog error recovery, real authentication/backend integration, the deployed build, and the remaining phases still need evaluation. Messaging-specific work remains deferred. No hosted CI result is claimed here.
+
+## Phase 3 validation
+
+Form fields also retain their original focused appearance: the shared white/dark focus ring excludes inputs, selects, and textareas, leaving their existing border styles and native browser focus indicators. Links, buttons, and keyboard-operated rating stars keep their shared focus ring.
+
+Local validation on 14 October 2026:
+
+- All 92 browser tests passed with baseline updates disabled: 22 new form tests plus the previous 70 tests. The suite now scans 41 states.
+- All 18 component/action tests passed. The ten new action tests verify that missing, out-of-range, fractional, and invalid ratings never reach the API, for both books and movies.
+- TypeScript checking, linting, formatting, and the production build passed. The existing bundle-size advisory remains.
+- All original scan states retain the same findings. Four edit/create-form baselines have reordered classes in one axe selector after styling the radios as stars. Added two reviewed baselines for failed book/movie review saves; they contain the same existing A08 contrast findings as the corresponding edit-form states. No unrelated failures were accepted. Axe did not detect the original placeholder-only label, rating-state, and draft-loss problems; dedicated behavior checks now cover them.
+- Browser checks exercise real clipboard paste, invalid credentials, duplicate-email and general registration failures, invalid photo types/size, and native radio keyboard selection at 320 CSS pixels. Automated checks confirm error descriptions, invalid states, and status/alert markup; they do not confirm actual screen-reader announcements.
+- After restoring the original UI, compared the initial login, registration, search, book-review, and movie-review forms against an isolated copy of `c1d5c32` at 1280 × 900. All five comparisons matched both position/dimensions and screenshot pixels. The reference server used intercepted API fixtures; it did not access real accounts or data. Temporary comparison code was removed afterwards.
+
+The original form appearance is preserved: compact stars with hover preview, textarea dimensions, button spacing and pending text, authentication layouts, and login alert placement. The existing Search heading labels its input without an added label row. Rating semantics use transparent native radios over the original stars; keyboard focus remains visible, and pointer clicks have no outline. Rating instructions/selected-value text, authentication hints, validation summaries, and status announcements are screen-reader-only and do not add rows or spacing. Visible field errors retain their styling; a failed review save also shows an error so users know their draft was not saved.
+
+Review forms validate before submitting and remain mounted while saving. The submit control retains focus and prevents duplicate requests; rating choices and text cannot change during the request. Cancel discards an unsaved draft without posting. Failed requests preserve values for retry. Successful saves wait for loader revalidation, announce completion, return focus to Edit, and allow reopening without stale success data. Each form owns its fetcher, and media-item changes reset the review section.
+
+The root and media-detail routes skip revalidation after a failed review action so an unavailable auth check or expired session cannot remove the draft. Successful saves and unrelated navigation keep the router's normal revalidation behavior. A draft is retained in the mounted form, not saved across navigation or a browser reload; copy it before leaving to sign in again. Full session-expiry recovery remains part of Phase 6.
+
+Search has an associated visible label, validation feedback, and focus returns to its input after clearing the search. Authentication fields expose required/invalid states, related error text, and autocomplete purposes. Server failures use alerts; duplicate registration email errors focus the email field. Password/photo descriptions are available to screen readers; visible requirements before submission remain open. The client photo limit matches the existing server limit of 5 MiB; no backend policy changed.
+
+Preserving the UI leaves some accessibility work unfinished: visible password/photo instructions, a visible rating-selection cue beyond color, and narrow-layout/zoom issues. Screen-reader-only text does not resolve these requirements for sighted users. Actual password-manager autofill, screen-reader operation/announcements, deployed integration, and final journey evaluation also remain pending. Messaging-specific forms and sending remain deferred. No hosted CI result is claimed here.
 
 ## Manual evaluation record
 

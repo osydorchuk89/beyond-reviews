@@ -98,7 +98,7 @@ test.describe("Page navigation", () => {
         await expect(
             page.getByText("The Open Road", { exact: true }),
         ).toBeVisible();
-        const input = page.getByPlaceholder("enter movie title");
+        const input = page.getByLabel("Search", { exact: true });
         await input.fill("Open");
         await page.evaluate(() => window.scrollTo(0, 80));
         const scrollBefore = await page.evaluate(() => window.scrollY);

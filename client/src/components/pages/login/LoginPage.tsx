@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
-import { useActionData } from "react-router";
+import { useState, useEffect, useRef } from "react";
+import { useActionData, useNavigation } from "react-router";
 import { LoginErrorAlert } from "./LoginErrorAlert";
 import { LoginForm } from "./LoginForm";
 
 export const LoginPage = () => {
     const actionData = useActionData() as { error?: string } | undefined;
     const [showError, setShowError] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const navigation = useNavigation();
 
-    // TODO: Think if I need to be able to close LoginErrorAlert
     useEffect(() => {
         if (actionData?.error) {
             setShowError(true);
@@ -16,13 +17,25 @@ export const LoginPage = () => {
 
     return (
         <div className="flex flex-col justify-center items-center py-10 h-[720px]">
-            <div className="flex flex-col justify-center items-center">
-                {showError && actionData?.error && (
-                    <LoginErrorAlert
-                        message={actionData.error}
-                        onClose={() => setShowError(false)}
-                    />
-                )}
+            <div
+                ref={containerRef}
+                className="flex flex-col justify-center items-center"
+            >
+                {showError &&
+                    navigation.state === "idle" &&
+                    actionData?.error && (
+                        <LoginErrorAlert
+                            message={actionData.error}
+                            onClose={() => {
+                                setShowError(false);
+                                containerRef.current
+                                    ?.querySelector<HTMLInputElement>(
+                                        'input[autocomplete="username"]',
+                                    )
+                                    ?.focus();
+                            }}
+                        />
+                    )}
                 <LoginForm />
             </div>
         </div>

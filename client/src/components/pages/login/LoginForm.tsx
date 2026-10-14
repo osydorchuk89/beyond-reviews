@@ -32,6 +32,7 @@ export const LoginForm = () => {
     });
 
     const onSubmit = (data: LoginInputs) => {
+        if (loginPending) return;
         submit(
             {
                 email: data.email,
@@ -61,8 +62,17 @@ export const LoginForm = () => {
                     type="email"
                     id="email"
                     placeholder="your@email.com"
+                    autoComplete="username"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    required
+                    readOnly={loginPending}
+                    aria-invalid={Boolean(errors.email)}
+                    aria-describedby={
+                        errors.email ? "login-email-error" : undefined
+                    }
                 />
-                <p className="text-red-700 font-medium">
+                <p id="login-email-error" className="text-red-700 font-medium">
                     {errors.email?.message}
                 </p>
             </div>
@@ -75,15 +85,37 @@ export const LoginForm = () => {
                     type="password"
                     id="password"
                     placeholder="password"
+                    autoComplete="current-password"
+                    required
+                    readOnly={loginPending}
+                    aria-invalid={Boolean(errors.password)}
+                    aria-describedby={
+                        errors.password ? "login-password-error" : undefined
+                    }
                 />
-                <p className="text-red-700 font-medium">
+                <p
+                    id="login-password-error"
+                    className="text-red-700 font-medium"
+                >
                     {errors.password?.message}
                 </p>
             </div>
 
-            <BaseButton type="submit" style="orange" disabled={loginPending}>
+            {Object.keys(errors).length > 0 && (
+                <p role="alert" className="sr-only">
+                    Please correct the fields above.
+                </p>
+            )}
+            <BaseButton
+                type="submit"
+                style="orange"
+                aria-disabled={loginPending}
+            >
                 {loginPending ? "Please wait..." : "LOGIN"}
             </BaseButton>
+            <p role="status" aria-atomic="true" className="sr-only">
+                {loginPending ? "Signing in…" : ""}
+            </p>
 
             <p className="text-center">
                 Don't have an account?{" "}

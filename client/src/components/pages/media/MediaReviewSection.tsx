@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import type { AuthData } from "../../../lib/entities";
 import { BaseLink } from "../../ui/BaseLink";
@@ -14,20 +14,28 @@ interface MediaReviewSectionProps {
     userReview?: MediaUserReview | null;
     authData: AuthData;
     mediaLabel: string;
-    fetcherKey: string;
 }
 
 export const MediaReviewSection = ({
     userReview,
     authData,
     mediaLabel,
-    fetcherKey,
 }: MediaReviewSectionProps) => {
     const userRating = userReview?.rating ?? 0;
     const userReviewText = userReview?.text ?? "";
 
     const [isEditing, setIsEditing] = useState(false);
     const [hasRated, setHasRated] = useState(userRating > 0);
+    const [status, setStatus] = useState("");
+    const editButtonRef = useRef<HTMLButtonElement>(null);
+    const restoreFocus = useRef(false);
+
+    useLayoutEffect(() => {
+        if (restoreFocus.current && !isEditing && hasRated) {
+            restoreFocus.current = false;
+            editButtonRef.current?.focus();
+        }
+    }, [isEditing, hasRated]);
 
     return (
         <div>
@@ -35,14 +43,18 @@ export const MediaReviewSection = ({
                 {authData.isAuthenticated && (!hasRated || isEditing) && (
                     <MovieReviewForm
                         mediaLabel={mediaLabel}
-                        fetcherKey={fetcherKey}
                         initialRating={userRating}
                         initialText={userReviewText}
                         hasRated={hasRated}
-                        onCancel={() => setIsEditing(false)}
+                        onCancel={() => {
+                            restoreFocus.current = true;
+                            setIsEditing(false);
+                        }}
                         onSuccess={() => {
                             setIsEditing(false);
                             setHasRated(true);
+                            restoreFocus.current = true;
+                            setStatus("Your review was saved.");
                         }}
                     />
                 )}
@@ -50,7 +62,11 @@ export const MediaReviewSection = ({
                     <MovieReviewDisplay
                         userRating={userRating}
                         userReview={userReviewText}
-                        onEdit={() => setIsEditing(true)}
+                        editButtonRef={editButtonRef}
+                        onEdit={() => {
+                            setStatus("");
+                            setIsEditing(true);
+                        }}
                     />
                 )}
                 {!authData.isAuthenticated && (
@@ -67,6 +83,9 @@ export const MediaReviewSection = ({
                     </p>
                 )}
             </div>
+            <p role="status" aria-atomic="true" className="sr-only">
+                {status}
+            </p>
         </div>
     );
 };

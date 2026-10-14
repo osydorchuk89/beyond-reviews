@@ -15,7 +15,7 @@
       },
       {
         "target": [
-          ".mb-5.w-full.flex-col > .text-sm.text-gray-500"
+          ".mb-5.flex-col.w-full > .text-sm.text-gray-500"
         ],
         "failedChecks": [
           "color-contrast"

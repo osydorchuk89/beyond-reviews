@@ -1,4 +1,7 @@
-import { createBrowserRouter } from "react-router";
+import {
+    createBrowserRouter,
+    type ShouldRevalidateFunctionArgs,
+} from "react-router";
 
 import { MainLayout } from "./components/MainLayout";
 import { UserLayout } from "./components/pages/user/UserLayout";
@@ -43,11 +46,27 @@ import { MoviePage } from "./components/pages/movie/MoviePage";
 import { BookPage } from "./components/pages/book/BookPage";
 import type { BookData, MovieData } from "./lib/entities";
 
+const revalidateAfterReview = ({
+    actionResult,
+    formAction,
+    defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs) => {
+    // Failed saves must not replace the draft with refreshed page/auth data.
+    if (
+        actionResult?.error &&
+        /\/(books|movies)\/[^/?]+$/.test(formAction ?? "")
+    ) {
+        return false;
+    }
+    return defaultShouldRevalidate;
+};
+
 export const router = createBrowserRouter([
     {
         Component: MainLayout,
         id: "root",
         loader: rootLoader,
+        shouldRevalidate: revalidateAfterReview,
         children: [
             {
                 children: [
@@ -91,6 +110,7 @@ export const router = createBrowserRouter([
                                             ?.title ?? "Book not found",
                                 },
                                 loader: bookLoader,
+                                shouldRevalidate: revalidateAfterReview,
                                 action: bookReviewAction,
                             },
                         ],
@@ -120,6 +140,7 @@ export const router = createBrowserRouter([
                                             ?.title ?? "Movie not found",
                                 },
                                 loader: movieLoader,
+                                shouldRevalidate: revalidateAfterReview,
                                 action: movieReviewAction,
                             },
                         ],

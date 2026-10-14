@@ -18,9 +18,11 @@ Test each phase on the pages it affects as you go. Before merging the PR, run th
 
 You do not need to finish a large testing setup before fixing urgent problems. Messaging-specific work remains deferred until after its refactor and is outside this PR.
 
-The review Cancel bug was fixed early in Phase 2. Prioritize the remaining review-save bug in Phase 3: a failed edit can **lose the draft without showing an error**.
+The urgent review bugs are fixed: Cancel no longer saves (Phase 2), and failed saves preserve the draft and show an error (Phase 3).
 
 No database changes are expected for this work.
+
+**Form appearance:** Keep the existing form layouts and styling from before Phase 3. Reuse visible text as labels and prefer changes to semantics and behavior. Form fixes that require a visible redesign remain pending; preserving the UI does not make those accessibility requirements pass.
 
 ## Phase 1 — Set up checks
 
@@ -53,6 +55,8 @@ Developer reference: use Playwright with axe for browser checks and the existing
 Developer reference: findings A01, A06, and A13. Improve shared buttons and links here so later fixes can reuse them.
 
 ## Phase 3 — Make forms and review saving reliable
+
+**Partly implemented on 14 October 2026, preserving the original form appearance:** the existing Search heading labels its input; form errors are associated with their fields; autofill hints, screen-reader descriptions, native keyboard-operable stars, and validated review saving are in place. Forms retain drafts after failed saves and restore useful focus. Added instruction rows, changed spacing/sizing, and moved alerts have been rolled back. Visible password/photo instructions and a rating-selection cue beyond color remain pending, along with actual password-manager and screen-reader evaluation. See the [checks and remaining evaluation](accessibility-testing.md#phase-3-validation).
 
 **Purpose:** Help people understand what to enter, correct mistakes, and keep their work.
 

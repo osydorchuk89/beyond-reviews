@@ -44,6 +44,7 @@ export const MoviePage = () => {
             <div className="flex flex-col md:flex-row gap-8 md:gap-10 py-6 sm:py-10">
                 <MovieMainInfo movie={movie} />
                 <MovieAdditionalInfo
+                    key={movie.id}
                     movie={movie}
                     userReview={movieReviewsData.userReview}
                 />

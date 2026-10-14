@@ -16,15 +16,17 @@ html {
     scroll-margin-block: 0.5rem;
 }
 
-/* A light inner outline and dark outer ring stay visible on both light and dark surfaces. */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+/* Form fields keep their original focus styles; other controls use a light/dark ring. */
+:where(a, button, [tabindex]):not(input, select, textarea):focus-visible,
+.rating-choice:has(input:focus-visible) {
     outline: 3px solid white;
     outline-offset: 2px;
     box-shadow: 0 0 0 5px #0c4a6e;
 }
 
 @media (forced-colors: active) {
-    :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    :where(a, button, [tabindex]):not(input, select, textarea):focus-visible,
+    .rating-choice:has(input:focus-visible) {
         outline-color: Highlight;
         box-shadow: none;
     }

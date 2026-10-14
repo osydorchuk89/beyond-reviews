@@ -15,7 +15,6 @@ export const MovieReviewSection = ({
             userReview={userReview}
             authData={authData}
             mediaLabel="movie"
-            fetcherKey="movie-review"
         />
     );
 };

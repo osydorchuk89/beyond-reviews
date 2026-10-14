@@ -1,4 +1,4 @@
-import { useRef, type RefObject } from "react";
+import { useRef, type Ref, type RefObject } from "react";
 
 import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
 import { BaseButton } from "../../ui/BaseButton";
@@ -7,12 +7,14 @@ interface MovieReviewDisplayProps {
     userRating: number;
     userReview: string;
     onEdit: () => void;
+    editButtonRef?: Ref<HTMLButtonElement>;
 }
 
 export const MovieReviewDisplay = ({
     userRating,
     userReview,
     onEdit,
+    editButtonRef,
 }: MovieReviewDisplayProps) => {
     const ref = useRef<HTMLParagraphElement>(null);
     const { isTruncated, isShowingMore, toggleIsShowingMore } =
@@ -44,7 +46,11 @@ export const MovieReviewDisplay = ({
                 )}
             </div>
             <div className="flex justify-start">
-                <BaseButton style="orange" handleClick={onEdit}>
+                <BaseButton
+                    ref={editButtonRef}
+                    style="orange"
+                    handleClick={onEdit}
+                >
                     EDIT YOUR REVIEW
                 </BaseButton>
             </div>

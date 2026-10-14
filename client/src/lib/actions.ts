@@ -3,6 +3,7 @@ import { isAxiosError } from "axios";
 
 import axiosInstance from "./axiosInstance";
 import { getAuthData } from "./api";
+import { ReviewSchema } from "./schemas";
 
 const getErrorMessage = (error: unknown, fallback: string): string => {
     if (isAxiosError<{ message?: unknown }>(error)) {
@@ -26,7 +27,10 @@ export const registrationAction = async ({ request }: { request: Request }) => {
         }
     } catch (error) {
         if (isAxiosError(error) && error.response?.status === 409) {
-            return { error: "User with this email already exists" };
+            return {
+                error: "User with this email already exists",
+                field: "email" as const,
+            };
         }
         return {
             error: getErrorMessage(error, "Registration failed"),
@@ -71,15 +75,23 @@ export const movieReviewAction = async ({
 }: ActionFunctionArgs) => {
     const { movieId } = params;
 
-    const authData = await getAuthData();
-    const userId = authData?.user?.id;
-
     const formData = await request.formData();
-    const rating = Number(formData.get("rating"));
-    const text = formData.get("text");
+    const validation = ReviewSchema.safeParse({
+        rating: formData.get("rating"),
+        text: formData.get("text") ?? "",
+    });
+    if (!validation.success) {
+        return { error: validation.error.issues[0].message };
+    }
+    const { rating, text } = validation.data;
     const date = new Date();
 
     try {
+        const authData = await getAuthData();
+        const userId = authData?.user?.id;
+        if (!authData.isAuthenticated || !userId) {
+            return { error: "Please sign in again before saving your review." };
+        }
         await axiosInstance.post(`/api/movies/${movieId}/reviews`, {
             movieId,
             userId,
@@ -101,15 +113,23 @@ export const bookReviewAction = async ({
 }: ActionFunctionArgs) => {
     const { bookId } = params;
 
-    const authData = await getAuthData();
-    const userId = authData?.user?.id;
-
     const formData = await request.formData();
-    const rating = Number(formData.get("rating"));
-    const text = formData.get("text");
+    const validation = ReviewSchema.safeParse({
+        rating: formData.get("rating"),
+        text: formData.get("text") ?? "",
+    });
+    if (!validation.success) {
+        return { error: validation.error.issues[0].message };
+    }
+    const { rating, text } = validation.data;
     const date = new Date();
 
     try {
+        const authData = await getAuthData();
+        const userId = authData?.user?.id;
+        if (!authData.isAuthenticated || !userId) {
+            return { error: "Please sign in again before saving your review." };
+        }
         await axiosInstance.post(`/api/books/${bookId}/reviews`, {
             bookId,
             userId,

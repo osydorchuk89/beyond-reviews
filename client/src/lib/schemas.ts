@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-const MAX_FILE_SIZE = 4500000;
+// Match the server's upload limit.
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = [
     "image/jpeg",
     "image/jpg",
@@ -33,7 +34,7 @@ export const UserSchema = z.object({
         if (files.length > 0 && files[0]?.size > MAX_FILE_SIZE) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "Photo size should not exceed 5MB",
+                message: "Photo size should not exceed 5 MiB",
             });
         }
         if (
@@ -60,9 +61,10 @@ export const LoginSchema = z.object({
 export const ReviewSchema = z.object({
     rating: z.coerce
         .number({
-            invalid_type_error: "Please select rating",
+            invalid_type_error: "Select a whole-number rating from 1 to 10",
         })
-        .min(1)
-        .max(10),
+        .int({ message: "Select a whole-number rating from 1 to 10" })
+        .min(1, { message: "Select a rating from 1 to 10" })
+        .max(10, { message: "Select a rating from 1 to 10" }),
     text: z.string().optional(),
 });
