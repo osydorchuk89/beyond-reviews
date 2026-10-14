@@ -7,11 +7,12 @@ export const HeroSection = () => {
             className={`bg-sky-800 flex gap-8 py-8 sm:py-20 ${horizontalPadding.page} text-white min-h-[80vh]`}
         >
             <div className="flex flex-col gap-12 sm:gap-20 w-full sm:w-1/2">
-                <p
+                <h1
+                    tabIndex={-1}
                     className={`${textSizes.heroTitle} font-bold text-center sm:text-start`}
                 >
                     Discover, Review, Connect
-                </p>
+                </h1>
                 <div className="flex justify-center sm:hidden">
                     <img
                         src="images/hero-image.png"

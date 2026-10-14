@@ -2,6 +2,8 @@
 
 Investigation date: 10 October 2026. Source baseline: `79a1499`.
 
+This is the original investigation record. For fixes completed since the audit and current test results, see the [testing guide and findings checklist](accessibility-testing.md#short-findings-checklist).
+
 This file records the investigation behind the [accessibility plan](accessibility-plan.md). The current implementation scope excludes user messaging until its planned refactor. Messaging findings are retained as a deferred backlog; they remain unresolved and must be addressed before claiming full-client conformance.
 
 The long-term goal is to make every client page and complete user workflow meet all applicable WCAG 2.2 Level A and AA criteria. Conformance covers full pages and complete processes, including error states and authentication. Automated checks alone cannot establish conformance. See the [W3C conformance requirements](https://www.w3.org/TR/WCAG22/#conformance-reqs).

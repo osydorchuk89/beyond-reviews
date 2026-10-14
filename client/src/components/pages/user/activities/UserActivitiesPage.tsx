@@ -95,19 +95,19 @@ export const UserActivitiesPage = () => {
                     Could not load {selectedTabLabel} activities.
                 </p>
             )}
-            {!isLoading && !hasError && activities.length > 0 && (
-                <>
-                    {activities.map((activity) => (
-                        <ActivityItem key={activity.id} activity={activity} />
-                    ))}
-                    {totalPages > 1 && (
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
-                </>
+            {!isLoading &&
+                !hasError &&
+                activities.length > 0 &&
+                activities.map((activity) => (
+                    <ActivityItem key={activity.id} activity={activity} />
+                ))}
+            {totalPages > 1 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    isLoading={isLoading}
+                />
             )}
             {!isLoading && !hasError && activities.length === 0 && (
                 <div className="flex flex-col items-center justify-center gap-10">

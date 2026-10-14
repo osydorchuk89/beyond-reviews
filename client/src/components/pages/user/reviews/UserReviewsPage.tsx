@@ -87,7 +87,7 @@ export const UserReviewsPage = () => {
     return (
         <div className="flex flex-col gap-6 sm:gap-10 min-h-[70vh] w-full max-w-4xl">
             <div className="flex flex-col items-center gap-5">
-                <p className="text-center text-xl font-bold">Reviews</p>
+                <h2 className="text-center text-xl font-bold">Reviews</h2>
                 <div className="flex flex-wrap justify-center gap-2">
                     {tabs.map((tab) => (
                         <BaseTab
@@ -111,31 +111,30 @@ export const UserReviewsPage = () => {
                 </p>
             )}
             {!isLoading && !hasError && reviews.length ? (
-                <>
-                    <ul className="flex flex-col gap-4">
-                        {activeTab === "movies"
-                            ? (reviews as MovieReview[]).map((review) => (
-                                  <MovieReviewDetails
-                                      key={review.id}
-                                      review={review}
-                                  />
-                              ))
-                            : (reviews as BookReview[]).map((review) => (
-                                  <BookReviewDetails
-                                      key={review.id}
-                                      review={review}
-                                  />
-                              ))}
-                    </ul>
-                    {totalPages > 1 && (
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
-                </>
+                <ul className="flex flex-col gap-4">
+                    {activeTab === "movies"
+                        ? (reviews as MovieReview[]).map((review) => (
+                              <MovieReviewDetails
+                                  key={review.id}
+                                  review={review}
+                              />
+                          ))
+                        : (reviews as BookReview[]).map((review) => (
+                              <BookReviewDetails
+                                  key={review.id}
+                                  review={review}
+                              />
+                          ))}
+                </ul>
             ) : null}
+            {totalPages > 1 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    isLoading={isLoading}
+                />
+            )}
             {!isLoading && !hasError && reviews.length === 0 && (
                 <div className="flex flex-col items-center justify-center gap-10">
                     <p className="text-center text-lg">

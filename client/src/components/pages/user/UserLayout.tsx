@@ -2,6 +2,8 @@ import {
     Link,
     Outlet,
     useLoaderData,
+    useLocation,
+    useMatches,
     useNavigation,
     useRouteLoaderData,
 } from "react-router";
@@ -10,6 +12,7 @@ import type { AuthData, User } from "../../../lib/entities";
 import { horizontalPadding } from "../../../styles/responsive";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { LoadingSpinner } from "../../ui/LoadingSpinner";
+import { getPageMetadata } from "../../../lib/pageMetadata";
 
 export const UserLayout = () => {
     const { authData } = useRouteLoaderData("root") as {
@@ -22,11 +25,14 @@ export const UserLayout = () => {
     const isSameUser = visitingUser && profileUser.id === visitingUser.id;
 
     const profileUserFullName = `${profileUser.firstName} ${profileUser.lastName}`;
+    const { pathname } = useLocation();
+    const { title } = getPageMetadata(useMatches());
 
     const navigation = useNavigation();
     const nextPathname = navigation.location?.pathname;
     const isNavigatingInsideUserProfile =
         navigation.state === "loading" &&
+        nextPathname !== pathname &&
         nextPathname?.startsWith(`/users/${profileUser.id}/`);
     const isLeavingUserProfile =
         navigation.state === "loading" &&
@@ -45,13 +51,15 @@ export const UserLayout = () => {
         <div
             className={`flex flex-col items-center gap-6 my-6 sm:my-10 w-full mx-auto ${horizontalPadding.page}`}
         >
-            <Link
+            <h1
+                tabIndex={-1}
                 className="text-center text-xl sm:text-2xl font-bold break-words"
-                to={`/users/${profileUser.id}/profile`}
-                relative="route"
             >
-                {profileUserFullName}
-            </Link>
+                <Link to={`/users/${profileUser.id}/profile`} relative="route">
+                    {profileUserFullName}
+                </Link>
+                <span className="sr-only"> — {title}</span>
+            </h1>
             {isNavigatingInsideUserProfile ? (
                 <LoadingSpinner />
             ) : (

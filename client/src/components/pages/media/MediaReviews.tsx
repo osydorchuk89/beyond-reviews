@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { MediaReviewCard, type MediaReviewCardData } from "./MediaReviewCard";
 import { Pagination } from "../../ui/Pagination";
@@ -33,7 +33,6 @@ interface MediaReviewsProps<
 }
 
 const REVIEWS_PER_PAGE = 10;
-const SCROLL_OFFSET = 80;
 
 export const MediaReviews = <
     TReview extends MediaReviewCardData,
@@ -48,22 +47,11 @@ export const MediaReviews = <
 }: MediaReviewsProps<TReview, TReviewsData>) => {
     const [reviewsData, setReviewsData] = useState(initialReviewsData);
     const [isLoading, setIsLoading] = useState(false);
-    const reviewsRef = useRef<HTMLDivElement>(null);
     const { reviews, currentPage, totalPages } = reviewsData;
 
     useEffect(() => {
         setReviewsData(initialReviewsData);
     }, [initialReviewsData]);
-
-    const scrollToReviews = () => {
-        if (reviewsRef.current) {
-            const top =
-                reviewsRef.current.getBoundingClientRect().top +
-                window.scrollY -
-                SCROLL_OFFSET;
-            window.scrollTo({ top, behavior: "smooth" });
-        }
-    };
 
     const handlePageChange = async (page: number) => {
         setIsLoading(true);
@@ -73,7 +61,6 @@ export const MediaReviews = <
                 ...data,
                 userReview: data.userReview ?? prevData.userReview,
             }));
-            scrollToReviews();
         } catch (error) {
             console.error(fetchErrorMessage, error);
         } finally {
@@ -82,9 +69,9 @@ export const MediaReviews = <
     };
 
     return (
-        <div ref={reviewsRef}>
+        <div>
             <hr className="h-px mb-5 bg-sky-400 border-0" />
-            <p className="text-center text-xl font-bold">User Reviews</p>
+            <h2 className="text-center text-xl font-bold">User Reviews</h2>
             <div className="flex flex-col my-5 gap-5">
                 {isLoading ? (
                     <LoadingSpinner />
@@ -112,6 +99,7 @@ export const MediaReviews = <
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={handlePageChange}
+                    isLoading={isLoading}
                 />
             )}
         </div>

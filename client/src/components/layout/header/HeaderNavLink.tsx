@@ -1,18 +1,21 @@
-import type { ReactNode } from "react";
-import { NavLink, type To } from "react-router";
+import type { ComponentPropsWithRef } from "react";
+import { NavLink } from "react-router";
 
-interface HeaderNavLinkProps {
-    to: To;
-    children: ReactNode;
-}
+type HeaderNavLinkProps = ComponentPropsWithRef<typeof NavLink>;
 
-export const HeaderNavLink = ({ to, children }: HeaderNavLinkProps) => {
+export const HeaderNavLink = ({
+    to,
+    children,
+    className,
+    ...props
+}: HeaderNavLinkProps) => {
     return (
         <NavLink
-            className={({ isActive }) =>
+            {...props}
+            className={(state) =>
                 `text-xl hover:text-orange-500 before:content-[attr(data-text)] before:font-semibold before:block before:h-0 before:overflow-hidden before:invisible ${
-                    isActive && "text-orange-500 font-semibold"
-                }`
+                    state.isActive ? "text-orange-500 font-semibold" : ""
+                } ${typeof className === "function" ? className(state) : (className ?? "")}`
             }
             to={to}
         >

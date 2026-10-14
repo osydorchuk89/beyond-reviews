@@ -1,10 +1,6 @@
-import { Outlet, useNavigation } from "react-router";
-
-import { LoadingSpinner } from "../../ui/LoadingSpinner";
+import { Outlet } from "react-router";
 
 export const MoviesLayout = () => {
-    const navigation = useNavigation();
-    const isLoading = navigation.state === "loading";
-
-    return <>{isLoading ? <LoadingSpinner /> : <Outlet />}</>;
+    // Keep catalog controls mounted while query parameters load new results.
+    return <Outlet />;
 };

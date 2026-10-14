@@ -14,12 +14,35 @@ export const MobileMenu = ({ user }: MobileMenuProps) => {
     const { isMenuOpen, openMenu, closeMenu } = useMobileMenuStore(
         (state) => state,
     );
-    const location = useLocation();
+    const { pathname } = useLocation();
+    const userId = user?.id;
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: Route and user changes intentionally close the menu.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: Close on page or account changes, not on query updates or data revalidation.
     useEffect(() => {
         closeMenu();
-    }, [location.pathname, user, closeMenu]);
+    }, [pathname, userId, closeMenu]);
+
+    useEffect(() => {
+        const desktop = window.matchMedia("(min-width: 40rem)");
+        const handleResize = () => {
+            if (!desktop.matches || !useMobileMenuStore.getState().isMenuOpen)
+                return;
+            closeMenu();
+            // The mobile trigger is hidden on desktop, so restore focus to visible navigation.
+            requestAnimationFrame(() => {
+                const navigation = document.querySelector(
+                    'nav[aria-label="Primary navigation"]',
+                );
+                const target =
+                    navigation?.querySelector<HTMLAnchorElement>(
+                        'a[aria-current="page"]',
+                    ) ?? navigation?.querySelector<HTMLAnchorElement>("a");
+                target?.focus();
+            });
+        };
+        desktop.addEventListener("change", handleResize);
+        return () => desktop.removeEventListener("change", handleResize);
+    }, [closeMenu]);
 
     return (
         <>
@@ -28,11 +51,13 @@ export const MobileMenu = ({ user }: MobileMenuProps) => {
                 onClick={openMenu}
                 className="sm:hidden p-2 hover:bg-sky-700 rounded-lg cursor-pointer"
                 aria-label="Toggle menu"
+                aria-expanded={isMenuOpen}
+                aria-controls={isMenuOpen ? "mobile-navigation" : undefined}
             >
                 <MenuIcon />
             </button>
 
-            {isMenuOpen && <MobileMenuModal />}
+            <MobileMenuModal />
         </>
     );
 };

@@ -28,7 +28,12 @@ export function MediaCatalogPage<TData>({
 }: MediaCatalogPageProps<TData>) {
     return (
         <div className="flex flex-col w-full mb-5">
-            <p className="text-4xl text-center font-bold py-5 mb-5">{title}</p>
+            <h1
+                tabIndex={-1}
+                className="text-4xl text-center font-bold py-5 mb-5"
+            >
+                {title}
+            </h1>
             <div
                 className={`flex flex-col lg:flex-row items-center gap-4 lg:items-start ${horizontalPadding.page}`}
             >

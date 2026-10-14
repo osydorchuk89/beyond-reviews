@@ -7,7 +7,10 @@ interface UserButtonProps {
 
 export const UserButton = ({ user }: UserButtonProps) => {
     return (
-        <Link to={`/users/${user?.id}/profile`}>
+        <Link
+            to={`/users/${user.id}/profile`}
+            aria-label={`Your profile: ${user.firstName} ${user.lastName}`}
+        >
             <div className="flex justify-center items-center w-12 h-12 rounded-full overflow-hidden bg-orange-300 hover:bg-orange-500 cursor-pointer">
                 <p className="text-orange-950">
                     {user.firstName[0] + user.lastName[0]}

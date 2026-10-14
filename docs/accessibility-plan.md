@@ -1,6 +1,6 @@
 # Client accessibility plan: WCAG 2.2 AA
 
-Updated: 13 October 2026. Based on the code review and local browser checks at `79a1499`.
+Updated: 14 October 2026. Based on the code review and local browser checks at `79a1499`, with implementation progress recorded below.
 
 The goal is to make the client easier to use with a keyboard, screen reader, enlarged text, and small screens, and to meet the applicable WCAG 2.2 Level A and AA requirements.
 
@@ -18,7 +18,7 @@ Test each phase on the pages it affects as you go. Before merging the PR, run th
 
 You do not need to finish a large testing setup before fixing urgent problems. Messaging-specific work remains deferred until after its refactor and is outside this PR.
 
-Fix the review bugs early: **Cancel currently saves a review**, and a failed review edit can **lose the draft without showing an error**. These fixes are described in Phase 3 and can be brought forward.
+The review Cancel bug was fixed early in Phase 2. Prioritize the remaining review-save bug in Phase 3: a failed edit can **lose the draft without showing an error**.
 
 No database changes are expected for this work.
 
@@ -39,6 +39,8 @@ Developer reference: use Playwright with axe for browser checks and the existing
 
 ## Phase 2 — Make navigation easier
 
+**Implemented on 14 October 2026:** a keyboard-friendly mobile menu, a skip link, named navigation and main content, page headings and titles, visible focus, and focus that follows page changes while staying on filters, tabs, and pagination. Shared controls now accept accessibility attributes and refs. Review Cancel no longer submits the form. See the [validation and remaining manual checks](accessibility-testing.md#phase-2-validation). Screen-reader evaluation and the final checks in Phase 6 remain pending.
+
 **Purpose:** Help people move around the app and understand where they are.
 
 - Make the mobile menu work with the keyboard: focus enters it, stays inside while open, Escape closes it, and focus returns to the menu button.
@@ -57,7 +59,7 @@ Developer reference: findings A01, A06, and A13. Improve shared buttons and link
 - Give search and form fields clear labels and instructions. Connect error messages to the affected fields and announce failures.
 - Make login and registration work with password managers and pasted credentials. Show password and upload requirements before submission.
 - Make the 1–10 rating a clearly named choice with a selected value that keyboard and screen-reader users can understand.
-- Fix review Cancel so it never saves. Validate before saving, keep the form and draft during requests, show save errors, and preserve useful focus.
+- Keep review Cancel from saving (fixed in Phase 2). Validate before saving, keep the form and draft during requests, show save errors, and preserve useful focus.
 
 **Done when:** People can complete forms, correct errors, select a rating, cancel an edit, and retry a failed save without losing their draft or place.
 

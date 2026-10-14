@@ -1,21 +1,5 @@
 [
   {
-    "rule": "landmark-one-main",
-    "findings": [
-      "A06"
-    ],
-    "nodes": [
-      {
-        "target": [
-          "html"
-        ],
-        "failedChecks": [
-          "page-has-main"
-        ]
-      }
-    ]
-  },
-  {
     "rule": "list",
     "findings": [
       "A12"
@@ -27,54 +11,6 @@
         ],
         "failedChecks": [
           "only-listitems"
-        ]
-      }
-    ]
-  },
-  {
-    "rule": "page-has-heading-one",
-    "findings": [
-      "A06"
-    ],
-    "nodes": [
-      {
-        "target": [
-          "html"
-        ],
-        "failedChecks": [
-          "page-has-heading-one"
-        ]
-      }
-    ]
-  },
-  {
-    "rule": "region",
-    "findings": [
-      "A06"
-    ],
-    "nodes": [
-      {
-        "target": [
-          ".gap-5 > .text-center.text-xl.font-bold"
-        ],
-        "failedChecks": [
-          "region"
-        ]
-      },
-      {
-        "target": [
-          ".sm\\:gap-10 > ul"
-        ],
-        "failedChecks": [
-          "region"
-        ]
-      },
-      {
-        "target": [
-          ".sm\\:text-2xl"
-        ],
-        "failedChecks": [
-          "region"
         ]
       }
     ]

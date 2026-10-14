@@ -3,3 +3,29 @@
 * {
     box-sizing: border-box;
 }
+
+:root {
+    --header-height: 6rem;
+}
+
+html {
+    scroll-padding-block-start: calc(var(--header-height) + 0.75rem);
+}
+
+:where(a, button, input, select, textarea, [tabindex]) {
+    scroll-margin-block: 0.5rem;
+}
+
+/* A light inner outline and dark outer ring stay visible on both light and dark surfaces. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid white;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px #0c4a6e;
+}
+
+@media (forced-colors: active) {
+    :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+        outline-color: Highlight;
+        box-shadow: none;
+    }
+}

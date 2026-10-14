@@ -55,13 +55,15 @@ export const ProfilePage = () => {
                 className="object-cover object-top w-28 h-28 sm:w-32 sm:h-32 rounded-full self-center"
                 alt="user avatar"
             />
-            <ul className="flex flex-col items-center gap-5 text-lg">
-                {visibleNavLinks.map((link) => (
-                    <BaseLink key={link.text} to={link.to}>
-                        {link.text}
-                    </BaseLink>
-                ))}
-            </ul>
+            <nav aria-label="Profile">
+                <ul className="flex flex-col items-center gap-5 text-lg">
+                    {visibleNavLinks.map((link) => (
+                        <li key={link.text}>
+                            <BaseLink to={link.to}>{link.text}</BaseLink>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
             <div className="flex justify-center">
                 {visitingUser && !isSameUser && !areFriends && (
                     <div className="w-full sm:w-auto flex justify-center text-center">

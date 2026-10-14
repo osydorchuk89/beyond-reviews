@@ -1,11 +1,24 @@
-interface CloseIconProps {
+import type { ComponentPropsWithRef } from "react";
+
+interface CloseIconProps
+    extends Omit<ComponentPropsWithRef<"button">, "style"> {
     handleClick?: () => void;
     style: "dark" | "light";
 }
 
-export const CloseIcon = ({ handleClick, style }: CloseIconProps) => {
+export const CloseIcon = ({
+    handleClick,
+    style,
+    onClick,
+    ...props
+}: CloseIconProps) => {
     return (
-        <button onClick={handleClick} type="button" aria-label="Close">
+        <button
+            type="button"
+            aria-label="Close"
+            {...props}
+            onClick={handleClick ?? onClick}
+        >
             <svg
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"

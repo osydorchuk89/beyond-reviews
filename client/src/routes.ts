@@ -41,6 +41,7 @@ import {
 import { MoviesLayout } from "./components/pages/movies/MoviesLayout";
 import { MoviePage } from "./components/pages/movie/MoviePage";
 import { BookPage } from "./components/pages/book/BookPage";
+import type { BookData, MovieData } from "./lib/entities";
 
 export const router = createBrowserRouter([
     {
@@ -50,10 +51,15 @@ export const router = createBrowserRouter([
         children: [
             {
                 children: [
-                    { index: true, Component: HeroSection },
+                    {
+                        index: true,
+                        Component: HeroSection,
+                        handle: { title: "Home" },
+                    },
                     {
                         path: "login",
                         Component: LoginPage,
+                        handle: { title: "Log in" },
                         loader: loginLoader,
                         action: loginAction,
                     },
@@ -64,6 +70,7 @@ export const router = createBrowserRouter([
                     {
                         path: "registration",
                         Component: RegistrationPage,
+                        handle: { title: "Register" },
                         action: registrationAction,
                     },
                     {
@@ -72,11 +79,17 @@ export const router = createBrowserRouter([
                             {
                                 index: true,
                                 Component: BooksPage,
+                                handle: { title: "Books" },
                                 loader: booksLoader,
                             },
                             {
                                 path: ":bookId",
                                 Component: BookPage,
+                                handle: {
+                                    title: (data: unknown) =>
+                                        (data as BookData | undefined)?.book
+                                            ?.title ?? "Book not found",
+                                },
                                 loader: bookLoader,
                                 action: bookReviewAction,
                             },
@@ -85,6 +98,7 @@ export const router = createBrowserRouter([
                     {
                         path: "music",
                         Component: MusicPage,
+                        handle: { title: "Music" },
                     },
                     {
                         path: "movies",
@@ -94,11 +108,17 @@ export const router = createBrowserRouter([
                             {
                                 index: true,
                                 Component: MoviesPage,
+                                handle: { title: "Movies" },
                                 loader: moviesLoader,
                             },
                             {
                                 path: ":movieId",
                                 Component: MoviePage,
+                                handle: {
+                                    title: (data: unknown) =>
+                                        (data as MovieData | undefined)?.movie
+                                            ?.title ?? "Movie not found",
+                                },
                                 loader: movieLoader,
                                 action: movieReviewAction,
                             },
@@ -116,40 +136,48 @@ export const router = createBrowserRouter([
                                     {
                                         path: "profile",
                                         Component: ProfilePage,
+                                        handle: { title: "Profile" },
                                     },
                                     {
                                         path: "activities",
                                         Component: UserActivitiesPage,
+                                        handle: { title: "Activities" },
                                         loader: userActivitiesLoader,
                                     },
                                     {
                                         path: "friends",
                                         Component: UserFriendsPage,
+                                        handle: { title: "Friends" },
                                         loader: userFriendsLoader,
                                     },
                                     {
                                         path: "messages",
                                         Component: UserMessagesPage,
+                                        handle: { title: "Messages" },
                                         loader: protectedLoader,
                                     },
                                     {
                                         path: "wishlist",
                                         Component: UserWishlistPage,
+                                        handle: { title: "Wishlist" },
                                         loader: userWishlistLoader,
                                     },
                                     {
                                         path: "watch-list",
                                         Component: UserWishlistPage,
+                                        handle: { title: "Wishlist" },
                                         loader: userWishlistLoader,
                                     },
                                     {
                                         path: "reviews",
                                         Component: UserReviewsPage,
+                                        handle: { title: "Reviews" },
                                         loader: userReviewsLoader,
                                     },
                                     {
                                         path: "settings",
                                         Component: UserSettingsPage,
+                                        handle: { title: "Settings" },
                                         loader: protectedLoader,
                                     },
                                 ],
@@ -160,6 +188,7 @@ export const router = createBrowserRouter([
                     {
                         path: "*",
                         Component: NotFoundPage,
+                        handle: { title: "Page not found" },
                     },
                 ],
             },

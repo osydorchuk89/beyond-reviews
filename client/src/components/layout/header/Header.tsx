@@ -31,13 +31,17 @@ export const Header = () => {
             >
                 Beyond Reviews
             </Link>
-            <ul className="hidden sm:flex flex-row gap-8">
-                {headerNavLinks.map((link) => (
-                    <li key={link.text}>
-                        <HeaderNavLink to={link.to}>{link.text}</HeaderNavLink>
-                    </li>
-                ))}
-            </ul>
+            <nav aria-label="Primary navigation" className="hidden sm:block">
+                <ul className="flex flex-row gap-8">
+                    {headerNavLinks.map((link) => (
+                        <li key={link.text}>
+                            <HeaderNavLink to={link.to}>
+                                {link.text}
+                            </HeaderNavLink>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
 
             {authData.user ? (
                 <div className="hidden sm:flex gap-4 justify-center items-center">

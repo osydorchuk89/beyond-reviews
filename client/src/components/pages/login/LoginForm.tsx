@@ -49,9 +49,9 @@ export const LoginForm = () => {
             onSubmit={handleSubmit(onSubmit)}
             data-testid="login-form"
         >
-            <p className="text-2xl font-bold text-center">
+            <h1 tabIndex={-1} className="text-2xl font-bold text-center">
                 Login to your account
-            </p>
+            </h1>
 
             <div className="flex flex-col gap-2">
                 <label htmlFor="email">Email:</label>

@@ -18,8 +18,8 @@ export const MoviePage = () => {
         return (
             <div className="flex flex-col justify-center items-center gap-12 min-h-[80vh]">
                 <article className="flex flex-col gap-4 text-center text-xl">
-                    <h2>Oops!</h2>
-                    <h2>The page for this movie does not exist</h2>
+                    <h1 tabIndex={-1}>Movie not found</h1>
+                    <p>The page for this movie does not exist</p>
                 </article>
                 <ButtonLink to="/movies" style="orange">
                     BACK TO ALL MOVIES

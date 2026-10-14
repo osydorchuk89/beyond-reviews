@@ -1,6 +1,8 @@
+import type { ComponentPropsWithRef } from "react";
 import { buttonStyles } from "../../styles/buttonStyles";
 
-interface BaseButtonProps {
+interface BaseButtonProps
+    extends Omit<ComponentPropsWithRef<"button">, "style"> {
     style: keyof typeof buttonStyles;
     children: React.ReactNode;
     type?: "submit" | "reset" | "button";
@@ -11,16 +13,20 @@ interface BaseButtonProps {
 export const BaseButton = ({
     style,
     children,
-    type,
-    disabled,
+    type = "button",
     handleClick,
+    onClick,
+    className,
+    ...props
 }: BaseButtonProps) => {
     return (
         <button
-            className={buttonStyles[style]}
-            onClick={handleClick}
+            {...props}
+            className={[buttonStyles[style], className]
+                .filter(Boolean)
+                .join(" ")}
+            onClick={handleClick ?? onClick}
             type={type}
-            disabled={disabled}
         >
             {children}
         </button>

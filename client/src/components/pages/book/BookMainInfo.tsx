@@ -22,9 +22,12 @@ export const BookMainInfo = ({ book }: BookMainInfoProps) => {
                     <BookBookmark book={book} authData={authData} />
                 </div>
             )}
-            <p className="mb-3 md:mb-0 text-2xl sm:text-3xl md:text-4xl text-center font-semibold">
+            <h1
+                tabIndex={-1}
+                className="mb-3 md:mb-0 text-2xl sm:text-3xl md:text-4xl text-center font-semibold"
+            >
                 {book.title}
-            </p>
+            </h1>
             <p className="text-lg text-center font-semibold">
                 {book.authors.join(", ") || "Unknown author"}
             </p>

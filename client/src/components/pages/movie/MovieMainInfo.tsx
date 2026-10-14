@@ -24,9 +24,12 @@ export const MovieMainInfo = ({ movie }: MovieMainInfoProps) => {
                     <MovieBookmark movie={movie} authData={authData} />
                 </div>
             )}
-            <p className="mb-6 md:mb-0 text-2xl sm:text-3xl md:text-4xl text-center font-semibold">
+            <h1
+                tabIndex={-1}
+                className="mb-6 md:mb-0 text-2xl sm:text-3xl md:text-4xl text-center font-semibold"
+            >
                 {movie.title}
-            </p>
+            </h1>
             <p className="text-xl font-semibold">
                 <QueryLink
                     onClick={() =>

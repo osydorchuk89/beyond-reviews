@@ -1,4 +1,6 @@
-interface ArrowIconProps {
+import type { ComponentPropsWithRef } from "react";
+
+interface ArrowIconProps extends ComponentPropsWithRef<"button"> {
     direction: "left" | "right";
     onClick: () => void;
     disabled?: boolean;
@@ -8,6 +10,8 @@ export const ArrowIcon = ({
     onClick,
     direction,
     disabled = false,
+    className,
+    ...props
 }: ArrowIconProps) => {
     const label =
         direction === "left"
@@ -16,7 +20,8 @@ export const ArrowIcon = ({
 
     return (
         <button
-            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fuchsia-700 text-white hover:bg-fuchsia-800 disabled:cursor-not-allowed disabled:bg-fuchsia-300 disabled:text-fuchsia-50"
+            {...props}
+            className={`flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fuchsia-700 text-white hover:bg-fuchsia-800 disabled:cursor-not-allowed disabled:bg-fuchsia-300 disabled:text-fuchsia-50 ${className ?? ""}`}
             onClick={onClick}
             type="button"
             aria-label={label}

@@ -62,6 +62,11 @@ export async function analyze(page: Page) {
 }
 
 export async function scan(page: Page, info: TestInfo, state: string) {
+    if ((await page.getByRole("dialog").count()) === 0) {
+        await expect(page.getByRole("main")).toHaveCount(1);
+        await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+        await expect(page).not.toHaveTitle("Beyond Reviews");
+    }
     const results = await analyze(page);
     await info.attach(`${state}-axe.json`, {
         body: JSON.stringify(

@@ -1,6 +1,6 @@
 # Accessibility checks and remaining work
 
-Phase 1 setup: 13 October 2026. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet.
+Updated: 14 October 2026, after Phase 2. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet.
 
 ## Run the checks
 
@@ -41,6 +41,11 @@ Use `api.respond(method, path, { status, body })` to add a response for an error
 - Empty/populated profiles, wishlist, reviews, activity, friends, and settings.
 - Book/movie review creation and edit forms, locked/available recommendations, switched wishlist tabs, and failed review-tab loads.
 - A regression probe that adds an unlabeled input and confirms that a new defect is detected.
+- Keyboard entry, focus containment, Escape, closing, destination links, resizing, scrolling, and logout in the mobile menu.
+- Skip links, page headings/titles, Back/Forward focus, forced-color focus outlines, and focus during search, filters, tabs, and pagination.
+- Missing media, the existing user-route error boundary, and review Cancel without a save request.
+
+`pages.spec.ts` contains the axe scans. `navigation.spec.ts` checks navigation and keyboard behavior. Every non-dialog scanned state also requires one main landmark, one main heading, and a page-specific document title. When the modal menu is open, its background is intentionally unavailable to assistive technology.
 
 Tests wait for the expected content or error before scanning. They fail on an unexpected application crash rather than treating its error screen as a successful page scan.
 
@@ -66,24 +71,24 @@ Changed selectors can change a fingerprint without changing the defect. Review t
 
 ## Short findings checklist
 
-Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). The initial findings remain open; Phase 1 adds checks and does not fix the UI. The client maintainer owns follow-up. Record the retest date and evidence when closing an item.
+Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). Phase 1 added checks; Phase 2 implements navigation fixes and the early Cancel fix. The client maintainer owns follow-up. Automated results below cover the specified states; screen-reader and final journey evaluation remain pending.
 
 | ID | What needs fixing | Planned phase | Status / retest |
 | --- | --- | --- | --- |
-| A01 | Mobile-menu keyboard and focus behavior | 2 | Open; behavioral retest pending |
-| A02 | Review Cancel, validation, rating labels and selection | 3, urgent fixes early | Open; behavioral retest pending |
+| A01 | Mobile-menu keyboard and focus behavior | 2 | Implemented; automated keyboard retest passed 14 October; screen-reader/final journey checks pending |
+| A02 | Review Cancel, validation, rating labels and selection | 3, urgent fixes early | Cancel fixed and retested for books/movies 14 October; rating and validation work remains open |
 | A03 | Review draft loss and focus during saves | 3, urgent fixes early | Open; success/failure retest pending |
 | A04 | Search labels | 3 | Open; message-input portion deferred |
 | A05 | Authentication labels, errors, instructions, autofill | 3 | Open; password-manager and screen-reader retest pending |
-| A06 | Main content, headings, titles, route focus | 2 | Open; structural baseline and manual retest pending |
-| A07 | Tabs, toggles, and selected filters | 4 | Open; chat-selection portion deferred |
+| A06 | Main content, headings, titles, route focus | 2 | Implemented for normal/placeholder/missing-item pages and the existing user error boundary; structural and route-focus checks passed 14 October; screen-reader evaluation pending |
+| A07 | Tabs, toggles, and selected filters | 4 | Open; pagination now exposes its current page and unavailable controls; chat-selection portion deferred |
 | A08 | Contrast | 5 | Open; contrast baseline and rendered-state retest pending |
 | A09 | Narrow layouts, zoom, and text spacing | 5 | Open; messaging layout portion deferred |
 | A10 | Loading, errors, success feedback, removed-control focus | 4 | Open; announcements and failures retest pending |
 | A11 | Message input, sending, history, and announcements | After refactor | Deferred; remains unresolved |
-| A12 | Link/image names and list structure | 4 | Open; chat-list portion deferred |
-| A13 | Visible focus and keyboard access in scrolling areas | 2, 4, 5 | Open; full keyboard/zoom retest pending |
-| A14 | Error recovery and timed feedback | 6 | Open; process/timing retest pending |
+| A12 | Link/image names and list structure | 4 | Profile navigation list and header profile-link name fixed in Phase 2; media/image work remains open; chat-list portion deferred |
+| A13 | Visible focus and keyboard access in scrolling areas | 2, 4, 5 | Partly implemented: shared focus outlines, header scroll clearance, scrollable menu, and stable paging focus retested 14 October; full scrolling/zoom checks remain open |
+| A14 | Error recovery and timed feedback | 6 | Open; existing user error page has a heading/title; root/catalog error recovery and process/timing evaluation remain pending |
 
 ## Phase 1 validation
 
@@ -95,6 +100,24 @@ Local validation on 13 October 2026 used Windows, Node 22.15.0, Playwright 1.64.
 - The CI guard rejected an attempted baseline update. Documentation links and the 55-criterion checklist were checked.
 
 The GitHub Actions workflow is configured; its first hosted run remains pending a push or PR. The local checks above do not close the known accessibility findings or replace the final manual/deployed evaluation.
+
+## Phase 2 validation
+
+Local validation on 14 October 2026:
+
+- All 70 browser tests passed with baseline updates disabled: the original 37 tests and 33 new navigation/keyboard tests. The original 39 axe scan states remain covered.
+- All eight component tests passed, including a regression check that ordinary buttons do not submit forms and explicit submit buttons still do.
+- Linting and the production build, including TypeScript checking, passed. Vite still reports the existing advisory about a bundle larger than 500 kB.
+- Reviewed all 39 baseline diffs. Changes only remove existing failing elements: 432 recorded rule/element occurrences became 43, and 20 states now have empty failure lists. This counts repeated findings across states, not unique defects or WCAG criteria. No new failing elements were accepted.
+- Visually checked the mobile menu and its focused close control in the browser screenshot attached to the keyboard test report.
+
+The mobile menu uses the already installed [Headless UI Dialog](https://headlessui.com/react/dialog). It provides a named modal, background isolation, focus containment, and focus restoration, following the [WAI modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/). Menu links close it before destination focus is applied; switching to desktop closes it and focuses visible navigation. Short menus scroll to focused controls.
+
+Route metadata supplies titles. `PageNavigation` moves focus to the destination heading after a pathname change, including browser history, and leaves initial-load focus alone. Query changes, local tabs, and revalidation keep their initiating control. Catalog controls and pagination stay mounted while requests run; paging controls expose unavailable states without discarding focus. Shared buttons, links, tabs, and icon buttons forward native attributes and refs for later phases. The sticky header is currently 6rem high; keep `--header-height` in `index.css` in sync if that changes.
+
+Vite ignores test snapshots and reports so writing them cannot reload a page in the middle of a test. Reports, screenshots, and build output remain untracked.
+
+These are local Chromium checks with synthetic data. Actual screen-reader use, broader contrast/layout/zoom evaluation, root/catalog error recovery, real authentication/backend integration, the deployed build, and the remaining phases still need evaluation. Messaging-specific work remains deferred. No hosted CI result is claimed here.
 
 ## Manual evaluation record
 

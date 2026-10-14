@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 
 import { BaseButton } from "./BaseButton";
@@ -6,16 +7,29 @@ interface PaginationProps {
     currentPage: number;
     totalPages: number;
     onPageChange?: (page: number) => void;
+    isLoading?: boolean;
 }
 
 export const Pagination = ({
     currentPage,
     totalPages,
     onPageChange,
+    isLoading = false,
 }: PaginationProps) => {
     const [_searchParams, setSearchParams] = useSearchParams();
+    const navigationRef = useRef<HTMLElement>(null);
+
+    useLayoutEffect(() => {
+        if (isLoading || currentPage < 1) return;
+        // Results can change height. Keep the user's focused paging control visible.
+        navigationRef.current
+            ?.querySelector<HTMLElement>(":focus")
+            ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }, [currentPage, isLoading]);
 
     const handlePageChange = (page: number) => {
+        if (isLoading || page < 1 || page > totalPages || page === currentPage)
+            return;
         if (onPageChange) {
             onPageChange(page);
             return;
@@ -56,11 +70,15 @@ export const Pagination = ({
     };
 
     return (
-        <div className="flex justify-center items-center gap-2 my-8">
+        <nav
+            ref={navigationRef}
+            aria-label="Pagination"
+            className="flex justify-center items-center gap-2 my-8"
+        >
             <BaseButton
                 handleClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                style="orange"
+                aria-disabled={isLoading || currentPage === 1}
+                style={isLoading || currentPage === 1 ? "disabled" : "orange"}
             >
                 PREVIOUS
             </BaseButton>
@@ -75,6 +93,8 @@ export const Pagination = ({
                         type="button"
                         key={page}
                         onClick={() => handlePageChange(page)}
+                        aria-current={currentPage === page ? "page" : undefined}
+                        aria-disabled={isLoading}
                         className={`cursor-pointer px-4 py-2 rounded-lg ${
                             currentPage === page
                                 ? "bg-sky-500 text-white"
@@ -88,11 +108,15 @@ export const Pagination = ({
 
             <BaseButton
                 handleClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                style="orange"
+                aria-disabled={isLoading || currentPage === totalPages}
+                style={
+                    isLoading || currentPage === totalPages
+                        ? "disabled"
+                        : "orange"
+                }
             >
                 NEXT
             </BaseButton>
-        </div>
+        </nav>
     );
 };

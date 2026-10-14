@@ -1,4 +1,10 @@
-import { useRouteLoaderData } from "react-router";
+import {
+    Dialog,
+    DialogBackdrop,
+    DialogPanel,
+    DialogTitle,
+} from "@headlessui/react";
+import { useLocation, useRouteLoaderData } from "react-router";
 
 import { useMobileMenuStore } from "../../../store";
 import { CloseIcon } from "../../icons/CloseIcon";
@@ -10,23 +16,39 @@ import type { AuthData } from "../../../lib/entities";
 
 export const MobileMenuModal = () => {
     const { authData } = useRouteLoaderData("root") as { authData: AuthData };
-    const { closeMenu } = useMobileMenuStore((state) => state);
+    const { isMenuOpen, closeMenu } = useMobileMenuStore((state) => state);
+    const { pathname } = useLocation();
 
     return (
-        <>
-            <button
-                type="button"
-                aria-label="Close menu"
-                className="sm:hidden fixed inset-0 bg-black/70 z-40"
-                onClick={closeMenu}
-            />
-            <div className="sm:hidden fixed top-0 right-0 h-full w-64 bg-sky-800 z-50 shadow-xl">
+        <Dialog
+            open={isMenuOpen}
+            onClose={closeMenu}
+            className="fixed inset-0 z-50"
+        >
+            <DialogBackdrop className="fixed inset-0 bg-black/70" />
+            <DialogPanel
+                id="mobile-navigation"
+                className="fixed top-0 right-0 h-dvh w-64 max-w-full overflow-y-auto bg-sky-800 text-white shadow-xl pb-6"
+            >
+                <DialogTitle className="sr-only">Navigation menu</DialogTitle>
                 <div className="flex justify-end p-4">
-                    <CloseIcon style="light" handleClick={closeMenu} />
+                    <CloseIcon
+                        style="light"
+                        handleClick={closeMenu}
+                        aria-label="Close menu"
+                        data-autofocus
+                    />
                 </div>
-                <nav className="flex flex-col px-4 gap-2">
+                <nav
+                    aria-label="Mobile navigation"
+                    className="flex flex-col px-4 gap-2"
+                >
                     {headerNavLinks.map((link) => (
-                        <HeaderNavLink key={link.to} to={link.to}>
+                        <HeaderNavLink
+                            key={link.to}
+                            to={link.to}
+                            onClick={closeMenu}
+                        >
                             {link.text}
                         </HeaderNavLink>
                     ))}
@@ -37,6 +59,7 @@ export const MobileMenuModal = () => {
                         <div className="flex flex-col gap-4">
                             <HeaderNavLink
                                 to={`/users/${authData.user?.id}/profile`}
+                                onClick={closeMenu}
                             >
                                 Your profile
                             </HeaderNavLink>
@@ -46,13 +69,14 @@ export const MobileMenuModal = () => {
                         <ButtonLink
                             style="orange"
                             to="/login"
-                            state={{ from: location.pathname }}
+                            onClick={closeMenu}
+                            state={{ from: pathname }}
                         >
                             LOGIN
                         </ButtonLink>
                     )}
                 </nav>
-            </div>
-        </>
+            </DialogPanel>
+        </Dialog>
     );
 };
