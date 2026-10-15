@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { SearchItem } from "../../../lib/entities";
 import { CloseIcon } from "../../icons/CloseIcon";
 
@@ -14,6 +15,7 @@ export const SortFilterItem = ({
     handleItemClick,
     handleCancelSortFilter,
 }: SortFilterItemProps) => {
+    const buttonRef = useRef<HTMLButtonElement>(null);
     return (
         <li
             className={`w-full flex relative items-center gap-2 text-orange-950 px-2 rounded-md ${
@@ -23,7 +25,9 @@ export const SortFilterItem = ({
             }`}
         >
             <button
+                ref={buttonRef}
                 type="button"
+                aria-pressed={isItemActive(item)}
                 className="w-full py-2 cursor-pointer"
                 onClick={() => handleItemClick(item)}
             >
@@ -33,7 +37,11 @@ export const SortFilterItem = ({
                 <div className="absolute top-2 right-2">
                     <CloseIcon
                         style="dark"
-                        handleClick={() => handleCancelSortFilter(item.type)}
+                        aria-label={`Clear ${item.text}`}
+                        handleClick={() => {
+                            buttonRef.current?.focus();
+                            handleCancelSortFilter(item.type);
+                        }}
                     />
                 </div>
             )}

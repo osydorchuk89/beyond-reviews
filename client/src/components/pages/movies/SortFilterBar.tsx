@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useSearchParams } from "react-router";
 
 import type { SearchItem } from "../../../lib/entities";
@@ -10,6 +10,7 @@ interface SortFilterProps {
 }
 
 export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
+    const listId = useId();
     const [isOpen, setIsOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const genre = searchParams.get("genre");
@@ -64,6 +65,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
                 type="button"
                 className="cursor-pointer flex items-center justify-between bg-sky-700 px-5 py-2 text-xl font-bold text-sky-50 lg:hidden"
                 aria-expanded={isOpen}
+                aria-controls={listId}
                 onClick={() => setIsOpen((prevIsOpen) => !prevIsOpen)}
             >
                 <span>{mobileTitle}</span>
@@ -73,6 +75,7 @@ export const SortFilterBar = ({ itemsList, title }: SortFilterProps) => {
                 {title}
             </p>
             <ul
+                id={listId}
                 className={`${
                     isOpen ? "flex" : "hidden"
                 } flex-col justify-between font-bold px-5 py-2 items-center md:items-stretch lg:flex`}

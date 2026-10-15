@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import type {
@@ -8,7 +8,7 @@ import type {
     WishlistData,
 } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
-import { BaseTab } from "../../../ui/BaseTab";
+import { MediaTabs } from "../../../ui/MediaTabs";
 import { BooksWishlistContent } from "./BooksWishlistContent";
 import { MoviesWishlistContent } from "./MoviesWishlistContent";
 import { WishlistEmptyState } from "./WishlistEmptyState";
@@ -36,25 +36,29 @@ export const UserWishlistPage = () => {
     };
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
     const [selectedTab, setSelectedTab] = useState<WishlistTab>("books");
+    const tabsId = useId();
 
     return (
         <div className="flex flex-col gap-8 items-center w-full">
             <div className="flex flex-col items-center gap-5 w-full">
                 <h2 className="text-xl text-center font-bold">Wishlist</h2>
-                <div className="flex flex-wrap justify-center gap-2">
-                    {tabs.map((tab) => (
-                        <BaseTab
-                            key={tab.value}
-                            isSelected={selectedTab === tab.value}
-                            onClick={() => setSelectedTab(tab.value)}
-                        >
-                            {tab.label}
-                        </BaseTab>
-                    ))}
-                </div>
+                <MediaTabs
+                    id={tabsId}
+                    label="Wishlist media"
+                    tabs={tabs}
+                    selected={selectedTab}
+                    onSelect={setSelectedTab}
+                />
             </div>
 
-            <div className="flex flex-col items-center gap-8 w-full min-h-[50vh]">
+            <div
+                id={`${tabsId}-panel`}
+                role="tabpanel"
+                aria-labelledby={`${tabsId}-tab-${selectedTab}`}
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: Tab panels need a keyboard entry point, including empty and loading states (APG Tabs).
+                tabIndex={0}
+                className="flex flex-col items-center gap-8 w-full min-h-[50vh]"
+            >
                 {selectedTab === "books" && (
                     <BooksWishlistContent
                         wishlistData={wishlistData}

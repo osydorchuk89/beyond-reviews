@@ -6,7 +6,7 @@ export const FriendRecommendationsLoadingSection = () => {
             </h3>
             <div className="flex flex-col items-center gap-4 rounded-lg border border-fuchsia-200 bg-white/70 p-5 text-center text-fuchsia-950">
                 <div className="h-8 w-8 rounded-full border-4 border-fuchsia-400 border-t-transparent animate-spin" />
-                <p className="font-semibold">
+                <p role="status" className="font-semibold">
                     Finding people with similar taste...
                 </p>
                 <div className="grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">

@@ -13,7 +13,16 @@ export const FilterTag = ({ filter, onRemoveFilter }: FilterTagProps) => {
             </span>
             <CloseIcon
                 style="dark"
-                handleClick={() => onRemoveFilter(filter)}
+                aria-label={`Remove ${filter}`}
+                handleClick={() => {
+                    // This tag disappears. The search field remains mounted while results load.
+                    document
+                        .querySelector<HTMLInputElement>(
+                            'search[aria-label="Catalog search"] input',
+                        )
+                        ?.focus();
+                    onRemoveFilter(filter);
+                }}
             />
         </li>
     );

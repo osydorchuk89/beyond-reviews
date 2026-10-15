@@ -1,4 +1,7 @@
-interface LikeIconProps {
+import type { ComponentPropsWithRef } from "react";
+
+interface LikeIconProps
+    extends Omit<ComponentPropsWithRef<"button">, "className"> {
     className: string;
     handleClick?: React.MouseEventHandler<HTMLButtonElement>;
     handleMouseEnter?: React.MouseEventHandler<SVGSVGElement>;
@@ -10,12 +13,15 @@ export const LikeIcon = ({
     handleClick,
     handleMouseEnter,
     handleMouseLeave,
+    "aria-label": label = "Toggle review like",
+    ...props
 }: LikeIconProps) => {
     return (
         <button
+            {...props}
             onClick={handleClick}
             type="button"
-            aria-label="Toggle review like"
+            aria-label={label}
         >
             <svg
                 aria-hidden="true"

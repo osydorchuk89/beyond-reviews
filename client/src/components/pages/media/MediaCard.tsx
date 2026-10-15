@@ -53,6 +53,7 @@ export const MediaCard = ({
                 <Link
                     className="hover:underline text-sky-50"
                     title={title}
+                    aria-label={title}
                     to={to}
                 >
                     {displayedTitle}

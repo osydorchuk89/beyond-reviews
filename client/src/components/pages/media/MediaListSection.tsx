@@ -1,8 +1,15 @@
-import { type ReactNode, useEffect, useState } from "react";
+import {
+    type ReactNode,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
 import { useSearchParams } from "react-router";
 
 import { BaseButton } from "../../ui/BaseButton";
 import { MediaFilters } from "./MediaFilters";
+import { ActionFeedback } from "../../ui/ActionFeedback";
 
 interface LoadMoreResult<TItem> {
     items: TItem[];
@@ -40,26 +47,70 @@ export function MediaListSection<TItem>({
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(currentPage);
     const [hasMoreItems, setHasMoreItems] = useState(hasMore);
+    const sectionRef = useRef<HTMLDivElement>(null);
+    const loadButtonRef = useRef<HTMLButtonElement>(null);
+    const requestId = useRef(0);
+    const pending = useRef(false);
+    const focusNewItem = useRef<number | null>(null);
+    const [status, setStatus] = useState("");
+    const [error, setError] = useState("");
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies(additionalItems): Wait until newly loaded cards are mounted before restoring focus.
+    useLayoutEffect(() => {
+        const index = focusNewItem.current;
+        if (index === null) return;
+        focusNewItem.current = null;
+        const cards = sectionRef.current?.querySelectorAll<HTMLElement>(
+            "[data-catalog-list] > li",
+        );
+        (cards?.[index] ?? cards?.[0])
+            ?.querySelector<HTMLAnchorElement>("a")
+            ?.focus();
+    }, [additionalItems]);
 
     const allItems = [...items, ...additionalItems];
 
     const handleLoadMore = async () => {
+        if (pending.current) return;
+        pending.current = true;
+        const currentRequest = ++requestId.current;
         setLoading(true);
+        setStatus("Loading more results…");
+        setError("");
         try {
             const nextPage = page + 1;
             const data = await loadMoreItems(nextPage, searchParams);
+            if (currentRequest !== requestId.current) return;
+            if (
+                !data.hasMore &&
+                document.activeElement === loadButtonRef.current
+            )
+                focusNewItem.current = allItems.length;
             setAdditionalItems((prev) => [...prev, ...data.items]);
             setPage(nextPage);
             setHasMoreItems(data.hasMore);
+            setStatus(
+                `${data.items.length} more results loaded. ${allItems.length + data.items.length} results shown.`,
+            );
         } catch (error) {
+            if (currentRequest !== requestId.current) return;
             console.error(fetchErrorMessage, error);
+            setStatus("");
+            setError("Could not load more results. Try again.");
         } finally {
-            setLoading(false);
+            if (currentRequest === requestId.current) {
+                pending.current = false;
+                setLoading(false);
+            }
         }
     };
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies(items): New catalog results must reset loaded items even when pagination is unchanged.
     useEffect(() => {
+        ++requestId.current;
+        pending.current = false;
+        setLoading(false);
+        setStatus(`${items.length} results shown.`);
+        setError("");
         setAdditionalItems([]);
         setPage(currentPage);
         setHasMoreItems(hasMore);
@@ -78,23 +129,28 @@ export function MediaListSection<TItem>({
     };
 
     return (
-        <div className="flex flex-col w-full">
+        <div ref={sectionRef} className="flex flex-col w-full">
             {filters.length > 0 && (
                 <MediaFilters
                     filters={filters}
                     handleCloseFilterTag={handleCloseFilterTag}
                 />
             )}
-            <div className="flex flex-col gap-10 mb-10 items-center">
+            <div
+                aria-busy={loading}
+                className="flex flex-col gap-10 mb-10 items-center"
+            >
                 {allItems.length > 0 ? (
                     <>
                         {renderItems(allItems)}
                         {hasMoreItems && (
                             <div className="flex justify-center mb-10">
                                 <BaseButton
+                                    ref={loadButtonRef}
                                     style="sky"
                                     handleClick={handleLoadMore}
-                                    disabled={loading}
+                                    aria-disabled={loading}
+                                    aria-busy={loading}
                                 >
                                     {loading ? "LOADING..." : "LOAD MORE"}
                                 </BaseButton>
@@ -107,6 +163,7 @@ export function MediaListSection<TItem>({
                     </div>
                 )}
             </div>
+            <ActionFeedback status={status} error={error} />
         </div>
     );
 }

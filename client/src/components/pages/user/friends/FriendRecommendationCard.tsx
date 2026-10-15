@@ -1,6 +1,8 @@
 import type { FriendRecommendation } from "../../../../lib/entities";
 import { BaseButton } from "../../../ui/BaseButton";
 import { BaseLink } from "../../../ui/BaseLink";
+import { useAsyncAction } from "../../../../hooks/useAsyncAction";
+import { ActionFeedback } from "../../../ui/ActionFeedback";
 
 interface FriendRecommendationCardProps {
     recommendation: FriendRecommendation;
@@ -13,6 +15,16 @@ export const FriendRecommendationCard = ({
     hasRequested,
     handleSendFriendRequest,
 }: FriendRecommendationCardProps) => {
+    const { isPending, status, error, run } = useAsyncAction();
+    const name = `${recommendation.user.firstName} ${recommendation.user.lastName}`;
+    const sendRequest = () => {
+        if (hasRequested) return;
+        void run(() => handleSendFriendRequest(recommendation.user.id), {
+            pending: `Sending friend request to ${name}…`,
+            success: `Friend request sent to ${name}.`,
+            error: "Could not send the friend request. Try again.",
+        });
+    };
     const sharedMovieCount = recommendation.sharedMovieCount;
     const sharedBookCount = recommendation.sharedBookCount;
     const sharedReviewCount = sharedMovieCount + sharedBookCount;
@@ -71,14 +83,19 @@ export const FriendRecommendationCard = ({
             <div className="w-full text-center">
                 <BaseButton
                     style={hasRequested ? "disabled" : "sky"}
-                    disabled={hasRequested}
-                    handleClick={() =>
-                        handleSendFriendRequest(recommendation.user.id)
+                    aria-disabled={hasRequested || isPending}
+                    aria-busy={isPending}
+                    aria-label={
+                        hasRequested
+                            ? `Request sent to ${name}`
+                            : `Add friend: ${name}`
                     }
+                    handleClick={sendRequest}
                 >
                     {hasRequested ? "Request sent" : "Add friend"}
                 </BaseButton>
             </div>
+            <ActionFeedback status={status} error={error} />
         </li>
     );
 };

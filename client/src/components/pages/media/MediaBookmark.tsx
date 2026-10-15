@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { type Id, toast } from "react-toastify";
 
 import type { AuthData } from "../../../lib/entities";
 import { BookMarkIcon } from "../../icons/BookMarkIcon";
 import { ToastNotification } from "../../ui/ToastNotification";
+import { getWishlistKey, useWishlistStore } from "../../../store";
+
+let wishlistSuccessToastId: Id | undefined;
 
 interface MediaBookmarkItem {
     id: string;
+    title: string;
     onWishlist?: { userId: string }[];
 }
 
@@ -28,11 +32,15 @@ export const MediaBookmark = <TItem extends MediaBookmarkItem>({
     addOrRemoveFromWishlist,
 }: MediaBookmarkProps<TItem>) => {
     const userId = authData.user?.id;
-    const userHasSavedItem = (item.onWishlist ?? []).some(
-        (wishlistItem) => wishlistItem.userId === userId,
-    );
-    const [iconFilled, setIconFilled] = useState(userHasSavedItem);
-    const [hasSaved, setHasSaved] = useState(userHasSavedItem);
+    const key = getWishlistKey(mediaLabel, item.id, userId);
+    const { selection, toggle } = useWishlistStore((state) => state);
+    const hasSaved =
+        selection?.key === key
+            ? selection.hasSaved
+            : (item.onWishlist ?? []).some((entry) => entry.userId === userId);
+    const isPending = selection?.key === key && selection.isPending;
+    const [isHovered, setIsHovered] = useState(false);
+    const iconFilled = isHovered ? !hasSaved : hasSaved;
 
     const getIconColor = () => {
         if (hasSaved && iconFilled) return "#0ea5e9";
@@ -41,13 +49,14 @@ export const MediaBookmark = <TItem extends MediaBookmarkItem>({
         return "#ffffff";
     };
 
-    const showNotificationToast = () => {
-        toast.dismiss();
-        return toast(
+    const showNotificationToast = (saved: boolean) => {
+        if (wishlistSuccessToastId !== undefined)
+            toast.dismiss(wishlistSuccessToastId);
+        wishlistSuccessToastId = toast(
             ({ closeToast }) => (
                 <ToastNotification
                     text={`${mediaLabel} was ${
-                        hasSaved ? "removed from" : "added to"
+                        saved ? "added to" : "removed from"
                     } your wishlist`}
                     closeToast={closeToast}
                 />
@@ -59,29 +68,26 @@ export const MediaBookmark = <TItem extends MediaBookmarkItem>({
     };
 
     const saveItem = async () => {
-        if (userId) {
-            setHasSaved((prevState) => !prevState);
-            setIconFilled((prevState) => !prevState);
-            try {
-                showNotificationToast();
-                await addOrRemoveFromWishlist(item.id, userId, hasSaved);
-            } catch (error) {
-                setHasSaved((prevState) => !prevState);
-                setIconFilled((prevState) => !prevState);
-                console.log(error);
-            }
-        }
+        if (!userId) return;
+        const saved = await toggle(key, (previousSaved) =>
+            addOrRemoveFromWishlist(item.id, userId, previousSaved),
+        );
+        if (saved !== undefined) showNotificationToast(saved);
     };
 
     return (
         <div className="absolute self-end top-0 right-0 flex flex-col justify-center items-end transition-opacity">
             <BookMarkIcon
+                aria-label={`Save ${item.title} to wishlist`}
+                aria-pressed={hasSaved}
+                aria-disabled={isPending}
+                aria-busy={isPending}
                 color={getIconColor()}
                 handleMouseEnter={() => {
-                    hasSaved ? setIconFilled(false) : setIconFilled(true);
+                    setIsHovered(true);
                 }}
                 handleMouseLeave={() => {
-                    hasSaved ? setIconFilled(true) : setIconFilled(false);
+                    setIsHovered(false);
                 }}
                 handleClick={saveItem}
             />

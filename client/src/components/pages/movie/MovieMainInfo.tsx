@@ -45,7 +45,7 @@ export const MovieMainInfo = ({ movie }: MovieMainInfoProps) => {
             <img
                 className="w-full max-w-80 rounded-lg"
                 src={moviePoster}
-                alt="movie poster"
+                alt={`${movie.title} poster`}
             />
         </div>
     );

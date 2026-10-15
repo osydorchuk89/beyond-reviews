@@ -6,7 +6,9 @@ export const BookRecommendationsLoadingSection = () => {
             </h2>
             <div className="flex flex-col items-center gap-4 rounded-lg border border-fuchsia-200 bg-white/70 p-5 text-center text-fuchsia-950">
                 <div className="h-8 w-8 rounded-full border-4 border-fuchsia-400 border-t-transparent animate-spin" />
-                <p className="font-semibold">Finding books for you...</p>
+                <p role="status" className="font-semibold">
+                    Finding books for you...
+                </p>
                 <div className="flex w-full max-w-3xl gap-4 overflow-hidden">
                     {[0, 1, 2].map((item) => (
                         <div

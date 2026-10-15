@@ -7,19 +7,23 @@ interface BooksListProps {
 
 export const BooksList = ({ allBooks }: BooksListProps) => {
     return (
-        <ul className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 items-center justify-items-center lg:justify-items-end w-full gap-16">
+        <ul
+            data-catalog-list
+            className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 items-center justify-items-center lg:justify-items-end w-full gap-16"
+        >
             {allBooks.map((book: Book) => (
-                <BookCard
-                    key={book.id}
-                    bookId={book.id}
-                    title={book.title}
-                    releaseYear={book.releaseYear}
-                    authors={book.authors}
-                    genres={book.genres}
-                    avgRating={book.avgRating}
-                    numRatings={book.numRatings}
-                    poster={book.poster}
-                />
+                <li key={book.id}>
+                    <BookCard
+                        bookId={book.id}
+                        title={book.title}
+                        releaseYear={book.releaseYear}
+                        authors={book.authors}
+                        genres={book.genres}
+                        avgRating={book.avgRating}
+                        numRatings={book.numRatings}
+                        poster={book.poster}
+                    />
+                </li>
             ))}
         </ul>
     );

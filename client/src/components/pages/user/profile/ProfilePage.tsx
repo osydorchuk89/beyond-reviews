@@ -7,6 +7,8 @@ import { profileNavLinks } from "../../../../lib/data";
 import { BaseLink } from "../../../ui/BaseLink";
 import { BaseButton } from "../../../ui/BaseButton";
 import { sendFriendRequest } from "../../../../lib/api";
+import { useAsyncAction } from "../../../../hooks/useAsyncAction";
+import { ActionFeedback } from "../../../ui/ActionFeedback";
 
 export const ProfilePage = () => {
     const { user: profileUser } = useRouteLoaderData("userProfile") as {
@@ -34,18 +36,21 @@ export const ProfilePage = () => {
             )) ||
         false;
     const [requestSent, setRequestSent] = useState(initialRequestSentState);
+    const { isPending, status, error, run } = useAsyncAction();
 
     const handleFriendRequest = async () => {
-        if (!visitingUser) return;
-
-        setRequestSent(true);
-
-        try {
-            await sendFriendRequest(visitingUser.id, profileUser.id);
-        } catch (error) {
-            setRequestSent(false);
-            console.error("Failed to send friend request:", error);
-        }
+        if (!visitingUser || requestSent) return;
+        await run(
+            async () => {
+                await sendFriendRequest(visitingUser.id, profileUser.id);
+                setRequestSent(true);
+            },
+            {
+                pending: "Sending friend request…",
+                success: `Friend request sent to ${profileUser.firstName} ${profileUser.lastName}.`,
+                error: "Could not send the friend request. Try again.",
+            },
+        );
     };
 
     return (
@@ -53,7 +58,7 @@ export const ProfilePage = () => {
             <img
                 src={profileUser.photo}
                 className="object-cover object-top w-28 h-28 sm:w-32 sm:h-32 rounded-full self-center"
-                alt="user avatar"
+                alt={`${profileUser.firstName} ${profileUser.lastName}`}
             />
             <nav aria-label="Profile">
                 <ul className="flex flex-col items-center gap-5 text-lg">
@@ -69,6 +74,8 @@ export const ProfilePage = () => {
                     <div className="w-full sm:w-auto flex justify-center text-center">
                         <BaseButton
                             style={requestSent ? "disabled" : "orange"}
+                            aria-disabled={requestSent || isPending}
+                            aria-busy={isPending}
                             handleClick={
                                 requestSent ? undefined : handleFriendRequest
                             }
@@ -80,6 +87,7 @@ export const ProfilePage = () => {
                     </div>
                 )}
             </div>
+            <ActionFeedback status={status} error={error} />
         </div>
     );
 };

@@ -26,7 +26,10 @@ export const FriendsList = ({
                                 key={friend.id}
                                 className="flex flex-col text-lg p-4 sm:p-5 rounded-lg shadow-lg bg-sky-100 gap-8 break-words"
                             >
-                                <BaseLink to={`/users/${friend.id}/profile`}>
+                                <BaseLink
+                                    data-friend-id={friend.id}
+                                    to={`/users/${friend.id}/profile`}
+                                >
                                     {`${friend.firstName} ${friend.lastName}`}
                                 </BaseLink>
                             </li>

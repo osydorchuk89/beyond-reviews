@@ -11,6 +11,7 @@ export const ArrowIcon = ({
     direction,
     disabled = false,
     className,
+    "aria-label": accessibleLabel,
     ...props
 }: ArrowIconProps) => {
     const label =
@@ -21,11 +22,13 @@ export const ArrowIcon = ({
     return (
         <button
             {...props}
-            className={`flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fuchsia-700 text-white hover:bg-fuchsia-800 disabled:cursor-not-allowed disabled:bg-fuchsia-300 disabled:text-fuchsia-50 ${className ?? ""}`}
-            onClick={onClick}
+            className={`flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-fuchsia-700 text-white hover:bg-fuchsia-800 aria-disabled:cursor-not-allowed aria-disabled:bg-fuchsia-300 aria-disabled:text-fuchsia-50 ${className ?? ""}`}
+            onClick={() => {
+                if (!disabled) onClick();
+            }}
             type="button"
-            aria-label={label}
-            disabled={disabled}
+            aria-label={accessibleLabel ?? label}
+            aria-disabled={disabled}
         >
             <svg
                 aria-hidden="true"

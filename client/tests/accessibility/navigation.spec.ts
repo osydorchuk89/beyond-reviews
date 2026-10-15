@@ -358,7 +358,7 @@ test.describe("Authenticated navigation", () => {
 
     test("tabs preserve keyboard focus", async ({ page }) => {
         await page.goto(`/users/${users.populated.id}/wishlist`);
-        const tab = page.getByRole("button", { name: "Movies", exact: true });
+        const tab = page.getByRole("tab", { name: "Movies", exact: true });
         await tab.focus();
         await page.keyboard.press("Enter");
         await expect(

@@ -11,7 +11,7 @@ export const BookReviewDetails = ({ review }: BookReviewDetailsProps) => {
         review.book.poster || "/images/fallback-movie-poster.jpg";
 
     return (
-        <div className="flex flex-col sm:flex-row bg-sky-100 rounded-lg shadow-lg p-4 sm:p-5 gap-6 sm:gap-8">
+        <li className="flex flex-col sm:flex-row bg-sky-100 rounded-lg shadow-lg p-4 sm:p-5 gap-6 sm:gap-8">
             <div className="w-full sm:w-1/4 flex flex-col items-center gap-4">
                 <Link
                     to={`/books/${review.bookId}`}
@@ -41,6 +41,6 @@ export const BookReviewDetails = ({ review }: BookReviewDetailsProps) => {
                     {review.text ?? <span className="italic">no review</span>}
                 </p>
             </div>
-        </div>
+        </li>
     );
 };

@@ -1,4 +1,4 @@
-import { type RefObject, useRef, useState } from "react";
+import { type RefObject, useId, useRef, useState } from "react";
 import { useRouteLoaderData } from "react-router";
 
 import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
@@ -6,6 +6,8 @@ import type { AuthData } from "../../../lib/entities";
 import { LikeIcon } from "../../icons/LikeIcon";
 import { StarIcon } from "../../icons/StarIcon";
 import { BaseLink } from "../../ui/BaseLink";
+import { useAsyncAction } from "../../../hooks/useAsyncAction";
+import { ActionFeedback } from "../../ui/ActionFeedback";
 
 export interface MediaReviewCardData {
     id: string;
@@ -45,6 +47,9 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
 
     const [iconFilled, setIconFilled] = useState(hasUserLikedReview);
     const [hasLiked, setHasLiked] = useState(hasUserLikedReview);
+    const textId = useId();
+    const { isPending, status, error, run } = useAsyncAction();
+    const reviewerName = `${review.user.firstName} ${review.user.lastName}`;
     const [likeCount, setLikeCount] = useState(
         review.likeCount ?? review.likedBy.length,
     );
@@ -57,17 +62,22 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
     });
 
     const handleLikeOrUnlikeReview = async () => {
-        setHasLiked((prevState) => !prevState);
-        setLikeCount((prev) => (hasLiked ? prev - 1 : prev + 1));
-        try {
-            if (userId) {
+        if (!userId) return;
+        await run(
+            async () => {
                 await likeOrUnlikeReview(mediaId, review.id, userId, hasLiked);
-            }
-        } catch (error) {
-            setHasLiked((prevState) => !prevState);
-            setLikeCount((prev) => (hasLiked ? prev + 1 : prev - 1));
-            console.log(error);
-        }
+                setHasLiked(!hasLiked);
+                setIconFilled(!hasLiked);
+                setLikeCount((previous) => previous + (hasLiked ? -1 : 1));
+            },
+            {
+                pending: `Updating like for ${reviewerName}'s review…`,
+                success: hasLiked
+                    ? `Like removed from ${reviewerName}'s review.`
+                    : `Liked ${reviewerName}'s review.`,
+                error: "Could not update your like. Try again.",
+            },
+        );
     };
 
     const ref = useRef<HTMLParagraphElement>(null);
@@ -98,6 +108,7 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
             {review.text ? (
                 <div>
                     <p
+                        id={textId}
                         ref={ref}
                         className={
                             isShowingMore ? "w-full" : "line-clamp-5 w-full"
@@ -109,6 +120,8 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
                         <div>
                             <button
                                 type="button"
+                                aria-expanded={isShowingMore}
+                                aria-controls={textId}
                                 className="mt-1 text-sky-700 hover:text-green-950 text-base font-medium uppercase cursor-pointer"
                                 onClick={toggleIsShowingMore}
                             >
@@ -125,18 +138,23 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
             </p>
             {userId && review.userId !== userId && (
                 <LikeIcon
+                    aria-label={`Like review by ${reviewerName}`}
+                    aria-pressed={hasLiked}
+                    aria-disabled={isPending}
+                    aria-busy={isPending}
                     className={`w-6 h-6 hover:cursor-pointer ${
                         iconFilled ? " fill-sky-600" : " fill-sky-50"
                     }`}
                     handleClick={handleLikeOrUnlikeReview}
                     handleMouseEnter={() => {
-                        hasLiked ? setIconFilled(false) : setIconFilled(true);
+                        setIconFilled(!hasLiked);
                     }}
                     handleMouseLeave={() => {
-                        hasLiked ? setIconFilled(true) : setIconFilled(false);
+                        setIconFilled(hasLiked);
                     }}
                 />
             )}
+            <ActionFeedback status={status} error={error} />
         </div>
     );
 };

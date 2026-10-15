@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 export const useHorizontalScroll = (itemCount: number) => {
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const scrollId = useId();
+    const scrollContainerRef = useRef<HTMLElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -30,16 +31,35 @@ export const useHorizontalScroll = (itemCount: number) => {
         };
 
         updateScrollState();
+        const revealFocus = (event: FocusEvent) => {
+            if (!(event.target instanceof HTMLElement)) return;
+            const target = event.target.getBoundingClientRect();
+            const container = scrollContainer.getBoundingClientRect();
+            const delta =
+                target.left < container.left
+                    ? target.left - container.left
+                    : target.right > container.right
+                      ? target.right - container.right
+                      : 0;
+            if (delta)
+                scrollContainer.scrollBy({ left: delta, behavior: "instant" });
+        };
+        const observer = new ResizeObserver(updateScrollState);
+        observer.observe(scrollContainer);
         scrollContainer.addEventListener("scroll", updateScrollState);
+        scrollContainer.addEventListener("focusin", revealFocus);
         window.addEventListener("resize", updateScrollState);
 
         return () => {
             scrollContainer.removeEventListener("scroll", updateScrollState);
+            scrollContainer.removeEventListener("focusin", revealFocus);
+            observer.disconnect();
             window.removeEventListener("resize", updateScrollState);
         };
     }, [itemCount]);
 
     return {
+        scrollId,
         scrollContainerRef,
         canScrollLeft,
         canScrollRight,

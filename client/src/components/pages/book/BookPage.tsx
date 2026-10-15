@@ -1,7 +1,9 @@
-import { useLoaderData } from "react-router";
-import { ToastContainer } from "react-toastify";
+import { useLoaderData, useRouteLoaderData } from "react-router";
 
-import type { Book, BookReviewsData } from "../../../lib/entities";
+import type { AuthData, Book, BookReviewsData } from "../../../lib/entities";
+import { useWishlistState } from "../../../hooks/useWishlistState";
+import { getWishlistKey } from "../../../store";
+import { ActionFeedback } from "../../ui/ActionFeedback";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { horizontalPadding } from "../../../styles/responsive";
 import { BookMainInfo } from "./BookMainInfo";
@@ -9,10 +11,20 @@ import { BookAdditionalInfo } from "./BookAdditionalInfo";
 import { BookReviews } from "./BookReviews";
 
 export const BookPage = () => {
+    const { authData } = useRouteLoaderData("root") as { authData: AuthData };
     const { book, bookReviewsData } = useLoaderData() as {
         book: Book;
         bookReviewsData: BookReviewsData;
     };
+    const wishlistKey = book
+        ? getWishlistKey("Book", book.id, authData.user?.id)
+        : null;
+    const wishlist = useWishlistState(
+        wishlistKey,
+        (book?.onWishlist ?? []).some(
+            (entry) => entry.userId === authData.user?.id,
+        ),
+    );
 
     if (!book) {
         return (
@@ -30,17 +42,9 @@ export const BookPage = () => {
 
     return (
         <div
+            key={wishlistKey}
             className={`flex flex-col w-full mx-auto ${horizontalPadding.page} text-sky-950 relative`}
         >
-            <ToastContainer
-                autoClose={3000}
-                hideProgressBar
-                toastStyle={{
-                    backgroundColor: "#bae6fd",
-                    paddingBlock: 0,
-                    paddingInline: 20,
-                }}
-            />
             <div className="flex flex-col md:flex-row gap-8 md:gap-10 py-6 sm:py-10">
                 <BookMainInfo book={book} />
                 <BookAdditionalInfo
@@ -52,6 +56,10 @@ export const BookPage = () => {
             <BookReviews
                 bookId={book.id}
                 initialBookReviewsData={bookReviewsData}
+            />
+            <ActionFeedback
+                status={wishlist?.status ?? ""}
+                error={wishlist?.error ?? ""}
             />
         </div>
     );

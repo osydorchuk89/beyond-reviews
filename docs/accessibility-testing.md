@@ -1,6 +1,6 @@
 # Accessibility checks and remaining work
 
-Updated: 14 October 2026, after Phase 3. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet.
+Updated: 15 October 2026, after Phase 4's nonvisual work, approved error notifications, and restoration of the original selection appearance. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet.
 
 ## Run the checks
 
@@ -47,6 +47,10 @@ Use `api.respond(method, path, { status, body })` to add a response for an error
 
 `pages.spec.ts` contains the original axe scans. `navigation.spec.ts` checks navigation and keyboard behavior. `forms.spec.ts` checks form labels, validation, autofill/paste support, upload errors, review creation/editing, slow saves, failures, retries, and expired sessions; it also scans failed review-save states. Every non-dialog scanned state also requires one main landmark, one main heading, and a page-specific document title. When the modal menu is open, its background is intentionally unavailable to assistive technology.
 
+`actions.spec.ts` checks tab selection, action states, slow/failed requests, retries, duplicate prevention, and focus after friend requests. `content.spec.ts` checks loading more results, review pagination, expanded reviews, and keyboard access to recommendation rows. Wishlist checks also verify that desktop and mobile controls share the same confirmed state, success toasts wait for the response, and leaving/reopening a detail page ignores the previous request. `src/store/wishlist.test.ts` checks request guards, recovery, and isolation between items, media types, accounts, and page visits.
+
+`notifications.spec.ts` checks visible persistent errors, one alert per failure, keyboard dismissal and focus restoration, repeated attempts, independent errors alongside wishlist success, cleanup on retry/navigation, and focus when a response arrives late. It also scans a friend-request failure at desktop/mobile widths. Existing action/content failure checks require visible errors.
+
 Tests wait for the expected content or error before scanning. They fail on an unexpected application crash rather than treating its error screen as a successful page scan.
 
 Axe scans WCAG A/AA tags through 2.2, plus best-practice structure checks such as main landmarks and headings. Best-practice rules are useful signals; they are not each a separate WCAG requirement. The suite follows [Playwright's accessibility testing guidance](https://playwright.dev/docs/accessibility-testing). Biome's existing recommended rules already include accessibility rules; no second linter was added.
@@ -71,7 +75,7 @@ Changed selectors can change a fingerprint without changing the defect. Review t
 
 ## Short findings checklist
 
-Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). Phases 2 and 3 implement navigation and form fixes. The client maintainer owns follow-up. Automated results below cover the specified states; screen-reader and final journey evaluation remain pending.
+Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). Phases 2–4 implement navigation, form, state, and feedback fixes. The client maintainer owns follow-up. Automated results below cover the specified states; screen-reader and final journey evaluation remain pending.
 
 | ID | What needs fixing | Planned phase | Status / retest |
 | --- | --- | --- | --- |
@@ -81,13 +85,13 @@ Evidence and affected source files are in the [audit](accessibility-audit.md#pri
 | A04 | Search labels | 3 | Search portion implemented and retested 14 October; message-input portion deferred |
 | A05 | Authentication labels, errors, instructions, autofill | 3 | Partly implemented: field associations, first-error focus, server errors, clipboard paste, autocomplete tokens, and photo validation retested 14 October; instruction text is screen-reader-only to preserve the UI; visible requirements and actual password-manager/screen-reader evaluation remain pending |
 | A06 | Main content, headings, titles, route focus | 2 | Implemented for normal/placeholder/missing-item pages and the existing user error boundary; structural and route-focus checks passed 14 October; screen-reader evaluation pending |
-| A07 | Tabs, toggles, and selected filters | 4 | Open; pagination now exposes its current page and unavailable controls; chat-selection portion deferred |
+| A07 | Tabs, toggles, and selected filters | 4 | Semantics implemented: tabs/panels, keyboard selection, pressed likes/saved items/filters, and current-page semantics. Page underline/bookmark checkmark rolled back at the maintainer's request; additional cues for these controls remain unresolved. Tabs/likes retain strong light/dark state differences; filters retain the selected remove control. Manual screen-reader/visual evaluation remains pending; chat-selection portion deferred |
 | A08 | Contrast | 5 | Open; contrast baseline and rendered-state retest pending |
 | A09 | Narrow layouts, zoom, and text spacing | 5 | Open; original star row, textarea size, form widths, and button spacing restored at the maintainer's request; responsive form changes require an agreed visual design; messaging layout portion deferred |
-| A10 | Loading, errors, success feedback, removed-control focus | 4 | Review-saving feedback/focus implemented in Phase 3; other actions and screen-reader announcements remain pending |
+| A10 | Loading, errors, success feedback, removed-control focus | 4 | Code changes implemented and retested 15 October: confirmed success, request guards, hidden pending/success status, approved persistent error toasts, existing loading/success appearance, stale-tab response protection, and focus after acceptance/final load-more. Actual screen-reader announcements and final journey evaluation pending |
 | A11 | Message input, sending, history, and announcements | After refactor | Deferred; remains unresolved |
-| A12 | Link/image names and list structure | 4 | Profile navigation list and header profile-link name fixed in Phase 2; media/image work remains open; chat-list portion deferred |
-| A13 | Visible focus and keyboard access in scrolling areas | 2, 4, 5 | Partly implemented: shared focus outlines, header scroll clearance, scrollable menu, and stable paging focus retested 14 October; full scrolling/zoom checks remain open |
+| A12 | Link/image names and list structure | 4 | Non-messaging code fixes implemented: contextual poster/link/action names and catalog/user-review list items retested 15 October; observed list failures removed from baselines; screen-reader/final journey evaluation pending; chat-list portion deferred |
+| A13 | Visible focus and keyboard access in scrolling areas | 2, 4, 5 | Partly implemented: Phase 2 focus fixes plus named keyboard-scrollable book/movie/friend recommendations, offscreen focus visibility, and retained arrow focus at limits retested 15 October; full scrolling/zoom/contrast evaluation remains open |
 | A14 | Error recovery and timed feedback | 6 | Open; existing user error page has a heading/title; root/catalog error recovery and process/timing evaluation remain pending |
 
 ## Phase 1 validation
@@ -141,6 +145,45 @@ The root and media-detail routes skip revalidation after a failed review action 
 Search has an associated visible label, validation feedback, and focus returns to its input after clearing the search. Authentication fields expose required/invalid states, related error text, and autocomplete purposes. Server failures use alerts; duplicate registration email errors focus the email field. Password/photo descriptions are available to screen readers; visible requirements before submission remain open. The client photo limit matches the existing server limit of 5 MiB; no backend policy changed.
 
 Preserving the UI leaves some accessibility work unfinished: visible password/photo instructions, a visible rating-selection cue beyond color, and narrow-layout/zoom issues. Screen-reader-only text does not resolve these requirements for sighted users. Actual password-manager autofill, screen-reader operation/announcements, deployed integration, and final journey evaluation also remain pending. Messaging-specific forms and sending remain deferred. No hosted CI result is claimed here.
+
+## Phase 4 validation
+
+Local validation on 15 October 2026, with the current appearance preserved:
+
+- 120 browser tests passed with baseline updates disabled: the previous 92 and 28 new action/content checks. The 41 axe scan states remain in place.
+- All 18 component/action tests passed. TypeScript checking, linting, formatting, and the production build passed. The existing bundle-size advisory remains.
+- Eight baselines lost their resolved list-structure exception: anonymous/empty/populated book and movie catalogs, expanded mobile movie filters, and populated user reviews. The populated friends baseline has new selectors for the same two low-contrast buttons after adding contextual names; their contrast failure remains open. No new rule or failing element was accepted.
+- Thirty temporary screenshot comparisons against `968af15` matched pixel for pixel. They covered loaded catalogs, book/movie details, wishlist, reviews, activities, friends, and another user's profile at 1280 × 900 and 390 × 844, plus Movies/Albums selections in all three tabbed sections at both widths. Both copies used the same intercepted images/API data. The isolated reference server and temporary comparison code were removed afterwards.
+
+Tabs use Left/Right arrows, Home, and End to move keyboard focus. Enter/Space select the focused tab, so moving between tabs does not start network requests. Each tab controls a shared panel named by the selected tab. The panel has a keyboard entry point even when it is empty or loading. This follows the manual-activation approach in the [W3C tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/). Slow review/activity responses cannot overwrite a newer tab's results or error state.
+
+Likes, wishlist buttons, and filters expose their selected state. Like counts, saved selection, and friend-request confirmation change only after the server request succeeds. The like API now propagates failures so the UI can handle them. Pending requests reject duplicate activation while retaining keyboard focus. Hidden status regions describe pending/completed actions; failures use the approved visible error toasts described below. Existing visible tab errors retain their appearance and now have alert semantics. Wishlist success still uses the existing toast, after confirmation, without a second success announcement. Desktop/mobile bookmarks share state and the request guard through Zustand alongside the existing mobile-menu store. The detail page resets wishlist state when the item or signed-in account changes; late responses cannot overwrite the new selection.
+
+Accepting a friend request leaves the request in place until success. If its button still has focus when the response arrives, focus moves to the next received request or the new friend's link. It does not steal focus after the user has moved elsewhere. When the final Load More button disappears, focus moves to the first newly added result; a failed load retains the existing results and allows retry. Removing a sidebar filter focuses its selection button, and removing a filter tag returns focus to Search.
+
+Catalogs and user-review lists have proper list items. Movie poster links include the title, truncated title links expose the full title, and icon actions have contextual names. Review expansion exposes its expanded state and the controlled text. Recommendation regions are named and keyboard-scrollable; focus reveals offscreen links/buttons, and reaching a scroll limit leaves focus on the arrow. The existing layouts, button/icon styling, hover previews, form styling, and toast appearance are preserved.
+
+**Selection appearance and remaining work:**
+
+The page underline and saved-bookmark checkmark were tried and rolled back at the maintainer's request. Pagination and bookmarks retain their original appearance, including icon fills and hover previews. Their accessible states and request/focus improvements remain. Additional visual selection cues for these two controls remain unresolved pending an agreed design.
+
+After the rollback, all seven focused wishlist/pagination browser checks, typechecking, and lint passed.
+
+The earlier proposal to add markers to every selected control was broader than necessary. [W3C's use-of-color guidance](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html) accepts a relative-luminance contrast of at least 3:1 as an additional visual distinction. Browser conversion of the installed palette gives approximately 5.1:1 between selected/unselected tab backgrounds and 3.8:1 between like fills. Selected filters already show a remove control. These controls retain their current appearance; full contrast, hover, forced-color, and manual evaluation remain pending.
+
+**Approved visible error notifications:**
+
+Failed likes, wishlist updates, sending/accepting friend requests, catalog Load More, and media-review pagination now show toasts in the existing light-blue notification style. They have no automatic dismissal timeout and can be closed using the existing dismiss button. Retrying clears that action's error; leaving its page context clears it too. Independent errors remain visible when another action succeeds. The shared notification container is available on catalog, detail, and profile pages. Existing loading indicators, buttons/icons, normal layouts, and wishlist-success appearance remain. No additional loading indicators were introduced.
+
+Each error uses the toast's alert semantics; the duplicate hidden error alert has been removed. Appearance of a notification preserves focus, including when the user has moved elsewhere during a slow request. Keyboard users can use the notification library's existing Alt+T shortcut, Tab to Dismiss, and Enter/Space to close. Closing a focused notification restores the location that was focused when it appeared, if that element is still mounted. These DOM/focus checks do not establish actual NVDA/VoiceOver announcement behavior.
+
+Validation after the approved error changes:
+
+- 125 browser tests passed with baseline updates disabled, including five notification checks and 43 axe scan states. Desktop/mobile error screenshots were visually inspected.
+- Both new error-state baselines contain only the existing A08 contrast failure on Back to your profile, matching the existing other-profile baseline. No new toast finding was accepted; previous scan baselines are unchanged by the error-notification work.
+- All 18 component/action tests, typechecking, lint, formatting, and the production build passed. The existing bundle-size advisory remains.
+
+Phase 4 remains partial while the selection cues are unresolved. Actual NVDA/VoiceOver announcements, full keyboard journeys, zoom/forced-color evaluation of the new states, deployed/backend integration, and feedback timing/recovery still require manual evaluation. The browser tests verify DOM state, focus, and mocked request outcomes; they do not establish those manual results or WCAG conformance. Messaging-specific changes remain deferred, and no real accounts or local API data were used in these checks.
 
 ## Manual evaluation record
 

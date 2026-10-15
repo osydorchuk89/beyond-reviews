@@ -7,7 +7,7 @@
     "nodes": [
       {
         "target": [
-          ".sm\\:w-auto > .bg-sky-600.hover\\:bg-sky-800.px-8"
+          "button[aria-label=\"Add friend: Taylor Reviewer\"]"
         ],
         "failedChecks": [
           "color-contrast"
@@ -15,7 +15,7 @@
       },
       {
         "target": [
-          ".w-76 > .text-center.w-full > .bg-sky-600.hover\\:bg-sky-800.px-8"
+          "button[data-accept-request=\"true\"]"
         ],
         "failedChecks": [
           "color-contrast"

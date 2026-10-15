@@ -1,4 +1,4 @@
-import { useRef, type Ref, type RefObject } from "react";
+import { useId, useRef, type Ref, type RefObject } from "react";
 
 import { useTruncatedElement } from "../../../hooks/useTruncatedElements";
 import { BaseButton } from "../../ui/BaseButton";
@@ -16,6 +16,7 @@ export const MovieReviewDisplay = ({
     onEdit,
     editButtonRef,
 }: MovieReviewDisplayProps) => {
+    const textId = useId();
     const ref = useRef<HTMLParagraphElement>(null);
     const { isTruncated, isShowingMore, toggleIsShowingMore } =
         useTruncatedElement({ ref: ref as RefObject<HTMLParagraphElement> });
@@ -30,13 +31,19 @@ export const MovieReviewDisplay = ({
             </div>
             <div>
                 <p className="font-bold">Your review: </p>
-                <p ref={ref} className={isShowingMore ? "" : "line-clamp-5"}>
+                <p
+                    id={textId}
+                    ref={ref}
+                    className={isShowingMore ? "" : "line-clamp-5"}
+                >
                     {userReview ?? "N/A"}
                 </p>
                 {isTruncated && (
                     <div>
                         <button
                             type="button"
+                            aria-expanded={isShowingMore}
+                            aria-controls={textId}
                             className="mt-1 text-sky-700 hover:text-green-950 text-base font-medium uppercase cursor-pointer"
                             onClick={toggleIsShowingMore}
                         >

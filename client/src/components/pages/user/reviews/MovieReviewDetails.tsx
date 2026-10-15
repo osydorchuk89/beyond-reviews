@@ -10,7 +10,7 @@ interface MovieReviewDetailsProps {
 export const MovieReviewDetails = ({ review }: MovieReviewDetailsProps) => {
     const moviePoster = getMoviePoster(review.movie.poster);
     return (
-        <div className="flex flex-col sm:flex-row bg-sky-100 rounded-lg shadow-lg p-4 sm:p-5 gap-6 sm:gap-8">
+        <li className="flex flex-col sm:flex-row bg-sky-100 rounded-lg shadow-lg p-4 sm:p-5 gap-6 sm:gap-8">
             <div className="w-full sm:w-1/4 flex flex-col items-center gap-4">
                 <Link
                     to={`/movies/${review.movieId}`}
@@ -25,7 +25,7 @@ export const MovieReviewDetails = ({ review }: MovieReviewDetailsProps) => {
                         width={150}
                         src={moviePoster}
                         className="rounded-lg w-36 sm:w-32 md:w-36"
-                        alt="movie poster"
+                        alt={`${review.movie.title} poster`}
                     />
                 </Link>
             </div>
@@ -40,6 +40,6 @@ export const MovieReviewDetails = ({ review }: MovieReviewDetailsProps) => {
                     {review.text ?? <span className="italic">no review</span>}
                 </p>
             </div>
-        </div>
+        </li>
     );
 };

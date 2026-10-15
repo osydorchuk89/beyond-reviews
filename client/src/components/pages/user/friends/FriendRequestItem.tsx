@@ -7,7 +7,8 @@ interface FriendRequestItemProps {
     lastName: string;
     photo: string;
     showAcceptButton?: boolean;
-    onAccept?: () => void;
+    onAccept?: (trigger: HTMLButtonElement) => void;
+    isPending?: boolean;
 }
 
 export const FriendRequestItem = ({
@@ -17,6 +18,7 @@ export const FriendRequestItem = ({
     photo,
     showAcceptButton = false,
     onAccept,
+    isPending = false,
 }: FriendRequestItemProps) => {
     return (
         <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-base sm:text-lg border-b border-b-sky-700 py-3">
@@ -34,7 +36,14 @@ export const FriendRequestItem = ({
             </div>
             {showAcceptButton && onAccept && (
                 <div className="w-full sm:w-auto text-center">
-                    <BaseButton style="sky" handleClick={onAccept}>
+                    <BaseButton
+                        style="sky"
+                        handleClick={(event) => onAccept(event.currentTarget)}
+                        aria-label={`Accept friend request from ${firstName} ${lastName}`}
+                        aria-disabled={isPending}
+                        aria-busy={isPending}
+                        data-accept-request
+                    >
                         Accept friend request
                     </BaseButton>
                 </div>

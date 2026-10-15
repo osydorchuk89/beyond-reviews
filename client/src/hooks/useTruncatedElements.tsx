@@ -9,14 +9,19 @@ export const useTruncatedElement = ({
     const [isShowingMore, setIsShowingMore] = useState(false);
 
     useLayoutEffect(() => {
-        const { offsetHeight, scrollHeight } = ref.current ?? {};
-
-        if (offsetHeight && scrollHeight && offsetHeight < scrollHeight) {
-            setIsTruncated(true);
-        } else {
-            setIsTruncated(false);
-        }
-    }, [ref]);
+        const paragraph = ref.current;
+        if (!paragraph || isShowingMore) return;
+        const measure = () => {
+            // Keep the focused collapse control mounted if resizing removes the clamp.
+            if (paragraph.parentElement?.contains(document.activeElement))
+                return;
+            setIsTruncated(paragraph.offsetHeight < paragraph.scrollHeight);
+        };
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(paragraph);
+        return () => observer.disconnect();
+    }, [ref, isShowingMore]);
 
     const toggleIsShowingMore = () => setIsShowingMore((prev) => !prev);
 

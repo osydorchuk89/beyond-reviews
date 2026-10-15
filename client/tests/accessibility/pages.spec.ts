@@ -224,7 +224,7 @@ for (const persona of ["empty", "populated"] as const) {
                 await scan(page, info, `${entry.state}-${persona}`);
                 if (entry.state === "wishlist") {
                     await page
-                        .getByRole("button", { name: "Movies", exact: true })
+                        .getByRole("tab", { name: "Movies", exact: true })
                         .click();
                     await expect(
                         page
@@ -322,14 +322,14 @@ for (const persona of ["empty", "populated"] as const) {
         test("review tab error", async ({ page, api }, info) => {
             await page.goto(`${prefix}/reviews`);
             await expect(
-                page.getByRole("button", { name: "Movies", exact: true }),
+                page.getByRole("tab", { name: "Movies", exact: true }),
             ).toBeVisible();
             api.respond("GET", `/api/users/${user.id}/movie-reviews`, {
                 status: 500,
                 body: { message: "Fixture request failure" },
             });
             await page
-                .getByRole("button", { name: "Movies", exact: true })
+                .getByRole("tab", { name: "Movies", exact: true })
                 .click();
             await expect(
                 page.getByText("Could not load movies reviews.", {

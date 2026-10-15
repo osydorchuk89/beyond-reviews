@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { getUserBookReviews, getUserMovieReviews } from "../../../../lib/api";
@@ -11,7 +11,7 @@ import type {
     UserReviewTab,
 } from "../../../../lib/entities";
 import { useIsSameUser } from "../../../../hooks/useIsSameUser";
-import { BaseTab } from "../../../ui/BaseTab";
+import { MediaTabs } from "../../../ui/MediaTabs";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { Pagination } from "../../../ui/Pagination";
 import { BookReviewDetails } from "./BookReviewDetails";
@@ -46,6 +46,9 @@ export const UserReviewsPage = () => {
         useState<UserReviewsData>(userReviews);
     const [isLoading, setIsLoading] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const tabsId = useId();
+    const requestId = useRef(0);
+    const [status, setStatus] = useState("");
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
     const { reviews, currentPage, totalPages } = reviewsData;
     const selectedTabLabel =
@@ -56,8 +59,10 @@ export const UserReviewsPage = () => {
         activeTab === "books" ? "Explore books" : "Explore movies";
 
     const fetchReviews = async (tab: UserReviewTab, page: number) => {
+        const currentRequest = ++requestId.current;
         setIsLoading(true);
         setHasError(false);
+        setStatus(`Loading ${tab} reviews…`);
 
         try {
             const nextReviewsData =
@@ -66,16 +71,23 @@ export const UserReviewsPage = () => {
                     : tab === "movies"
                       ? await getUserMovieReviews(profileUser.id, page)
                       : await getUserBookReviews(profileUser.id, page);
+            if (currentRequest !== requestId.current) return;
             setReviewsData(nextReviewsData);
+            setStatus(
+                `${tab} reviews loaded. Page ${page}. ${nextReviewsData.reviews.length} reviews shown.`,
+            );
         } catch (error) {
+            if (currentRequest !== requestId.current) return;
             console.log(error);
             setHasError(true);
+            setStatus("");
         } finally {
-            setIsLoading(false);
+            if (currentRequest === requestId.current) setIsLoading(false);
         }
     };
 
     const handleTabChange = async (tab: UserReviewTab) => {
+        if (tab === activeTab && !hasError) return;
         setActiveTab(tab);
         await fetchReviews(tab, 1);
     };
@@ -88,68 +100,78 @@ export const UserReviewsPage = () => {
         <div className="flex flex-col gap-6 sm:gap-10 min-h-[70vh] w-full max-w-4xl">
             <div className="flex flex-col items-center gap-5">
                 <h2 className="text-center text-xl font-bold">Reviews</h2>
-                <div className="flex flex-wrap justify-center gap-2">
-                    {tabs.map((tab) => (
-                        <BaseTab
-                            key={tab.value}
-                            isSelected={activeTab === tab.value}
-                            onClick={() => handleTabChange(tab.value)}
-                        >
-                            {tab.label}
-                        </BaseTab>
-                    ))}
-                </div>
-            </div>
-            {isLoading && (
-                <div className="flex min-h-48 items-center justify-center">
-                    <div className="h-10 w-10 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
-                </div>
-            )}
-            {!isLoading && hasError && (
-                <p className="text-center text-lg">
-                    Could not load {selectedTabLabel} reviews.
-                </p>
-            )}
-            {!isLoading && !hasError && reviews.length ? (
-                <ul className="flex flex-col gap-4">
-                    {activeTab === "movies"
-                        ? (reviews as MovieReview[]).map((review) => (
-                              <MovieReviewDetails
-                                  key={review.id}
-                                  review={review}
-                              />
-                          ))
-                        : (reviews as BookReview[]).map((review) => (
-                              <BookReviewDetails
-                                  key={review.id}
-                                  review={review}
-                              />
-                          ))}
-                </ul>
-            ) : null}
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    isLoading={isLoading}
+                <MediaTabs
+                    id={tabsId}
+                    label="Reviews media"
+                    tabs={tabs}
+                    selected={activeTab}
+                    onSelect={handleTabChange}
                 />
-            )}
-            {!isLoading && !hasError && reviews.length === 0 && (
-                <div className="flex flex-col items-center justify-center gap-10">
-                    <p className="text-center text-lg">
-                        {isSameUser ? "You have" : `${profileUserName} has`} no
-                        {activeTab === "albums"
-                            ? " album reviews yet"
-                            : ` ${selectedTabLabel} reviews yet`}
+            </div>
+            <p role="status" className="sr-only">
+                {status}
+            </p>
+            <div
+                id={`${tabsId}-panel`}
+                role="tabpanel"
+                aria-labelledby={`${tabsId}-tab-${activeTab}`}
+                aria-busy={isLoading}
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: Tab panels need a keyboard entry point, including empty and loading states (APG Tabs).
+                tabIndex={0}
+                className="flex flex-col gap-6 sm:gap-10"
+            >
+                {isLoading && (
+                    <div className="flex min-h-48 items-center justify-center">
+                        <div className="h-10 w-10 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
+                    </div>
+                )}
+                {!isLoading && hasError && (
+                    <p role="alert" className="text-center text-lg">
+                        Could not load {selectedTabLabel} reviews.
                     </p>
-                    {isSameUser && activeTab !== "albums" && (
-                        <ButtonLink style="orange" to={exploreTo}>
-                            {exploreLabel}
-                        </ButtonLink>
-                    )}
-                </div>
-            )}
+                )}
+                {!isLoading && !hasError && reviews.length ? (
+                    <ul className="flex flex-col gap-4">
+                        {activeTab === "movies"
+                            ? (reviews as MovieReview[]).map((review) => (
+                                  <MovieReviewDetails
+                                      key={review.id}
+                                      review={review}
+                                  />
+                              ))
+                            : (reviews as BookReview[]).map((review) => (
+                                  <BookReviewDetails
+                                      key={review.id}
+                                      review={review}
+                                  />
+                              ))}
+                    </ul>
+                ) : null}
+                {totalPages > 1 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        isLoading={isLoading}
+                    />
+                )}
+                {!isLoading && !hasError && reviews.length === 0 && (
+                    <div className="flex flex-col items-center justify-center gap-10">
+                        <p className="text-center text-lg">
+                            {isSameUser ? "You have" : `${profileUserName} has`}{" "}
+                            no
+                            {activeTab === "albums"
+                                ? " album reviews yet"
+                                : ` ${selectedTabLabel} reviews yet`}
+                        </p>
+                        {isSameUser && activeTab !== "albums" && (
+                            <ButtonLink style="orange" to={exploreTo}>
+                                {exploreLabel}
+                            </ButtonLink>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

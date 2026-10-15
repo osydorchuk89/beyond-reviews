@@ -9,8 +9,13 @@ interface FriendRequestsSectionProps {
     title: string;
     requests: ReceivedFriendRequest[] | SentFriendRequest[];
     type: "received" | "sent";
-    onAcceptRequest?: (profileUserId: string, requestUserId: string) => void;
+    onAcceptRequest?: (
+        profileUserId: string,
+        requestUserId: string,
+        trigger: HTMLButtonElement,
+    ) => void;
     profileUserId?: string;
+    pendingIds?: string[];
 }
 
 export const FriendRequestsSection = ({
@@ -19,6 +24,7 @@ export const FriendRequestsSection = ({
     type,
     onAcceptRequest,
     profileUserId,
+    pendingIds = [],
 }: FriendRequestsSectionProps) => {
     return (
         <div className={`flex flex-col gap-3 ${horizontalPadding.custom}`}>
@@ -43,14 +49,16 @@ export const FriendRequestsSection = ({
                                 lastName={user.lastName}
                                 photo={user.photo}
                                 showAcceptButton={type === "received"}
+                                isPending={pendingIds.includes(userId)}
                                 onAccept={
                                     type === "received" &&
                                     onAcceptRequest &&
                                     profileUserId
-                                        ? () =>
+                                        ? (trigger) =>
                                               onAcceptRequest(
                                                   profileUserId,
                                                   userId,
+                                                  trigger,
                                               )
                                         : undefined
                                 }

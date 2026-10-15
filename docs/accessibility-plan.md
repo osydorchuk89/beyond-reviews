@@ -1,6 +1,6 @@
 # Client accessibility plan: WCAG 2.2 AA
 
-Updated: 14 October 2026. Based on the code review and local browser checks at `79a1499`, with implementation progress recorded below.
+Updated: 15 October 2026. Based on the code review and local browser checks at `79a1499`, with implementation progress recorded below.
 
 The goal is to make the client easier to use with a keyboard, screen reader, enlarged text, and small screens, and to meet the applicable WCAG 2.2 Level A and AA requirements.
 
@@ -70,6 +70,12 @@ Developer reference: findings A01, A06, and A13. Improve shared buttons and link
 Developer reference: findings A02–A05. Use native radio inputs for ratings, make button types explicit, and connect the existing review validation to submission. Messaging inputs and sending are deferred.
 
 ## Phase 4 — Explain selections and action results
+
+**Partly implemented on 15 October 2026, preserving the normal page appearance:** tabs now support keyboard navigation and expose their selection; likes, saved items, and filters expose their state. Actions wait for confirmed success, prevent duplicate requests, and provide screen-reader feedback. Approved visible error notifications now explain failed actions. Accepting requests and loading the last results keep focus somewhere useful. Image/link names, list structure, review expansion, and recommendation scrolling are improved. See the [checks and remaining work](accessibility-testing.md#phase-4-validation).
+
+**Selection appearance:** the page underline and saved-bookmark checkmark were rolled back at the maintainer's request. Pagination and bookmarks retain their original appearance; additional selection cues remain unresolved pending an agreed design. Tabs and likes retain their strong light/dark state differences, and selected filters retain their existing remove control. Further contrast and manual evaluation remain in later phases.
+
+**Approved visible error feedback is implemented:** failed likes, wishlist updates, friend requests, and result loading show error toasts using the existing notification style. They remain until dismissed, retried, or their page context is left. Focus stays where the user is working, and each error has one alert. Existing loading indicators and success feedback retain their appearance; no additional pending indicators are planned in this phase. Actual screen-reader evaluation remains pending. Messaging remains deferred.
 
 **Purpose:** Make it clear what is selected and whether an action worked.
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import type {
@@ -11,7 +11,7 @@ import { useIsSameUser } from "../../../../hooks/useIsSameUser";
 import { ButtonLink } from "../../../ui/ButtonLink";
 import { ActivityItem } from "./ActivityItem";
 import { Pagination } from "../../../ui/Pagination";
-import { BaseTab } from "../../../ui/BaseTab";
+import { MediaTabs } from "../../../ui/MediaTabs";
 
 const tabs: { value: UserActivityTab; label: string }[] = [
     { value: "books", label: "Books" },
@@ -32,6 +32,9 @@ export const UserActivitiesPage = () => {
         useState<UserActivities>(userActivities);
     const [isLoading, setIsLoading] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const tabsId = useId();
+    const requestId = useRef(0);
+    const [status, setStatus] = useState("");
     const { isSameUser, profileUserName } = useIsSameUser(profileUser);
     const { activities, currentPage, totalPages } = activitiesData;
     const selectedTabLabel =
@@ -42,8 +45,10 @@ export const UserActivitiesPage = () => {
         activeTab === "books" ? "Explore books" : "Explore movies";
 
     const fetchActivities = async (tab: UserActivityTab, page: number) => {
+        const currentRequest = ++requestId.current;
         setIsLoading(true);
         setHasError(false);
+        setStatus(`Loading ${tab} activities…`);
 
         try {
             const nextActivitiesData = await getUserActivities(
@@ -51,16 +56,23 @@ export const UserActivitiesPage = () => {
                 page,
                 tab,
             );
+            if (currentRequest !== requestId.current) return;
             setActivitiesData(nextActivitiesData);
+            setStatus(
+                `${tab} activities loaded. Page ${page}. ${nextActivitiesData.activities.length} activities shown.`,
+            );
         } catch (error) {
+            if (currentRequest !== requestId.current) return;
             console.log(error);
             setHasError(true);
+            setStatus("");
         } finally {
-            setIsLoading(false);
+            if (currentRequest === requestId.current) setIsLoading(false);
         }
     };
 
     const handleTabChange = async (tab: UserActivityTab) => {
+        if (tab === activeTab && !hasError) return;
         setActiveTab(tab);
         await fetchActivities(tab, 1);
     };
@@ -73,57 +85,67 @@ export const UserActivitiesPage = () => {
         <div className="flex flex-col gap-6 sm:gap-10 min-h-[70vh] w-full max-w-4xl">
             <div className="flex flex-col items-center gap-5">
                 <h2 className="text-center text-xl font-bold">Activities</h2>
-                <div className="flex flex-wrap justify-center gap-2">
-                    {tabs.map((tab) => (
-                        <BaseTab
-                            key={tab.value}
-                            isSelected={activeTab === tab.value}
-                            onClick={() => handleTabChange(tab.value)}
-                        >
-                            {tab.label}
-                        </BaseTab>
-                    ))}
-                </div>
-            </div>
-            {isLoading && (
-                <div className="flex min-h-48 items-center justify-center">
-                    <div className="h-10 w-10 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
-                </div>
-            )}
-            {!isLoading && hasError && (
-                <p className="text-center text-lg">
-                    Could not load {selectedTabLabel} activities.
-                </p>
-            )}
-            {!isLoading &&
-                !hasError &&
-                activities.length > 0 &&
-                activities.map((activity) => (
-                    <ActivityItem key={activity.id} activity={activity} />
-                ))}
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    isLoading={isLoading}
+                <MediaTabs
+                    id={tabsId}
+                    label="Activities media"
+                    tabs={tabs}
+                    selected={activeTab}
+                    onSelect={handleTabChange}
                 />
-            )}
-            {!isLoading && !hasError && activities.length === 0 && (
-                <div className="flex flex-col items-center justify-center gap-10">
-                    <p className="text-center text-lg">
-                        {isSameUser ? "You have" : `${profileUserName} has`} no
-                        {activeTab === "albums"
-                            ? " album activities yet"
-                            : ` ${selectedTabLabel} activities`}
+            </div>
+            <p role="status" className="sr-only">
+                {status}
+            </p>
+            <div
+                id={`${tabsId}-panel`}
+                role="tabpanel"
+                aria-labelledby={`${tabsId}-tab-${activeTab}`}
+                aria-busy={isLoading}
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: Tab panels need a keyboard entry point, including empty and loading states (APG Tabs).
+                tabIndex={0}
+                className="flex flex-col gap-6 sm:gap-10"
+            >
+                {isLoading && (
+                    <div className="flex min-h-48 items-center justify-center">
+                        <div className="h-10 w-10 rounded-full border-4 border-sky-500 border-t-transparent animate-spin" />
+                    </div>
+                )}
+                {!isLoading && hasError && (
+                    <p role="alert" className="text-center text-lg">
+                        Could not load {selectedTabLabel} activities.
                     </p>
-                    {isSameUser && activeTab !== "albums" && (
-                        <ButtonLink style="orange" to={exploreTo}>
-                            {exploreLabel}
-                        </ButtonLink>
-                    )}
-                </div>
-            )}
+                )}
+                {!isLoading &&
+                    !hasError &&
+                    activities.length > 0 &&
+                    activities.map((activity) => (
+                        <ActivityItem key={activity.id} activity={activity} />
+                    ))}
+                {totalPages > 1 && (
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                        isLoading={isLoading}
+                    />
+                )}
+                {!isLoading && !hasError && activities.length === 0 && (
+                    <div className="flex flex-col items-center justify-center gap-10">
+                        <p className="text-center text-lg">
+                            {isSameUser ? "You have" : `${profileUserName} has`}{" "}
+                            no
+                            {activeTab === "albums"
+                                ? " album activities yet"
+                                : ` ${selectedTabLabel} activities`}
+                        </p>
+                        {isSameUser && activeTab !== "albums" && (
+                            <ButtonLink style="orange" to={exploreTo}>
+                                {exploreLabel}
+                            </ButtonLink>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

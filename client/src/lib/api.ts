@@ -208,6 +208,7 @@ export const sendLikeOrUnlike = async (
         });
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 
@@ -224,6 +225,7 @@ export const sendBookLikeOrUnlike = async (
         });
     } catch (error) {
         console.log(error);
+        throw error;
     }
 };
 

@@ -1,4 +1,7 @@
-interface BookMarkIconProps {
+import type { ComponentPropsWithRef } from "react";
+
+interface BookMarkIconProps
+    extends Omit<ComponentPropsWithRef<"button">, "color"> {
     color: string;
     handleClick?: React.MouseEventHandler<HTMLButtonElement>;
     handleMouseEnter?: React.MouseEventHandler<SVGSVGElement>;
@@ -10,13 +13,16 @@ export const BookMarkIcon = ({
     handleClick,
     handleMouseEnter,
     handleMouseLeave,
+    "aria-label": label = "Toggle wishlist",
+    ...props
 }: BookMarkIconProps) => {
     return (
         <button
+            {...props}
             onClick={handleClick}
             className="z-5"
             type="button"
-            aria-label="Toggle wishlist"
+            aria-label={label}
         >
             <svg
                 aria-hidden="true"

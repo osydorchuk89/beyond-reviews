@@ -27,19 +27,18 @@ export const FriendRecommendationsSection = ({
     );
 
     const handleSendFriendRequest = async (otherUserId: string) => {
+        if (requestedUserIds.includes(otherUserId)) return;
+        await onSendFriendRequest(otherUserId);
         setRequestedUserIds((prev) => [...prev, otherUserId]);
-        try {
-            await onSendFriendRequest(otherUserId);
-        } catch (error) {
-            setRequestedUserIds((prev) =>
-                prev.filter((userId) => userId !== otherUserId),
-            );
-            console.error("Failed to send friend request:", error);
-        }
     };
 
-    const { scrollContainerRef, canScrollLeft, canScrollRight, handleScroll } =
-        useHorizontalScroll(recommendations.length);
+    const {
+        scrollId,
+        scrollContainerRef,
+        canScrollLeft,
+        canScrollRight,
+        handleScroll,
+    } = useHorizontalScroll(recommendations.length);
 
     return (
         <section className="flex flex-col gap-8 w-full rounded-xl bg-fuchsia-100 p-4 sm:p-6">
@@ -63,11 +62,17 @@ export const FriendRecommendationsSection = ({
                 <div className="flex items-center gap-4">
                     <ArrowIcon
                         direction="left"
+                        aria-controls={scrollId}
+                        aria-label="Scroll friend recommendations left"
                         onClick={() => handleScroll("left")}
                         disabled={!canScrollLeft}
                     />
-                    <div
+                    <section
                         ref={scrollContainerRef}
+                        id={scrollId}
+                        aria-label="Friend recommendations"
+                        // biome-ignore lint/a11y/noNoninteractiveTabindex: A named horizontal scroll region needs keyboard scrolling.
+                        tabIndex={0}
                         className="w-full overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                     >
                         <ul className="flex w-max gap-8 pr-4">
@@ -87,9 +92,11 @@ export const FriendRecommendationsSection = ({
                                 );
                             })}
                         </ul>
-                    </div>
+                    </section>
                     <ArrowIcon
                         direction="right"
+                        aria-controls={scrollId}
+                        aria-label="Scroll friend recommendations right"
                         onClick={() => handleScroll("right")}
                         disabled={!canScrollRight}
                     />

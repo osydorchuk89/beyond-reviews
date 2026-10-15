@@ -1,18 +1,1 @@
-[
-  {
-    "rule": "list",
-    "findings": [
-      "A12"
-    ],
-    "nodes": [
-      {
-        "target": [
-          ".sm\\:gap-10 > ul"
-        ],
-        "failedChecks": [
-          "only-listitems"
-        ]
-      }
-    ]
-  }
-]
+[]

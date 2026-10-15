@@ -1,18 +1,30 @@
-import { useLoaderData } from "react-router";
-import { ToastContainer } from "react-toastify";
+import { useLoaderData, useRouteLoaderData } from "react-router";
 
 import { MovieMainInfo } from "./MovieMainInfo";
 import { MovieReviews } from "./MovieReviews";
 import { MovieAdditionalInfo } from "./MovieAdditionalInfo";
-import type { Movie, MovieReviewsData } from "../../../lib/entities";
+import type { AuthData, Movie, MovieReviewsData } from "../../../lib/entities";
+import { useWishlistState } from "../../../hooks/useWishlistState";
+import { getWishlistKey } from "../../../store";
+import { ActionFeedback } from "../../ui/ActionFeedback";
 import { ButtonLink } from "../../ui/ButtonLink";
 import { horizontalPadding } from "../../../styles/responsive";
 
 export const MoviePage = () => {
+    const { authData } = useRouteLoaderData("root") as { authData: AuthData };
     const { movie, movieReviewsData } = useLoaderData() as {
         movie: Movie;
         movieReviewsData: MovieReviewsData;
     };
+    const wishlistKey = movie
+        ? getWishlistKey("Movie", movie.id, authData.user?.id)
+        : null;
+    const wishlist = useWishlistState(
+        wishlistKey,
+        (movie?.onWishlist ?? []).some(
+            (entry) => entry.userId === authData.user?.id,
+        ),
+    );
 
     if (!movie) {
         return (
@@ -30,17 +42,9 @@ export const MoviePage = () => {
 
     return (
         <div
+            key={wishlistKey}
             className={`flex flex-col w-full mx-auto ${horizontalPadding.page} text-sky-950 relative`}
         >
-            <ToastContainer
-                autoClose={3000}
-                hideProgressBar
-                toastStyle={{
-                    backgroundColor: "#bae6fd",
-                    paddingBlock: 0,
-                    paddingInline: 20,
-                }}
-            />
             <div className="flex flex-col md:flex-row gap-8 md:gap-10 py-6 sm:py-10">
                 <MovieMainInfo movie={movie} />
                 <MovieAdditionalInfo
@@ -52,6 +56,10 @@ export const MoviePage = () => {
             <MovieReviews
                 movieId={movie.id}
                 initialMovieReviewsData={movieReviewsData}
+            />
+            <ActionFeedback
+                status={wishlist?.status ?? ""}
+                error={wishlist?.error ?? ""}
             />
         </div>
     );
