@@ -41,7 +41,7 @@ export const FriendRecommendationsSection = ({
     } = useHorizontalScroll(recommendations.length);
 
     return (
-        <section className="flex flex-col gap-8 w-full rounded-xl bg-fuchsia-100 p-4 sm:p-6">
+        <section className="recommendations flex flex-col gap-8 w-full rounded-xl bg-fuchsia-100 p-4 sm:p-6">
             <h3 className="text-xl text-center text-fuchsia-950 font-bold">
                 Suggested friends
             </h3>
@@ -59,7 +59,7 @@ export const FriendRecommendationsSection = ({
                     </p>
                 </div>
             ) : recommendations.length > 0 ? (
-                <div className="flex items-center gap-4">
+                <div className="recommendation-row flex items-center gap-4">
                     <ArrowIcon
                         direction="left"
                         aria-controls={scrollId}

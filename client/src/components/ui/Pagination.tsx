@@ -73,7 +73,7 @@ export const Pagination = ({
         <nav
             ref={navigationRef}
             aria-label="Pagination"
-            className="flex justify-center items-center gap-2 my-8"
+            className="flex flex-wrap justify-center items-center gap-2 my-8"
         >
             <BaseButton
                 handleClick={() => handlePageChange(currentPage - 1)}
@@ -97,7 +97,7 @@ export const Pagination = ({
                         aria-disabled={isLoading}
                         className={`cursor-pointer px-4 py-2 rounded-lg ${
                             currentPage === page
-                                ? "bg-sky-500 text-white"
+                                ? "bg-sky-700 text-white"
                                 : "bg-sky-100 hover:bg-sky-200"
                         }`}
                     >

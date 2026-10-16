@@ -1,18 +1,1 @@
-[
-  {
-    "rule": "color-contrast",
-    "findings": [
-      "A08"
-    ],
-    "nodes": [
-      {
-        "target": [
-          ".bg-sky-600"
-        ],
-        "failedChecks": [
-          "color-contrast"
-        ]
-      }
-    ]
-  }
-]
+[]

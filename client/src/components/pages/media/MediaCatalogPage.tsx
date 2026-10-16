@@ -42,7 +42,7 @@ export function MediaCatalogPage<TData>({
                     <SortFilterBar itemsList={sortItems} title="Sort by:" />
                     <SortFilterBar itemsList={filterItems} title="Filter:" />
                 </aside>
-                <div className="flex flex-col w-full md:w-3/4">
+                <div className="flex flex-col w-full lg:w-3/4">
                     <Suspense fallback={<LoadingSpinner />}>
                         <Await resolve={dataPromise}>{renderContent}</Await>
                     </Suspense>

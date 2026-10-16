@@ -1,6 +1,6 @@
 # Client accessibility plan: WCAG 2.2 AA
 
-Updated: 15 October 2026. Based on the code review and local browser checks at `79a1499`, with implementation progress recorded below.
+Updated: 16 October 2026. Based on the code review and local browser checks at `79a1499`, with implementation progress recorded below.
 
 The goal is to make the client easier to use with a keyboard, screen reader, enlarged text, and small screens, and to meet the applicable WCAG 2.2 Level A and AA requirements.
 
@@ -22,7 +22,7 @@ The urgent review bugs are fixed: Cancel no longer saves (Phase 2), and failed s
 
 No database changes are expected for this work.
 
-**Form appearance:** Keep the existing form layouts and styling from before Phase 3. Reuse visible text as labels and prefer changes to semantics and behavior. Form fixes that require a visible redesign remain pending; preserving the UI does not make those accessibility requirements pass.
+**Form appearance:** Keep the existing form layouts and styling except for the specific contrast and responsive fixes approved in Phase 5. Reuse visible text as labels and prefer changes to semantics and behavior. Further visible changes require approval; preserving the UI does not make unresolved accessibility requirements pass.
 
 ## Phase 1 — Set up checks
 
@@ -56,7 +56,7 @@ Developer reference: findings A01, A06, and A13. Improve shared buttons and link
 
 ## Phase 3 — Make forms and review saving reliable
 
-**Partly implemented on 14 October 2026, preserving the original form appearance:** the existing Search heading labels its input; form errors are associated with their fields; autofill hints, screen-reader descriptions, native keyboard-operable stars, and validated review saving are in place. Forms retain drafts after failed saves and restore useful focus. Added instruction rows, changed spacing/sizing, and moved alerts have been rolled back. Visible password/photo instructions and a rating-selection cue beyond color remain pending, along with actual password-manager and screen-reader evaluation. See the [checks and remaining evaluation](accessibility-testing.md#phase-3-validation).
+**Partly implemented on 14 October 2026, preserving the original form appearance:** the existing Search heading labels its input; form errors are associated with their fields; autofill hints, screen-reader descriptions, native keyboard-operable stars, and validated review saving are in place. Forms retain drafts after failed saves and restore useful focus. Added instruction rows, changed spacing/sizing, and moved alerts were rolled back. Phase 5 subsequently adds approved star sizing, stronger light/dark selection contrast, and other targeted responsive fixes. Visible password/photo instructions remain pending, along with actual password-manager and screen-reader evaluation. See the [checks and remaining evaluation](accessibility-testing.md#phase-3-validation).
 
 **Purpose:** Help people understand what to enter, correct mistakes, and keep their work.
 
@@ -73,7 +73,7 @@ Developer reference: findings A02–A05. Use native radio inputs for ratings, ma
 
 **Partly implemented on 15 October 2026, preserving the normal page appearance:** tabs now support keyboard navigation and expose their selection; likes, saved items, and filters expose their state. Actions wait for confirmed success, prevent duplicate requests, and provide screen-reader feedback. Approved visible error notifications now explain failed actions. Accepting requests and loading the last results keep focus somewhere useful. Image/link names, list structure, review expansion, and recommendation scrolling are improved. See the [checks and remaining work](accessibility-testing.md#phase-4-validation).
 
-**Selection appearance:** the page underline and saved-bookmark checkmark were rolled back at the maintainer's request. Pagination and bookmarks retain their original appearance; additional selection cues remain unresolved pending an agreed design. Tabs and likes retain their strong light/dark state differences, and selected filters retain their existing remove control. Further contrast and manual evaluation remain in later phases.
+**Selection appearance:** the page underline and saved-bookmark checkmark were rolled back at the maintainer's request. Phase 5's approved darker pagination, bookmark, and rating colors now supply strong light/dark distinctions. Tabs and likes retain their strong light/dark state differences, and selected filters retain their existing remove control. Final visual and assistive-technology evaluation remains pending.
 
 **Approved visible error feedback is implemented:** failed likes, wishlist updates, friend requests, and result loading show error toasts using the existing notification style. They remain until dismissed, retried, or their page context is left. Focus stays where the user is working, and each error has one alert. Existing loading indicators and success feedback retain their appearance; no additional pending indicators are planned in this phase. Actual screen-reader evaluation remains pending. Messaging remains deferred.
 
@@ -89,6 +89,17 @@ Developer reference: findings A02–A05. Use native radio inputs for ratings, ma
 Developer reference: findings A07, A10, and A12, plus recommendation focus checks in A13. Preserve existing toast announcements and avoid announcing the same result twice. Chat selection and message announcements are deferred.
 
 ## Phase 5 — Improve readability and small-screen layouts
+
+**Approved implementation completed on 16 October 2026; final manual validation pending:** registration and the ten rating choices fit at 320 CSS pixels; card headers and login grow with enlarged text; recommendation cards fit their visible area, with arrows above on narrow layouts. Selected filters and unusually long names, titles, and reviews wrap within their containers. Header, star, bookmark, button, metadata, and icon contrast are improved. See the [checks and remaining manual evaluation](accessibility-testing.md#phase-5-validation).
+
+The approved changes are:
+
+- **Layout:** fit registration within the screen; keep ten rating stars on one row by shrinking them only when needed; reduce review-button spacing on small screens and allow wrapping; let pagination wrap.
+- **Colors:** use darker versions of the existing blue buttons, selected pagination background, inline Search button, review metadata, filter close icons, and query-link hover text.
+- **Further approved fixes:** lighter header highlights, darker outlined rating stars and saved bookmarks, growing card headers/login, and responsive recommendation rows.
+- **Wrapping:** allow selected filters to move onto additional rows, keep close buttons from shrinking, and wrap long names/titles/reviews within existing containers.
+
+The usual desktop layouts are preserved. The previously rejected pagination underline, bookmark checkmark, and form instructions remain absent. All approved code changes are implemented. Native zoom/text enlargement and the final manual focus/target-size evaluation remain before Phase 5 can be fully closed; include those checks in the Phase 6 evaluation.
 
 **Purpose:** Keep content readable and controls usable when the display or text size changes.
 

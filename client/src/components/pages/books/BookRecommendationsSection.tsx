@@ -29,7 +29,7 @@ export const BookRecommendationsSection = ({
     } = useHorizontalScroll(recommendations.length);
 
     return (
-        <section className="flex flex-col gap-8 w-full rounded-xl bg-fuchsia-100 p-4 sm:p-6">
+        <section className="recommendations flex flex-col gap-8 w-full rounded-xl bg-fuchsia-100 p-4 sm:p-6">
             <h2 className="text-xl text-center text-fuchsia-950 font-bold">
                 Recommended for you
             </h2>
@@ -46,7 +46,7 @@ export const BookRecommendationsSection = ({
                     </p>
                 </div>
             ) : recommendations.length > 0 ? (
-                <div className="flex items-center gap-4">
+                <div className="recommendation-row flex items-center gap-4">
                     <ArrowIcon
                         direction="left"
                         aria-controls={scrollId}

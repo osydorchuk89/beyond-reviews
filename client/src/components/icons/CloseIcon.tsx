@@ -10,6 +10,7 @@ export const CloseIcon = ({
     handleClick,
     style,
     onClick,
+    className,
     ...props
 }: CloseIconProps) => {
     return (
@@ -17,6 +18,7 @@ export const CloseIcon = ({
             type="button"
             aria-label="Close"
             {...props}
+            className={["shrink-0", className].filter(Boolean).join(" ")}
             onClick={handleClick ?? onClick}
         >
             <svg
@@ -26,7 +28,7 @@ export const CloseIcon = ({
                 viewBox="0 0 24 24"
                 strokeWidth="2"
                 stroke="currentColor"
-                className={`w-6 h-6 cursor-pointer ${style === "light" ? "text-white" : "text-orange-600 hover:text-orange-900"} `}
+                className={`w-6 h-6 cursor-pointer ${style === "light" ? "text-white" : "text-orange-800 hover:text-orange-900"} `}
             >
                 <path
                     strokeLinecap="round"

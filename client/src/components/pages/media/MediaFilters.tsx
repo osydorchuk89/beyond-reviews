@@ -10,7 +10,7 @@ export const MediaFilters = ({
     handleCloseFilterTag,
 }: MediaFiltersProps) => {
     return (
-        <ul className="flex flex-row justify-center gap-4">
+        <ul className="flex flex-row flex-wrap justify-center gap-4">
             {filters.map((filter) => (
                 <FilterTag
                     key={filter}

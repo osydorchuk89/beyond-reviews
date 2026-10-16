@@ -75,19 +75,19 @@ Changed selectors can change a fingerprint without changing the defect. Review t
 
 ## Short findings checklist
 
-Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). Phases 2–4 implement navigation, form, state, and feedback fixes. The client maintainer owns follow-up. Automated results below cover the specified states; screen-reader and final journey evaluation remain pending.
+Evidence and affected source files are in the [audit](accessibility-audit.md#prioritized-findings). Phases 2–5 implement navigation, form, state, feedback, contrast, and responsive fixes. The client maintainer owns follow-up. Automated results below cover the specified states; screen-reader and final journey evaluation remain pending.
 
 | ID | What needs fixing | Planned phase | Status / retest |
 | --- | --- | --- | --- |
 | A01 | Mobile-menu keyboard and focus behavior | 2 | Implemented; automated keyboard retest passed 14 October; screen-reader/final journey checks pending |
-| A02 | Review Cancel, validation, rating labels and selection | 3, urgent fixes early | Partly implemented: native radio semantics behind the original stars, required rating, create/edit/cancel, and invalid action payloads retested 14 October; a visible selected-value cue beyond color and screen-reader evaluation remain pending |
+| A02 | Review Cancel, validation, rating labels and selection | 3, 5, urgent fixes early | Code fixes implemented: native radio semantics behind stars, required rating, create/edit/cancel, and invalid payloads. Phase 5 adds approved responsive stars with visible outlines and measured light/dark selection contrast; keyboard and forced-color emulation checks passed 16 October. Actual screen-reader/final visual evaluation remains pending |
 | A03 | Review draft loss and focus during saves | 3, urgent fixes early | Implemented; slow saves, duplicate prevention, failure/retry, network/session failures, reopening, and focus retested for books/movies 14 October |
 | A04 | Search labels | 3 | Search portion implemented and retested 14 October; message-input portion deferred |
 | A05 | Authentication labels, errors, instructions, autofill | 3 | Partly implemented: field associations, first-error focus, server errors, clipboard paste, autocomplete tokens, and photo validation retested 14 October; instruction text is screen-reader-only to preserve the UI; visible requirements and actual password-manager/screen-reader evaluation remain pending |
 | A06 | Main content, headings, titles, route focus | 2 | Implemented for normal/placeholder/missing-item pages and the existing user error boundary; structural and route-focus checks passed 14 October; screen-reader evaluation pending |
-| A07 | Tabs, toggles, and selected filters | 4 | Semantics implemented: tabs/panels, keyboard selection, pressed likes/saved items/filters, and current-page semantics. Page underline/bookmark checkmark rolled back at the maintainer's request; additional cues for these controls remain unresolved. Tabs/likes retain strong light/dark state differences; filters retain the selected remove control. Manual screen-reader/visual evaluation remains pending; chat-selection portion deferred |
-| A08 | Contrast | 5 | Open; contrast baseline and rendered-state retest pending |
-| A09 | Narrow layouts, zoom, and text spacing | 5 | Open; original star row, textarea size, form widths, and button spacing restored at the maintainer's request; responsive form changes require an agreed visual design; messaging layout portion deferred |
+| A07 | Tabs, toggles, and selected filters | 4, 5 | Code fixes implemented. Approved darker pagination, bookmarks and rating stars supply measured light/dark state distinctions; rejected underline/checkmark stay removed. Tabs/likes retain strong light/dark state differences; filters retain the selected remove control. Keyboard/state checks passed 16 October; manual screen-reader/visual evaluation remains pending; chat-selection portion deferred |
+| A08 | Contrast | 5 | Observed failures fixed with approved colors, outlines, hover treatments and stronger selected states. All 47 contrast-node exceptions removed from the 43 baseline states; no new exception added. Targeted rendered-color/hover/forced-color emulation checks passed 16 October. Full manual state/focus evaluation remains pending |
+| A09 | Narrow layouts, zoom, and text spacing | 5 | Approved code fixes implemented 16 October: fluid registration, responsive stars, wrapping review actions/pagination/filters, growing card headers/login, fitting recommendation panels and wrapping long names/titles/reviews. Targeted desktop, 320-pixel, doubled-font, long-content and spacing checks passed. Native zoom/text enlargement and final layout evaluation remain pending; messaging portion deferred |
 | A10 | Loading, errors, success feedback, removed-control focus | 4 | Code changes implemented and retested 15 October: confirmed success, request guards, hidden pending/success status, approved persistent error toasts, existing loading/success appearance, stale-tab response protection, and focus after acceptance/final load-more. Actual screen-reader announcements and final journey evaluation pending |
 | A11 | Message input, sending, history, and announcements | After refactor | Deferred; remains unresolved |
 | A12 | Link/image names and list structure | 4 | Non-messaging code fixes implemented: contextual poster/link/action names and catalog/user-review list items retested 15 October; observed list failures removed from baselines; screen-reader/final journey evaluation pending; chat-list portion deferred |
@@ -144,7 +144,7 @@ The root and media-detail routes skip revalidation after a failed review action 
 
 Search has an associated visible label, validation feedback, and focus returns to its input after clearing the search. Authentication fields expose required/invalid states, related error text, and autocomplete purposes. Server failures use alerts; duplicate registration email errors focus the email field. Password/photo descriptions are available to screen readers; visible requirements before submission remain open. The client photo limit matches the existing server limit of 5 MiB; no backend policy changed.
 
-Preserving the UI leaves some accessibility work unfinished: visible password/photo instructions, a visible rating-selection cue beyond color, and narrow-layout/zoom issues. Screen-reader-only text does not resolve these requirements for sighted users. Actual password-manager autofill, screen-reader operation/announcements, deployed integration, and final journey evaluation also remain pending. Messaging-specific forms and sending remain deferred. No hosted CI result is claimed here.
+At the end of Phase 3, preserving the UI left visible password/photo instructions, rating selection contrast, and narrow-layout/zoom issues unfinished. Phase 5 subsequently implements the approved rating contrast and targeted responsive fixes; visible password/photo requirements remain pending. Screen-reader-only text does not resolve those visible-instruction requirements. Actual password-manager autofill, screen-reader operation/announcements, deployed integration, and final journey evaluation also remain pending. Messaging-specific forms and sending remain deferred. No hosted CI result is claimed here.
 
 ## Phase 4 validation
 
@@ -165,7 +165,7 @@ Catalogs and user-review lists have proper list items. Movie poster links includ
 
 **Selection appearance and remaining work:**
 
-The page underline and saved-bookmark checkmark were tried and rolled back at the maintainer's request. Pagination and bookmarks retain their original appearance, including icon fills and hover previews. Their accessible states and request/focus improvements remain. Additional visual selection cues for these two controls remain unresolved pending an agreed design.
+The page underline and saved-bookmark checkmark were tried and rolled back at the maintainer's request. Their accessible states and request/focus improvements remain. Phase 5 subsequently implements approved darker pagination/bookmark colors with stronger light/dark state differences; the underline/checkmark remain absent.
 
 After the rollback, all seven focused wishlist/pagination browser checks, typechecking, and lint passed.
 
@@ -183,7 +183,57 @@ Validation after the approved error changes:
 - Both new error-state baselines contain only the existing A08 contrast failure on Back to your profile, matching the existing other-profile baseline. No new toast finding was accepted; previous scan baselines are unchanged by the error-notification work.
 - All 18 component/action tests, typechecking, lint, formatting, and the production build passed. The existing bundle-size advisory remains.
 
-Phase 4 remains partial while the selection cues are unresolved. Actual NVDA/VoiceOver announcements, full keyboard journeys, zoom/forced-color evaluation of the new states, deployed/backend integration, and feedback timing/recovery still require manual evaluation. The browser tests verify DOM state, focus, and mocked request outcomes; they do not establish those manual results or WCAG conformance. Messaging-specific changes remain deferred, and no real accounts or local API data were used in these checks.
+Phase 5 supplies the subsequently approved light/dark selection distinctions. Actual NVDA/VoiceOver announcements, full keyboard journeys, native zoom/high-contrast evaluation, deployed/backend integration, and feedback timing/recovery still require manual evaluation. The browser tests verify DOM state, focus, and mocked request outcomes; they do not establish those manual results or WCAG conformance. Messaging-specific changes remain deferred, and no real accounts or local API data were used in these checks.
+
+## Phase 5 preparation
+
+On 16 October 2026, isolated Chromium inspection visited 15 routes: home, login, registration, both catalogs and detail/review forms, populated profile/wishlist/reviews/activities/friends, another user's profile, music, and an unknown path. The initial populated persona redirected login to home; login was subsequently inspected with an anonymous response. API responses and images were synthetic; real accounts and local API data were not used.
+
+The inspection checked three conditions separately: a 320-pixel viewport, a 1280-pixel viewport with text-spacing overrides (1.5 line height, 2em paragraph spacing, .12em letter spacing, .16em word spacing), and a 1280-pixel viewport with computed font sizes doubled. Loading skeletons and loading status were allowed to finish before measurement. Font-size injection is a diagnostic approximation, not native browser text enlargement. Document-width measurements alone do not detect internal clipping, overlapping text, partially hidden carousel content, or obscured focus. No pass or conformance conclusion follows from this inspection.
+
+Confirmed examples before the approved fixes at 320 CSS pixels:
+
+- Registration's 576-pixel form produces a 448-pixel document width and clips content on the left.
+- Both detail/review forms produce a 356-pixel document width because their ten 32-pixel rating choices exceed the form's available width.
+- Rendered white text on the shared blue button measures 4.02:1; inline Search text measures 3.38:1; review date/count metadata measures 4.20:1. These small-text combinations need 4.5:1.
+
+Two groups were approved and implemented under the instruction to approve UI changes before applying them:
+
+| Group | Proposed change |
+| --- | --- |
+| Layout | Cap registration at its container width. Let the ten stars share the available width while retaining one row and their normal 32-pixel size where it fits. Reduce review-action spacing on small screens and wrap actions when necessary. Allow pagination to wrap. |
+| Contrast | Blue buttons and selected pagination: `sky-700`. Inline Search background: `orange-700`. Review metadata: `gray-600`. Dark close icons: `orange-800`. Query-link hover: `sky-700`. Retain existing darker hover treatments where applicable. |
+
+## Phase 5 validation
+
+The approved fixes cap registration at its container width, share the rating row between ten equal square controls up to 32 pixels each, wrap review actions/pagination, and improve contrast. Small-screen review-action gaps are 12 pixels; desktop horizontal gaps retain 40 pixels. The inline Search hover uses `orange-800` to preserve a darker hover response after its default becomes `orange-700`. Input focus styling, labels, form instructions, and messaging-specific components are unchanged.
+
+`layout.spec.ts` adds 50 browser tests: registration/login and book/movie cards/review forms at normal desktop size, 320 pixels, doubled computed font sizes, and narrow text-spacing overrides; all three recommendation rows at 320, 390 and 768 pixels; book/movie pagination at 320 × 256; and header, catalog-hover and SVG contrast. Checks cover form/control bounds, desktop widths, ten same-row targets of at least 24 × 24 pixels, keyboard selection of all ratings, visible keyboard focus, growing card titles above metadata, Google label/logo separation, fitting recommendation panels with long names, offscreen focused links, wrapping pagination, and focus below the sticky header. SVG measurements check actual rendered stroke width, normal and hover selection contrast, and forced-color emulation. Whole-page contrast analyses include the header. Font-size overrides, forced-color emulation and a reduced viewport do not establish native text enlargement, real browser zoom or actual Windows high-contrast-theme results.
+
+Tablet follow-up: reproduced a 2-pixel overlap between catalog cards at 768 pixels. The results container narrowed to 75% at `md` while the grid switched to two columns; it now stays full width until the sidebar moves alongside it at `lg`. Ten additional geometry checks passed for books and movies at 767, 768, 769, 1024 and 1536 pixels, along with typechecking and lint. These tests bring the configured suite to 194; the full 184-test result below predates this focused follow-up.
+
+`wrapping.spec.ts` adds 18 checks at 320 pixels, with normal and increased text spacing. They cover multiple selected filters, long filter labels, at least 24 × 24-pixel close controls, keyboard filter removal and Search focus, long book/movie detail titles/credits/reviews, both profile review tabs, profile/friend names, and activity titles/reviews. The shared main-content wrapping rule also permits flex/grid content to shrink below a long word's intrinsic width; ordinary short text keeps its existing layout. Filter labels use a readable line height instead of zero, and the existing chip spacing is retained. Shared fixes may incidentally help messaging, but messaging-specific evaluation remains deferred.
+
+Validation on 16 October:
+
+- All 184 browser tests passed in the final combined run with snapshot updating disabled, including 58 new Phase 5 checks. This includes 43 baselined scan states and eight additional contrast analyses.
+- All 28 unit tests, typechecking, lint, and the production build passed; the existing bundle-size advisory remains.
+- Removed all 47 previously baselined contrast-node exceptions, without adding new ones. All 43 baseline JSON files now contain `[]`; they remain checked in to catch regressions. Empty baselines do not establish WCAG conformance or cover untested layouts/states.
+- Actual narrow stars measure approximately 24.8 × 24.8 pixels and remain 32 × 32 on desktop. All ten choices remain in one row and keyboard-operable. Desktop registration remains 576 pixels wide.
+- Selected pagination (`sky-700`) versus unselected pagination (`sky-100`) measures 5.09:1. This supplies the additional lightness distinction described by [W3C's Use of Color guidance](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html), without restoring the rejected underline. Forced-color and final visual evaluation remain pending.
+
+The second approved round is implemented:
+
+| Area | Previous issue | Implemented fix |
+| --- | --- | --- |
+| Header highlight/hover | Orange on dark blue measured 2.60:1. | `orange-200` active/hover text measures 5.52:1. |
+| Rating appearance | Selected orange on its review background measured 2.17:1. | Darker selected stars and a thin dark-orange outline: 3.93:1 against the background; selected/unselected fill difference 3.06:1. |
+| Saved bookmark | Blue on white measured 2.77:1. | `sky-700` fill/border measures 5.86:1 at rest; `sky-600` saved hover remains at least 3:1 against white and the unsaved hover fill. The icon shape and absence of a checkmark are preserved. |
+| Enlarged card titles | A 112-pixel title extended outside its fixed 64-pixel header when fonts were doubled. | The header grows with its content and pushes metadata down; short desktop headers remain 64 pixels tall. |
+| Narrow recommendations | A 304-pixel card was shown through a 144-pixel area at a 320-pixel viewport. | A container query moves arrows above the row when its available width is at most 28rem; cards fit that width using container units. Friend cards contain their visually hidden status elements so focusing later cards cannot create page overflow. |
+| Enlarged login | The Google link extended to about y=849 while main/footer met at y=816; logo/label could overlap. | The page keeps a minimum height but grows with its content, and the Google link reserves horizontal space for its logo. |
+
+Synthetic-content inspection originally found horizontal overflow at a 320-pixel viewport from multiple selected filters (430-pixel document), unusually long profile names (493), long review/title content (2020), and long detail titles/descriptions (2253). The approved wrapping fixes now keep those documents at 320 pixels. All approved Phase 5 implementation work is complete. Native 200% text enlargement, real 400% browser zoom, and complete manual focus/target-size evaluation remain pending before this phase is fully closed. Messaging-specific work remains deferred.
 
 ## Manual evaluation record
 

@@ -47,9 +47,9 @@ export const MediaCard = ({
 
     return (
         <div
-            className={`flex flex-col w-76 justify-start items-center bg-sky-100 rounded-lg p-5 relative ${hasShadow && "shadow-lg"}`}
+            className={`flex flex-col w-76 justify-start items-center bg-sky-100 rounded-lg p-5 relative [overflow-wrap:anywhere] ${hasShadow && "shadow-lg"}`}
         >
-            <p className="w-full text-center text-xl font-bold h-16 bg-sky-700 rounded-t-lg flex justify-center items-center absolute top-0 p-4">
+            <p className="w-[calc(100%+2.5rem)] text-center text-xl font-bold min-h-16 bg-sky-700 rounded-t-lg flex shrink-0 justify-center items-center -mx-5 -mt-5 p-4">
                 <Link
                     className="hover:underline text-sky-50"
                     title={title}
@@ -60,13 +60,13 @@ export const MediaCard = ({
                 </Link>
             </p>
             {subtitle && (
-                <p className="mb-2 text-sky-950 mt-16 text-center min-h-6">
+                <p className="mb-2 text-sky-950 mt-5 text-center min-h-6">
                     {subtitle}
                 </p>
             )}
             {showGenres && (
                 <p
-                    className={`mb-2 text-sky-950 text-center min-h-6 ${!subtitle ? "mt-16" : ""}`}
+                    className={`mb-2 text-sky-950 text-center min-h-6 ${!subtitle ? "mt-5" : ""}`}
                 >
                     {displayedGenres.length > 0 ? (
                         displayedGenres.map((genre, index) => (

@@ -92,14 +92,14 @@ export const MovieReviewForm = ({
                     <p id={`${id}-rating-hint`} className="sr-only">
                         Choose a rating from 1 (lowest) to 10 (highest).
                     </p>
-                    <div className="flex">
+                    <div className="grid grid-cols-10 w-full max-w-80">
                         {Array.from(
                             { length: 10 },
                             (_, index) => index + 1,
                         ).map((rating) => (
                             <div key={rating}>
                                 <label
-                                    className="rating-choice relative inline-block h-8 w-8 cursor-pointer"
+                                    className="rating-choice relative inline-block aspect-square w-full cursor-pointer"
                                     onMouseEnter={() => {
                                         if (!isUpdating) setHover(rating);
                                     }}
@@ -127,7 +127,7 @@ export const MovieReviewForm = ({
                                     />
                                     <span className="pointer-events-none">
                                         <StarIcon
-                                            className={`w-8 h-8 border-none hover:cursor-pointer ${rating <= (hover || userRating) ? "fill-orange-500" : "fill-orange-300"}`}
+                                            className={`w-full h-full stroke-orange-700 stroke-1 border-none hover:cursor-pointer ${rating <= (hover || userRating) ? "fill-orange-700" : "fill-orange-300"}`}
                                         />
                                     </span>
                                 </label>
@@ -179,7 +179,7 @@ export const MovieReviewForm = ({
                         try saving again.
                     </p>
                 )}
-                <div className="flex gap-10">
+                <div className="flex flex-wrap gap-x-3 gap-y-3 sm:gap-x-10">
                     <BaseButton
                         style="sky"
                         type="button"

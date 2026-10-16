@@ -43,8 +43,8 @@ export const MediaBookmark = <TItem extends MediaBookmarkItem>({
     const iconFilled = isHovered ? !hasSaved : hasSaved;
 
     const getIconColor = () => {
-        if (hasSaved && iconFilled) return "#0ea5e9";
-        if (hasSaved && !iconFilled) return "#38bdf8";
+        if (hasSaved && iconFilled) return "var(--color-sky-700)";
+        if (hasSaved && !iconFilled) return "var(--color-sky-600)";
         if (!hasSaved && iconFilled) return "#e0f2fe";
         return "#ffffff";
     };

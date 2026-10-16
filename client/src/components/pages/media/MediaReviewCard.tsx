@@ -100,10 +100,10 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
                             <StarIcon className="w-6 h-6 fill-sky-500 border-none" />
                         </span>
                         <span className="font-bold">{review.rating}</span>
-                        <span className="text-gray-500 font-bold">/10</span>
+                        <span className="text-gray-600 font-bold">/10</span>
                     </div>
                 </div>
-                <p className="text-sm text-gray-500">{parsedDate}</p>
+                <p className="text-sm text-gray-600">{parsedDate}</p>
             </div>
             {review.text ? (
                 <div>
@@ -131,9 +131,9 @@ export const MediaReviewCard = <TReview extends MediaReviewCardData>({
                     )}
                 </div>
             ) : (
-                <p className="w-full text-gray-500 italic mb-5">no review</p>
+                <p className="w-full text-gray-600 italic mb-5">no review</p>
             )}
-            <p className="text-gray-500 text-sm mt-5 mb-1">
+            <p className="text-gray-600 text-sm mt-5 mb-1">
                 {likeCount} {likeCount === 1 ? "like" : "likes"}
             </p>
             {userId && review.userId !== userId && (

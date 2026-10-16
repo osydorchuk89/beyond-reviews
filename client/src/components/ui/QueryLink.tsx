@@ -12,7 +12,7 @@ export const QueryLink = ({
     return (
         <button
             type="button"
-            className={`${isBold && "text-lg"} text-sky-800 hover:text-sky-500 ${isBold && "font-medium"} hover:underline cursor-pointer`}
+            className={`${isBold && "text-lg"} text-sky-800 hover:text-sky-700 ${isBold && "font-medium"} hover:underline cursor-pointer`}
             onClick={onClick}
         >
             {children}

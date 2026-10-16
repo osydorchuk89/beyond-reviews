@@ -61,7 +61,7 @@ export const RegistrationForm = () => {
         <Form
             noValidate
             encType="multipart/form-data"
-            className="flex flex-col justify-start w-[36rem] px-5 pt-5 pb-10 gap-5"
+            className="flex flex-col justify-start w-[36rem] max-w-full px-5 pt-5 pb-10 gap-5"
             onSubmit={handleSubmit(onSubmit)}
         >
             {!isSubmitting &&
@@ -80,7 +80,7 @@ export const RegistrationForm = () => {
                 </label>
                 <input
                     {...register("firstName")}
-                    className="border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
+                    className="min-w-0 max-w-full border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
                     type="text"
                     id="firstName"
                     placeholder="Jane"
@@ -107,7 +107,7 @@ export const RegistrationForm = () => {
                 </label>
                 <input
                     {...register("lastName")}
-                    className="border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
+                    className="min-w-0 max-w-full border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
                     type="text"
                     id="lastName"
                     placeholder="Doe"
@@ -134,7 +134,7 @@ export const RegistrationForm = () => {
                 </label>
                 <input
                     {...register("email")}
-                    className="border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
+                    className="min-w-0 max-w-full border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
                     type="email"
                     id="email"
                     placeholder="jane.doe@email.com"
@@ -161,7 +161,7 @@ export const RegistrationForm = () => {
                 </label>
                 <input
                     {...register("password")}
-                    className="border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
+                    className="min-w-0 max-w-full border border-gray-700 rounded-md px-3 py-2 focus:border-orange-900"
                     type="password"
                     id="password"
                     placeholder="password"
@@ -187,7 +187,7 @@ export const RegistrationForm = () => {
                 </label>
                 <input
                     {...register("photo")}
-                    className="w-fit file:border-none file:px-4 file:py-2 file:rounded-md file:text-orange-950 file:bg-orange-200 active:file:bg-orange-400 hover:file:cursor-pointer"
+                    className="min-w-0 max-w-full w-fit file:border-none file:px-4 file:py-2 file:rounded-md file:text-orange-950 file:bg-orange-200 active:file:bg-orange-400 hover:file:cursor-pointer"
                     type="file"
                     id="photo"
                     accept="image/jpeg,image/png,image/webp"

@@ -41,7 +41,7 @@ export const FriendRecommendationCard = ({
     const sharedFavoriteItems = recommendation.sharedFavoriteItems;
 
     return (
-        <li className="flex w-76 shrink-0 flex-col justify-between gap-5 rounded-lg bg-white/70 p-4">
+        <li className="relative flex w-76 shrink-0 flex-col justify-between gap-5 rounded-lg bg-white/70 p-4 [overflow-wrap:anywhere]">
             <div className="flex min-w-0 gap-3">
                 <img
                     src={recommendation.user.photo}

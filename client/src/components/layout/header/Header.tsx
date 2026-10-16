@@ -21,7 +21,7 @@ export const Header = () => {
             }`}
         >
             <Link
-                className={`${textSizes.heading} text-2xl font-semibold hover:text-orange-500`}
+                className={`${textSizes.heading} text-2xl font-semibold hover:text-orange-200`}
                 to="/"
                 onClick={(e) => {
                     if (pathname === "/") {

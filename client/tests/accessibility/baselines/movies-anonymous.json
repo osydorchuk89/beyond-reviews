@@ -1,18 +1,1 @@
-[
-  {
-    "rule": "color-contrast",
-    "findings": [
-      "A08"
-    ],
-    "nodes": [
-      {
-        "target": [
-          ".text-orange-500"
-        ],
-        "failedChecks": [
-          "color-contrast"
-        ]
-      }
-    ]
-  }
-]
+[]
