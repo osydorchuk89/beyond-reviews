@@ -113,4 +113,4 @@ Both projects use TypeScript 7. Run `npm --prefix client run typecheck` to check
 
 Run `npm --prefix client run test:run` for non-watch component tests and `npm --prefix client run test:a11y` for browser accessibility checks. Install Chromium first with `npm --prefix client exec playwright install chromium`. Browser tests start a separate client on port 5174 and use synthetic API responses, so no server or account credentials are needed.
 
-See [Accessibility Testing](docs/accessibility-testing.md) for commands, current failure baselines, and the manual checklist. The work follows the [WCAG 2.2 AA plan](docs/accessibility-plan.md); user messaging is deferred until after its refactor.
+For new or changed client UI, follow the repository's [WCAG 2.2 AA skill](client/.agents/skills/wcag-accessibility/SKILL.md), also linked from [client/AGENTS.md](client/AGENTS.md). It covers implementation patterns, design constraints, and validation. Keep the maintained tests and fixtures; generated reports and temporary previews are disposable. Accessibility scans directly require zero violations. Automated checks complement manual keyboard, screen-reader, and zoom evaluation.

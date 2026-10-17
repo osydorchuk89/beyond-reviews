@@ -14,7 +14,6 @@
         "test": "vitest",
         "test:run": "vitest run",
         "test:a11y": "playwright test",
-        "test:a11y:baseline": "playwright test --update-snapshots=all",
         "test:a11y:report": "playwright show-report"
     },
     "dependencies": {

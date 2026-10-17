@@ -27,6 +27,7 @@ Important server concerns:
 
 Important client concerns:
 
+- For client UI work, follow [client/AGENTS.md](client/AGENTS.md) and its repository-local WCAG 2.2 AA skill.
 - App entry points live in `client/src/main.tsx`, `client/src/App.tsx`, and `client/src/routes.ts`.
 - Shared UI and feature components live under `client/src/components`.
 - Client state and shared logic live under `client/src/store`, `client/src/hooks`, and `client/src/lib`.

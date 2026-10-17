@@ -3,24 +3,10 @@ import { expect, type Page, type TestInfo } from "@playwright/test";
 
 type ScanResults = Awaited<ReturnType<AxeBuilder["analyze"]>>;
 
-// Finding IDs link each allowed rule to the audit. Only observed nodes are baselined.
-const findingsByRule: Record<string, string[]> = {
-    "color-contrast": ["A08"],
-    label: ["A02", "A04"],
-    list: ["A12"],
-    listitem: ["A12"],
-    "landmark-one-main": ["A06"],
-    "page-has-heading-one": ["A06"],
-    region: ["A06"],
-    "heading-order": ["A06"],
-    "scrollable-region-focusable": ["A13"],
-};
-
 export function fingerprints(violations: ScanResults["violations"]) {
     return violations
         .map((violation) => ({
             rule: violation.id,
-            findings: findingsByRule[violation.id] ?? [],
             nodes: violation.nodes
                 .map((node) => ({
                     target: node.target,
@@ -87,10 +73,7 @@ export async function scan(page: Page, info: TestInfo, state: string) {
 
     const actual = fingerprints(results.violations);
     expect(
-        actual.filter((violation) => violation.findings.length === 0),
-        "Investigate unmapped rules and add them to the findings register before baselining",
+        actual,
+        "Fix accessibility violations before accepting this change",
     ).toEqual([]);
-    // Exact matching catches new nodes/checks and requires removal of resolved exceptions.
-    // Default/CI runs cannot create or update missing baselines.
-    expect(JSON.stringify(actual, null, 2)).toMatchSnapshot(`${state}.json`);
 }

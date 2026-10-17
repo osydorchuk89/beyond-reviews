@@ -1,17 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
 
-if (
-    process.env.CI &&
-    process.argv.some(
-        (argument) =>
-            argument === "-u" || argument.startsWith("--update-snapshots"),
-    )
-) {
-    throw new Error(
-        "Accessibility baselines must be reviewed locally, not updated in CI.",
-    );
-}
-
 export default defineConfig({
     testDir: "./tests/accessibility",
     testMatch: "**/*.spec.ts",
@@ -21,8 +9,6 @@ export default defineConfig({
     workers: 2,
     timeout: 45_000,
     expect: { timeout: 10_000 },
-    updateSnapshots: "none",
-    snapshotPathTemplate: "{testDir}/baselines/{arg}{ext}",
     reporter: [
         [process.env.CI ? "github" : "list"],
         ["html", { open: "never" }],
