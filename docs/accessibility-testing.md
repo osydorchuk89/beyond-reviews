@@ -1,6 +1,6 @@
 # Accessibility checks and remaining work
 
-Updated: 15 October 2026, after Phase 4's nonvisual work, approved error notifications, and restoration of the original selection appearance. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet.
+Updated: 17 October 2026, with Phase 5 fixes and Phase 6 journeys/recovery work. This is the testing guide for the [accessibility plan](accessibility-plan.md). It does not claim that the app meets WCAG yet. See the [Phase 6 evaluation record](accessibility-evaluation.md) for current evidence, the public-site check and remaining work.
 
 ## Run the checks
 
@@ -84,15 +84,15 @@ Evidence and affected source files are in the [audit](accessibility-audit.md#pri
 | A03 | Review draft loss and focus during saves | 3, urgent fixes early | Implemented; slow saves, duplicate prevention, failure/retry, network/session failures, reopening, and focus retested for books/movies 14 October |
 | A04 | Search labels | 3 | Search portion implemented and retested 14 October; message-input portion deferred |
 | A05 | Authentication labels, errors, instructions, autofill | 3 | Partly implemented: field associations, first-error focus, server errors, clipboard paste, autocomplete tokens, and photo validation retested 14 October; instruction text is screen-reader-only to preserve the UI; visible requirements and actual password-manager/screen-reader evaluation remain pending |
-| A06 | Main content, headings, titles, route focus | 2 | Implemented for normal/placeholder/missing-item pages and the existing user error boundary; structural and route-focus checks passed 14 October; screen-reader evaluation pending |
+| A06 | Main content, headings, titles, route focus | 2, 6 | Implemented for normal/placeholder/missing-item pages and root/catalog/detail/user error screens. Phase 6 also verifies title/focus recovery at the same URL after retry; actual screen-reader evaluation remains pending |
 | A07 | Tabs, toggles, and selected filters | 4, 5 | Code fixes implemented. Approved darker pagination, bookmarks and rating stars supply measured light/dark state distinctions; rejected underline/checkmark stay removed. Tabs/likes retain strong light/dark state differences; filters retain the selected remove control. Keyboard/state checks passed 16 October; manual screen-reader/visual evaluation remains pending; chat-selection portion deferred |
 | A08 | Contrast | 5 | Observed failures fixed with approved colors, outlines, hover treatments and stronger selected states. All 47 contrast-node exceptions removed from the 43 baseline states; no new exception added. Targeted rendered-color/hover/forced-color emulation checks passed 16 October. Full manual state/focus evaluation remains pending |
 | A09 | Narrow layouts, zoom, and text spacing | 5 | Approved code fixes implemented 16 October: fluid registration, responsive stars, wrapping review actions/pagination/filters, growing card headers/login, fitting recommendation panels and wrapping long names/titles/reviews. Targeted desktop, 320-pixel, doubled-font, long-content and spacing checks passed. Native zoom/text enlargement and final layout evaluation remain pending; messaging portion deferred |
-| A10 | Loading, errors, success feedback, removed-control focus | 4 | Code changes implemented and retested 15 October: confirmed success, request guards, hidden pending/success status, approved persistent error toasts, existing loading/success appearance, stale-tab response protection, and focus after acceptance/final load-more. Actual screen-reader announcements and final journey evaluation pending |
+| A10 | Loading, errors, success feedback, removed-control focus | 4, 6 | Confirmed success, request guards, pending/success status, persistent error toasts, stale-tab protection and removed-control focus are implemented. Phase 6 adds sign-out errors, accurate retry feedback and complete synthetic journeys; actual screen-reader announcements and manual journey evaluation remain pending |
 | A11 | Message input, sending, history, and announcements | After refactor | Deferred; remains unresolved |
 | A12 | Link/image names and list structure | 4 | Non-messaging code fixes implemented: contextual poster/link/action names and catalog/user-review list items retested 15 October; observed list failures removed from baselines; screen-reader/final journey evaluation pending; chat-list portion deferred |
 | A13 | Visible focus and keyboard access in scrolling areas | 2, 4, 5 | Partly implemented: Phase 2 focus fixes plus named keyboard-scrollable book/movie/friend recommendations, offscreen focus visibility, and retained arrow focus at limits retested 15 October; full scrolling/zoom/contrast evaluation remains open |
-| A14 | Error recovery and timed feedback | 6 | Open; existing user error page has a heading/title; root/catalog error recovery and process/timing evaluation remain pending |
+| A14 | Error recovery and timed feedback | 6 | Recovery code implemented: approved root/catalog/detail/user error screens with loader-only retry, restored title/focus, observed deferred rejections, genuine 404 pages, sign-in return after failed attempts, persistent sign-out errors and shared pending protection. Real session timing, screen-reader and deployed evaluation remain pending |
 
 ## Phase 1 validation
 
@@ -235,6 +235,12 @@ The second approved round is implemented:
 
 Synthetic-content inspection originally found horizontal overflow at a 320-pixel viewport from multiple selected filters (430-pixel document), unusually long profile names (493), long review/title content (2020), and long detail titles/descriptions (2253). The approved wrapping fixes now keep those documents at 320 pixels. All approved Phase 5 implementation work is complete. Native 200% text enlargement, real 400% browser zoom, and complete manual focus/target-size evaluation remain pending before this phase is fully closed. Messaging-specific work remains deferred.
 
+## Phase 6 validation
+
+On 17 October, all **213** isolated Chromium tests and **28** unit tests passed. Typechecking, linting and the production build passed. The **19 new tests** join complete sign-in/review/wishlist/social journeys and cover root/catalog/detail/user error recovery, lost connections, slow/repeated retries, restored titles/focus, genuine HTTP 404 responses, persistent sign-out failures and duplicate protection across desktop/mobile navigation. Successful recovery is checked for false failure announcements. All **57** axe baselines are empty; no new exception was added.
+
+Both supplied accounts also passed local authentication smoke checks. Six selected real-API page states had no axe violations or incomplete results. These checks do not establish screen-reader, native zoom or deployed-build conformance. The [evaluation record](accessibility-evaluation.md) lists exactly what was exercised and what still needs manual evaluation. The [statement](accessibility-statement.md) includes the confirmed feedback contact and remains documentation only, as requested; no app page or footer link was added.
+
 ## Manual evaluation record
 
 Use the [plan's journey table](accessibility-plan.md#what-to-test-in-this-round) to select routes and states. Record one result per criterion and route/state: **pass**, **fail**, **not applicable**, or **not yet tested**. Explain every not-applicable decision. Leave unresolved messaging findings deferred, not passed or not applicable.
@@ -245,63 +251,63 @@ For each completed check, record:
 | --- | --- | --- | --- | --- | --- |
 | Example: 2.4.3 | Mobile menu open | Not yet tested | Check entry, containment, Escape, return focus | Record versions during evaluation | Unassigned |
 
-The individual criterion checklist below starts as **not yet tested for final evaluation**. Earlier audit evidence and automated baselines do not close a criterion across all applicable routes. Recheck the deployed build before a conformance claim.
+The individual checklist below records evidence reviewed on 17 October and the remaining evaluation. **Pending** means there is evidence for part of the requirement but no final pass across applicable pages/processes. **Not applicable to tested content** is limited to the app content reviewed here: no audio/video player or motion/gesture feature was found in source or the exercised non-messaging routes. It does not clear deferred messaging, Google sign-in, or a different deployed build. Recheck rendered content after release. Automated test files named below are under `client/tests/accessibility/`.
 
-| Criterion | Requirement | Final evaluation status |
+| Criterion | Requirement | Review status and evidence / remaining check |
 | --- | --- | --- |
-| 1.1.1 | Non-text Content | Not yet tested |
-| 1.2.1 | Audio-only and Video-only (Prerecorded) | Not yet tested |
-| 1.2.2 | Captions (Prerecorded) | Not yet tested |
-| 1.2.3 | Audio Description or Media Alternative (Prerecorded) | Not yet tested |
-| 1.2.4 | Captions (Live) | Not yet tested |
-| 1.2.5 | Audio Description (Prerecorded) | Not yet tested |
-| 1.3.1 | Info and Relationships | Not yet tested |
-| 1.3.2 | Meaningful Sequence | Not yet tested |
-| 1.3.3 | Sensory Characteristics | Not yet tested |
-| 1.3.4 | Orientation | Not yet tested |
-| 1.3.5 | Identify Input Purpose | Not yet tested |
-| 1.4.1 | Use of Color | Not yet tested |
-| 1.4.2 | Audio Control | Not yet tested |
-| 1.4.3 | Contrast (Minimum) | Not yet tested |
-| 1.4.4 | Resize Text | Not yet tested |
-| 1.4.5 | Images of Text | Not yet tested |
-| 1.4.10 | Reflow | Not yet tested |
-| 1.4.11 | Non-text Contrast | Not yet tested |
-| 1.4.12 | Text Spacing | Not yet tested |
-| 1.4.13 | Content on Hover or Focus | Not yet tested |
-| 2.1.1 | Keyboard | Not yet tested |
-| 2.1.2 | No Keyboard Trap | Not yet tested |
-| 2.1.4 | Character Key Shortcuts | Not yet tested |
-| 2.2.1 | Timing Adjustable | Not yet tested |
-| 2.2.2 | Pause, Stop, Hide | Not yet tested |
-| 2.3.1 | Three Flashes or Below Threshold | Not yet tested |
-| 2.4.1 | Bypass Blocks | Not yet tested |
-| 2.4.2 | Page Titled | Not yet tested |
-| 2.4.3 | Focus Order | Not yet tested |
-| 2.4.4 | Link Purpose (In Context) | Not yet tested |
-| 2.4.5 | Multiple Ways | Not yet tested |
-| 2.4.6 | Headings and Labels | Not yet tested |
-| 2.4.7 | Focus Visible | Not yet tested |
-| 2.4.11 | Focus Not Obscured (Minimum) | Not yet tested |
-| 2.5.1 | Pointer Gestures | Not yet tested |
-| 2.5.2 | Pointer Cancellation | Not yet tested |
-| 2.5.3 | Label in Name | Not yet tested |
-| 2.5.4 | Motion Actuation | Not yet tested |
-| 2.5.7 | Dragging Movements | Not yet tested |
-| 2.5.8 | Target Size (Minimum) | Not yet tested |
-| 3.1.1 | Language of Page | Not yet tested |
-| 3.1.2 | Language of Parts | Not yet tested |
-| 3.2.1 | On Focus | Not yet tested |
-| 3.2.2 | On Input | Not yet tested |
-| 3.2.3 | Consistent Navigation | Not yet tested |
-| 3.2.4 | Consistent Identification | Not yet tested |
-| 3.2.6 | Consistent Help | Not yet tested |
-| 3.3.1 | Error Identification | Not yet tested |
-| 3.3.2 | Labels or Instructions | Not yet tested |
-| 3.3.3 | Error Suggestion | Not yet tested |
-| 3.3.4 | Error Prevention (Legal, Financial, Data) | Not yet tested |
-| 3.3.7 | Redundant Entry | Not yet tested |
-| 3.3.8 | Accessible Authentication (Minimum) | Not yet tested |
-| 4.1.2 | Name, Role, Value | Not yet tested |
-| 4.1.3 | Status Messages | Not yet tested |
+| 1.1.1 | Non-text Content | Pending: axe/naming checks; manually review real posters, avatars and icon names |
+| 1.2.1 | Audio-only and Video-only (Prerecorded) | Not applicable to tested content: no audio/video |
+| 1.2.2 | Captions (Prerecorded) | Not applicable to tested content: no video |
+| 1.2.3 | Audio Description or Media Alternative (Prerecorded) | Not applicable to tested content: no video |
+| 1.2.4 | Captions (Live) | Not applicable to tested content: no live video |
+| 1.2.5 | Audio Description (Prerecorded) | Not applicable to tested content: no video |
+| 1.3.1 | Info and Relationships | Pending: headings, lists, form/rating/tab semantics tested; screen-reader evaluation |
+| 1.3.2 | Meaningful Sequence | Pending: navigation/journey tests; manual reading and focus order with reflow |
+| 1.3.3 | Sensory Characteristics | Pending: review visible instructions and error/recovery wording in each process |
+| 1.3.4 | Orientation | Pending: responsive widths tested; manual landscape/portrait journeys |
+| 1.3.5 | Identify Input Purpose | Pending: autocomplete tokens and paste tested in forms; real password manager |
+| 1.4.1 | Use of Color | Pending: state semantics and measured light/dark differences; final visual state review |
+| 1.4.2 | Audio Control | Not applicable to tested content: no automatic audio |
+| 1.4.3 | Contrast (Minimum) | Pending: empty axe baselines and targeted hover/color checks; real assets/all states |
+| 1.4.4 | Resize Text | Pending: doubled-font layout checks; native 200% text enlargement |
+| 1.4.5 | Images of Text | Pending: inspect real assets; distinguish artwork/logo exceptions from UI text |
+| 1.4.10 | Reflow | Pending: 320-pixel and long-content tests; native 400% browser zoom |
+| 1.4.11 | Non-text Contrast | Pending: stars/bookmarks/focus measured or emulated; final visual state/theme review |
+| 1.4.12 | Text Spacing | Pending: layout/wrapping tests; manual review for lost content across journeys |
+| 1.4.13 | Content on Hover or Focus | Pending: hover states tested; confirm no author-controlled supplemental content missed |
+| 2.1.1 | Keyboard | Pending: component and complete keyboard-activation journeys; manual Tab-only journeys |
+| 2.1.2 | No Keyboard Trap | Pending: mobile-menu containment/Escape tested; manual all-process escape/return |
+| 2.1.4 | Character Key Shortcuts | Not applicable to tested content: no unmodified character shortcuts; Alt+T uses a modifier |
+| 2.2.1 | Timing Adjustable | Pending: errors remain available and mounted review drafts survive failures; real session timing |
+| 2.2.2 | Pause, Stop, Hide | Pending: essential loading indicators and toast timers reviewed; manual long-loading/animation check |
+| 2.3.1 | Three Flashes or Below Threshold | Pending: no flashing UI found; inspect real uploaded/third-party imagery |
+| 2.4.1 | Bypass Blocks | Pending: skip-link/main focus tested; screen-reader and deployed verification |
+| 2.4.2 | Page Titled | Pending: normal/missing/root/catalog/detail/user errors and retry titles tested; screen-reader/deployed check |
+| 2.4.3 | Focus Order | Pending: route/history/modal/removed-button focus tested; error recovery and manual journeys |
+| 2.4.4 | Link Purpose (In Context) | Pending: contextual link names tested; manual screen-reader links list |
+| 2.4.5 | Multiple Ways | Pending: catalogs/search/profile links provide routes; evaluate all non-process pages |
+| 2.4.6 | Headings and Labels | Pending: heading/label assertions and axe; manual meaningfulness review |
+| 2.4.7 | Focus Visible | Pending: keyboard styles and forced-color emulation tested; native theme/zoom checks |
+| 2.4.11 | Focus Not Obscured (Minimum) | Pending: sticky-header/menu/scroll checks; manual zoom and notification-overlay review |
+| 2.5.1 | Pointer Gestures | Not applicable to tested content: no custom multipoint/path gesture required |
+| 2.5.2 | Pointer Cancellation | Pending: native click controls used; manual pointer-down/cancel and file-control checks |
+| 2.5.3 | Label in Name | Pending: accessible-name locators/axe; manual visible-label comparison across states |
+| 2.5.4 | Motion Actuation | Not applicable to tested content: no device-motion feature/listener |
+| 2.5.7 | Dragging Movements | Pending: recommendation arrows/keyboard alternatives tested; manual scrollbar/reordering review |
+| 2.5.8 | Target Size (Minimum) | Pending: rating/filter target dimensions tested; all remaining target sizes/spacing/exceptions |
+| 3.1.1 | Language of Page | Pending: `lang="en"` in source; verify deployed documents and any new pages |
+| 3.1.2 | Language of Parts | Open: language handling for non-English reviews/user content needs evaluation |
+| 3.2.1 | On Focus | Pending: manual-activation tabs/route focus tested; manual all-control review |
+| 3.2.2 | On Input | Pending: explicit search/form submission tested; manual filters/ratings expectations |
+| 3.2.3 | Consistent Navigation | Pending: shared desktop/mobile navigation tested; manual cross-page comparison |
+| 3.2.4 | Consistent Identification | Pending: shared controls reused; compare action names/states manually |
+| 3.2.6 | Consistent Help | Pending: documented feedback contact confirmed; owner retained current app/footer, review consistent help placement if added |
+| 3.3.1 | Error Identification | Pending: field errors, preserved values and persistent action errors tested; screen-reader speech |
+| 3.3.2 | Labels or Instructions | Open: requirements are associated but screen-reader-only; visible registration guidance unresolved |
+| 3.3.3 | Error Suggestion | Pending: validation, corrections, approved retry screen and 404 links tested; manual screen-reader review |
+| 3.3.4 | Error Prevention (Legal, Financial, Data) | Pending: review edits/cancel and saved-item reversal tested; assess every applicable stored-data action |
+| 3.3.7 | Redundant Entry | Pending: failed-login/registration/review values retained in mounted forms; real multistep auth process |
+| 3.3.8 | Accessible Authentication (Minimum) | Pending: paste/autocomplete and local account smoke checks; complete journeys, password manager and Google return |
+| 4.1.2 | Name, Role, Value | Pending: semantic/state assertions and axe; real screen-reader control interaction |
+| 4.1.3 | Status Messages | Pending: status/alert counts and timing tested; actual spoken loading/success/error announcements |
 

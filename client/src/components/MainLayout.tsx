@@ -4,6 +4,7 @@ import { Header } from "./layout/header/Header";
 import { Footer } from "./layout/footer/Footer";
 import { PageNavigation } from "./PageNavigation";
 import { NotificationContainer } from "./ui/NotificationContainer";
+import { LogoutFeedback } from "./ui/LogoutFeedback";
 
 export const MainLayout = () => {
     const mainRef = useRef<HTMLElement>(null);
@@ -22,6 +23,7 @@ export const MainLayout = () => {
             </main>
             <Footer />
             <NotificationContainer />
+            <LogoutFeedback />
         </>
     );
 };

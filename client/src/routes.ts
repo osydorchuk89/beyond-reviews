@@ -19,7 +19,7 @@ import { UserWishlistPage } from "./components/pages/user/wishlist/UserWishlistP
 import { UserReviewsPage } from "./components/pages/user/reviews/UserReviewsPage";
 import { UserSettingsPage } from "./components/pages/user/settings/UserSettingsPage";
 import { NotFoundPage } from "./components/pages/NotFoundPage";
-import { ErrorPage } from "./components/pages/ErrorPage";
+import { ErrorPage, RootErrorPage } from "./components/pages/ErrorPage";
 import {
     loginLoader,
     booksLoader,
@@ -64,11 +64,13 @@ const revalidateAfterReview = ({
 export const router = createBrowserRouter([
     {
         Component: MainLayout,
+        ErrorBoundary: RootErrorPage,
         id: "root",
         loader: rootLoader,
         shouldRevalidate: revalidateAfterReview,
         children: [
             {
+                ErrorBoundary: ErrorPage,
                 children: [
                     {
                         index: true,

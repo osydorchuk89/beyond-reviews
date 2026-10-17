@@ -489,9 +489,11 @@ test.describe("Friend requests", () => {
         });
         await expect(sent).toHaveAttribute("aria-disabled", "true");
         await expect(sent).toBeFocused();
-        await expect(page.getByRole("status")).toContainText(
-            "Friend request sent to Casey Requester.",
-        );
+        await expect(
+            page
+                .getByRole("status")
+                .filter({ hasText: "Friend request sent to Casey Requester." }),
+        ).toHaveCount(1);
         await sent.press("Enter");
         expect(held.bodies).toHaveLength(2);
     });

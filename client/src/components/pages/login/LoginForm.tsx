@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -21,7 +22,9 @@ export const LoginForm = () => {
         navigation.state !== "idle" && navigation.formAction === "/login";
 
     const location = useLocation() as Location<LocationState>;
-    const from = location.state?.from ?? "/";
+    // A failed form action can clear location.state. Keep the original return
+    // page through retries so users can continue the task that led to sign-in.
+    const from = useRef(location.state?.from ?? "/").current;
 
     const {
         register,

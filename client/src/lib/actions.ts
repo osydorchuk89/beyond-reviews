@@ -64,7 +64,7 @@ export const logoutAction = async () => {
         await axiosInstance.post("/auth/logout");
         return null;
     } catch {
-        return { error: "Logout failed" };
+        return { error: "Could not sign out. Try again." };
     }
 };
 

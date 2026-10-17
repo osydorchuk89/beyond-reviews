@@ -16,7 +16,7 @@ export const LoginPage = () => {
     }, [actionData]);
 
     return (
-        <div className="flex flex-col justify-center items-center py-10 min-h-[720px]">
+        <div className="flex flex-col justify-center items-center py-10 min-h-[840px]">
             <div
                 ref={containerRef}
                 className="flex flex-col justify-center items-center"

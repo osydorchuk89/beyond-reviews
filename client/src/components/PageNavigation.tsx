@@ -1,5 +1,10 @@
 import { useLayoutEffect, useRef, type RefObject } from "react";
-import { useLocation, useMatches, useNavigation } from "react-router";
+import {
+    useLocation,
+    useMatches,
+    useNavigation,
+    useRevalidator,
+} from "react-router";
 import { getPageMetadata } from "../lib/pageMetadata";
 
 interface PageNavigationProps {
@@ -9,11 +14,12 @@ interface PageNavigationProps {
 export const PageNavigation = ({ mainRef }: PageNavigationProps) => {
     const { pathname } = useLocation();
     const navigation = useNavigation();
+    const revalidator = useRevalidator();
     const { documentTitle } = getPageMetadata(useMatches());
     const previousPathname = useRef(pathname);
 
     useLayoutEffect(() => {
-        if (navigation.state !== "idle") return;
+        if (navigation.state !== "idle" || revalidator.state !== "idle") return;
         const main = mainRef.current;
         const heading = main?.querySelector<HTMLHeadingElement>("h1");
         // An existing route error boundary can override the normal route's title.
@@ -29,7 +35,7 @@ export const PageNavigation = ({ mainRef }: PageNavigationProps) => {
             (heading ?? main)?.focus({ preventScroll: true });
         });
         return () => cancelAnimationFrame(frame);
-    }, [pathname, navigation.state, documentTitle, mainRef]);
+    }, [pathname, navigation.state, revalidator.state, documentTitle, mainRef]);
 
     return null;
 };

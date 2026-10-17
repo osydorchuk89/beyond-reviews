@@ -1,6 +1,6 @@
 # Client accessibility plan: WCAG 2.2 AA
 
-Updated: 16 October 2026. Based on the code review and local browser checks at `79a1499`, with implementation progress recorded below.
+Updated: 17 October 2026. Based on the code review and local browser checks at `79a1499`, with implementation progress recorded below.
 
 The goal is to make the client easier to use with a keyboard, screen reader, enlarged text, and small screens, and to meet the applicable WCAG 2.2 Level A and AA requirements.
 
@@ -114,12 +114,14 @@ Developer reference: findings A08, A09, and A13. Measure actual rendered colors 
 
 ## Phase 6 — Test complete journeys and keep checking
 
+**Implementation on 17 October 2026; final manual evaluation pending:** added complete synthetic keyboard journeys for sign-in, reviews, saved items and friends. Failed page loads now use the approved recovery screen with retry, useful title/focus, and a home link; genuine HTTP 404 responses use the existing missing-item pages. Fixed sign-in return navigation across retries, deferred-request rejection handling and sign-out failure feedback. Both real accounts passed local authentication smoke checks; selected real pages also passed axe checks. The [accessibility statement](accessibility-statement.md) includes the confirmed contact email and stays as documentation only, as requested; no page/footer link was added. See the [evaluation record and remaining checks](accessibility-evaluation.md). Screen-reader, native zoom, full authentication integration and current deployed-build evaluation remain pending. Phase 6 is not yet fully closed.
+
 **Purpose:** Verify that the fixes work together in normal use and when something goes wrong.
 
 - Test complete journeys with a keyboard and screen reader, including signing in, finding media, writing reviews, saving items, and managing friend requests.
 - Test errors, slow requests, missing items, expired sessions, browser Back/Forward, and useful recovery options. Make error pages accessible.
 - Finish the WCAG checklist for the current scope and record any remaining gaps. Check the deployed build as well as the local app.
-- Keep automated checks running for future changes and publish an accurate accessibility statement that explains the messaging deferral.
+- Keep automated checks running for future changes and maintain an accurate accessibility statement that explains the messaging deferral. At the owner's request, keep it in repository documentation rather than adding an app page or footer link.
 
 **Done when:** The journeys in the current scope pass their applicable automated and manual checks, and the remaining messaging work is clearly recorded.
 

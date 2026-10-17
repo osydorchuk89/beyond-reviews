@@ -53,7 +53,7 @@ export const Header = () => {
                     <ButtonLink
                         style="orange"
                         to="/login"
-                        state={{ from: location.pathname }}
+                        state={{ from: pathname }}
                     >
                         LOGIN
                     </ButtonLink>

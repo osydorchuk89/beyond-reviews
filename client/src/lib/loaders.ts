@@ -1,4 +1,5 @@
 import { type LoaderFunctionArgs, redirect } from "react-router";
+import { isAxiosError } from "axios";
 
 import {
     getAuthData,
@@ -30,6 +31,12 @@ const unavailableBookRecommendationsData: BookRecommendationsData = {
     recommendationsAvailable: false,
 };
 
+const missingMedia = (error: unknown) => {
+    // Use the existing missing-item screen only for a genuine API 404.
+    if (isAxiosError(error) && error.response?.status === 404) return null;
+    throw error;
+};
+
 export const rootLoader = async () => {
     const authData = await getAuthData();
     return { authData };
@@ -59,6 +66,9 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
         sortOrder,
         search,
     );
+    // The request may reject before the root loader lets Await mount. Observe
+    // it now; the original rejection still reaches the route error boundary.
+    void moviesDataPromise.catch(() => undefined);
     const movieRecommendationsDataPromise = getAuthData()
         .then((authData) =>
             authData.user ? getMovieRecommendations(authData.user.id) : null,
@@ -71,21 +81,20 @@ export const moviesLoader = ({ request }: LoaderFunctionArgs) => {
 export const movieLoader = async ({ params }: LoaderFunctionArgs) => {
     const { movieId } = params as { movieId: string };
 
-    const authDataPromise = getAuthData();
-    const moviePromise = getMovie(movieId);
+    // Observe both requests together, including failures before auth completes.
+    const [authData, movie] = await Promise.all([
+        getAuthData(),
+        getMovie(movieId).catch(missingMedia),
+    ]);
+    if (!movie) return { movie, movieReviewsData: null };
 
-    const authData = await authDataPromise;
-    const movieReviewsDataPromise = getMovieReviews(
+    const movieReviewsData = await getMovieReviews(
         movieId,
         1,
         10,
         authData.user?.id,
     );
 
-    const [movie, movieReviewsData] = await Promise.all([
-        moviePromise,
-        movieReviewsDataPromise,
-    ]);
     return { movie, movieReviewsData };
 };
 
@@ -145,7 +154,7 @@ export const bookLoader = async ({ params }: LoaderFunctionArgs) => {
 
     const authDataPromise = getAuthData();
     const authData = await authDataPromise;
-    const bookPromise = getBook(bookId, authData.user?.id);
+    const bookPromise = getBook(bookId, authData.user?.id).catch(missingMedia);
     const bookReviewsDataPromise = getBookReviews(
         bookId,
         1,
@@ -182,6 +191,7 @@ export const booksLoader = ({ request }: LoaderFunctionArgs) => {
         sortOrder,
         search,
     );
+    void booksDataPromise.catch(() => undefined);
     const bookRecommendationsDataPromise = getAuthData()
         .then((authData) =>
             authData.user
