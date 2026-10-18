@@ -19,6 +19,7 @@ import { resolveAuthUser } from "./lib/auth-http.js";
 import { BASE_CLIENT_URL } from "./config/constants.js";
 
 const app = express();
+app.disable("x-powered-by");
 
 const corsOptions = {
     origin: BASE_CLIENT_URL,

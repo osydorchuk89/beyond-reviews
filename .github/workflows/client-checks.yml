@@ -29,12 +29,12 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: client/package-lock.json
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:run
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+      - run: npm run test:a11y:install
       - run: npm run test:a11y
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}

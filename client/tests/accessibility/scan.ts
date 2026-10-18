@@ -16,7 +16,10 @@ export function fingerprints(violations: ScanResults["violations"]) {
                                 (check) => check.id,
                             ),
                         ),
-                    ].sort(),
+                    ].sort((left, right) => {
+                        if (left === right) return 0;
+                        return left < right ? -1 : 1;
+                    }),
                 }))
                 .sort((a, b) =>
                     JSON.stringify(a).localeCompare(JSON.stringify(b), "en"),
