@@ -105,7 +105,7 @@ Alternatively, run `npm run format` inside `client/` or `server/`. Each command 
 
 Run `npm run lint` inside either project to check Biome's recommended rules without changing files. The client also explicitly enables React Hooks and component export checks for Fast Refresh. Linting and TypeScript compilation are separate checks; use `npm run build` for compiler validation.
 
-In `server/`, run `npm run typecheck` to check application code, development scripts, and tests together without emitting JavaScript. The server build checks only production application code under `src/`.
+In `server/`, run `npm run typecheck` to check application code and tests together without emitting JavaScript. The server build checks only production application code under `src/`.
 
 Both projects use TypeScript 7. Run `npm --prefix client run typecheck` to check frontend code, its tests, and the Vite/Vitest configuration without bundling. The client build also performs this type check before the Vite production build. Run `npm --prefix server run typecheck` for the full server check.
 

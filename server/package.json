@@ -21,7 +21,6 @@
     "license": "ISC",
     "devDependencies": {
         "@biomejs/biome": "2.5.15",
-        "@faker-js/faker": "^9.9.0",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
         "@types/multer": "^1.4.12",
